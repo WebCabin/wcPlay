@@ -1,0 +1,34 @@
+{
+  "name": "wcPlay",
+  "description": "wcPlay (Web Cabin Play) is a node based visual scripting editor tool.",
+  "version": "1.0.0",
+  "keywords": [
+    "css",
+    "js",
+    "tool",
+    "scripting",
+    "web",
+    "dynamic"
+  ],
+  "homepage": "http://play.webcabin.org/",
+  "main": [
+    "Build",
+    "Build/Themes"
+  ],
+  "ignore": [
+    "/.*",
+    "favicon.ico",
+    "index.html",
+    "indexBin.html",
+    "demo.js",
+    "Code",
+    "Compiler",
+    "images",
+    "Themes"
+  ],
+  "dependencies": {
+    "jquery": "1.11.1",
+    "font-awesome": "4.2.0"
+  },
+  "license": "MIT"
+}

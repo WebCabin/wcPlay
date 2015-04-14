@@ -1,0 +1,7 @@
+/**
+ * Options for a [NUMBER]{@link wcPlay.PROP_TYPE} property.
+ * @typedef {Object} wcPlay~NumberOptions
+ * @property {Number} [min=-Infinity] - The minimum value of the number range.
+ * @property {Number} [max=Infinity] - The maximum value of the number range.
+ * @property {Number} [step=1] - The amount the value will go up or down when the user clicks the up and down arrow controls.
+ */

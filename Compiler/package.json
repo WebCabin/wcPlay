@@ -1,0 +1,25 @@
+{
+  "name": "web-cabin-play",
+  "author": "Web Cabin",
+  "version": "1.0.0",
+  "description": "Web Cabin Play is a node based visual scripting tool written in JavaScript under the MIT License.",
+  "main": "compiler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node compiler.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gihub.com/WebCabin/wcPlay.git"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": "~0.10"
+  },
+  "dependencies": {
+    "uglify-js": "1.3.5",
+    "uglifycss": "0.0.9",
+    "jsdoc": "<=3.3.0",
+    "ink-docstrap": "git+https://github.com/WebCabin/docstrap.git"
+  }
+}
