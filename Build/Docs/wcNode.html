@@ -27,7 +27,14 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcPlay.html">wcPlay</a></li>
+					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcPlay.html">wcPlay</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="global.html#triggerCondition">triggerCondition</a></li>
 				</ul>
 			</li>
 			
@@ -65,7 +72,7 @@
         
 <hr>
 <dt>
-    <h4 class="name" id="wcNode"><toc class="small"><i></i></toc><toc> </toc><toc>new </toc><toc><b>wcNode</b>(parent, name, pos)</toc>
+    <h4 class="name" id="wcNode"><toc class="small"><i></i></toc><toc> </toc><toc>new </toc><toc><b>wcNode</b>(parent, pos, name)</toc>
         
     </h4>
 
@@ -75,7 +82,7 @@
     
     
     <div class="description">
-        <p style="margin-left: 20px;">The base class for all nodes, contains the core functionality of a node.</p>
+        <p style="margin-left: 20px;">The foundation class for all nodes.<br>When inheriting, make sure to include 'this._super(parent, name, pos);' at the top of your init functions.</p>
     </div>
     
 
@@ -133,29 +140,6 @@
 
         <tr>
             
-                <td class="name"><code>name</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The name of the node, as displayed on the title bar.</td>
-        </tr>
-
-	
-
-        <tr>
-            
                 <td class="name"><code>pos</code></td>
             
 
@@ -173,6 +157,29 @@
             
 
             <td class="description last">The position of this node in the visual editor.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The name of the node, as displayed on the title bar.</td>
         </tr>
 
 	
@@ -442,13 +449,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="node.js.html">node.js</a>,
-     <a href="node.js.html#sunlight-1-line-806">line 806</a>
+     <a href="node.js.html#sunlight-1-line-897">line 897</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="node.js.html">node.js</a>,
-				 <a href="node.js.html#sunlight-1-line-806">line 806</a>
+				 <a href="node.js.html#sunlight-1-line-897">line 897</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -671,13 +678,242 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="node.js.html">node.js</a>,
-     <a href="node.js.html#sunlight-1-line-795">line 795</a>
+     <a href="node.js.html#sunlight-1-line-886">line 886</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="node.js.html">node.js</a>,
-				 <a href="node.js.html#sunlight-1-line-795">line 795</a>
+				 <a href="node.js.html#sunlight-1-line-886">line 886</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt class="name" id=".PROPERTY">
+    <h4><toc class="small"><i>static</i></toc><toc> </toc>
+        var
+        <b><toc>PROPERTY</toc></b>
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p style="margin-left:20px;">Default property type names.</p>
+    </div>
+    
+
+    
+        <h5>Type: 
+<span class="param-type">String</span>
+
+</h5>
+    
+
+    
+<dl class="details">
+	
+
+	<h5 class="subsection-title">Properties:</h5>
+
+	<dl>
+
+<div class="prop-container">
+<table class="props table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+		<th>Default</th>
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>ENABLED</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    enabled
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>LOG</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    debug log
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>BREAK</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    debug break
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>TRIGGER</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    trigger
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+</div></dl>
+
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="node.js.html">node.js</a>,
+     <a href="node.js.html#sunlight-1-line-908">line 908</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="node.js.html">node.js</a>,
+				 <a href="node.js.html#sunlight-1-line-908">line 908</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -886,13 +1122,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="node.js.html">node.js</a>,
-     <a href="node.js.html#sunlight-1-line-205">line 205</a>
+     <a href="node.js.html#sunlight-1-line-273">line 273</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="node.js.html">node.js</a>,
-				 <a href="node.js.html#sunlight-1-line-205">line 205</a>
+				 <a href="node.js.html#sunlight-1-line-273">line 273</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -911,7 +1147,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="connectExit"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>connectExit</b>(name, targetNode)</toc>
+    <h4 class="name" id="connectExit"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>connectExit</b>(name, targetNode, targetName)</toc>
         
         >
         
@@ -928,7 +1164,7 @@
     
     
     <div class="description">
-        <p style="margin-left: 20px;">Connects an exit link on this ndoe to an entry link of another.</p>
+        <p style="margin-left: 20px;">Connects an exit link on this node to an entry link of another.</p>
     </div>
     
 
@@ -1006,6 +1242,29 @@
         </tr>
 
 	
+
+        <tr>
+            
+                <td class="name"><code>targetName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The name of the target node's entry link to link to.</td>
+        </tr>
+
+	
 	</tbody>
 </table>
 
@@ -1070,13 +1329,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="node.js.html">node.js</a>,
-     <a href="node.js.html#sunlight-1-line-271">line 271</a>
+     <a href="node.js.html#sunlight-1-line-339">line 339</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="node.js.html">node.js</a>,
-				 <a href="node.js.html#sunlight-1-line-271">line 271</a>
+				 <a href="node.js.html#sunlight-1-line-339">line 339</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -1277,13 +1536,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="node.js.html">node.js</a>,
-     <a href="node.js.html#sunlight-1-line-336">line 336</a>
+     <a href="node.js.html#sunlight-1-line-405">line 405</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="node.js.html">node.js</a>,
-				 <a href="node.js.html#sunlight-1-line-336">line 336</a>
+				 <a href="node.js.html#sunlight-1-line-405">line 405</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -1484,13 +1743,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="node.js.html">node.js</a>,
-     <a href="node.js.html#sunlight-1-line-402">line 402</a>
+     <a href="node.js.html#sunlight-1-line-471">line 471</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="node.js.html">node.js</a>,
-				 <a href="node.js.html#sunlight-1-line-402">line 402</a>
+				 <a href="node.js.html#sunlight-1-line-471">line 471</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -1509,7 +1768,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="createEntry"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>createEntry</b>(name)</toc>
+    <h4 class="name" id="createEntry"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>createEntry</b>(<span class="optional">name</span>)</toc>
         
         >
         
@@ -1549,7 +1808,11 @@
 		<th>Type</th>
 
 		
+		<th>Argument</th>
+		
 
+		
+		<th>Default</th>
 		
 
 		<th class="last">Description</th>
@@ -1574,7 +1837,23 @@
             </td>
 
             
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
 
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    "In"
+                
+                </td>
             
 
             <td class="description last">The name of the entry link.</td>
@@ -1645,13 +1924,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="node.js.html">node.js</a>,
-     <a href="node.js.html#sunlight-1-line-85">line 85</a>
+     <a href="node.js.html#sunlight-1-line-145">line 145</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="node.js.html">node.js</a>,
-				 <a href="node.js.html#sunlight-1-line-85">line 85</a>
+				 <a href="node.js.html#sunlight-1-line-145">line 145</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -1670,7 +1949,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="createExit"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>createExit</b>(name)</toc>
+    <h4 class="name" id="createExit"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>createExit</b>(<span class="optional">name</span>)</toc>
         
         >
         
@@ -1710,7 +1989,11 @@
 		<th>Type</th>
 
 		
+		<th>Argument</th>
+		
 
+		
+		<th>Default</th>
 		
 
 		<th class="last">Description</th>
@@ -1735,7 +2018,23 @@
             </td>
 
             
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
 
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    "Out"
+                
+                </td>
             
 
             <td class="description last">The name of the exit link.</td>
@@ -1806,13 +2105,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="node.js.html">node.js</a>,
-     <a href="node.js.html#sunlight-1-line-106">line 106</a>
+     <a href="node.js.html#sunlight-1-line-170">line 170</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="node.js.html">node.js</a>,
-				 <a href="node.js.html#sunlight-1-line-106">line 106</a>
+				 <a href="node.js.html#sunlight-1-line-170">line 170</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -1928,7 +2227,7 @@
             <td class="type">
             
                 
-<span class="param-type"><a href="wcPlay.html#.VALUE_CONTROL_TYPE">wcPlay.VALUE_CONTROL_TYPE</a></span>
+<span class="param-type"><a href="wcPlay.html#.PROPERTY_TYPE">wcPlay.PROPERTY_TYPE</a></span>
 
 
             
@@ -1949,7 +2248,7 @@
             
                 <td class="default">
                 
-                    wcPlay.VALUE_CONTROL_TYPE.NONE
+                    wcPlay.PROPERTY_TYPE.NONE
                 
                 </td>
             
@@ -2028,7 +2327,7 @@
                 </td>
             
 
-            <td class="description last">Additional options for this property, see <a href="wcPlay.html#.VALUE_CONTROL_TYPE">wcPlay.VALUE_CONTROL_TYPE</a>.</td>
+            <td class="description last">Additional options for this property, see <a href="wcPlay.html#.PROPERTY_TYPE">wcPlay.PROPERTY_TYPE</a>.</td>
         </tr>
 
 	
@@ -2096,13 +2395,359 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="node.js.html">node.js</a>,
-     <a href="node.js.html#sunlight-1-line-126">line 126</a>
+     <a href="node.js.html#sunlight-1-line-194">line 194</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="node.js.html">node.js</a>,
-				 <a href="node.js.html#sunlight-1-line-126">line 126</a>
+				 <a href="node.js.html#sunlight-1-line-194">line 194</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="debugLog"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>debugLog</b>(<span class="optional">enabled</span>)</toc>
+        
+        >
+        
+        <i><small>
+<span class="param-type">Boolean</span>
+
+</small></i>
+        
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p style="margin-left: 20px;">Sets, or Gets this node's debug log state.</p>
+    </div>
+    
+
+    
+
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>enabled</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">If supplied, will assign a new debug log state.</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+    
+<h5>Returns: 
+<span class="param-type">Boolean</span>
+
+</h5>
+    
+            <p class="param-desc" style="margin-left: 20px;">
+    
+		 The current debug log state.
+	</p>
+
+        
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="node.js.html">node.js</a>,
+     <a href="node.js.html#sunlight-1-line-91">line 91</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="node.js.html">node.js</a>,
+				 <a href="node.js.html#sunlight-1-line-91">line 91</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="debugPause"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>debugPause</b>(<span class="optional">enabled</span>)</toc>
+        
+        >
+        
+        <i><small>
+<span class="param-type">Boolean</span>
+
+</small></i>
+        
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p style="margin-left: 20px;">Sets, or Gets this node's debug pause state.</p>
+    </div>
+    
+
+    
+
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>enabled</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">If supplied, will assign a new debug pause state.</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+    
+<h5>Returns: 
+<span class="param-type">Boolean</span>
+
+</h5>
+    
+            <p class="param-desc" style="margin-left: 20px;">
+    
+		 The current debug pause state.
+	</p>
+
+        
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="node.js.html">node.js</a>,
+     <a href="node.js.html#sunlight-1-line-105">line 105</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="node.js.html">node.js</a>,
+				 <a href="node.js.html#sunlight-1-line-105">line 105</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -2306,13 +2951,106 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="node.js.html">node.js</a>,
-     <a href="node.js.html#sunlight-1-line-700">line 700</a>
+     <a href="node.js.html#sunlight-1-line-772">line 772</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="node.js.html">node.js</a>,
-				 <a href="node.js.html#sunlight-1-line-700">line 700</a>
+				 <a href="node.js.html#sunlight-1-line-772">line 772</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="destroy"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>destroy</b>()</toc>
+        
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p style="margin-left: 20px;">Destroys and removes the node.</p>
+    </div>
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="node.js.html">node.js</a>,
+     <a href="node.js.html#sunlight-1-line-38">line 38</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="node.js.html">node.js</a>,
+				 <a href="node.js.html#sunlight-1-line-38">line 38</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -2540,13 +3278,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="node.js.html">node.js</a>,
-     <a href="node.js.html#sunlight-1-line-468">line 468</a>
+     <a href="node.js.html#sunlight-1-line-537">line 537</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="node.js.html">node.js</a>,
-				 <a href="node.js.html#sunlight-1-line-468">line 468</a>
+				 <a href="node.js.html#sunlight-1-line-537">line 537</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -2774,13 +3512,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="node.js.html">node.js</a>,
-     <a href="node.js.html#sunlight-1-line-504">line 504</a>
+     <a href="node.js.html#sunlight-1-line-573">line 573</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="node.js.html">node.js</a>,
-				 <a href="node.js.html#sunlight-1-line-504">line 504</a>
+				 <a href="node.js.html#sunlight-1-line-573">line 573</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -3008,13 +3746,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="node.js.html">node.js</a>,
-     <a href="node.js.html#sunlight-1-line-540">line 540</a>
+     <a href="node.js.html#sunlight-1-line-609">line 609</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="node.js.html">node.js</a>,
-				 <a href="node.js.html#sunlight-1-line-540">line 540</a>
+				 <a href="node.js.html#sunlight-1-line-609">line 609</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -3242,13 +3980,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="node.js.html">node.js</a>,
-     <a href="node.js.html#sunlight-1-line-576">line 576</a>
+     <a href="node.js.html#sunlight-1-line-645">line 645</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="node.js.html">node.js</a>,
-				 <a href="node.js.html#sunlight-1-line-576">line 576</a>
+				 <a href="node.js.html#sunlight-1-line-645">line 645</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -3415,13 +4153,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="node.js.html">node.js</a>,
-     <a href="node.js.html#sunlight-1-line-45">line 45</a>
+     <a href="node.js.html#sunlight-1-line-77">line 77</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="node.js.html">node.js</a>,
-				 <a href="node.js.html#sunlight-1-line-45">line 45</a>
+				 <a href="node.js.html#sunlight-1-line-77">line 77</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -3524,13 +4262,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="node.js.html">node.js</a>,
-     <a href="node.js.html#sunlight-1-line-32">line 32</a>
+     <a href="node.js.html#sunlight-1-line-64">line 64</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="node.js.html">node.js</a>,
-				 <a href="node.js.html#sunlight-1-line-32">line 32</a>
+				 <a href="node.js.html#sunlight-1-line-64">line 64</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -3633,13 +4371,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="node.js.html">node.js</a>,
-     <a href="node.js.html#sunlight-1-line-59">line 59</a>
+     <a href="node.js.html#sunlight-1-line-119">line 119</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="node.js.html">node.js</a>,
-				 <a href="node.js.html#sunlight-1-line-59">line 59</a>
+				 <a href="node.js.html#sunlight-1-line-119">line 119</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -3890,13 +4628,201 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="node.js.html">node.js</a>,
-     <a href="node.js.html#sunlight-1-line-716">line 716</a>
+     <a href="node.js.html#sunlight-1-line-788">line 788</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="node.js.html">node.js</a>,
-				 <a href="node.js.html#sunlight-1-line-716">line 716</a>
+				 <a href="node.js.html#sunlight-1-line-788">line 788</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="onPropertyChanged"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onPropertyChanged</b>(name, oldValue, newValue)</toc>
+        
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p style="margin-left: 20px;">Event that is called when a property has changed.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
+    </div>
+    
+
+    
+
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The name of the property.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>oldValue</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The old value of the property.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>newValue</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The new value of the property.</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="nodeentry.js.html">nodeentry.js</a>,
+     <a href="nodeentry.js.html#sunlight-1-line-42">line 42</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="nodeentry.js.html">nodeentry.js</a>,
+				 <a href="nodeentry.js.html#sunlight-1-line-42">line 42</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -4078,13 +5004,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="node.js.html">node.js</a>,
-     <a href="node.js.html#sunlight-1-line-760">line 760</a>
+     <a href="node.js.html#sunlight-1-line-842">line 842</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="node.js.html">node.js</a>,
-				 <a href="node.js.html#sunlight-1-line-760">line 760</a>
+				 <a href="node.js.html#sunlight-1-line-842">line 842</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -4285,13 +5211,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="node.js.html">node.js</a>,
-     <a href="node.js.html#sunlight-1-line-748">line 748</a>
+     <a href="node.js.html#sunlight-1-line-827">line 827</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="node.js.html">node.js</a>,
-				 <a href="node.js.html#sunlight-1-line-748">line 748</a>
+				 <a href="node.js.html#sunlight-1-line-827">line 827</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -4378,13 +5304,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="node.js.html">node.js</a>,
-     <a href="node.js.html#sunlight-1-line-730">line 730</a>
+     <a href="node.js.html#sunlight-1-line-802">line 802</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="node.js.html">node.js</a>,
-				 <a href="node.js.html#sunlight-1-line-730">line 730</a>
+				 <a href="node.js.html#sunlight-1-line-802">line 802</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -4520,13 +5446,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="node.js.html">node.js</a>,
-     <a href="node.js.html#sunlight-1-line-738">line 738</a>
+     <a href="node.js.html#sunlight-1-line-813">line 813</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="node.js.html">node.js</a>,
-				 <a href="node.js.html#sunlight-1-line-738">line 738</a>
+				 <a href="node.js.html#sunlight-1-line-813">line 813</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -4545,7 +5471,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="property"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>property</b>(name, <span class="optional">value</span>, <span class="optional">iteration</span>)</toc>
+    <h4 class="name" id="property"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>property</b>(name, <span class="optional">value</span>, <span class="optional">forceChange</span>)</toc>
         
         >
         
@@ -4666,13 +5592,13 @@
 
         <tr>
             
-                <td class="name"><code>iteration</code></td>
+                <td class="name"><code>forceChange</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Number</span>
+<span class="param-type">Boolean</span>
 
 
             
@@ -4692,7 +5618,7 @@
 
             
 
-            <td class="description last">Should be omitted, used internally to prevent infinite loops.</td>
+            <td class="description last">If value is supplied, set this to true if you want to force the change event to be sent to all chained properties.</td>
         </tr>
 
 	
@@ -4763,13 +5689,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="node.js.html">node.js</a>,
-     <a href="node.js.html#sunlight-1-line-651">line 651</a>
+     <a href="node.js.html#sunlight-1-line-732">line 732</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="node.js.html">node.js</a>,
-				 <a href="node.js.html#sunlight-1-line-651">line 651</a>
+				 <a href="node.js.html#sunlight-1-line-732">line 732</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -4924,13 +5850,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="node.js.html">node.js</a>,
-     <a href="node.js.html#sunlight-1-line-160">line 160</a>
+     <a href="node.js.html#sunlight-1-line-228">line 228</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="node.js.html">node.js</a>,
-				 <a href="node.js.html#sunlight-1-line-160">line 160</a>
+				 <a href="node.js.html#sunlight-1-line-228">line 228</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -5085,13 +6011,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="node.js.html">node.js</a>,
-     <a href="node.js.html#sunlight-1-line-175">line 175</a>
+     <a href="node.js.html#sunlight-1-line-243">line 243</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="node.js.html">node.js</a>,
-				 <a href="node.js.html#sunlight-1-line-175">line 175</a>
+				 <a href="node.js.html#sunlight-1-line-243">line 243</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -5246,13 +6172,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="node.js.html">node.js</a>,
-     <a href="node.js.html#sunlight-1-line-190">line 190</a>
+     <a href="node.js.html#sunlight-1-line-258">line 258</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="node.js.html">node.js</a>,
-				 <a href="node.js.html#sunlight-1-line-190">line 190</a>
+				 <a href="node.js.html#sunlight-1-line-258">line 258</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -5339,13 +6265,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="node.js.html">node.js</a>,
-     <a href="node.js.html#sunlight-1-line-76">line 76</a>
+     <a href="node.js.html#sunlight-1-line-136">line 136</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="node.js.html">node.js</a>,
-				 <a href="node.js.html#sunlight-1-line-76">line 76</a>
+				 <a href="node.js.html#sunlight-1-line-136">line 136</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -5371,7 +6297,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="triggerEntry"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>triggerEntry</b>(name)</toc>
+    <h4 class="name" id="triggerEntry"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>triggerEntry</b>(<span class="optional">name</span>)</toc>
         
         >
         
@@ -5411,7 +6337,11 @@
 		<th>Type</th>
 
 		
+		<th>Argument</th>
+		
 
+		
+		<th>Default</th>
 		
 
 		<th class="last">Description</th>
@@ -5436,7 +6366,23 @@
             </td>
 
             
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
 
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    "In"
+                
+                </td>
             
 
             <td class="description last">The name of the entry link to trigger.</td>
@@ -5507,13 +6453,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="node.js.html">node.js</a>,
-     <a href="node.js.html#sunlight-1-line-612">line 612</a>
+     <a href="node.js.html#sunlight-1-line-681">line 681</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="node.js.html">node.js</a>,
-				 <a href="node.js.html#sunlight-1-line-612">line 612</a>
+				 <a href="node.js.html#sunlight-1-line-681">line 681</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -5532,7 +6478,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="triggerExit"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>triggerExit</b>(name)</toc>
+    <h4 class="name" id="triggerExit"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>triggerExit</b>(<span class="optional">name</span>)</toc>
         
         >
         
@@ -5572,7 +6518,11 @@
 		<th>Type</th>
 
 		
+		<th>Argument</th>
+		
 
+		
+		<th>Default</th>
 		
 
 		<th class="last">Description</th>
@@ -5597,7 +6547,23 @@
             </td>
 
             
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
 
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    "Out"
+                
+                </td>
             
 
             <td class="description last">The name of the exit link to trigger.</td>
@@ -5668,13 +6634,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="node.js.html">node.js</a>,
-     <a href="node.js.html#sunlight-1-line-630">line 630</a>
+     <a href="node.js.html#sunlight-1-line-703">line 703</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="node.js.html">node.js</a>,
-				 <a href="node.js.html#sunlight-1-line-630">line 630</a>
+				 <a href="node.js.html#sunlight-1-line-703">line 703</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -5761,13 +6727,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="node.js.html">node.js</a>,
-     <a href="node.js.html#sunlight-1-line-68">line 68</a>
+     <a href="node.js.html#sunlight-1-line-128">line 128</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="node.js.html">node.js</a>,
-				 <a href="node.js.html#sunlight-1-line-68">line 68</a>
+				 <a href="node.js.html#sunlight-1-line-128">line 128</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -5803,7 +6769,7 @@
 <dd>
     
     <div class="description">
-        <p style="margin-left:20px;">Options for a <a href="wcPlay.html#.VALUE_CONTROL_TYPE">NUMBER</a> value.</p>
+        <p style="margin-left:20px;">Options for a <a href="wcPlay.html#.PROPERTY_TYPE">NUMBER</a> value.</p>
     </div>
     
 
@@ -6016,6 +6982,163 @@
 </dd>
 
             
+                
+<hr>
+<dt class="name" id="~SelectOptions">
+    <h4><toc class="small"><i>inner</i></toc><toc> </toc>
+        typedef var
+        <b><toc>SelectOptions</toc></b>
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p style="margin-left:20px;">Options for a <a href="wcPlay.html#.PROPERTY_TYPE">SELECT</a> value.</p>
+    </div>
+    
+
+    
+        <h5>Type: 
+<span class="param-type">Object</span>
+
+</h5>
+    
+
+    
+<dl class="details">
+	
+
+	<h5 class="subsection-title">Properties:</h5>
+
+	<dl>
+
+<div class="prop-container">
+<table class="props table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>items</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;String></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">A list of items to display in the combo box.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>asString</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">When the value is selected, does it record the string value, or item index number?</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+</div></dl>
+
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="node.jsdoc.html">node.jsdoc</a>,
+     <a href="node.jsdoc.html#sunlight-1-line-9">line 9</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="node.jsdoc.html">node.jsdoc</a>,
+				 <a href="node.jsdoc.html#sunlight-1-line-9">line 9</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+            
             
                 
 <hr>
@@ -6137,13 +7260,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="node.js.html">node.js</a>,
-     <a href="node.js.html#sunlight-1-line-771">line 771</a>
+     <a href="node.js.html#sunlight-1-line-856">line 856</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="node.js.html">node.js</a>,
-				 <a href="node.js.html#sunlight-1-line-771">line 771</a>
+				 <a href="node.js.html#sunlight-1-line-856">line 856</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -6279,13 +7402,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="node.js.html">node.js</a>,
-     <a href="node.js.html#sunlight-1-line-780">line 780</a>
+     <a href="node.js.html#sunlight-1-line-868">line 868</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="node.js.html">node.js</a>,
-				 <a href="node.js.html#sunlight-1-line-780">line 780</a>
+				 <a href="node.js.html#sunlight-1-line-868">line 868</a>
 			</li>
 		</ul>
 	</dd> -->
