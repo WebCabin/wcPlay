@@ -5,10 +5,10 @@ wcNode = Class.extend({
    * @class wcNode
    *
    * @param {String} parent - The parent object of this node.
-   * @param {String} name - The name of the node, as displayed on the title bar.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
+   * @param {String} name - The name of the node, as displayed on the title bar.
    */
-  init: function(parent, name, pos) {
+  init: function(parent, pos, name) {
     this.name = name;
     this.type = typeof this;
 
@@ -28,9 +28,9 @@ wcNode = Class.extend({
     this._parent = parent;
 
     // Give the node its default properties.
-    this.createProperty(wcNode.PROPERTY.ENABLED, wcPlay.VALUE_CONTROL_TYPE.TOGGLE, true);
-    this.createProperty(wcNode.PROPERTY.LOG, wcPlay.VALUE_CONTROL_TYPE.TOGGLE, false);
-    this.createProperty(wcNode.PROPERTY.BREAK, wcPlay.VALUE_CONTROL_TYPE.TOGGLE, false);
+    this.createProperty(wcNode.PROPERTY.ENABLED, wcPlay.PROPERTY_TYPE.TOGGLE, true);
+    this.createProperty(wcNode.PROPERTY.LOG, wcPlay.PROPERTY_TYPE.TOGGLE, false);
+    this.createProperty(wcNode.PROPERTY.BREAK, wcPlay.PROPERTY_TYPE.TOGGLE, false);
 
     this.engine().__addNode(this);
   },
@@ -89,6 +89,20 @@ wcNode = Class.extend({
   },
 
   /**
+   * Sets, or Gets this node's debug log state.
+   * @function wcNode#debugLog
+   * @param {Boolean} [enabled] - If supplied, will assign a new debug log state.
+   * @returns {Boolean} - The current debug log state.
+   */
+  debugLog: function(enabled) {
+    if (enabled !== undefined) {
+      this.property(wcNode.PROPERTY.LOG, enabled? true: false);
+    }
+
+    return this.property(wcNode.PROPERTY.LOG);
+  },
+
+  /**
    * Sets, or Gets this node's debug pause state.
    * @function wcNode#debugPause
    * @param {Boolean} [enabled] - If supplied, will assign a new debug pause state.
@@ -100,7 +114,7 @@ wcNode = Class.extend({
     }
 
     return this.property(wcNode.PROPERTY.BREAK);
-  }
+  },
 
   /**
    * Gets this node's awake state.
@@ -131,10 +145,14 @@ wcNode = Class.extend({
   /**
    * Creates a new entry link on the node.
    * @function wcNode#createEntry
-   * @param {String} name - The name of the entry link.
+   * @param {String} [name="In"] - The name of the entry link.
    * @returns {Boolean} - Fails if the entry link name already exists.
    */
   createEntry: function(name) {
+    if (name === undefined) {
+      name = 'In';
+    }
+
     for (var i = 0; i < this.chain.entry.length; ++i) {
       if (this.chain.entry[i].name === name) {
         return false;
@@ -152,10 +170,14 @@ wcNode = Class.extend({
   /**
    * Creates a new exit link on the node.
    * @function wcNode#createExit
-   * @param {String} name - The name of the exit link.
+   * @param {String} [name="Out"] - The name of the exit link.
    * @returns {Boolean} - Fails if the exit link name already exists.
    */
   createExit: function(name) {
+    if (name === undefined) {
+      name = 'Out';
+    }
+
     for (var i = 0; i < this.chain.exit.length; ++i) {
       if (this.chain.exit[i].name === name) {
         return false;
@@ -173,9 +195,9 @@ wcNode = Class.extend({
    * Creates a new property.
    * @function wcNode#createProperty
    * @param {String} name - The name of the property.
-   * @param {wcPlay.VALUE_CONTROL_TYPE} [controlType=wcPlay.VALUE_CONTROL_TYPE.NONE] - The type of property.
+   * @param {wcPlay.PROPERTY_TYPE} [controlType=wcPlay.PROPERTY_TYPE.NONE] - The type of property.
    * @param {Object} [defaultValue] - A default value for this property.
-   * @param {Object} [options] - Additional options for this property, see {@link wcPlay.VALUE_CONTROL_TYPE}.
+   * @param {Object} [options] - Additional options for this property, see {@link wcPlay.PROPERTY_TYPE}.
    * @returns {Boolean} - Failes if the property does not exist.
    */
   createProperty: function(name, controlType, defaultValue, options) {
@@ -187,8 +209,8 @@ wcNode = Class.extend({
     }
 
     // Make sure the type is valid.
-    if (!wcPlay.VALUE_CONTROL_TYPE.hasOwnProperty(controlType)) {
-      controlType = wcPlay.VALUE_CONTROL_TYPE.NONE;
+    if (!wcPlay.PROPERTY_TYPE.hasOwnProperty(controlType)) {
+      controlType = wcPlay.PROPERTY_TYPE.NONE;
     }
 
     this.properties.push({
@@ -274,8 +296,8 @@ wcNode = Class.extend({
 
     // Find the target link.
     for (var i = 0; i < targetNode.chain.exit.length; ++i) {
-      if (targetNode.chain.exit[a].name === targetName) {
-        targetLink = targetNode.chain.exit[a];
+      if (targetNode.chain.exit[i].name === targetName) {
+        targetLink = targetNode.chain.exit[i];
         break;
       }
     }
@@ -315,13 +337,14 @@ wcNode = Class.extend({
   },
 
   /**
-   * Connects an exit link on this ndoe to an entry link of another.
+   * Connects an exit link on this node to an entry link of another.
    * @function wcNode#connectExit
    * @param {String} name - The name of the exit link on this node.
    * @param {wcNode} targetNode - The target node to link to.
+   * @param {String} targetName - The name of the target node's entry link to link to.
    * @returns {wcNode.CONNECT_RESULT} - The result.
    */
-  connectExit: function(name, targetNode, targetLink) {
+  connectExit: function(name, targetNode, targetName) {
     if (!(targetNode instanceof wcNode)) {
       return wcNode.CONNECT_RESULT.NOT_FOUND;
     }
@@ -339,8 +362,8 @@ wcNode = Class.extend({
 
     // Find the target link.
     for (var i = 0; i < targetNode.chain.entry.length; ++i) {
-      if (targetNode.chain.entry[a].name === targetName) {
-        targetLink = targetNode.chain.entry[a];
+      if (targetNode.chain.entry[i].name === targetName) {
+        targetLink = targetNode.chain.entry[i];
         break;
       }
     }
@@ -658,14 +681,18 @@ wcNode = Class.extend({
   /**
    * Triggers an entry link and activates this node.
    * @function wcNode#triggerEntry
-   * @param {String} name - The name of the entry link to trigger.
+   * @param {String} [name="In"] - The name of the entry link to trigger.
    * @returns {Boolean} - Fails if the entry link does not exist.
    */
   triggerEntry: function(name) {
+    if (name === undefined) {
+      name = 'In';
+    }
+
     for (var i = 0; i < this.chain.entry.length; ++i) {
       if (this.chain.entry[i].name == name) {
         // Always queue the trigger so execution is not immediate.
-        this.engine().__queueNodeEntry(this.chain.entry[i].node, this.chain.entry[i].name);
+        this.engine().__queueNodeEntry(this, this.chain.entry[i].name);
         return true;
       }
     }
@@ -676,10 +703,18 @@ wcNode = Class.extend({
   /**
    * Triggers an exit link.
    * @function wcNode#triggerExit
-   * @param {String} name - The name of the exit link to trigger.
+   * @param {String} [name="Out"] - The name of the exit link to trigger.
    * @returns {Boolean} - Fails if the exit link does not exist.
    */
   triggerExit: function(name) {
+    if (name === undefined) {
+      name = 'Out';
+    }
+
+    if (this.debugLog()) {
+      console.log('DEBUG: Node "' + this.name + '" Triggered Exit link "' + name + '"');
+    }
+
     for (var i = 0; i < this.chain.exit.length; ++i) {
       var exitLink = this.chain.exit[i];
       if (exitLink.name == name) {
@@ -699,9 +734,10 @@ wcNode = Class.extend({
    * @function wcNode#property
    * @param {String} name - The name of the property.
    * @param {Object} [value] - If supplied, will assign a new value to the property.
+   * @param {Boolean} [forceChange] - If value is supplied, set this to true if you want to force the change event to be sent to all chained properties.
    * @returns {Object|undefined} - The value of the property, or undefined if not found.
    */
-  property: function(name, value) {
+  property: function(name, value, forceChange) {
     for (var i = 0; i < this.properties.length; ++i) {
       var prop = this.properties[i];
       if (prop.name === name) {
@@ -710,11 +746,11 @@ wcNode = Class.extend({
           var oldValue = prop.value;
 
           // Notify about to change event.
-          if (prop.value !== value) {
+          if (forceChange || prop.value !== value) {
             value = this.onPropertyChanging(prop.name, oldValue, value) || value;
           }
 
-          if (prop.value !== value) {
+          if (forceChange || prop.value !== value) {
             prop.value = value;
 
             // Notify that the property has changed.
@@ -769,6 +805,9 @@ wcNode = Class.extend({
    * @function wcNode#onStart
    */
   onStart: function() {
+    if (this.debugLog()) {
+      console.log('DEBUG: Node "' + this.name + '" started!');
+    }
   },
 
   /**
@@ -778,6 +817,10 @@ wcNode = Class.extend({
    * @param {String} name - The name of the entry link triggered.
    */
   onTriggered: function(name) {
+    if (this.debugLog()) {
+      console.log('DEBUG: Node "' + this.name + '" Triggered Entry link "' + name + '"');
+    }
+
     this.wake();
   },
 
@@ -791,6 +834,9 @@ wcNode = Class.extend({
    * @returns {Object} - Return the new value of the property (usually newValue unless you are proposing restrictions). If no value is returned, newValue is assumed.
    */
   onPropertyChanging: function(name, oldValue, newValue) {
+    // if (this.debugLog()) {
+    //   console.log('DEBUG: Node "' + this.name + '" Changing Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
+    // }
   },
 
   /**
@@ -802,6 +848,9 @@ wcNode = Class.extend({
    * @param {Object} newValue - The new value of the property.
    */
   onPropertyChanged: function(name, oldValue, newValue) {
+    if (this.debugLog()) {
+      console.log('DEBUG: Node "' + this.name + '" Changed Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
+    }
   },
 
   /**
@@ -811,6 +860,9 @@ wcNode = Class.extend({
    * @param {String} name - The name of the property.
    */
   onPropertyGet: function(name) {
+    // if (this.debugLog()) {
+    //   console.log('DEBUG: Node "' + this.name + '" Requested Property "' + name + '"');
+    // }
   },
 
   /**
@@ -820,6 +872,9 @@ wcNode = Class.extend({
    * @param {String} name - The name of the property.
    */
   onPropertyGot: function(name) {
+    if (this.debugLog()) {
+      console.log('DEBUG: Node "' + this.name + '" Got Property "' + name + '"');
+    }
   },
 });
 
@@ -852,7 +907,7 @@ wcNode.CONNECT_RESULT = {
  */
 wcNode.PROPERTY = {
   ENABLED: 'enabled',
-  LOG: 'log output',
+  LOG: 'debug log',
   BREAK: 'debug break',
   TRIGGER: 'trigger',
 };

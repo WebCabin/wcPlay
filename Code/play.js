@@ -8,6 +8,8 @@ function wcPlay() {
   this._compositeNodes = [];
   this._storageNodes = [];
 
+  this._properties = [];
+
   this._queuedChain = [];
   this._queuedProperties = [];
 
@@ -20,14 +22,16 @@ function wcPlay() {
  * Determines how a property's control should be rendered within the editor view.
  * @enum {String}
  */
-wcPlay.VALUE_CONTROL_TYPE = {
+wcPlay.PROPERTY_TYPE = {
   /** Displays the property with no edit control. No options are used. */
   NONE: 'none',
   /** Displays the property as a checkbox. No options are used. */
   TOGGLE: 'toggle',
-  /** Displays the property as a number control. [Number options]{@link wcPlay~NumberOptions} are used. */
+  /** Displays the property as a number control. [Number options]{@link wcNode~NumberOptions} are used. */
   NUMBER: 'number',
+  /** Displays the property as a text field. No options are used. */
   STRING: 'string',
+  /** Displays the property as a combo box control. [Select options]{@link wcNode~SelectOptions} are used. */
   SELECT: 'select',
 };
 
@@ -39,7 +43,7 @@ wcPlay.NODE_TYPE = {
   ENTRY: 'entry',
   PROCESS: 'process',
   COMPOSITE: 'composite',
-  STORAGE: 'storage',  
+  STORAGE: 'storage',
 };
 
 /**
@@ -57,7 +61,7 @@ wcPlay.NODE_LIBRARY = [];
  */
 wcPlay.registerNodeType = function(name, constructor, type) {
   for (var i = 0; i < wcPlay.NODE_LIBRARY.length; ++i) {
-    if (wcPlay.NODE_LIBRARY[i].constructor.toLowerCase() === constructorName.toLowerCase()) {
+    if (wcPlay.NODE_LIBRARY[i].constructor === constructor) {
       return false;
     }
   }
@@ -75,11 +79,24 @@ wcPlay.prototype = {
    * Initializes the script and begins the update process.
    * @function wcPlay#init
    */
-  init: function() {
+  start: function() {
     var self = this;
     this._updateID = setInterval(function() {
       self.update();
     }, 25);
+
+    for (var i = 0; i < this._storageNodes.length; ++i) {
+      this._storageNodes[i].onStart();
+    }
+    for (var i = 0; i < this._processNodes.length; ++i) {
+      this._processNodes[i].onStart();
+    }
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      this._compositeNodes[i].onStart();
+    }
+    for (var i = 0; i < this._entryNodes.length; ++i) {
+      this._entryNodes[i].onStart();
+    }
   },
 
   /**
@@ -174,11 +191,12 @@ wcPlay.prototype = {
    * @param {String} name - The entry link name.
    */
   __queueNodeEntry: function(node, name) {
-    // TODO: Handle break points in Play script.
-    this._queuedChain.push({
-      node: node,
-      name: name,
-    });
+    if (node.enabled()) {
+      this._queuedChain.push({
+        node: node,
+        name: name,
+      });
+    }
   },
 
   /**
@@ -190,10 +208,12 @@ wcPlay.prototype = {
    * @param {Object} value - The property value.
    */
   __queueNodeProperty: function(node, name, value) {
-    this._queuedProperties.push({
-      node: node,
-      name: name,
-      value: value,
-    });
+    if (node.enabled()) {
+      this._queuedProperties.push({
+        node: node,
+        name: name,
+        value: value,
+      });
+    }
   },
 };

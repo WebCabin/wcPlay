@@ -5,17 +5,17 @@ wcNodeEntry = wcNode.extend({
    * @class wcNodeEntry
    *
    * @param {String} parent - The parent object of this node.
-   * @param {String} name - The name of the node, as displayed on the title bar.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
+   * @param {String} name - The name of the node, as displayed on the title bar.
    */
-  init: function(parent, name, pos) {
-    this._super(parent, name, pos);
+  init: function(parent, pos, name) {
+    this._super(parent, pos, name);
 
     // Create a default exit link.
-    this.createExit('Out');
+    this.createExit();
 
     // Add a manual trigger control.
-    this.createProperty(wcNode.PROPERTY.TRIGGER, wcPlay.VALUE_CONTROL_TYPE.TOGGLE, false);
+    this.createProperty(wcNode.PROPERTY.TRIGGER, wcPlay.PROPERTY_TYPE.TOGGLE, false);
   },
 
   /**

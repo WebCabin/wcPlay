@@ -5,14 +5,14 @@ wcNodeProcess = wcNode.extend({
    * @class wcNodeProcess
    *
    * @param {String} parent - The parent object of this node.
-   * @param {String} name - The name of the node, as displayed on the title bar.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
+   * @param {String} name - The name of the node, as displayed on the title bar.
    */
-  init: function(parent, name, pos) {
-    this._super(parent, name, pos);
+  init: function(parent, pos, name) {
+    this._super(parent, pos, name);
 
     // Create a default links.
-    this.createEntry('In');
-    this.createExit('Out');
+    this.createEntry();
+    this.createExit();
   },
 });
