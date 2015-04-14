@@ -1,49 +1,6 @@
 /**
- * Callback handler when a property is about to be changed.<br>
- * The 'this' pointer is the owning wcNode of the property.
- * @callback wcPlay~PropertyChanging
- * @param {String} name - The name of the property.
- * @param {Object} oldValue - The current value of the property.
- * @param {Object} newValue - The new, proposed, value of the property.
- * @returns {Object} - Return the new value of the property (usually newValue unless you are proposing restrictions).
- */
-
-/**
- * Callback handler when a property has changed.<br>
- * The 'this' pointer is the owning wcNode of the property.
- * @callback wcPlay~PropertyChanged
- * @param {String} name - The name of the property.
- * @param {Object} oldValue - The old value of the property.
- * @param {Object} newValue - The new value of the property.
- */
-
-/**
- * Callback handler when the property is being asked its value, before the value is actually retrieved.<br>
- * The 'this' pointer is the owning wcNode of the property.
- * @callback wcPlay~PropertyGet
- * @param {String} name - The name of the property.
- */
-
-/**
- * Callback handler when the property has had its value retrieved.<br>
- * The 'this' pointer is the owning wcNode of the property.
- * @callback wcPlay~PropertyGot
- * @param {String} name - The name of the property.
- */
-
-/**
- * Default options for all [property]{@link wcPlay.PROP_TYPE} types.
- * @typedef {Object} wcPlay~PropertyOptions
- * @property {wcPlay~PropertyChanging} [onChanging] - A function callback when the property is about to be changed.
- * @property {wcPlay~PropertyChanged} [onChanged] - A function callback when the property has changed.
- * @property {wcPlay~PropertyGet} [onGet] - A function callback called before the property value is retrieved.
- * @property {wcPlay~PropertyGot} [onGot] - A function callback called after the property value has been retrieved.
- */
-
-/**
- * Options for a [NUMBER]{@link wcPlay.PROP_TYPE} property.
- * @typedef {Object} wcPlay~NumberOptions
- * @property {Number} [min=-Infinity] - The minimum value of the number range.
- * @property {Number} [max=Infinity] - The maximum value of the number range.
- * @property {Number} [step=1] - The amount the value will go up or down when the user clicks the up and down arrow controls.
+ * A 2D positional coordinate.
+ * @typedef {Object} wcPlay~Coordinates
+ * @property {Number} x - The horizontal coordinate.
+ * @property {Number} y - The vertical coordinate.
  */

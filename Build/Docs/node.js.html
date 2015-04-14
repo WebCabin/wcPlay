@@ -1,7 +1,59 @@
-wcNode = Class.extend({
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>wcPlay Source: node.js</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.dark.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.superhero.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container-fluid">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html"><div style='font-size:15px;line-height:15px;margin-top:-5px;'>Web Cabin Play<br>v1.0.0</div></a>
+	</div>
+	<div class="navbar-collapse">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcPlay.html">wcPlay</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+	</div>
+</div>
+</div>
+
+
+<div class="container-fluid">
+<div class="row">
+
+	
+	<div class="col-md-10 col-md-offset-1">
+	
+		<div id="main">
+    		
+
+		<h1 class="page-title">Source: node.js</h1>
+    
+<section>
+	<article>
+		<pre
+			class="sunlight-highlight-javascript linenums">wcNode = Class.extend({
   /**
-   * The foundation class for all nodes.<br>
-   * When inheriting, make sure to include 'this._super(parent, name, pos);' at the top of your init functions.
+   * The base class for all nodes, contains the core functionality of a node.
    * @class wcNode
    *
    * @param {String} parent - The parent object of this node.
@@ -11,6 +63,7 @@ wcNode = Class.extend({
   init: function(parent, name, pos) {
     this.name = name;
     this.type = typeof this;
+    this.log = false;
 
     this.category = "default";
     this.color = null;
@@ -24,41 +77,9 @@ wcNode = Class.extend({
     this.properties = [];
 
     this._meta = {};
+    this._enabled = true;
     this._awake = false;
     this._parent = parent;
-
-    // Give the node its default properties.
-    this.createProperty(wcNode.PROPERTY.ENABLED, wcPlay.VALUE_CONTROL_TYPE.TOGGLE, true);
-    this.createProperty(wcNode.PROPERTY.LOG, wcPlay.VALUE_CONTROL_TYPE.TOGGLE, false);
-    this.createProperty(wcNode.PROPERTY.BREAK, wcPlay.VALUE_CONTROL_TYPE.TOGGLE, false);
-
-    this.engine().__addNode(this);
-  },
-
-  /**
-   * Destroys and removes the node.
-   * @function wcNode#destroy
-   */
-  destroy: function() {
-    // Remove all links.
-    for (var i = 0; i < this.chain.entry.length; ++i) {
-      var item = this.chain.entry[i];
-      this.disconnectEntry(item.name);
-    }
-
-    for (var i = 0; i < this.chain.exit.length; ++i) {
-      var item = this.chain.exit[i];
-      this.disconnectExit(item.name);
-    }
-
-    for (var i = 0; i < this.properties.length; ++i) {
-      var item = this.properties[i];
-      this.disconnectInput(item.name);
-      this.disconnectOutput(item.name);
-    }
-
-    // Remove the node from wcPlay
-    this.engine().__removeNode(this);
   },
 
   /**
@@ -82,25 +103,11 @@ wcNode = Class.extend({
    */
   enabled: function(enabled) {
     if (enabled !== undefined) {
-      this.property(wcNode.PROPERTY.ENABLED, enabled? true: false);
+      this._enabled = enabled? true: false;
     }
 
-    return this.property(wcNode.PROPERTY.ENABLED);
+    return this._enabled;
   },
-
-  /**
-   * Sets, or Gets this node's debug pause state.
-   * @function wcNode#debugPause
-   * @param {Boolean} [enabled] - If supplied, will assign a new debug pause state.
-   * @returns {Boolean} - The current debug pause state.
-   */
-  debugPause: function(enabled) {
-    if (enabled !== undefined) {
-      this.property(wcNode.PROPERTY.BREAK, enabled? true: false);
-    }
-
-    return this.property(wcNode.PROPERTY.BREAK);
-  }
 
   /**
    * Gets this node's awake state.
@@ -135,7 +142,7 @@ wcNode = Class.extend({
    * @returns {Boolean} - Fails if the entry link name already exists.
    */
   createEntry: function(name) {
-    for (var i = 0; i < this.chain.entry.length; ++i) {
+    for (var i = 0; i &lt; this.chain.entry.length; ++i) {
       if (this.chain.entry[i].name === name) {
         return false;
       }
@@ -156,7 +163,7 @@ wcNode = Class.extend({
    * @returns {Boolean} - Fails if the exit link name already exists.
    */
   createExit: function(name) {
-    for (var i = 0; i < this.chain.exit.length; ++i) {
+    for (var i = 0; i &lt; this.chain.exit.length; ++i) {
       if (this.chain.exit[i].name === name) {
         return false;
       }
@@ -180,7 +187,7 @@ wcNode = Class.extend({
    */
   createProperty: function(name, controlType, defaultValue, options) {
     // Make sure this property doesn't already exist.
-    for (var i = 0; i < this.properties.length; ++i) {
+    for (var i = 0; i &lt; this.properties.length; ++i) {
       if (this.properties[i].name === name) {
         return false;
       }
@@ -210,7 +217,7 @@ wcNode = Class.extend({
    * @returns {Boolean} - Fails if the link does not exist.
    */
   removeEntry: function(name) {
-    for (var i = 0; i < this.chain.entry.length; ++i) {
+    for (var i = 0; i &lt; this.chain.entry.length; ++i) {
       if (this.chain.entry[i].name === name) {
         return this.disconnectEntry(name) === wcNode.CONNECT_RESULT.SUCCESS;
       }
@@ -225,7 +232,7 @@ wcNode = Class.extend({
    * @returns {Boolean} - Fails if the link does not exist.
    */
   removeExit: function(name) {
-    for (var i = 0; i < this.chain.exit.length; ++i) {
+    for (var i = 0; i &lt; this.chain.exit.length; ++i) {
       if (this.chain.exit[i].name === name) {
         return this.disconnectExit(name) === wcNode.CONNECT_RESULT.SUCCESS;
       }
@@ -240,7 +247,7 @@ wcNode = Class.extend({
    * @returns {Boolean} - Fails if the property does not exist.
    */
   removeProperty: function(name) {
-    for (var i = 0; i < this.properties.length; ++i) {
+    for (var i = 0; i &lt; this.properties.length; ++i) {
       if (this.properties[i].name === name) {
         return this.disconnectInput(name) === this.disconnectOutput(name) === wcNode.CONNECT_RESULT.SUCCESS;
       }
@@ -265,7 +272,7 @@ wcNode = Class.extend({
     var targetLink = null;
 
     // Find my link.
-    for (var i = 0; i < this.chain.entry.length; ++i) {
+    for (var i = 0; i &lt; this.chain.entry.length; ++i) {
       if (this.chain.entry[i].name === name) {
         myLink = this.chain.entry[i];
         break;
@@ -273,7 +280,7 @@ wcNode = Class.extend({
     }
 
     // Find the target link.
-    for (var i = 0; i < targetNode.chain.exit.length; ++i) {
+    for (var i = 0; i &lt; targetNode.chain.exit.length; ++i) {
       if (targetNode.chain.exit[a].name === targetName) {
         targetLink = targetNode.chain.exit[a];
         break;
@@ -285,14 +292,14 @@ wcNode = Class.extend({
     }
 
     // Make sure the connection doesn't already exist.
-    for (var i = 0; i < myLink.links.length; ++i) {
-      if (myLink.links[i].node === targetNode && myLink.links[i].name === targetLink.name) {
+    for (var i = 0; i &lt; myLink.links.length; ++i) {
+      if (myLink.links[i].node === targetNode &amp;&amp; myLink.links[i].name === targetLink.name) {
         return wcNode.CONNECT_RESULT.ALREADY_CONNECTED;
       }
     }
 
-    for (var i = 0; i < targetLink.links.length; ++i) {
-      if (targetLink.links[i].node === this && targetLink.links[i].name === myLink.name) {
+    for (var i = 0; i &lt; targetLink.links.length; ++i) {
+      if (targetLink.links[i].node === this &amp;&amp; targetLink.links[i].name === myLink.name) {
         return wcNode.CONNECT_RESULT.ALREADY_CONNECTED;
       }
     }
@@ -330,7 +337,7 @@ wcNode = Class.extend({
     var targetLink = null;
 
     // Find my link.
-    for (var i = 0; i < this.chain.exit.length; ++i) {
+    for (var i = 0; i &lt; this.chain.exit.length; ++i) {
       if (this.chain.exit[i].name === name) {
         myLink = this.chain.exit[i];
         break;
@@ -338,7 +345,7 @@ wcNode = Class.extend({
     }
 
     // Find the target link.
-    for (var i = 0; i < targetNode.chain.entry.length; ++i) {
+    for (var i = 0; i &lt; targetNode.chain.entry.length; ++i) {
       if (targetNode.chain.entry[a].name === targetName) {
         targetLink = targetNode.chain.entry[a];
         break;
@@ -350,14 +357,14 @@ wcNode = Class.extend({
     }
 
     // Make sure the connection doesn't already exist.
-    for (var i = 0; i < myLink.links.length; ++i) {
-      if (myLink.links[i].node === targetNode && myLink.links[i].name === targetLink.name) {
+    for (var i = 0; i &lt; myLink.links.length; ++i) {
+      if (myLink.links[i].node === targetNode &amp;&amp; myLink.links[i].name === targetLink.name) {
         return wcNode.CONNECT_RESULT.ALREADY_CONNECTED;
       }
     }
 
-    for (var i = 0; i < targetLink.links.length; ++i) {
-      if (targetLink.links[i].node === this && targetLink.links[i].name === myLink.name) {
+    for (var i = 0; i &lt; targetLink.links.length; ++i) {
+      if (targetLink.links[i].node === this &amp;&amp; targetLink.links[i].name === myLink.name) {
         return wcNode.CONNECT_RESULT.ALREADY_CONNECTED;
       }
     }
@@ -396,7 +403,7 @@ wcNode = Class.extend({
     var targetProperty = null;
 
     // Find my property.
-    for (var i = 0; i < this.properties.length; ++i) {
+    for (var i = 0; i &lt; this.properties.length; ++i) {
       if (this.properties[i].name === name) {
         myProperty = this.properties[i];
         break;
@@ -404,7 +411,7 @@ wcNode = Class.extend({
     }
 
     // Find the target property.
-    for (var i = 0; i < targetNode.properties.length; ++i) {
+    for (var i = 0; i &lt; targetNode.properties.length; ++i) {
       if (targetNode.properties[i].name === targetName) {
         targetProperty = targetNode.properties[i];
         break;
@@ -416,14 +423,14 @@ wcNode = Class.extend({
     }
 
     // Make sure the connection doesn't already exist.
-    for (var i = 0; i < myProperty.inputs.length; ++i) {
-      if (myProperty.inputs[i].node === targetNode && myProperty.inputs[i].name === targetProperty.name) {
+    for (var i = 0; i &lt; myProperty.inputs.length; ++i) {
+      if (myProperty.inputs[i].node === targetNode &amp;&amp; myProperty.inputs[i].name === targetProperty.name) {
         return wcNode.CONNECT_RESULT.ALREADY_CONNECTED;
       }
     }
 
-    for (var i = 0; i < targetProperty.outputs.length; ++i) {
-      if (targetProperty.outputs[i].node === this && targetProperty.outputs[i].name === myProperty.name) {
+    for (var i = 0; i &lt; targetProperty.outputs.length; ++i) {
+      if (targetProperty.outputs[i].node === this &amp;&amp; targetProperty.outputs[i].name === myProperty.name) {
         return wcNode.CONNECT_RESULT.ALREADY_CONNECTED;
       }
     }
@@ -462,7 +469,7 @@ wcNode = Class.extend({
     var targetProperty = null;
 
     // Find my property.
-    for (var i = 0; i < this.properties.length; ++i) {
+    for (var i = 0; i &lt; this.properties.length; ++i) {
       if (this.properties[i].name === name) {
         myProperty = this.properties[i];
         break;
@@ -470,7 +477,7 @@ wcNode = Class.extend({
     }
 
     // Find the target property.
-    for (var i = 0; i < targetNode.properties.length; ++i) {
+    for (var i = 0; i &lt; targetNode.properties.length; ++i) {
       if (targetNode.properties[i].name === targetName) {
         targetProperty = targetNode.properties[i];
         break;
@@ -482,14 +489,14 @@ wcNode = Class.extend({
     }
 
     // Make sure the connection doesn't already exist.
-    for (var i = 0; i < myProperty.outputs.length; ++i) {
-      if (myProperty.outputs[i].node === targetNode && myProperty.outputs[i].name === targetProperty.name) {
+    for (var i = 0; i &lt; myProperty.outputs.length; ++i) {
+      if (myProperty.outputs[i].node === targetNode &amp;&amp; myProperty.outputs[i].name === targetProperty.name) {
         return wcNode.CONNECT_RESULT.ALREADY_CONNECTED;
       }
     }
 
-    for (var i = 0; i < targetProperty.inputs.length; ++i) {
-      if (targetProperty.inputs[i].node === this && targetProperty.inputs[i].name === myProperty.name) {
+    for (var i = 0; i &lt; targetProperty.inputs.length; ++i) {
+      if (targetProperty.inputs[i].node === this &amp;&amp; targetProperty.inputs[i].name === myProperty.name) {
         return wcNode.CONNECT_RESULT.ALREADY_CONNECTED;
       }
     }
@@ -522,7 +529,7 @@ wcNode = Class.extend({
   disconnectEntry: function(name, targetNode, targetName) {
     // Find my entry link.
     var myLink = null;
-    for (var i = 0; i < this.chain.entry.length; ++i) {
+    for (var i = 0; i &lt; this.chain.entry.length; ++i) {
       if (this.chain.entry[i].name === name) {
         myLink = this.chain.entry[i];
         break;
@@ -534,9 +541,9 @@ wcNode = Class.extend({
     }
 
     // Iterate through all chained links and disconnect as necessary.
-    for (var i = 0; i < myLink.links.length; ++i) {
+    for (var i = 0; i &lt; myLink.links.length; ++i) {
       var targetLink = myLink.links[i];
-      if ((!targetNode || targetNode === targetLink.node) && (!targetName || targetName === targetLink.name)) {
+      if ((!targetNode || targetNode === targetLink.node) &amp;&amp; (!targetName || targetName === targetLink.name)) {
         // Remove this link.
         myLink.links.splice(i, 1);
         i--;
@@ -558,7 +565,7 @@ wcNode = Class.extend({
   disconnectExit: function(name, targetNode, targetName) {
     // Find my exit link.
     var myLink = null;
-    for (var i = 0; i < this.chain.exit.length; ++i) {
+    for (var i = 0; i &lt; this.chain.exit.length; ++i) {
       if (this.chain.exit[i].name === name) {
         myLink = this.chain.exit[i];
         break;
@@ -570,9 +577,9 @@ wcNode = Class.extend({
     }
 
     // Iterate through all chained links and disconnect as necessary.
-    for (var i = 0; i < myLink.links.length; ++i) {
+    for (var i = 0; i &lt; myLink.links.length; ++i) {
       var targetLink = myLink.links[i];
-      if ((!targetNode || targetNode === targetLink.node) && (!targetName || targetName === targetLink.name)) {
+      if ((!targetNode || targetNode === targetLink.node) &amp;&amp; (!targetName || targetName === targetLink.name)) {
         // Remove this link.
         myLink.links.splice(i, 1);
         i--;
@@ -594,7 +601,7 @@ wcNode = Class.extend({
   disconnectInput: function(name, targetNode, targetName) {
     // Find my property.
     var myProperty = null;
-    for (var i = 0; i < this.properties.length; ++i) {
+    for (var i = 0; i &lt; this.properties.length; ++i) {
       if (this.properties[i].name === name) {
         myProperty = this.properties[i];
         break;
@@ -606,9 +613,9 @@ wcNode = Class.extend({
     }
 
     // Iterate through all chained links and disconnect as necessary.
-    for (var i = 0; i < myProperty.inputs.length; ++i) {
+    for (var i = 0; i &lt; myProperty.inputs.length; ++i) {
       var targetProperty = myProperty.inputs[i];
-      if ((!targetNode || targetNode === targetProperty.node) && (!targetName || targetName === targetProperty.name)) {
+      if ((!targetNode || targetNode === targetProperty.node) &amp;&amp; (!targetName || targetName === targetProperty.name)) {
         // Remove this link.
         myProperty.inputs.splice(i, 1);
         i--;
@@ -630,7 +637,7 @@ wcNode = Class.extend({
   disconnectOutput: function(name, targetNode, targetName) {
     // Find my property.
     var myProperty = null;
-    for (var i = 0; i < this.properties.length; ++i) {
+    for (var i = 0; i &lt; this.properties.length; ++i) {
       if (this.properties[i].name === name) {
         myProperty = this.properties[i];
         break;
@@ -642,9 +649,9 @@ wcNode = Class.extend({
     }
 
     // Iterate through all chained links and disconnect as necessary.
-    for (var i = 0; i < myProperty.outputs.length; ++i) {
+    for (var i = 0; i &lt; myProperty.outputs.length; ++i) {
       var targetProperty = myProperty.outputs[i];
-      if ((!targetNode || targetNode === targetProperty.node) && (!targetName || targetName === targetProperty.name)) {
+      if ((!targetNode || targetNode === targetProperty.node) &amp;&amp; (!targetName || targetName === targetProperty.name)) {
         // Remove this link.
         myProperty.outputs.splice(i, 1);
         i--;
@@ -662,7 +669,7 @@ wcNode = Class.extend({
    * @returns {Boolean} - Fails if the entry link does not exist.
    */
   triggerEntry: function(name) {
-    for (var i = 0; i < this.chain.entry.length; ++i) {
+    for (var i = 0; i &lt; this.chain.entry.length; ++i) {
       if (this.chain.entry[i].name == name) {
         // Always queue the trigger so execution is not immediate.
         this.engine().__queueNodeEntry(this.chain.entry[i].node, this.chain.entry[i].name);
@@ -680,12 +687,12 @@ wcNode = Class.extend({
    * @returns {Boolean} - Fails if the exit link does not exist.
    */
   triggerExit: function(name) {
-    for (var i = 0; i < this.chain.exit.length; ++i) {
+    for (var i = 0; i &lt; this.chain.exit.length; ++i) {
       var exitLink = this.chain.exit[i];
       if (exitLink.name == name) {
         // Activate all entry links chained to this exit.
-        for (var a = 0; a < exitLink.links.length; ++a) {
-          exitLink.links[a].node && exitLink.links[a].node.triggerEntry(exitLink.links[a].name);
+        for (var a = 0; a &lt; exitLink.links.length; ++a) {
+          exitLink.links[a].node &amp;&amp; exitLink.links[a].node.triggerEntry(exitLink.links[a].name);
         }
         return true;
       }
@@ -699,12 +706,23 @@ wcNode = Class.extend({
    * @function wcNode#property
    * @param {String} name - The name of the property.
    * @param {Object} [value] - If supplied, will assign a new value to the property.
+   * @param {Number} [iteration] - Should be omitted, used internally to prevent infinite loops.
    * @returns {Object|undefined} - The value of the property, or undefined if not found.
    */
-  property: function(name, value) {
-    for (var i = 0; i < this.properties.length; ++i) {
+  property: function(name, value, iteration) {
+    for (var i = 0; i &lt; this.properties.length; ++i) {
       var prop = this.properties[i];
       if (prop.name === name) {
+        if (iteration === undefined) {
+          iteration = 0;
+        } else if (iteration > 2000) {
+          // iteration value increases every time a property attempts to change all properties connected to it,
+          // If we get rediculously high, we should bail out to prevent and infinite loop.
+          // To actually reach this, the user would have to chain an extreme number of properties together
+          // or cause a property loop that never uses the same value twice.
+          return prop.value;
+        }
+
         if (value !== undefined) {
           // Retrieve the current value of the property
           var oldValue = prop.value;
@@ -721,9 +739,8 @@ wcNode = Class.extend({
             this.onPropertyChanged(prop.name, oldValue, value);
 
             // Now follow any output links and assign the new value to them as well.
-            var engine = this.engine();
-            for (a = 0; a < prop.outputs.length; ++a) {
-              engine.__queueNodeProperty(prop.outputs[a].node, prop.outputs[a].name, value);
+            for (a = 0; a &lt; prop.outputs.length; ++a) {
+              prop.outputs[a].node.property(prop.outputs[a].name, value, iteration+1);
             }
           }
         }
@@ -741,7 +758,7 @@ wcNode = Class.extend({
    * @returns {Object|undefined} - The default value of the property, or undefined if not found.
    */
   defaultValue: function(name, value) {
-    for (var i = 0; i < this.properties.length; ++i) {
+    for (var i = 0; i &lt; this.properties.length; ++i) {
       var prop = this.properties[i];
       if (prop.name === name) {
         prop.defaultValue = value;
@@ -750,7 +767,7 @@ wcNode = Class.extend({
   },
 
   /**
-   * Event that is called when a connection has been made.<br>
+   * Event that is called when a connection has been made.&lt;br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onConnect
    * @param {Boolean} isConnecting - True if a connection is being made, false if it is a disconnection.
@@ -764,7 +781,7 @@ wcNode = Class.extend({
   },
 
   /**
-   * Event that is called as soon as the Play script has started.<br>
+   * Event that is called as soon as the Play script has started.&lt;br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onStart
    */
@@ -772,7 +789,7 @@ wcNode = Class.extend({
   },
 
   /**
-   * Event that is called when an entry link has been triggered.<br>
+   * Event that is called when an entry link has been triggered.&lt;br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onTriggered
    * @param {String} name - The name of the entry link triggered.
@@ -782,7 +799,7 @@ wcNode = Class.extend({
   },
 
   /**
-   * Event that is called when a property is about to be changed.<br>
+   * Event that is called when a property is about to be changed.&lt;br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onPropertyChanging
    * @param {String} name - The name of the property.
@@ -794,7 +811,7 @@ wcNode = Class.extend({
   },
 
   /**
-   * Event that is called when a property has changed.<br>
+   * Event that is called when a property has changed.&lt;br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onPropertyChanged
    * @param {String} name - The name of the property.
@@ -805,7 +822,7 @@ wcNode = Class.extend({
   },
 
   /**
-   * Event that is called when the property is being asked its value, before the value is actually retrieved.<br>
+   * Event that is called when the property is being asked its value, before the value is actually retrieved.&lt;br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @callback wcNode~onPropertyGet
    * @param {String} name - The name of the property.
@@ -814,7 +831,7 @@ wcNode = Class.extend({
   },
 
   /**
-   * Event that is called when the property has had its value retrieved.<br>
+   * Event that is called when the property has had its value retrieved.&lt;br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @callback wcNode~onPropertyGot
    * @param {String} name - The name of the property.
@@ -844,15 +861,133 @@ wcNode.CONNECT_RESULT = {
   ALREADY_CONNECTED: 'already_connected',
   SUCCESS: 'success',
 };
+</pre>
+	</article>
+</section>
 
 
-/**
- * Default property type names.
- * @enum {String}
- */
-wcNode.PROPERTY = {
-  ENABLED: 'enabled',
-  LOG: 'log output',
-  BREAK: 'debug break',
-  TRIGGER: 'trigger',
-};
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+
+</div>
+
+<div class="row">
+	
+	<div class="col-md-10 col-md-offset-1">
+	
+		<footer>
+		
+		
+		<span class="jsdoc-message">
+			Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta3</a>
+			on 2015-04-14 using the <a
+			href="https://github.com/WebCabin/docstrap">Web Cabin DocStrap template</a>.
+		</span>
+		</footer>
+	</div>
+</div>
+<div style="height:1000px;"></div>
+
+<!--<script src="scripts/sunlight.js"></script>-->
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/bootstrap-dropdown.js"></script>
+<script src="scripts/toc.js"></script>
+
+<script>
+$( function () {
+	// $( "[id*='$']" ).each( function () {
+	// 	var $this = $( this );
+
+	// 	$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	// } );
+
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			// return $( heading ).attr( "id" ) || ( prefix + i );
+			return ( prefix + i );
+		},
+		selectors   : "h1,h2,h3,h4",
+		showAndHide : false,
+		scrollTo    : "100px"
+	} );
+
+	$( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+	// $( ".tutorial-section pre, .readme-section pre" ).addClass( "sunlight-highlight-javascript" ).addClass( "linenums" );
+
+	$( ".tutorial-section pre, .readme-section pre" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			lang = "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$("a[name^='sunlight-1-line-']").each(function() {
+		$(this).wrap('<div id="' + this.name + '" style="padding-top:40px;margin-top:-40px;display:inline-block;" class="sunlight-line-container"></div>');
+		this.name = '';
+	});
+
+  $("h1,h2,h3,h4").each(function() {
+  	$(this).css('padding-top', 50).css('margin-top', -50);
+  });
+} );
+</script>
+
+
+
+
+
+
+<!-- Piwik Analytics -->
+<script type="text/javascript">
+  var _paq = _paq || [];
+  
+  
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="https://analytics.webcabin.org/";
+    _paq.push(['setTrackerUrl', u+'piwik.php']);
+    _paq.push(['setSiteId', 8]);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<noscript><p><img src="https://analytics.webcabin.org/piwik.php?idsite=8" style="border:0;" alt="" /></p></noscript>
+<!-- End Piwik Code -->
+
+
+
+</body>
+</html>
