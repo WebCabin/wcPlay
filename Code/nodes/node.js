@@ -1,6 +1,6 @@
 Class.extend('wcNode', 'Node', 'Core', {
   /**
-   * @class wcNode
+   * @class
    * The foundation class for all nodes.<br>
    * When inheriting, make sure to include 'this._super(parent, pos, name);' at the top of your init functions.
    *

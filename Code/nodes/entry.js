@@ -1,6 +1,6 @@
 wcNode.extend('wcNodeEntry', 'Entry Node', 'Core', {
   /**
-   * @class wcNodeEntry
+   * @class
    * The base class for all entry nodes. These are nodes that start script chains.<br>
    * When inheriting, make sure to include 'this._super(parent, pos, name);' at the top of your init function.
    *

@@ -10,4 +10,3 @@ call Compiler\node_modules\.bin\jsdoc Code Code\nodes Code\nodes\entry Code\node
 copy "favicon.ico" "Build\Docs\favicon.ico"
 
 endlocal
-pause

@@ -1,9 +1,11 @@
 wcNodeEntry.extend('wcNodeEntryStart', 'Start', 'Core', {
   /**
-   * The base class for all entry nodes. These are nodes that start script chains.<br>
+   * @class
+   * An entry node that fires as soon as the script [starts]{@link wcPlay#start}.<br>
    * When inheriting, make sure to include 'this._super(parent, pos, name);' at the top of your init function.
-   * @class wcNodeEntryStart
    *
+   * @constructor wcNodeEntryStart
+   * @description
    * @param {String} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
    * @param {String} [name="Start"] - The name of the node, as displayed on the title bar.

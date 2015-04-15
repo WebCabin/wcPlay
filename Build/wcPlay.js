@@ -72,9 +72,11 @@
   };
 })();
 /**
- * The main class for wcPlay.
  * @class wcPlay
+ * The main class for wcPlay.
+ *
  * @constructor
+ * @description
  * @param {wcPlay~Options} [options] - Custom options.
  */
 function wcPlay(options) {
@@ -141,10 +143,10 @@ wcPlay.NODE_TYPE = {
 wcPlay.NODE_LIBRARY = [];
 
 /**
- * A global function that registers a new node type into the library.
+ * A global function that registers a new node type into the library. This is called automatically when a new extended node type is defined, you should not have to do this manually.
  * @param {String} name - The name of the node.
  * @param {String} constructor - The constructor name.
- * @param {}
+ * @param {wcPlay.NODE_TYPE} type - The node's type.
  * @returns {Boolean} - Success or failure.
  */
 wcPlay.registerNodeType = function(name, constructor, type) {

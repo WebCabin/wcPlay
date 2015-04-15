@@ -1,6 +1,6 @@
 wcNode.extend('wcNodeStorage', 'Storage', 'Core', {
   /**
-   * @class wcNodeStorage
+   * @class
    * The base class for all storage nodes. These are nodes that interact with script variables and exchange data.<br>
    * When inheriting, make sure to include 'this._super(parent, pos, name);' at the top of your init function.
    *
