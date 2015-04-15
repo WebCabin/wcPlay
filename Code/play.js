@@ -1,8 +1,10 @@
 /**
  * The main class for wcPlay.
  * @class wcPlay
+ * @constructor
+ * @param {wcPlay~Options} [options] - Custom options.
  */
-function wcPlay() {
+function wcPlay(options) {
   this._entryNodes = [];
   this._processNodes = [];
   this._compositeNodes = [];
@@ -16,6 +18,19 @@ function wcPlay() {
   this._updateID = 0;
   this._isPaused = false;
   this._isStepping = false;
+
+  var defaultOptions = {
+    silent: false,
+    updateRate: 25,
+  };
+
+  this._options = {};
+  for (var prop in defaultOptions) {
+    this._options[prop] = defaultOptions[prop];
+  }
+  for (var prop in options) {
+    this._options[prop] = options[prop];
+  }
 };
 
 /**
@@ -23,8 +38,6 @@ function wcPlay() {
  * @enum {String}
  */
 wcPlay.PROPERTY_TYPE = {
-  /** Displays the property with no edit control. No options are used. */
-  NONE: 'none',
   /** Displays the property as a checkbox. No options are used. */
   TOGGLE: 'toggle',
   /** Displays the property as a number control. [Number options]{@link wcNode~NumberOptions} are used. */
@@ -33,6 +46,8 @@ wcPlay.PROPERTY_TYPE = {
   STRING: 'string',
   /** Displays the property as a combo box control. [Select options]{@link wcNode~SelectOptions} are used. */
   SELECT: 'select',
+  /** Displays the property as a color picker button. No options are used. */
+  COLOR: 'color',
 };
 
 /**
@@ -76,6 +91,14 @@ wcPlay.registerNodeType = function(name, constructor, type) {
 
 wcPlay.prototype = {
   /**
+   * Gets whether the script is running in [silent mode]{@link wcPlay~Options}.
+   * @returns {Boolean}
+   */
+  isSilent: function() {
+    return this._options.silent;
+  },
+
+  /**
    * Initializes the script and begins the update process.
    * @function wcPlay#init
    */
@@ -83,20 +106,9 @@ wcPlay.prototype = {
     var self = this;
     this._updateID = setInterval(function() {
       self.update();
-    }, 25);
+    }, this._options.updateRate);
 
-    for (var i = 0; i < this._storageNodes.length; ++i) {
-      this._storageNodes[i].onStart();
-    }
-    for (var i = 0; i < this._processNodes.length; ++i) {
-      this._processNodes[i].onStart();
-    }
-    for (var i = 0; i < this._compositeNodes.length; ++i) {
-      this._compositeNodes[i].onStart();
-    }
-    for (var i = 0; i < this._entryNodes.length; ++i) {
-      this._entryNodes[i].onStart();
-    }
+    this.__notifyNodes('onStart', []);
   },
 
   /**
@@ -134,6 +146,91 @@ wcPlay.prototype = {
   },
 
   /**
+   * Creates a new global property.
+   * @param {String} name - The name of the property.
+   * @param {wcPlay.PROPERTY_TYPE} [controlType=wcPlay.PROPERTY_TYPE.STRING] - The type of property.
+   * @param {Object} [defaultValue] - A default value for this property.
+   * @param {Object} [options] - Additional options for this property, see {@link wcPlay.PROPERTY_TYPE}.
+   * @returns {Boolean} - Failes if the property does not exist.
+   */
+  createProperty: function(name, controlType, defaultValue, options) {
+    // Make sure this property doesn't already exist.
+    for (var i = 0; i < this._properties.length; ++i) {
+      if (this._properties[i].name === name) {
+        return false;
+      }
+    }
+
+    // Make sure the type is valid.
+    if (!wcPlay.PROPERTY_TYPE.hasOwnProperty(controlType)) {
+      controlType = wcPlay.PROPERTY_TYPE.STRING;
+    }
+
+    this._properties.push({
+      name: name,
+      value: defaultValue,
+      defaultValue: defaultValue,
+      controlType: controlType,
+      options: options || {},
+    });
+    return true;
+  },
+
+  /**
+   * Renames an existing global property.
+   * @function wcPlay#renameProperty
+   * @param {String} name - The current name of the global property to rename.
+   * @param {String} newName - The new desired name of the global property.
+   * @returns {Boolean} - Fails if the property was not found or if the new name is already used.
+   */
+  renameProperty: function(name, newName) {
+    var prop = null;
+    for (var i = 0; i < this._properties.length; ++i) {
+      if (this._properties[i].name === newName) {
+        return false;
+      }
+
+      if (this._properties[i].name === name) {
+        prop = this._properties[i];
+      }
+    }
+
+    if (!prop) {
+      return false;
+    }
+
+    prop.name = newName;
+    this.__notifyNodes('onGlobalPropertyRenamed', [name, newName]);
+  },
+
+  /**
+   * Gets, or Sets a global property value.
+   * @function wcPlay#property
+   * @param {String} name - The name of the property.
+   * @param {Object} [value] - If supplied, will assign a new value to the property.
+   * @returns {Object} - The current value of the property, or undefined if not found.
+   */
+  property: function(name, value) {
+    var prop = null;
+    for (var i = 0; i < this._properties.length; ++i) {
+      if (this._properties[i].name === name) {
+        prop = this._properties[i];
+        break;
+      }
+    }
+
+    if (!prop) {
+      return;
+    }
+
+    if (value !== undefined && value !== prop.value) {
+      var oldValue = prop.value;
+      prop.value = value;
+      this.__notifyNodes('onGlobalPropertyChanged', [prop.name, oldValue, prop.value]);
+    }
+  },
+
+  /**
    * Triggers an event into the Play script.
    * @function wcPlay#triggerEvent
    * @param {String} name - The event name to trigger (more specifically, the name of the wcNodeEntry).
@@ -144,6 +241,38 @@ wcPlay.prototype = {
       if (this._entryNodes[i].name === name) {
         this._entryNodes[i].onTriggered(data);
       }
+    }
+  },
+
+  /**
+   * Queues a node entry link to trigger on the next update.
+   * @function wcPlay#queueNodeEntry
+   * @param {wcNode} node - The node being queued.
+   * @param {String} name - The entry link name.
+   */
+  queueNodeEntry: function(node, name) {
+    if (node.enabled()) {
+      this._queuedChain.push({
+        node: node,
+        name: name,
+      });
+    }
+  },
+
+  /**
+   * Queues a node property value change to trigger on the next update.
+   * @function wcPlay#queueNodeProperty
+   * @param {wcNode} node - The node being queued.
+   * @param {String} name - The property name.
+   * @param {Object} value - The property value.
+   */
+  queueNodeProperty: function(node, name, value) {
+    if (node.enabled()) {
+      this._queuedProperties.push({
+        node: node,
+        name: name,
+        value: value,
+      });
     }
   },
 
@@ -184,36 +313,37 @@ wcPlay.prototype = {
   },
 
   /**
-   * Queues a node entry link to trigger on the next update.
-   * @function wcPlay#__queueNodeEntry
+   * Sends a custom notification event to all nodes.
+   * @function wcPlay#__notifyNodes
    * @private
-   * @param {wcNode} node - The node being queued.
-   * @param {String} name - The entry link name.
+   * @param {String} func - The node function to call.
+   * @param {Object[]} args - A list of arguments to forward into the function call.
    */
-  __queueNodeEntry: function(node, name) {
-    if (node.enabled()) {
-      this._queuedChain.push({
-        node: node,
-        name: name,
-      });
+  __notifyNodes: function(func, args) {
+    var self;
+    for (var i = 0; i < this._storageNodes.length; ++i) {
+      self = this._storageNodes[i];
+      if (typeof self[func] === 'function') {
+        self[func].apply(self, args);
+      }
     }
-  },
-
-  /**
-   * Queues a node property value change to trigger on the next update.
-   * @function wcPlay#__queueNodeProperty
-   * @private
-   * @param {wcNode} node - The node being queued.
-   * @param {String} name - The property name.
-   * @param {Object} value - The property value.
-   */
-  __queueNodeProperty: function(node, name, value) {
-    if (node.enabled()) {
-      this._queuedProperties.push({
-        node: node,
-        name: name,
-        value: value,
-      });
+    for (var i = 0; i < this._processNodes.length; ++i) {
+      self = this._processNodes[i];
+      if (typeof self[func] === 'function') {
+        self[func].apply(self, args);
+      }
+    }
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      self = this._compositeNodes[i];
+      if (typeof self[func] === 'function') {
+        self[func].apply(self, args);
+      }
+    }
+    for (var i = 0; i < this._entryNodes.length; ++i) {
+      self = this._entryNodes[i];
+      if (typeof self[func] === 'function') {
+        self[func].apply(self, args);
+      }
     }
   },
 };

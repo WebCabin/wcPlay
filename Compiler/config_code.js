@@ -30,7 +30,7 @@ var header = '\
  *  font-awesome 4.2.0\n\
  *\n\
  * Author: Jeff Houde (lochemage@webcabin.org)\n\
- * Web: http://play.webcabin.org/\n\
+ * Web: https://play.webcabin.org/\n\
  *\n\
  * Licensed under\n\
  *   MIT License http://www.opensource.org/licenses/mit-license\n\
@@ -55,59 +55,58 @@ function uglifyCSS(srcPath, distPath) {
 // Combine the source files
 concat({
   src: [
-    '../Code/docker.js',
-    '../Code/ghost.js',
-    '../Code/layout.js',
-    '../Code/panel.js',
-    '../Code/frame.js',
-    '../Code/splitter.js',
-    '../Code/collapser.js',
-    '../Code/drawer.js',
-    '../Code/tabframe.js',
-    '../Code/iframe.js',
+    '../Code/class.js',
+    '../Code/play.js',
+    '../Code/nodes/node.js',
+    '../Code/nodes/entry.js',
+    '../Code/nodes/process.js',
+    '../Code/nodes/storage.js',
+    '../Code/nodes/entry/start.js',
+    '../Code/nodes/process/delay.js',
+    '../Code/nodes/process/log.js',
   ],
-  dest: '../Build/wcDocker.js',
+  dest: '../Build/wcPlay.js',
 });
 
-concat({
-  src: [
-    '../Code/style.css',
-  ],
-  dest: '../Build/wcDocker.css',
-});
+// concat({
+//   src: [
+//     '../Code/style.css',
+//   ],
+//   dest: '../Build/wcPlay.css',
+// });
 
 // Move the un-minified version to the build folder.
-concat({
-  src: [
-    '../Themes/default.css',
-  ],
-  dest: '../Build/Themes/default.css',
-});
-concat({
-  src: [
-    '../Themes/bigRed.css',
-  ],
-  dest: '../Build/Themes/bigRed.css',
-});
-concat({
-  src: [
-    '../Themes/shadow.css',
-  ],
-  dest: '../Build/Themes/shadow.css',
-});
-concat({
-  src: [
-    '../Themes/ideDark.css',
-  ],
-  dest: '../Build/Themes/ideDark.css',
-});
+// concat({
+//   src: [
+//     '../Themes/default.css',
+//   ],
+//   dest: '../Build/Themes/default.css',
+// });
+// concat({
+//   src: [
+//     '../Themes/bigRed.css',
+//   ],
+//   dest: '../Build/Themes/bigRed.css',
+// });
+// concat({
+//   src: [
+//     '../Themes/shadow.css',
+//   ],
+//   dest: '../Build/Themes/shadow.css',
+// });
+// concat({
+//   src: [
+//     '../Themes/ideDark.css',
+//   ],
+//   dest: '../Build/Themes/ideDark.css',
+// });
 
 
 // Now minify them. 
-uglifyJS('../Build/wcDocker.js', '../Build/wcDocker.min.js');
-uglifyCSS('../Build/wcDocker.css', '../Build/wcDocker.min.css');
+uglifyJS('../Build/wcPlay.js', '../Build/wcPlay.min.js');
+// uglifyCSS('../Build/wcPlay.css', '../Build/wcPlay.min.css');
 
-uglifyCSS('../Themes/default.css', '../Build/Themes/default.min.css');
-uglifyCSS('../Themes/bigRed.css', '../Build/Themes/bigRed.min.css');
-uglifyCSS('../Themes/shadow.css', '../Build/Themes/shadow.min.css');
-uglifyCSS('../Themes/ideDark.css', '../Build/Themes/ideDark.min.css');
+// uglifyCSS('../Themes/default.css', '../Build/Themes/default.min.css');
+// uglifyCSS('../Themes/bigRed.css', '../Build/Themes/bigRed.min.css');
+// uglifyCSS('../Themes/shadow.css', '../Build/Themes/shadow.min.css');
+// uglifyCSS('../Themes/ideDark.css', '../Build/Themes/ideDark.min.css');

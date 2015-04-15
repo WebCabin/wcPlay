@@ -1,4 +1,11 @@
 /**
+ * Custom options available when constructing a new {@link wcPlay} instance.
+ * @typedef {Object} wcPlay~Options
+ * @property {Boolean} [silent=false] - If true, will disable debug logging on all nodes.
+ * @property {Number} [updateRate=25] - The time, in milliseconds, between node updates.
+ */
+
+/**
  * A 2D positional coordinate.
  * @typedef {Object} wcPlay~Coordinates
  * @property {Number} x - The horizontal coordinate.

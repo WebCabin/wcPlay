@@ -1,7 +1,7 @@
-wcNodeProcessLog = wcNodeProcess.extend({
+wcNodeProcess.extend('wcNodeProcessLog', 'Log', 'Core', {
   /**
    * The base class for all process nodes. These are nodes that make up the bulk of script chains.<br>
-   * When inheriting, make sure to include 'this._super(parent, name, pos);' at the top of your init function.
+   * When inheriting, make sure to include 'this._super(parent, pos, name);' at the top of your init function.
    * @class wcNodeProcessLog
    *
    * @param {String} parent - The parent object of this node.
@@ -9,7 +9,7 @@ wcNodeProcessLog = wcNodeProcess.extend({
    * @param {String} [name="Log"] - The name of the node, as displayed on the title bar.
    */
   init: function(parent, pos, name) {
-    this._super(parent, pos, name || 'Log');
+    this._super(parent, pos, name);
 
     // Create the message property so we know what to output in the log.
     this.createProperty('Message', wcPlay.PROPERTY_TYPE.STRING, 'Log message.');
@@ -26,8 +26,6 @@ wcNodeProcessLog = wcNodeProcess.extend({
 
     var msg = this.property('Message');
     console.log('LOG: ' + msg);
-    this.triggerExit();
+    this.triggerExit('Out');
   },
 });
-
-wcPlay.registerNodeType('Log', 'wcNodeProcessLog', wcPlay.NODE_TYPE.PROCESS);

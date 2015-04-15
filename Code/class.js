@@ -1,8 +1,8 @@
 /* Simple JavaScript Inheritance
  * By John Resig http://ejohn.org/
  * MIT Licensed.
+ * Modified by Jeff Houde https://play.webcabin.org/
  */
-// Inspired by base2 and Prototype
 (function(){
   var initializing = false, fnTest = /xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/;
  
@@ -10,13 +10,19 @@
   this.Class = function(){};
  
   // Create a new Class that inherits from this class
-  Class.extend = function(prop) {
+  Class.extend = function() {
+    // First argument is always the class name.
+    var className = arguments[0];
+    // Full argument list will all be passed into the classInit function call.
+    // Last argument is always the class definition.
+    var prop = arguments[arguments.length-1];
+
     var _super = this.prototype;
    
     // Instantiate a base class (but only create the instance,
     // don't run the init constructor)
     initializing = true;
-    var prototype = new this();
+    var prototype = new this(arguments);
     initializing = false;
    
     // Copy the properties over onto the new prototype
@@ -46,8 +52,11 @@
     // The dummy class constructor
     function Class() {
       // All construction is actually done in the init method
-      if ( !initializing && this.init )
-        this.init.apply(this, arguments);
+      if (!initializing) {
+        this.init && this.init.apply(this, arguments);
+      } else {
+        this.classInit && this.classInit.apply(this, arguments[0]);
+      }
     }
    
     // Populate our constructed prototype object
@@ -59,6 +68,6 @@
     // And make this class extendable
     Class.extend = arguments.callee;
    
-    return Class;
+    window[className] = Class;
   };
 })();

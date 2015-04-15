@@ -27,14 +27,7 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcPlay.html">wcPlay</a></li>
-				</ul>
-			</li>
-			
-			<li class="dropdown">
-				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
-				<ul class="dropdown-menu ">
-					<li><a href="global.html#triggerCondition">triggerCondition</a></li>
+					<li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessLog.html">wcNodeProcessLog</a></li><li><a href="wcPlay.html">wcPlay</a></li>
 				</ul>
 			</li>
 			
@@ -62,6 +55,8 @@
         wcPlay
         </h2>
         
+            <div class="class-description"><p style="margin-left:20px;">wcPlay</p></div>
+        
     
 </header>
 
@@ -72,7 +67,7 @@
         
 <hr>
 <dt>
-    <h4 class="name" id="wcPlay"><toc class="small"><i></i></toc><toc> </toc><toc>new </toc><toc><b>wcPlay</b>()</toc>
+    <h4 class="name" id="wcPlay"><toc class="small"><i></i></toc><toc> </toc><toc>new </toc><toc><b>wcPlay</b>(<span class="optional">options</span>)</toc>
         
     </h4>
 
@@ -91,6 +86,67 @@
     
     
     
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="wcPlay.html#~Options">wcPlay~Options</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Custom options.</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
     
     
     
@@ -140,13 +196,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="play.js.html">play.js</a>,
-     <a href="play.js.html#sunlight-1-line-1">line 1</a>
+     <a href="play.js.html#sunlight-1-line-7">line 7</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="play.js.html">play.js</a>,
-				 <a href="play.js.html#sunlight-1-line-1">line 1</a>
+				 <a href="play.js.html#sunlight-1-line-7">line 7</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -230,13 +286,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="play.js.html">play.js</a>,
-     <a href="play.js.html#sunlight-1-line-53">line 53</a>
+     <a href="play.js.html#sunlight-1-line-68">line 68</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="play.js.html">play.js</a>,
-				 <a href="play.js.html#sunlight-1-line-53">line 53</a>
+				 <a href="play.js.html#sunlight-1-line-68">line 68</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -459,13 +515,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="play.js.html">play.js</a>,
-     <a href="play.js.html#sunlight-1-line-42">line 42</a>
+     <a href="play.js.html#sunlight-1-line-57">line 57</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="play.js.html">play.js</a>,
-				 <a href="play.js.html#sunlight-1-line-42">line 42</a>
+				 <a href="play.js.html#sunlight-1-line-57">line 57</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -540,35 +596,6 @@
 
         <tr>
             
-                <td class="name"><code>NONE</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-
-            
-                <td class="default">
-                
-                    none
-                
-                </td>
-            
-
-            <td class="description last">Displays the property with no edit control. No options are used.</td>
-        </tr>
-
-	
-
-        <tr>
-            
                 <td class="name"><code>TOGGLE</code></td>
             
 
@@ -620,7 +647,7 @@
                 </td>
             
 
-            <td class="description last">Displays the property as a number control. <a href="wcNode.html#~NumberOptions">Number options</a> are used.</td>
+            <td class="description last">Displays the property as a number control. Number options are used.</td>
         </tr>
 
 	
@@ -678,7 +705,36 @@
                 </td>
             
 
-            <td class="description last">Displays the property as a combo box control. <a href="wcNode.html#~SelectOptions">Select options</a> are used.</td>
+            <td class="description last">Displays the property as a combo box control. Select options are used.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>COLOR</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    color
+                
+                </td>
+            
+
+            <td class="description last">Displays the property as a color picker button. No options are used.</td>
         </tr>
 
 	
@@ -717,13 +773,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="play.js.html">play.js</a>,
-     <a href="play.js.html#sunlight-1-line-25">line 25</a>
+     <a href="play.js.html#sunlight-1-line-40">line 40</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="play.js.html">play.js</a>,
-				 <a href="play.js.html#sunlight-1-line-25">line 25</a>
+				 <a href="play.js.html#sunlight-1-line-40">line 40</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -927,13 +983,303 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="play.js.html">play.js</a>,
-     <a href="play.js.html#sunlight-1-line-62">line 62</a>
+     <a href="play.js.html#sunlight-1-line-77">line 77</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="play.js.html">play.js</a>,
-				 <a href="play.js.html#sunlight-1-line-62">line 62</a>
+				 <a href="play.js.html#sunlight-1-line-77">line 77</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="createProperty"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>createProperty</b>(name, <span class="optional">controlType</span>, <span class="optional">defaultValue</span>, <span class="optional">options</span>)</toc>
+        
+        >
+        
+        <i><small>
+<span class="param-type">Boolean</span>
+
+</small></i>
+        
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p style="margin-left: 20px;">Creates a new global property.</p>
+    </div>
+    
+
+    
+
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+		<th>Default</th>
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The name of the property.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>controlType</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="wcPlay.html#.PROPERTY_TYPE">wcPlay.PROPERTY_TYPE</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    wcPlay.PROPERTY_TYPE.STRING
+                
+                </td>
+            
+
+            <td class="description last">The type of property.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>defaultValue</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">A default value for this property.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Additional options for this property, see <a href="wcPlay.html#.PROPERTY_TYPE">wcPlay.PROPERTY_TYPE</a>.</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+    
+<h5>Returns: 
+<span class="param-type">Boolean</span>
+
+</h5>
+    
+            <p class="param-desc" style="margin-left: 20px;">
+    
+		 Failes if the property does not exist.
+	</p>
+
+        
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="play.js.html">play.js</a>,
+     <a href="play.js.html#sunlight-1-line-156">line 156</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="play.js.html">play.js</a>,
+				 <a href="play.js.html#sunlight-1-line-156">line 156</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -1020,13 +1366,863 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="play.js.html">play.js</a>,
-     <a href="play.js.html#sunlight-1-line-78">line 78</a>
+     <a href="play.js.html#sunlight-1-line-101">line 101</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="play.js.html">play.js</a>,
-				 <a href="play.js.html#sunlight-1-line-78">line 78</a>
+				 <a href="play.js.html#sunlight-1-line-101">line 101</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="isSilent"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>isSilent</b>()</toc>
+        
+        >
+        
+        <i><small>
+<span class="param-type">Boolean</span>
+
+</small></i>
+        
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p style="margin-left: 20px;">Gets whether the script is running in <a href="wcPlay.html#~Options">silent mode</a>.</p>
+    </div>
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+<h5>Returns: 
+<span class="param-type">Boolean</span>
+
+</h5>
+    
+            
+
+        
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="play.js.html">play.js</a>,
+     <a href="play.js.html#sunlight-1-line-97">line 97</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="play.js.html">play.js</a>,
+				 <a href="play.js.html#sunlight-1-line-97">line 97</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="property"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>property</b>(name, <span class="optional">value</span>)</toc>
+        
+        >
+        
+        <i><small>
+<span class="param-type">Object</span>
+
+</small></i>
+        
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p style="margin-left: 20px;">Gets, or Sets a global property value.</p>
+    </div>
+    
+
+    
+
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The name of the property.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">If supplied, will assign a new value to the property.</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+    
+<h5>Returns: 
+<span class="param-type">Object</span>
+
+</h5>
+    
+            <p class="param-desc" style="margin-left: 20px;">
+    
+		 The current value of the property, or undefined if not found.
+	</p>
+
+        
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="play.js.html">play.js</a>,
+     <a href="play.js.html#sunlight-1-line-206">line 206</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="play.js.html">play.js</a>,
+				 <a href="play.js.html#sunlight-1-line-206">line 206</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="queueNodeEntry"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>queueNodeEntry</b>(node, name)</toc>
+        
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p style="margin-left: 20px;">Queues a node entry link to trigger on the next update.</p>
+    </div>
+    
+
+    
+
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>node</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="wcNode.html">wcNode</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The node being queued.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The entry link name.</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="play.js.html">play.js</a>,
+     <a href="play.js.html#sunlight-1-line-247">line 247</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="play.js.html">play.js</a>,
+				 <a href="play.js.html#sunlight-1-line-247">line 247</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="queueNodeProperty"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>queueNodeProperty</b>(node, name, value)</toc>
+        
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p style="margin-left: 20px;">Queues a node property value change to trigger on the next update.</p>
+    </div>
+    
+
+    
+
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>node</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="wcNode.html">wcNode</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The node being queued.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The property name.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The property value.</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="play.js.html">play.js</a>,
+     <a href="play.js.html#sunlight-1-line-262">line 262</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="play.js.html">play.js</a>,
+				 <a href="play.js.html#sunlight-1-line-262">line 262</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="renameProperty"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>renameProperty</b>(name, newName)</toc>
+        
+        >
+        
+        <i><small>
+<span class="param-type">Boolean</span>
+
+</small></i>
+        
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p style="margin-left: 20px;">Renames an existing global property.</p>
+    </div>
+    
+
+    
+
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current name of the global property to rename.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>newName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The new desired name of the global property.</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+    
+<h5>Returns: 
+<span class="param-type">Boolean</span>
+
+</h5>
+    
+            <p class="param-desc" style="margin-left: 20px;">
+    
+		 Fails if the property was not found or if the new name is already used.
+	</p>
+
+        
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="play.js.html">play.js</a>,
+     <a href="play.js.html#sunlight-1-line-179">line 179</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="play.js.html">play.js</a>,
+				 <a href="play.js.html#sunlight-1-line-179">line 179</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -1185,13 +2381,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="play.js.html">play.js</a>,
-     <a href="play.js.html#sunlight-1-line-136">line 136</a>
+     <a href="play.js.html#sunlight-1-line-233">line 233</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="play.js.html">play.js</a>,
-				 <a href="play.js.html#sunlight-1-line-136">line 136</a>
+				 <a href="play.js.html#sunlight-1-line-233">line 233</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -1278,13 +2474,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="play.js.html">play.js</a>,
-     <a href="play.js.html#sunlight-1-line-102">line 102</a>
+     <a href="play.js.html#sunlight-1-line-114">line 114</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="play.js.html">play.js</a>,
-				 <a href="play.js.html#sunlight-1-line-102">line 102</a>
+				 <a href="play.js.html#sunlight-1-line-114">line 114</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -1440,6 +2636,195 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="play.jsdoc.html">play.jsdoc</a>,
+     <a href="play.jsdoc.html#sunlight-1-line-8">line 8</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="play.jsdoc.html">play.jsdoc</a>,
+				 <a href="play.jsdoc.html#sunlight-1-line-8">line 8</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+            
+                
+<hr>
+<dt class="name" id="~Options">
+    <h4><toc class="small"><i>inner</i></toc><toc> </toc>
+        typedef var
+        <b><toc>Options</toc></b>
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p style="margin-left:20px;">Custom options available when constructing a new <a href="wcPlay.html">wcPlay</a> instance.</p>
+    </div>
+    
+
+    
+        <h5>Type: 
+<span class="param-type">Object</span>
+
+</h5>
+    
+
+    
+<dl class="details">
+	
+
+	<h5 class="subsection-title">Properties:</h5>
+
+	<dl>
+
+<div class="prop-container">
+<table class="props table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+		<th>Default</th>
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>silent</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last">If true, will disable debug logging on all nodes.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>updateRate</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    25
+                
+                </td>
+            
+
+            <td class="description last">The time, in milliseconds, between node updates.</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+</div></dl>
+
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="play.jsdoc.html">play.jsdoc</a>,
      <a href="play.jsdoc.html#sunlight-1-line-1">line 1</a>
   </dt>
 <!-- 	<dd class="tag-source">
@@ -1498,7 +2883,7 @@
 		
 		<span class="jsdoc-message">
 			Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta3</a>
-			on 2015-04-14 using the <a
+			on 2015-04-15 using the <a
 			href="https://github.com/WebCabin/docstrap">Web Cabin DocStrap template</a>.
 		</span>
 		</footer>

@@ -1,7 +1,7 @@
-wcNodeEntryStart = wcNodeEntry.extend({
+wcNodeEntry.extend('wcNodeEntryStart', 'Start', 'Core', {
   /**
    * The base class for all entry nodes. These are nodes that start script chains.<br>
-   * When inheriting, make sure to include 'this._super(parent, name, pos);' at the top of your init function.
+   * When inheriting, make sure to include 'this._super(parent, pos, name);' at the top of your init function.
    * @class wcNodeEntryStart
    *
    * @param {String} parent - The parent object of this node.
@@ -9,7 +9,7 @@ wcNodeEntryStart = wcNodeEntry.extend({
    * @param {String} [name="Start"] - The name of the node, as displayed on the title bar.
    */
   init: function(parent, pos, name) {
-    this._super(parent, pos, name || 'Start');
+    this._super(parent, pos, name);
   },
 
   /**
@@ -22,5 +22,3 @@ wcNodeEntryStart = wcNodeEntry.extend({
     this.onTriggered();
   },
 });
-
-wcPlay.registerNodeType('Start', 'wcNodeEntryStart', wcPlay.NODE_TYPE.ENTRY);
