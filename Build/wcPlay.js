@@ -94,7 +94,7 @@ function wcPlay(options) {
   this._isPaused = false;
   this._isStepping = false;
 
-  this._renderers = [];
+  this._editors = [];
 
   // Setup our options.
   this._options = {
@@ -483,15 +483,15 @@ wcPlay.prototype = {
 
   /**
    * Sends a custom notification event to all renderers.
-   * @function wcPlay#__notifyRenderers
+   * @function wcPlay#__notifyEditors
    * @private
    * @param {String} func - The renderer function to call.
    * @param {Object[]} args - A list of arguments to forward into the function call.
    */
-  __notifyRenderers: function(func, args) {
+  __notifyEditors: function(func, args) {
     var self;
-    for (var i = 0; i < this._renderers.length; ++i) {
-      self = this._renderers[i];
+    for (var i = 0; i < this._editors.length; ++i) {
+      self = this._editors[i];
       if (typeof self[func] === 'function') {
         self[func].apply(self, args);
       }
@@ -505,9 +505,9 @@ wcPlay.prototype = {
  * @constructor
  * @description
  * @param {external:jQuery~Object|external:jQuery~Selector|external:domNode} container - The container element.
- * @param {wcRenderCanvas~Options} [options] - Custom options.
+ * @param {wcPlayEditor~Options} [options] - Custom options.
  */
-function wcRenderCanvas(container, options) {
+function wcPlayEditor(container, options) {
   this.$container = $(container);
   this.$viewport = null;
   this._viewportContext = null;
@@ -579,26 +579,26 @@ function wcRenderCanvas(container, options) {
   window.requestAnimationFrame(this.__update.bind(this));
 }
 
-wcRenderCanvas.prototype = {
+wcPlayEditor.prototype = {
   /**
    * Gets, or Sets the {@link wcPlay} engine that this renderer will render.
-   * @function wcRenderCanvas#engine
+   * @function wcPlayEditor#engine
    * @param {wcPlay} [engine] - If supplied, will assign a new {@link wcPlay} engine to render.
    * @returns {wcPlay} - The current {@link wcPlay} engine.
    */
   engine: function(engine) {
     if (engine !== undefined) {
       if (this._engine) {
-        var index = this._engine._renderers.indexOf(this);
+        var index = this._engine._editors.indexOf(this);
         if (index > -1) {
-          this._engine._renderers.splice(index, 1);
+          this._engine._editors.splice(index, 1);
         }
       }
 
       this._engine = engine;
 
       if (this._engine) {
-        this._engine._renderers.push(this);
+        this._engine._editors.push(this);
       }
     }
 
@@ -607,7 +607,7 @@ wcRenderCanvas.prototype = {
 
   /**
    * Positions the canvas view to the center of all nodes.
-   * @function wcRenderCanvas#center
+   * @function wcPlayEditor#center
    */
   center: function() {
     // TODO:
@@ -615,7 +615,7 @@ wcRenderCanvas.prototype = {
 
   /**
    * Event that is called when the container view is resized.
-   * @function wcRenderCanvas#onResized
+   * @function wcPlayEditor#onResized
    */
   onResized: function() {
     var width = this.$container.width();
@@ -633,7 +633,7 @@ wcRenderCanvas.prototype = {
 
   /**
    * Renders a new frame.
-   * @function wcRenderCanvas#__update
+   * @function wcPlayEditor#__update
    * @private
    */
   __update: function(timestamp) {
@@ -685,9 +685,9 @@ wcRenderCanvas.prototype = {
 
   /**
    * Assigns font data to the canvas.
-   * @function wcRenderCanvas#__setCanvasFont
+   * @function wcPlayEditor#__setCanvasFont
    * @private
-   * @param {Object} font - The font data to assign (wcRenderCanvas~_font object).
+   * @param {Object} font - The font data to assign (wcPlayEditor~_font object).
    * @param {external:Canvas~Context} context - The canvas context.
    */
   __setCanvasFont: function(font, context) {
@@ -696,7 +696,7 @@ wcRenderCanvas.prototype = {
 
   /**
    * Clamps a given string value to a specific number of characters and appends a '...' if necessary.
-   * @function wcRenderCanvas#__clampString
+   * @function wcPlayEditor#__clampString
    * @private
    * @param {String} str - The string to clamp.
    * @param {Number} len - The number of characters to allow.
@@ -711,7 +711,7 @@ wcRenderCanvas.prototype = {
 
   /**
    * Blends two colors together.
-   * @function wcRenderCanvas#__blendColors
+   * @function wcPlayEditor#__blendColors
    * @private
    * @param {String} c0 - The first color, must be in hex string format: "#FFFFFF".
    * @param {String} c1 - The second color, must be in hex string format: "#FFFFFF".
@@ -724,10 +724,10 @@ wcRenderCanvas.prototype = {
 
   /**
    * Retrieves a bounding rectangle that encloses all given rectangles.
-   * @function wcRenderCanvas#__boundingRect
+   * @function wcPlayEditor#__boundingRect
    * @private
-   * @param {wcRenderCanvas~Rect[]} rects - A list of rectangles to expand from.
-   * @param {wcRenderCanvas~Rect} - A bounding rectangle that encloses all given rectangles.
+   * @param {wcPlayEditor~Rect[]} rects - A list of rectangles to expand from.
+   * @param {wcPlayEditor~Rect} - A bounding rectangle that encloses all given rectangles.
    */
   __boundingRect: function(rects) {
     var bounds = {
@@ -757,11 +757,11 @@ wcRenderCanvas.prototype = {
 
   /**
    * Draws a list of nodes on the canvas.
-   * @function wcRenderCanvas#__drawNodes
+   * @function wcPlayEditor#__drawNodes
    * @private
    * @param {wcNode[]} node - The node to render.
    * @param {external:Canvas~Context} context - The canvas context to render on.
-   * @param {wcRenderCanvas~DrawNodeOptions} [options] - Custom options.
+   * @param {wcPlayEditor~DrawNodeOptions} [options] - Custom options.
    */
   __drawNodes: function(nodes, context, options) {
     for (var i = 0; i < nodes.length; ++i) {
@@ -771,13 +771,13 @@ wcRenderCanvas.prototype = {
 
   /**
    * Draws a single node on the canvas at a given position.
-   * @function wcRenderCanvas#__drawNode
+   * @function wcPlayEditor#__drawNode
    * @private
    * @param {wcNode} node - The node to render.
    * @param {wcPlay~Coordinates} pos - The position to render the node in the canvas, relative to the top-middle of the node.
    * @param {external:Canvas~Context} context - The canvas context to render on.
-   * @param {wcRenderCanvas~DrawNodeOptions} [options] - Custom options.
-   * @returns {wcRenderCanvas~DrawNodeData} - Data associated with the newly drawn node.
+   * @param {wcPlayEditor~DrawNodeOptions} [options] - Custom options.
+   * @returns {wcPlayEditor~DrawNodeData} - Data associated with the newly drawn node.
    */
   __drawNode: function(node, pos, context, options) {
     var data = {
@@ -863,12 +863,12 @@ wcRenderCanvas.prototype = {
 
   /**
    * Measures the space to render entry links for a node.
-   * @function wcRenderCanvas#__measureEntryLinks
+   * @function wcPlayEditor#__measureEntryLinks
    * @private
    * @param {wcNode} node - The node to measure.
    * @param {external:Canvas~Context} context - The canvas context.
    * @param {wcPlay~Coordinates} pos - The (top, center) position to measure the links.
-   * @returns {wcRenderCanvas~Rect} - A bounding rectangle.
+   * @returns {wcPlayEditor~Rect} - A bounding rectangle.
    */
   __measureEntryLinks: function(node, context, pos) {
     var bounds = {
@@ -898,12 +898,12 @@ wcRenderCanvas.prototype = {
 
   /**
    * Measures the space to render exit links for a node.
-   * @function wcRenderCanvas#__measureExitLinks
+   * @function wcPlayEditor#__measureExitLinks
    * @private
    * @param {wcNode} node - The node to measure.
    * @param {external:Canvas~Context} context - The canvas context.
    * @param {wcPlay~Coordinates} pos - The (top, center) position to measure the links.
-   * @returns {wcRenderCanvas~Rect} - A bounding rectangle.
+   * @returns {wcPlayEditor~Rect} - A bounding rectangle.
    */
   __measureExitLinks: function(node, context, pos) {
     var bounds = {
@@ -933,12 +933,12 @@ wcRenderCanvas.prototype = {
 
   /**
    * Measures the space to render the center area for a node.
-   * @function wcRenderCanvas#__measureCenter
+   * @function wcPlayEditor#__measureCenter
    * @private
    * @param {wcNode} node - The node to measure.
    * @param {external:Canvas~Context} context - The canvas context.
    * @param {wcPlay~Coordinates} pos - The (top, center) position to measure.
-   * @returns {wcRenderCanvas~Rect} - A bounding rectangle. The height is only the amount of space rendered within the node bounds (links stick out).
+   * @returns {wcPlayEditor~Rect} - A bounding rectangle. The height is only the amount of space rendered within the node bounds (links stick out).
    */
   __measureCenter: function(node, context, pos) {
     var bounds = {
@@ -975,13 +975,13 @@ wcRenderCanvas.prototype = {
 
   /**
    * Draws the entry links of a node.
-   * @function wcRenderCanvas#__drawEntryLinks
+   * @function wcPlayEditor#__drawEntryLinks
    * @private
    * @param {wcNode} node - The node to draw.
    * @param {external:Canvas~Context} context - The canvas context.
    * @param {wcPlay~Coordinates} pos - The (top, center) position to draw the links on the canvas.
    * @param {Number} width - The width of the area to draw in.
-   * @returns {wcRenderCanvas~BoundingData[]} - An array of bounding rectangles, one for each link 'nub'.
+   * @returns {wcPlayEditor~BoundingData[]} - An array of bounding rectangles, one for each link 'nub'.
    */
   __drawEntryLinks: function(node, context, pos, width) {
     var xPos = pos.x - width/2 + this._drawStyle.links.margin;
@@ -1025,13 +1025,13 @@ wcRenderCanvas.prototype = {
 
   /**
    * Draws the exit links of a node.
-   * @function wcRenderCanvas#__drawExitLinks
+   * @function wcPlayEditor#__drawExitLinks
    * @private
    * @param {wcNode} node - The node to draw.
    * @param {external:Canvas~Context} context - The canvas context.
    * @param {wcPlay~Coordinates} pos - The (top, center) position to draw the links on the canvas.
    * @param {Number} width - The width of the area to draw in.
-   * @returns {wcRenderCanvas~BoundingData[]} - An array of bounding rectangles, one for each link 'nub'.
+   * @returns {wcPlayEditor~BoundingData[]} - An array of bounding rectangles, one for each link 'nub'.
    */
   __drawExitLinks: function(node, context, pos, width) {
     var xPos = pos.x - width/2 + this._drawStyle.links.margin;
@@ -1083,12 +1083,12 @@ wcRenderCanvas.prototype = {
 
   /**
    * Measures the space to render the center area for a node.
-   * @function wcRenderCanvas#__drawCenter
+   * @function wcPlayEditor#__drawCenter
    * @private
    * @param {wcNode} node - The node to draw.
    * @param {external:Canvas~Context} context - The canvas context.
-   * @param {wcRenderCanvas~Rect} rect - The bounding area to draw in.
-   * @returns {wcRenderCanvas~DrawPropertyData} - Contains bounding rectangles for various drawings.
+   * @param {wcPlayEditor~Rect} rect - The bounding area to draw in.
+   * @returns {wcPlayEditor~DrawPropertyData} - Contains bounding rectangles for various drawings.
    */
   __drawCenter: function(node, context, rect) {
     var upper = (node.chain.entry.length)? this._font.links.size + this._drawStyle.links.padding: 0;
@@ -1266,12 +1266,12 @@ Class.extend('wcNode', 'Node', '', {
     };
     this._collapsed = false;
     this._awake = false;
+    this._log = false;
+    this._break = false;
     this._parent = parent;
 
     // Give the node its default properties.
     this.createProperty(wcNode.PROPERTY.ENABLED, wcPlay.PROPERTY_TYPE.TOGGLE, true);
-    this.createProperty(wcNode.PROPERTY.LOG, wcPlay.PROPERTY_TYPE.TOGGLE, false);
-    this.createProperty(wcNode.PROPERTY.BREAK, wcPlay.PROPERTY_TYPE.TOGGLE, false);
 
     var engine = this.engine();
     engine && engine.__addNode(this);
@@ -1357,11 +1357,11 @@ Class.extend('wcNode', 'Node', '', {
    */
   debugLog: function(enabled) {
     if (enabled !== undefined) {
-      this.property(wcNode.PROPERTY.LOG, enabled? true: false);
+      this._log = enabled? true: false;
     }
 
     var engine = this.engine();
-    return (!engine || engine.isSilent())? false: this.property(wcNode.PROPERTY.LOG);
+    return (!engine || engine.isSilent())? false: this._log;
   },
 
   /**
@@ -1372,11 +1372,11 @@ Class.extend('wcNode', 'Node', '', {
    */
   debugBreak: function(enabled) {
     if (enabled !== undefined) {
-      this.property(wcNode.PROPERTY.BREAK, enabled? true: false);
+      this._break = enabled? true: false;
     }
 
     var engine = this.engine();
-    return engine.debugging() && this.property(wcNode.PROPERTY.BREAK);
+    return engine.debugging() && this._break;
   },
 
   /**
@@ -2263,9 +2263,6 @@ wcNode.CONNECT_RESULT = {
  */
 wcNode.PROPERTY = {
   ENABLED: 'enabled',
-  LOG: 'debug log',
-  BREAK: 'breakpoint',
-  TRIGGER: 'trigger',
 };
 wcNode.extend('wcNodeEntry', 'Entry Node', '', {
   /**
@@ -2286,9 +2283,6 @@ wcNode.extend('wcNodeEntry', 'Entry Node', '', {
 
     // Create a default exit link.
     this.createExit('out');
-
-    // Add a manual trigger control.
-    this.createProperty(wcNode.PROPERTY.TRIGGER, wcPlay.PROPERTY_TYPE.TOGGLE, false);
   },
 
   /**
@@ -2331,25 +2325,25 @@ wcNode.extend('wcNodeEntry', 'Entry Node', '', {
     return true;
   },
 
-  /**
-   * Event that is called when a property has changed.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNode#onPropertyChanged
-   * @param {String} name - The name of the property.
-   * @param {Object} oldValue - The old value of the property.
-   * @param {Object} newValue - The new value of the property.
-   */
-  onPropertyChanged: function(name, oldValue, newValue) {
-    this._super(name, oldValue, newValue);
+  // *
+  //  * Event that is called when a property has changed.<br>
+  //  * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+  //  * @function wcNode#onPropertyChanged
+  //  * @param {String} name - The name of the property.
+  //  * @param {Object} oldValue - The old value of the property.
+  //  * @param {Object} newValue - The new value of the property.
+   
+  // onPropertyChanged: function(name, oldValue, newValue) {
+  //   this._super(name, oldValue, newValue);
 
-    // Manually trigger the event.
-    if (name === wcNode.PROPERTY.TRIGGER && newValue) {
-      this.triggerExit('out');
+  //   // Manually trigger the event.
+  //   // if (name === wcNode.PROPERTY.TRIGGER && newValue) {
+  //   //   this.triggerExit('out');
 
-      // Turn the toggle back off so it can be used again.
-      this.property(wcNode.PROPERTY.TRIGGER, false);
-    }
-  },
+  //   //   // Turn the toggle back off so it can be used again.
+  //   //   this.property(wcNode.PROPERTY.TRIGGER, false);
+  //   // }
+  // },
 });
 
 

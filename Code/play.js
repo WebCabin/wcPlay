@@ -21,7 +21,7 @@ function wcPlay(options) {
   this._isPaused = false;
   this._isStepping = false;
 
-  this._renderers = [];
+  this._editors = [];
 
   // Setup our options.
   this._options = {
@@ -410,15 +410,15 @@ wcPlay.prototype = {
 
   /**
    * Sends a custom notification event to all renderers.
-   * @function wcPlay#__notifyRenderers
+   * @function wcPlay#__notifyEditors
    * @private
    * @param {String} func - The renderer function to call.
    * @param {Object[]} args - A list of arguments to forward into the function call.
    */
-  __notifyRenderers: function(func, args) {
+  __notifyEditors: function(func, args) {
     var self;
-    for (var i = 0; i < this._renderers.length; ++i) {
-      self = this._renderers[i];
+    for (var i = 0; i < this._editors.length; ++i) {
+      self = this._editors[i];
       if (typeof self[func] === 'function') {
         self[func].apply(self, args);
       }

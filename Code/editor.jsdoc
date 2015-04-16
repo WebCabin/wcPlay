@@ -1,0 +1,46 @@
+/**
+ * Custom options available when constructing a new {@link wcPlay} instance.
+ * @typedef {Object} wcPlayEditor~Options
+ * @property {Boolean} [readOnly=false] - If true, the script will not be editable.
+ */
+
+/**
+ * Custom options for drawing a node on the canvas.
+ * @typedef {Object} wcPlayEditor~DrawNodeOptions
+ */
+
+/**
+ * The 2D bounds of a rectangle.
+ * @typedef {Object} wcPlayEditor~Rect
+ * @property {Number} top
+ * @property {Number} left
+ * @property {Number} width
+ * @property {Number} height
+ */
+
+/**
+ * Bounding information for mouse click events.
+ * @typedef {Object} wcPlayEditor~BoundingData
+ * @property {wcPlayEditor~Rect} rect - The bounding rectangle.
+ * @property {String} name - The name of the bounded object.
+ */
+
+/**
+ * Data associated with a drawn node.
+ * @typedef {Object} wcPlayEditor~DrawNodeData
+ * @property {wcNode} node - The node instance.
+ * @property {wcPlayEditor~Rect} rect - Bounding rectangle of the node (not including links that stick out).
+ * @property {wcPlayEditor~BoundingData[]} entryBounds - Bounding data of entry links.
+ * @property {wcPlayEditor~BoundingData[]} exitBounds - Bounding data of exit links.
+ * @property {wcPlayEditor~BoundingData[]} inputBounds - Bounding data of property input links.
+ * @property {wcPlayEditor~BoundingData[]} outputBounds - Bounding data of property output links.
+ * @property {wcPlayEditor~BoundingData[]} valueBounds - Bounding data of property value text.
+ */
+
+/**
+ * This object contains bounding data for property values, property input links, and property output links.
+ * @typedef {Object} wcPlayEditor~DrawPropertyData
+ * @property {wcPlayEditor~BoundingData[]} inputBounds - Bounding data of property input links.
+ * @property {wcPlayEditor~BoundingData[]} outputBounds - Bounding data of property output links.
+ * @property {wcPlayEditor~BoundingData[]} valueBounds - Bounding data of property value text.
+ */

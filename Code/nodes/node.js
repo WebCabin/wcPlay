@@ -35,12 +35,12 @@ Class.extend('wcNode', 'Node', '', {
     };
     this._collapsed = false;
     this._awake = false;
+    this._log = false;
+    this._break = false;
     this._parent = parent;
 
     // Give the node its default properties.
     this.createProperty(wcNode.PROPERTY.ENABLED, wcPlay.PROPERTY_TYPE.TOGGLE, true);
-    this.createProperty(wcNode.PROPERTY.LOG, wcPlay.PROPERTY_TYPE.TOGGLE, false);
-    this.createProperty(wcNode.PROPERTY.BREAK, wcPlay.PROPERTY_TYPE.TOGGLE, false);
 
     var engine = this.engine();
     engine && engine.__addNode(this);
@@ -126,11 +126,11 @@ Class.extend('wcNode', 'Node', '', {
    */
   debugLog: function(enabled) {
     if (enabled !== undefined) {
-      this.property(wcNode.PROPERTY.LOG, enabled? true: false);
+      this._log = enabled? true: false;
     }
 
     var engine = this.engine();
-    return (!engine || engine.isSilent())? false: this.property(wcNode.PROPERTY.LOG);
+    return (!engine || engine.isSilent())? false: this._log;
   },
 
   /**
@@ -141,11 +141,11 @@ Class.extend('wcNode', 'Node', '', {
    */
   debugBreak: function(enabled) {
     if (enabled !== undefined) {
-      this.property(wcNode.PROPERTY.BREAK, enabled? true: false);
+      this._break = enabled? true: false;
     }
 
     var engine = this.engine();
-    return engine.debugging() && this.property(wcNode.PROPERTY.BREAK);
+    return engine.debugging() && this._break;
   },
 
   /**
@@ -1032,7 +1032,4 @@ wcNode.CONNECT_RESULT = {
  */
 wcNode.PROPERTY = {
   ENABLED: 'enabled',
-  LOG: 'debug log',
-  BREAK: 'breakpoint',
-  TRIGGER: 'trigger',
 };

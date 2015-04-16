@@ -17,9 +17,6 @@ wcNode.extend('wcNodeEntry', 'Entry Node', '', {
 
     // Create a default exit link.
     this.createExit('out');
-
-    // Add a manual trigger control.
-    this.createProperty(wcNode.PROPERTY.TRIGGER, wcPlay.PROPERTY_TYPE.TOGGLE, false);
   },
 
   /**
@@ -62,24 +59,24 @@ wcNode.extend('wcNodeEntry', 'Entry Node', '', {
     return true;
   },
 
-  /**
-   * Event that is called when a property has changed.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNode#onPropertyChanged
-   * @param {String} name - The name of the property.
-   * @param {Object} oldValue - The old value of the property.
-   * @param {Object} newValue - The new value of the property.
-   */
-  onPropertyChanged: function(name, oldValue, newValue) {
-    this._super(name, oldValue, newValue);
+  // *
+  //  * Event that is called when a property has changed.<br>
+  //  * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+  //  * @function wcNode#onPropertyChanged
+  //  * @param {String} name - The name of the property.
+  //  * @param {Object} oldValue - The old value of the property.
+  //  * @param {Object} newValue - The new value of the property.
+   
+  // onPropertyChanged: function(name, oldValue, newValue) {
+  //   this._super(name, oldValue, newValue);
 
-    // Manually trigger the event.
-    if (name === wcNode.PROPERTY.TRIGGER && newValue) {
-      this.triggerExit('out');
+  //   // Manually trigger the event.
+  //   // if (name === wcNode.PROPERTY.TRIGGER && newValue) {
+  //   //   this.triggerExit('out');
 
-      // Turn the toggle back off so it can be used again.
-      this.property(wcNode.PROPERTY.TRIGGER, false);
-    }
-  },
+  //   //   // Turn the toggle back off so it can be used again.
+  //   //   this.property(wcNode.PROPERTY.TRIGGER, false);
+  //   // }
+  // },
 });
 

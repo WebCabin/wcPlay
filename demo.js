@@ -6,13 +6,13 @@ $(document).ready(function() {
     debugging: false,
   });
 
-  // Create an instance of our canvas renderer.
-  var myPlayRenderer = new wcRenderCanvas('.playContainer', {
+  // Create an instance of our script editor.
+  var myPlayEditor = new wcPlayEditor('.playContainer', {
     readOnly: false,
   });
 
   // Assign the current Play script to be rendered.
-  myPlayRenderer.engine(myPlay);
+  myPlayEditor.engine(myPlay);
 
   // Add some nodes.
   var startNode = new wcNodeEntryStart(myPlay, {x: 400, y: 30});

@@ -57,7 +57,7 @@ concat({
   src: [
     '../Code/class.js',
     '../Code/play.js',
-    '../Code/rendercanvas.js',
+    '../Code/editor.js',
     '../Code/nodes/node.js',
     '../Code/nodes/entry.js',
     '../Code/nodes/process.js',
