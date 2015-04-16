@@ -100,6 +100,7 @@ function wcPlay(options) {
   this._options = {
     silent: false,
     updateRate: 25,
+    debugging: true,
   };
   for (var prop in options) {
     this._options[prop] = options[prop];
@@ -202,6 +203,7 @@ wcPlay.prototype = {
       count--;
       var item = this._queuedProperties.shift();
       item.node._meta.flash = true;
+      item.node._meta.paused = false;
       item.node.property(item.name, item.value);
     }
 
@@ -212,6 +214,7 @@ wcPlay.prototype = {
         count--;
         var item = this._queuedChain.shift();
         item.node._meta.flash = true;
+        item.node._meta.paused = false;
         item.node.onTriggered(item.name);
       }
     }
@@ -220,6 +223,48 @@ wcPlay.prototype = {
     if (this._isStepping) {
       this._isPaused = true;
     }
+  },
+
+  /**
+   * Gets, or Sets the debugging state of the script.
+   * @function wcPlay#debugging
+   * @param {Boolean} [debug] - If supplied, will assign the debugging state of the script.
+   * @returns {Boolean} - The current debugging state of the script.
+   */
+  debugging: function(debug) {
+    if (debug !== undefined) {
+      this._options.debugging = debug? true: false;
+    }
+
+    return this._options.debugging;
+  },
+
+  /**
+   * Gets, or Sets the pause state of the script.
+   * @function wcPlay#paused
+   * @param {Boolean} [paused] - If supplied, will assign the paused state of the script.
+   * @returns {Boolean} - The current pause state of the script.
+   */
+  paused: function(paused) {
+    if (paused !== undefined) {
+      this._isPaused = paused? true: false;
+    }
+
+    return this._isPaused;
+  },
+
+  /**
+   * Gets, or Sets the stepping state of the script.
+   * @function wcPlay#stepping
+   * @param {Boolean} [stepping] - If supplied, will assign the stepping state of the script.
+   * @returns {Boolean} - The current stepping state of the script.
+   */
+  stepping: function(stepping) {
+    if (stepping !== undefined) {
+      this._isStepping = stepping? true: false;
+    }
+
+    return this._isStepping;
   },
 
   /**
@@ -333,6 +378,12 @@ wcPlay.prototype = {
         node: node,
         name: name,
       });
+
+      if (node.debugBreak() || this._isStepping) {
+        node._meta.flash = true;
+        node._meta.paused = true;
+        this._isPaused = true;
+      }
     }
   },
 
@@ -350,6 +401,12 @@ wcPlay.prototype = {
         name: name,
         value: value,
       });
+
+      if (node.debugBreak() || this._isStepping) {
+        node._meta.flash = true;
+        node._meta.paused = true;
+        this._isPaused = true;
+      }
     }
   },
 
@@ -584,7 +641,6 @@ wcRenderCanvas.prototype = {
       this._lastUpdate = timestamp;
     }
     this._elapsed = (timestamp - this._lastUpdate) / 1000;
-
     this._lastUpdate = timestamp;
 
     this.onResized();
@@ -735,23 +791,41 @@ wcRenderCanvas.prototype = {
     };
 
     // Update flash state.
-    if (node._meta.flash) {
-      node._meta.flashDelta += this._elapsed * 10.0;
-      if (node._meta.flashDelta >= 1.0) {
-        node._meta.flashDelta = 1.0;
+    var self = this;
+    function __updateFlash(meta, darkColor, lightColor, pauseColor, keepPaused) {
+      if (meta.flash) {
+        meta.flashDelta += self._elapsed * 10.0;
+        if (meta.flashDelta >= 1.0) {
+          meta.flashDelta = 1.0;
 
-        if (!node._meta.awake) {
-          node._meta.flash = false;
+          if (!meta.awake && (!meta.paused || (!keepPaused && !self._engine.paused()))) {
+            meta.flash = false;
+          }
+        }
+      } else if (meta.flashDelta > 0.0) {
+        meta.flashDelta -= self._elapsed * 5.0;
+        if (meta.flashDelta <= 0.0) {
+          meta.flashDelta = 0;
+          meta.paused = keepPaused? meta.paused: false;
         }
       }
-    } else if (node._meta.flashDelta > 0.0) {
-      node._meta.flashDelta -= this._elapsed * 5.0;
-      if (node._meta.flashDelta <= 0.0) {
-        node._meta.flashDelta = 0;
-      }
+
+      meta.color = self.__blendColors(darkColor, meta.paused? pauseColor: lightColor, meta.flashDelta * 0.75);
     }
 
-    node._meta.color = this.__blendColors(node.color, "#FFFFFF", node._meta.flashDelta*0.5);
+    __updateFlash(node._meta, node.color, "#FFFFFF", "#FF0000", true);
+    for (var i = 0; i < node.chain.entry.length; ++i) {
+      __updateFlash(node.chain.entry[i].meta, "#000000", "#FFFF00", "#FFFF00");
+    }
+    for (var i = 0; i < node.chain.exit.length; ++i) {
+      __updateFlash(node.chain.exit[i].meta, "#000000", "#FFFF00", "#FFFF00");
+    }
+    for (var i = 0; i < node.properties.length; ++i) {
+      __updateFlash(node.properties[i].inputMeta, "#000000", "#FFFF00", "#FFFF00");
+      __updateFlash(node.properties[i].outputMeta, "#000000", "#FFFF00", "#FFFF00");
+    }
+
+    // TODO: Ignore drawing if the node is out of view.
 
     // Take some measurements so we know where everything on the node should be drawn.
     var entryBounds  = this.__measureEntryLinks(node, context, pos);
@@ -777,11 +851,13 @@ wcRenderCanvas.prototype = {
     data.rect.left -= this._drawStyle.links.length;
     data.rect.width += this._drawStyle.links.length * 2;
 
-    context.strokeStyle = "gray";
-    // context.strokeRect(entryBounds.left, entryBounds.top, entryBounds.width, entryBounds.height);
-    // context.strokeRect(exitBounds.left, exitBounds.top, exitBounds.width, exitBounds.height);
-    // context.strokeRect(centerBounds.left, centerBounds.top, centerBounds.width, centerBounds.height);
-    // context.strokeRect(data.rect.left, data.rect.top, data.rect.width, data.rect.height);
+    if (node._meta.flashDelta) {
+      context.strokeStyle = "red";
+      // context.strokeRect(entryBounds.left, entryBounds.top, entryBounds.width, entryBounds.height);
+      // context.strokeRect(exitBounds.left, exitBounds.top, exitBounds.width, exitBounds.height);
+      // context.strokeRect(centerBounds.left, centerBounds.top, centerBounds.width, centerBounds.height);
+      context.strokeRect(data.rect.left, data.rect.top, data.rect.width, data.rect.height);
+    }
     return data;
   },
 
@@ -912,7 +988,6 @@ wcRenderCanvas.prototype = {
     var yPos = pos.y + this._drawStyle.links.length + this._font.links.size;
 
     this.__setCanvasFont(this._font.links, context);
-    context.fillStyle = "black";
 
     var result = [];
 
@@ -921,6 +996,7 @@ wcRenderCanvas.prototype = {
     for (var i = 0; i < links.length; ++i) {
       if (!collapsed || links[i].links.length) {
         // Link label
+        context.fillStyle = "black";
         var w = context.measureText(links[i].name).width + this._drawStyle.links.spacing;
         context.fillText(links[i].name, xPos + this._drawStyle.links.spacing/2, yPos);
 
@@ -932,6 +1008,8 @@ wcRenderCanvas.prototype = {
           height: this._drawStyle.links.length,
         };
 
+        context.fillStyle = links[i].meta.color;
+        context.strokeStyle = links[i].meta.color;
         context.fillRect(rect.left, rect.top, rect.width, rect.height);
         result.push({
           rect: rect,
@@ -960,7 +1038,6 @@ wcRenderCanvas.prototype = {
     var yPos = pos.y + this._font.links.size;
 
     this.__setCanvasFont(this._font.links, context);
-    context.fillStyle = "black";
 
     var result = [];
 
@@ -969,6 +1046,7 @@ wcRenderCanvas.prototype = {
     for (var i = 0; i < links.length; ++i) {
       if (!collapsed || links[i].links.length) {
         // Link label
+        context.fillStyle = "black";
         var w = context.measureText(links[i].name).width + this._drawStyle.links.spacing;
         context.fillText(links[i].name, xPos + this._drawStyle.links.spacing/2, yPos);
 
@@ -980,6 +1058,8 @@ wcRenderCanvas.prototype = {
           height: this._drawStyle.links.length,
         };
 
+        context.fillStyle = links[i].meta.color;
+        context.strokeStyle = links[i].meta.color;
         context.beginPath();
         context.moveTo(rect.left, rect.top);
         context.lineTo(rect.left + rect.width, rect.top);
@@ -1069,6 +1149,7 @@ wcRenderCanvas.prototype = {
       upper += this._font.property.size;
 
       // Property name.
+      context.fillStyle = "black";
       context.textAlign = "left";
       this.__setCanvasFont(this._font.property, context);
       context.fillText(props[i].name + ': ', rect.left + this._drawStyle.node.margin, rect.top + upper);
@@ -1098,6 +1179,8 @@ wcRenderCanvas.prototype = {
           height: this._drawStyle.links.width,
         };
 
+        context.fillStyle = props[i].inputMeta.color;
+        context.strokeStyle = props[i].inputMeta.color;
         context.fillRect(linkRect.left, linkRect.top, linkRect.width, linkRect.height);
         result.inputBounds.push({
           rect: linkRect,
@@ -1113,7 +1196,9 @@ wcRenderCanvas.prototype = {
           width: this._drawStyle.links.length,
           height: this._drawStyle.links.width,
         }
-        // context.fillRect(linkRect.left, linkRect.top, linkRect.width/2, linkRect.height);
+
+        context.fillStyle = props[i].outputMeta.color;
+        context.strokeStyle = props[i].outputMeta.color;
         context.beginPath();
         context.moveTo(linkRect.left, linkRect.top);
         context.lineTo(linkRect.left + linkRect.width/2, linkRect.top);
@@ -1160,7 +1245,6 @@ Class.extend('wcNode', 'Node', '', {
   init: function(parent, pos, name) {
     this.name = name || this.name;
     this.color = '#FFFFFF';
-    this.colorAccent = '#666666';
 
     this.pos = {
       x: pos && pos.x || 0,
@@ -1178,6 +1262,7 @@ Class.extend('wcNode', 'Node', '', {
       flashDelta: 0,
       awake: false,
       color: null,
+      paused: false,
     };
     this._collapsed = false;
     this._awake = false;
@@ -1281,16 +1366,17 @@ Class.extend('wcNode', 'Node', '', {
 
   /**
    * Sets, or Gets this node's debug pause state.
-   * @function wcNode#debugPause
+   * @function wcNode#debugBreak
    * @param {Boolean} [enabled] - If supplied, will assign a new debug pause state.
    * @returns {Boolean} - The current debug pause state.
    */
-  debugPause: function(enabled) {
+  debugBreak: function(enabled) {
     if (enabled !== undefined) {
       this.property(wcNode.PROPERTY.BREAK, enabled? true: false);
     }
 
-    return this.property(wcNode.PROPERTY.BREAK);
+    var engine = this.engine();
+    return engine.debugging() && this.property(wcNode.PROPERTY.BREAK);
   },
 
   /**
@@ -1357,6 +1443,11 @@ Class.extend('wcNode', 'Node', '', {
       name: name,
       active: false,
       links: [],
+      meta: {
+        flash: false,
+        flashDelta: 0,
+        color: "#000000",
+      },
     });
     return true;
   },
@@ -1377,6 +1468,11 @@ Class.extend('wcNode', 'Node', '', {
     this.chain.exit.push({
       name: name,
       links: [],
+      meta: {
+        flash: false,
+        flashDelta: 0,
+        color: "#000000",
+      },
     });
     return true;
   },
@@ -1411,6 +1507,16 @@ Class.extend('wcNode', 'Node', '', {
       inputs: [],
       outputs: [],
       options: options || {},
+      inputMeta: {
+        flash: false,
+        flashDelta: 0,
+        color: "#000000",
+      },
+      outputMeta: {
+        flash: false,
+        flashDelta: 0,
+        color: "#000000",
+      },
     });
     return true;
   },
@@ -1888,6 +1994,10 @@ Class.extend('wcNode', 'Node', '', {
       if (this.chain.entry[i].name == name) {
         // Always queue the trigger so execution is not immediate.
         var engine = this.engine();
+        this.chain.entry[i].meta.flash = true;
+        if (this.debugBreak() || (engine && engine.stepping())) {
+          this.chain.entry[i].meta.paused = true;
+        }
         engine && engine.queueNodeEntry(this, this.chain.entry[i].name);
         return true;
       }
@@ -1910,9 +2020,17 @@ Class.extend('wcNode', 'Node', '', {
     for (var i = 0; i < this.chain.exit.length; ++i) {
       var exitLink = this.chain.exit[i];
       if (exitLink.name == name) {
+        this.chain.exit[i].meta.flash = true;
         // Activate all entry links chained to this exit.
+        var engine = this.engine();
+
         for (var a = 0; a < exitLink.links.length; ++a) {
-          exitLink.links[a].node && exitLink.links[a].node.triggerEntry(exitLink.links[a].name);
+          if (exitLink.links[a].node) {
+            exitLink.links[a].node.triggerEntry(exitLink.links[a].name);
+            if (exitLink.links[a].node.debugBreak() || (engine && engine.stepping())) {
+              this.chain.exit[i].meta.paused = true;
+            }
+          }
         }
         return true;
       }
@@ -1937,6 +2055,12 @@ Class.extend('wcNode', 'Node', '', {
           // Retrieve the current value of the property
           var oldValue = prop.value;
 
+          var engine = this.engine();
+          prop.outputMeta.flash = true;
+          if (this.debugBreak() || (engine && engine.stepping())) {
+            prop.outputMeta.paused = true;
+          }
+
           // Notify about to change event.
           if (forceChange || prop.value !== value) {
             value = this.onPropertyChanging(prop.name, oldValue, value) || value;
@@ -1949,14 +2073,36 @@ Class.extend('wcNode', 'Node', '', {
             this.onPropertyChanged(prop.name, oldValue, value);
 
             // Now follow any output links and assign the new value to them as well.
-            var engine = this.engine();
             for (a = 0; a < prop.outputs.length; ++a) {
-              engine && engine.queueNodeProperty(prop.outputs[a].node, prop.outputs[a].name, value);
+              prop.outputs[a].node && prop.outputs[a].node.triggerProperty(prop.outputs[a].name, value);
             }
           }
         }
 
         return prop.value;
+      }
+    }
+  },
+
+  /**
+   * Triggers a property that is about to be changed by the output of another property.
+   * @function wcNode#triggerProperty
+   * @param {String} name - The name of the property.
+   * @param {Object} value - The new value of the property.
+   */
+  triggerProperty: function(name, value) {
+    var engine = this.engine();
+    if (engine) {
+      engine.queueNodeProperty(this, name, value);
+    }
+
+    for (var i = 0; i < this.properties.length; ++i) {
+      var prop = this.properties[i];
+      if (prop.name === name) {
+        prop.inputMeta.flash = true;
+        if (this.debugBreak() || (engine && engine.stepping())) {
+          prop.inputMeta.paused = true;
+        }
       }
     }
   },
@@ -2118,7 +2264,7 @@ wcNode.CONNECT_RESULT = {
 wcNode.PROPERTY = {
   ENABLED: 'enabled',
   LOG: 'debug log',
-  BREAK: 'debug break',
+  BREAK: 'breakpoint',
   TRIGGER: 'trigger',
 };
 wcNode.extend('wcNodeEntry', 'Entry Node', '', {
@@ -2137,7 +2283,6 @@ wcNode.extend('wcNodeEntry', 'Entry Node', '', {
   init: function(parent, pos, name) {
     this._super(parent, pos, name);
     this.color = '#CCCC00';
-    this.colorAccent = '#888800';
 
     // Create a default exit link.
     this.createExit('out');
@@ -2224,7 +2369,6 @@ wcNode.extend('wcNodeProcess', 'Node Process', '', {
   init: function(parent, pos, name) {
     this._super(parent, pos, name);
     this.color = '#007ACC';
-    this.colorAccent = '#004A88';
 
     // Create a default links.
     this.createEntry('in');
@@ -2265,7 +2409,6 @@ wcNode.extend('wcNodeStorage', 'Storage', 'Core', {
   init: function(parent, pos, name) {
     this._super(parent, pos, name);
     this.color = '#009900';
-    this.colorAccent = '#005500';
 
     this.createProperty('value', wcPlay.PROPERTY_TYPE.STRING, '');
   },

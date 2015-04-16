@@ -3,6 +3,7 @@ $(document).ready(function() {
   var myPlay = new wcPlay({
     silent: false,
     updateRate: 25,
+    debugging: false,
   });
 
   // Create an instance of our canvas renderer.
@@ -21,11 +22,11 @@ $(document).ready(function() {
   var storageNode = new wcNodeStorage(myPlay, {x: 150, y: 650});
 
   // Assign them all debug log enabled, so they will console log various events.
-  startNode.debugLog(true);
-  logNode.debugLog(true);
-  delayNode.debugLog(true);
-  operationNode.debugLog(true);
-  storageNode.debugLog(true);
+  // startNode.debugLog(true);
+  // logNode.debugLog(true);
+  // delayNode.debugLog(true);
+  // operationNode.debugLog(true);
+  // storageNode.debugLog(true);
 
   // Assign some property values.
   storageNode.property('value', 0);
@@ -46,7 +47,31 @@ $(document).ready(function() {
   operationNode.collapsed(true);
   storageNode.collapsed(true);
 
-
   // Start execution of the script.
   myPlay.start();
+
+  setTimeout(function() {
+    operationNode.debugBreak(true);
+  }, 500);
+
+  $('body').on('keyup', function(event) {
+    switch (event.keyCode) {
+      // Space to step
+      case 32:
+        myPlay.paused(false);
+        myPlay.stepping(true);
+        break;
+      // Enter to continue;
+      case 13:
+        myPlay.paused(false);
+        myPlay.stepping(false);
+        break;
+      // Esc disable pausing.
+      case 27:
+        myPlay.debugging(!myPlay.debugging());
+        myPlay.paused(false);
+        myPlay.stepping(false);
+        break;
+    };
+  });
 });

@@ -194,7 +194,6 @@ wcRenderCanvas.prototype = {
       this._lastUpdate = timestamp;
     }
     this._elapsed = (timestamp - this._lastUpdate) / 1000;
-
     this._lastUpdate = timestamp;
 
     this.onResized();
@@ -345,23 +344,41 @@ wcRenderCanvas.prototype = {
     };
 
     // Update flash state.
-    if (node._meta.flash) {
-      node._meta.flashDelta += this._elapsed * 10.0;
-      if (node._meta.flashDelta >= 1.0) {
-        node._meta.flashDelta = 1.0;
+    var self = this;
+    function __updateFlash(meta, darkColor, lightColor, pauseColor, keepPaused) {
+      if (meta.flash) {
+        meta.flashDelta += self._elapsed * 10.0;
+        if (meta.flashDelta >= 1.0) {
+          meta.flashDelta = 1.0;
 
-        if (!node._meta.awake) {
-          node._meta.flash = false;
+          if (!meta.awake &amp;&amp; (!meta.paused || (!keepPaused &amp;&amp; !self._engine.paused()))) {
+            meta.flash = false;
+          }
+        }
+      } else if (meta.flashDelta > 0.0) {
+        meta.flashDelta -= self._elapsed * 5.0;
+        if (meta.flashDelta &lt;= 0.0) {
+          meta.flashDelta = 0;
+          meta.paused = keepPaused? meta.paused: false;
         }
       }
-    } else if (node._meta.flashDelta > 0.0) {
-      node._meta.flashDelta -= this._elapsed * 5.0;
-      if (node._meta.flashDelta &lt;= 0.0) {
-        node._meta.flashDelta = 0;
-      }
+
+      meta.color = self.__blendColors(darkColor, meta.paused? pauseColor: lightColor, meta.flashDelta * 0.75);
     }
 
-    node._meta.color = this.__blendColors(node.color, "#FFFFFF", node._meta.flashDelta*0.5);
+    __updateFlash(node._meta, node.color, "#FFFFFF", "#FF0000", true);
+    for (var i = 0; i &lt; node.chain.entry.length; ++i) {
+      __updateFlash(node.chain.entry[i].meta, "#000000", "#FFFF00", "#FFFF00");
+    }
+    for (var i = 0; i &lt; node.chain.exit.length; ++i) {
+      __updateFlash(node.chain.exit[i].meta, "#000000", "#FFFF00", "#FFFF00");
+    }
+    for (var i = 0; i &lt; node.properties.length; ++i) {
+      __updateFlash(node.properties[i].inputMeta, "#000000", "#FFFF00", "#FFFF00");
+      __updateFlash(node.properties[i].outputMeta, "#000000", "#FFFF00", "#FFFF00");
+    }
+
+    // TODO: Ignore drawing if the node is out of view.
 
     // Take some measurements so we know where everything on the node should be drawn.
     var entryBounds  = this.__measureEntryLinks(node, context, pos);
@@ -387,11 +404,13 @@ wcRenderCanvas.prototype = {
     data.rect.left -= this._drawStyle.links.length;
     data.rect.width += this._drawStyle.links.length * 2;
 
-    context.strokeStyle = "gray";
-    // context.strokeRect(entryBounds.left, entryBounds.top, entryBounds.width, entryBounds.height);
-    // context.strokeRect(exitBounds.left, exitBounds.top, exitBounds.width, exitBounds.height);
-    // context.strokeRect(centerBounds.left, centerBounds.top, centerBounds.width, centerBounds.height);
-    // context.strokeRect(data.rect.left, data.rect.top, data.rect.width, data.rect.height);
+    if (node._meta.flashDelta) {
+      context.strokeStyle = "red";
+      // context.strokeRect(entryBounds.left, entryBounds.top, entryBounds.width, entryBounds.height);
+      // context.strokeRect(exitBounds.left, exitBounds.top, exitBounds.width, exitBounds.height);
+      // context.strokeRect(centerBounds.left, centerBounds.top, centerBounds.width, centerBounds.height);
+      context.strokeRect(data.rect.left, data.rect.top, data.rect.width, data.rect.height);
+    }
     return data;
   },
 
@@ -522,7 +541,6 @@ wcRenderCanvas.prototype = {
     var yPos = pos.y + this._drawStyle.links.length + this._font.links.size;
 
     this.__setCanvasFont(this._font.links, context);
-    context.fillStyle = "black";
 
     var result = [];
 
@@ -531,6 +549,7 @@ wcRenderCanvas.prototype = {
     for (var i = 0; i &lt; links.length; ++i) {
       if (!collapsed || links[i].links.length) {
         // Link label
+        context.fillStyle = "black";
         var w = context.measureText(links[i].name).width + this._drawStyle.links.spacing;
         context.fillText(links[i].name, xPos + this._drawStyle.links.spacing/2, yPos);
 
@@ -542,6 +561,8 @@ wcRenderCanvas.prototype = {
           height: this._drawStyle.links.length,
         };
 
+        context.fillStyle = links[i].meta.color;
+        context.strokeStyle = links[i].meta.color;
         context.fillRect(rect.left, rect.top, rect.width, rect.height);
         result.push({
           rect: rect,
@@ -570,7 +591,6 @@ wcRenderCanvas.prototype = {
     var yPos = pos.y + this._font.links.size;
 
     this.__setCanvasFont(this._font.links, context);
-    context.fillStyle = "black";
 
     var result = [];
 
@@ -579,6 +599,7 @@ wcRenderCanvas.prototype = {
     for (var i = 0; i &lt; links.length; ++i) {
       if (!collapsed || links[i].links.length) {
         // Link label
+        context.fillStyle = "black";
         var w = context.measureText(links[i].name).width + this._drawStyle.links.spacing;
         context.fillText(links[i].name, xPos + this._drawStyle.links.spacing/2, yPos);
 
@@ -590,6 +611,8 @@ wcRenderCanvas.prototype = {
           height: this._drawStyle.links.length,
         };
 
+        context.fillStyle = links[i].meta.color;
+        context.strokeStyle = links[i].meta.color;
         context.beginPath();
         context.moveTo(rect.left, rect.top);
         context.lineTo(rect.left + rect.width, rect.top);
@@ -679,6 +702,7 @@ wcRenderCanvas.prototype = {
       upper += this._font.property.size;
 
       // Property name.
+      context.fillStyle = "black";
       context.textAlign = "left";
       this.__setCanvasFont(this._font.property, context);
       context.fillText(props[i].name + ': ', rect.left + this._drawStyle.node.margin, rect.top + upper);
@@ -708,6 +732,8 @@ wcRenderCanvas.prototype = {
           height: this._drawStyle.links.width,
         };
 
+        context.fillStyle = props[i].inputMeta.color;
+        context.strokeStyle = props[i].inputMeta.color;
         context.fillRect(linkRect.left, linkRect.top, linkRect.width, linkRect.height);
         result.inputBounds.push({
           rect: linkRect,
@@ -723,7 +749,9 @@ wcRenderCanvas.prototype = {
           width: this._drawStyle.links.length,
           height: this._drawStyle.links.width,
         }
-        // context.fillRect(linkRect.left, linkRect.top, linkRect.width/2, linkRect.height);
+
+        context.fillStyle = props[i].outputMeta.color;
+        context.strokeStyle = props[i].outputMeta.color;
         context.beginPath();
         context.moveTo(linkRect.left, linkRect.top);
         context.lineTo(linkRect.left + linkRect.width/2, linkRect.top);

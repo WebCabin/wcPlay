@@ -14,7 +14,6 @@ wcNode.extend('wcNodeProcess', 'Node Process', '', {
   init: function(parent, pos, name) {
     this._super(parent, pos, name);
     this.color = '#007ACC';
-    this.colorAccent = '#004A88';
 
     // Create a default links.
     this.createEntry('in');

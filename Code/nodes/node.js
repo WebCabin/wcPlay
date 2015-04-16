@@ -14,7 +14,6 @@ Class.extend('wcNode', 'Node', '', {
   init: function(parent, pos, name) {
     this.name = name || this.name;
     this.color = '#FFFFFF';
-    this.colorAccent = '#666666';
 
     this.pos = {
       x: pos && pos.x || 0,
@@ -32,6 +31,7 @@ Class.extend('wcNode', 'Node', '', {
       flashDelta: 0,
       awake: false,
       color: null,
+      paused: false,
     };
     this._collapsed = false;
     this._awake = false;
@@ -135,16 +135,17 @@ Class.extend('wcNode', 'Node', '', {
 
   /**
    * Sets, or Gets this node's debug pause state.
-   * @function wcNode#debugPause
+   * @function wcNode#debugBreak
    * @param {Boolean} [enabled] - If supplied, will assign a new debug pause state.
    * @returns {Boolean} - The current debug pause state.
    */
-  debugPause: function(enabled) {
+  debugBreak: function(enabled) {
     if (enabled !== undefined) {
       this.property(wcNode.PROPERTY.BREAK, enabled? true: false);
     }
 
-    return this.property(wcNode.PROPERTY.BREAK);
+    var engine = this.engine();
+    return engine.debugging() && this.property(wcNode.PROPERTY.BREAK);
   },
 
   /**
@@ -211,6 +212,11 @@ Class.extend('wcNode', 'Node', '', {
       name: name,
       active: false,
       links: [],
+      meta: {
+        flash: false,
+        flashDelta: 0,
+        color: "#000000",
+      },
     });
     return true;
   },
@@ -231,6 +237,11 @@ Class.extend('wcNode', 'Node', '', {
     this.chain.exit.push({
       name: name,
       links: [],
+      meta: {
+        flash: false,
+        flashDelta: 0,
+        color: "#000000",
+      },
     });
     return true;
   },
@@ -265,6 +276,16 @@ Class.extend('wcNode', 'Node', '', {
       inputs: [],
       outputs: [],
       options: options || {},
+      inputMeta: {
+        flash: false,
+        flashDelta: 0,
+        color: "#000000",
+      },
+      outputMeta: {
+        flash: false,
+        flashDelta: 0,
+        color: "#000000",
+      },
     });
     return true;
   },
@@ -742,6 +763,10 @@ Class.extend('wcNode', 'Node', '', {
       if (this.chain.entry[i].name == name) {
         // Always queue the trigger so execution is not immediate.
         var engine = this.engine();
+        this.chain.entry[i].meta.flash = true;
+        if (this.debugBreak() || (engine && engine.stepping())) {
+          this.chain.entry[i].meta.paused = true;
+        }
         engine && engine.queueNodeEntry(this, this.chain.entry[i].name);
         return true;
       }
@@ -764,9 +789,17 @@ Class.extend('wcNode', 'Node', '', {
     for (var i = 0; i < this.chain.exit.length; ++i) {
       var exitLink = this.chain.exit[i];
       if (exitLink.name == name) {
+        this.chain.exit[i].meta.flash = true;
         // Activate all entry links chained to this exit.
+        var engine = this.engine();
+
         for (var a = 0; a < exitLink.links.length; ++a) {
-          exitLink.links[a].node && exitLink.links[a].node.triggerEntry(exitLink.links[a].name);
+          if (exitLink.links[a].node) {
+            exitLink.links[a].node.triggerEntry(exitLink.links[a].name);
+            if (exitLink.links[a].node.debugBreak() || (engine && engine.stepping())) {
+              this.chain.exit[i].meta.paused = true;
+            }
+          }
         }
         return true;
       }
@@ -791,6 +824,12 @@ Class.extend('wcNode', 'Node', '', {
           // Retrieve the current value of the property
           var oldValue = prop.value;
 
+          var engine = this.engine();
+          prop.outputMeta.flash = true;
+          if (this.debugBreak() || (engine && engine.stepping())) {
+            prop.outputMeta.paused = true;
+          }
+
           // Notify about to change event.
           if (forceChange || prop.value !== value) {
             value = this.onPropertyChanging(prop.name, oldValue, value) || value;
@@ -803,14 +842,36 @@ Class.extend('wcNode', 'Node', '', {
             this.onPropertyChanged(prop.name, oldValue, value);
 
             // Now follow any output links and assign the new value to them as well.
-            var engine = this.engine();
             for (a = 0; a < prop.outputs.length; ++a) {
-              engine && engine.queueNodeProperty(prop.outputs[a].node, prop.outputs[a].name, value);
+              prop.outputs[a].node && prop.outputs[a].node.triggerProperty(prop.outputs[a].name, value);
             }
           }
         }
 
         return prop.value;
+      }
+    }
+  },
+
+  /**
+   * Triggers a property that is about to be changed by the output of another property.
+   * @function wcNode#triggerProperty
+   * @param {String} name - The name of the property.
+   * @param {Object} value - The new value of the property.
+   */
+  triggerProperty: function(name, value) {
+    var engine = this.engine();
+    if (engine) {
+      engine.queueNodeProperty(this, name, value);
+    }
+
+    for (var i = 0; i < this.properties.length; ++i) {
+      var prop = this.properties[i];
+      if (prop.name === name) {
+        prop.inputMeta.flash = true;
+        if (this.debugBreak() || (engine && engine.stepping())) {
+          prop.inputMeta.paused = true;
+        }
       }
     }
   },
@@ -972,6 +1033,6 @@ wcNode.CONNECT_RESULT = {
 wcNode.PROPERTY = {
   ENABLED: 'enabled',
   LOG: 'debug log',
-  BREAK: 'debug break',
+  BREAK: 'breakpoint',
   TRIGGER: 'trigger',
 };

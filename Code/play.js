@@ -27,6 +27,7 @@ function wcPlay(options) {
   this._options = {
     silent: false,
     updateRate: 25,
+    debugging: true,
   };
   for (var prop in options) {
     this._options[prop] = options[prop];
@@ -129,6 +130,7 @@ wcPlay.prototype = {
       count--;
       var item = this._queuedProperties.shift();
       item.node._meta.flash = true;
+      item.node._meta.paused = false;
       item.node.property(item.name, item.value);
     }
 
@@ -139,6 +141,7 @@ wcPlay.prototype = {
         count--;
         var item = this._queuedChain.shift();
         item.node._meta.flash = true;
+        item.node._meta.paused = false;
         item.node.onTriggered(item.name);
       }
     }
@@ -147,6 +150,48 @@ wcPlay.prototype = {
     if (this._isStepping) {
       this._isPaused = true;
     }
+  },
+
+  /**
+   * Gets, or Sets the debugging state of the script.
+   * @function wcPlay#debugging
+   * @param {Boolean} [debug] - If supplied, will assign the debugging state of the script.
+   * @returns {Boolean} - The current debugging state of the script.
+   */
+  debugging: function(debug) {
+    if (debug !== undefined) {
+      this._options.debugging = debug? true: false;
+    }
+
+    return this._options.debugging;
+  },
+
+  /**
+   * Gets, or Sets the pause state of the script.
+   * @function wcPlay#paused
+   * @param {Boolean} [paused] - If supplied, will assign the paused state of the script.
+   * @returns {Boolean} - The current pause state of the script.
+   */
+  paused: function(paused) {
+    if (paused !== undefined) {
+      this._isPaused = paused? true: false;
+    }
+
+    return this._isPaused;
+  },
+
+  /**
+   * Gets, or Sets the stepping state of the script.
+   * @function wcPlay#stepping
+   * @param {Boolean} [stepping] - If supplied, will assign the stepping state of the script.
+   * @returns {Boolean} - The current stepping state of the script.
+   */
+  stepping: function(stepping) {
+    if (stepping !== undefined) {
+      this._isStepping = stepping? true: false;
+    }
+
+    return this._isStepping;
   },
 
   /**
@@ -260,6 +305,12 @@ wcPlay.prototype = {
         node: node,
         name: name,
       });
+
+      if (node.debugBreak() || this._isStepping) {
+        node._meta.flash = true;
+        node._meta.paused = true;
+        this._isPaused = true;
+      }
     }
   },
 
@@ -277,6 +328,12 @@ wcPlay.prototype = {
         name: name,
         value: value,
       });
+
+      if (node.debugBreak() || this._isStepping) {
+        node._meta.flash = true;
+        node._meta.paused = true;
+        this._isPaused = true;
+      }
     }
   },
 

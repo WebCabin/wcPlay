@@ -14,7 +14,6 @@ wcNode.extend('wcNodeEntry', 'Entry Node', '', {
   init: function(parent, pos, name) {
     this._super(parent, pos, name);
     this.color = '#CCCC00';
-    this.colorAccent = '#888800';
 
     // Create a default exit link.
     this.createExit('out');
