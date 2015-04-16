@@ -13,6 +13,7 @@ wcNode.extend('wcNodeEntry', 'Entry Node', 'Core', {
    */
   init: function(parent, pos, name) {
     this._super(parent, pos, name);
+    this.color = '#CCCC00';
 
     // Create a default exit link.
     this.createExit('Out');
@@ -34,7 +35,7 @@ wcNode.extend('wcNodeEntry', 'Entry Node', 'Core', {
     this.className = className;
     this.name = name;
     this.category = category;
-    wcPlay.registerNodeType(name, className, wcPlay.NODE_TYPE.ENTRY);
+    wcPlay.registerNodeType(className, name, category, wcPlay.NODE_TYPE.ENTRY);
   },
 
   /**

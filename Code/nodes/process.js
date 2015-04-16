@@ -13,6 +13,7 @@ wcNode.extend('wcNodeProcess', 'Node Process', 'Core', {
    */
   init: function(parent, pos, name) {
     this._super(parent, pos, name);
+    this.color = '#007ACC';
 
     // Create a default links.
     this.createEntry('In');
@@ -32,13 +33,6 @@ wcNode.extend('wcNodeProcess', 'Node Process', 'Core', {
     this.className = className;
     this.name = name;
     this.category = category;
-    wcPlay.registerNodeType(name, className, wcPlay.NODE_TYPE.PROCESS);
+    wcPlay.registerNodeType(className, name, category, wcPlay.NODE_TYPE.PROCESS);
   },
 });
-
-// wcNodeProcess.prototype.classInit = function(className, name) {
-//   this.className = className;
-//   this.name = name;
-//   wcPlay.registerNodeType(name, className, wcPlay.NODE_TYPE.PROCESS);
-// };
-

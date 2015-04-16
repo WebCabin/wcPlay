@@ -13,9 +13,12 @@ Class.extend('wcNode', 'Node', 'Core', {
    */
   init: function(parent, pos, name) {
     this.name = name || this.name;
-    this.color = null;
+    this.color = '#FFFFFF';
 
-    this.pos = pos;
+    this.pos = {
+      x: pos && pos.x || 0,
+      y: pos && pos.y || 0,
+    };
 
     this.chain = {
       entry: [],
@@ -24,6 +27,7 @@ Class.extend('wcNode', 'Node', 'Core', {
     this.properties = [];
 
     this._meta = {};
+    this._collapsed = false;
     this._awake = false;
     this._parent = parent;
 
@@ -32,7 +36,8 @@ Class.extend('wcNode', 'Node', 'Core', {
     this.createProperty(wcNode.PROPERTY.LOG, wcPlay.PROPERTY_TYPE.TOGGLE, false);
     this.createProperty(wcNode.PROPERTY.BREAK, wcPlay.PROPERTY_TYPE.TOGGLE, false);
 
-    this.engine().__addNode(this);
+    var engine = this.engine();
+    engine && engine.__addNode(this);
   },
 
   /**
@@ -48,7 +53,7 @@ Class.extend('wcNode', 'Node', 'Core', {
     this.className = className;
     this.name = name;
     this.category = category;
-    wcPlay.registerNodeType(name, className, wcPlay.NODE_TYPE.STORAGE);
+    wcPlay.registerNodeType(className, name, category, wcPlay.NODE_TYPE.STORAGE);
   },
 
   /**
@@ -74,20 +79,21 @@ Class.extend('wcNode', 'Node', 'Core', {
     }
 
     // Remove the node from wcPlay
-    this.engine().__removeNode(this);
+    var engine = this.engine();
+    engine && engine.__removeNode(this);
   },
 
   /**
    * Retrieves the wcPlay engine that owns this node.
    * @function wcNode#engine
-   * @returns {wcPlay}
+   * @returns {wcPlay|null} - Either the wcPlay engine, or null if it doesn't belong to one.
    */
   engine: function() {
     var play = this._parent;
-    while (!(play instanceof wcPlay)) {
+    while (play && !(play instanceof wcPlay)) {
       play = play._parent;
     }
-    return play;
+    return play || null;
   },
 
   /**
@@ -115,7 +121,8 @@ Class.extend('wcNode', 'Node', 'Core', {
       this.property(wcNode.PROPERTY.LOG, enabled? true: false);
     }
 
-    return this.engine().isSilent()? false: this.property(wcNode.PROPERTY.LOG);
+    var engine = this.engine();
+    return (!engine || engine.isSilent())? false: this.property(wcNode.PROPERTY.LOG);
   },
 
   /**
@@ -148,6 +155,21 @@ Class.extend('wcNode', 'Node', 'Core', {
    */
   sleep: function() {
     // TODO:
+  },
+
+  /**
+   * Gets, or Sets the current position of the node.
+   * @function wcNode#pos
+   * @param {wcPlay~Coordinates} [pos] - If supplied, will assign a new position for this node.
+   * @returns {wcPlay~Coordinates} - The current position of this node.
+   */
+  pos: function(pos) {
+    if (pos !== undefined) {
+      this.pos.x = pos.x;
+      this.pos.y = pos.y;
+    }
+
+    return {x: this.pos.x, y: this.pos.y};
   },
 
   /**
@@ -692,7 +714,8 @@ Class.extend('wcNode', 'Node', 'Core', {
     for (var i = 0; i < this.chain.entry.length; ++i) {
       if (this.chain.entry[i].name == name) {
         // Always queue the trigger so execution is not immediate.
-        this.engine().queueNodeEntry(this, this.chain.entry[i].name);
+        var engine = this.engine();
+        engine && engine.queueNodeEntry(this, this.chain.entry[i].name);
         return true;
       }
     }
@@ -755,7 +778,7 @@ Class.extend('wcNode', 'Node', 'Core', {
             // Now follow any output links and assign the new value to them as well.
             var engine = this.engine();
             for (a = 0; a < prop.outputs.length; ++a) {
-              engine.queueNodeProperty(prop.outputs[a].node, prop.outputs[a].name, value);
+              engine && engine.queueNodeProperty(prop.outputs[a].node, prop.outputs[a].name, value);
             }
           }
         }

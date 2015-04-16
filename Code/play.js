@@ -21,15 +21,13 @@ function wcPlay(options) {
   this._isPaused = false;
   this._isStepping = false;
 
-  var defaultOptions = {
+  this._renders = [];
+
+  // Setup our options.
+  this._options = {
     silent: false,
     updateRate: 25,
   };
-
-  this._options = {};
-  for (var prop in defaultOptions) {
-    this._options[prop] = defaultOptions[prop];
-  }
   for (var prop in options) {
     this._options[prop] = options[prop];
   }
@@ -71,21 +69,23 @@ wcPlay.NODE_LIBRARY = [];
 
 /**
  * A global function that registers a new node type into the library. This is called automatically when a new extended node type is defined, you should not have to do this manually.
- * @param {String} name - The name of the node.
- * @param {String} constructor - The constructor name.
+ * @param {String} name - The name of the node constructor.
+ * @param {String} displayName - The display name.
+ * @param {String} category - The display category name.
  * @param {wcPlay.NODE_TYPE} type - The node's type.
  * @returns {Boolean} - Success or failure.
  */
-wcPlay.registerNodeType = function(name, constructor, type) {
+wcPlay.registerNodeType = function(name, displayName, category, type) {
   for (var i = 0; i < wcPlay.NODE_LIBRARY.length; ++i) {
-    if (wcPlay.NODE_LIBRARY[i].constructor === constructor) {
+    if (wcPlay.NODE_LIBRARY[i].name === name) {
       return false;
     }
   }
 
   wcPlay.NODE_LIBRARY.push({
     name: name,
-    constructor: constructor,
+    displayName: displayName,
+    category: category,
     type: type,
   });
   return true;

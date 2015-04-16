@@ -13,6 +13,9 @@ wcNodeProcess.extend('wcNodeProcessLog', 'Log', 'Core', {
   init: function(parent, pos, name) {
     this._super(parent, pos, name);
 
+    this.createEntry('something');
+    this.createEntry('somethingelse');
+
     // Create the message property so we know what to output in the log.
     this.createProperty('Message', wcPlay.PROPERTY_TYPE.STRING, 'Log message.');
   },

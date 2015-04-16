@@ -12,6 +12,7 @@ wcNode.extend('wcNodeStorage', 'Storage', 'Core', {
    */
   init: function(parent, pos, name) {
     this._super(parent, pos, name);
+    this.color = '#009900';
 
     this.createProperty('Value', wcPlay.PROPERTY_TYPE.STRING, '');
   },
