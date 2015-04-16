@@ -13,8 +13,9 @@ wcNode.extend('wcNodeStorage', 'Storage', 'Core', {
   init: function(parent, pos, name) {
     this._super(parent, pos, name);
     this.color = '#009900';
+    this.colorAccent = '#005500';
 
-    this.createProperty('Value', wcPlay.PROPERTY_TYPE.STRING, '');
+    this.createProperty('value', wcPlay.PROPERTY_TYPE.STRING, '');
   },
 
   /**
@@ -26,6 +27,6 @@ wcNode.extend('wcNodeStorage', 'Storage', 'Core', {
     this._super();
 
     // Force a property change event so all connected nodes receive our value.
-    this.property('Value', this.property('Value'), true);
+    this.property('value', this.property('value'), true);
   },
 });

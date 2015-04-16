@@ -14,25 +14,38 @@ $(document).ready(function() {
   myPlayRenderer.engine(myPlay);
 
   // Add some nodes.
-  var startNode = new wcNodeEntryStart(myPlay, {x: 50, y: -100});
-  var logNode = new wcNodeProcessLog(myPlay, {x: 50, y: 0});
-  var delayNode = new wcNodeProcessDelay(myPlay, {x: 50, y: 100});
-  var storageNode = new wcNodeStorage(myPlay, {x: -50, y: 0});
+  var startNode = new wcNodeEntryStart(myPlay, {x: 400, y: 30});
+  var logNode = new wcNodeProcessLog(myPlay, {x: 400, y: 200});
+  var delayNode = new wcNodeProcessDelay(myPlay, {x: 400, y: 400});
+  var operationNode = new wcNodeProcessOperation(myPlay, {x: 400, y: 600});
+  var storageNode = new wcNodeStorage(myPlay, {x: 150, y: 650});
 
   // Assign them all debug log enabled, so they will console log various events.
   startNode.debugLog(true);
   logNode.debugLog(true);
   delayNode.debugLog(true);
+  operationNode.debugLog(true);
   storageNode.debugLog(true);
 
-  // Assign a value to the storage node.
-  storageNode.property('Value', 'Message changed by storage node!');
+  // Assign some property values.
+  storageNode.property('value', 0);
+  operationNode.property('valueB', 1);
 
   // Chain some nodes together.
-  storageNode.connectOutput('Value', logNode, 'Message');
-  startNode.connectExit('Out', logNode, 'In');
-  logNode.connectExit('Out', delayNode, 'In');
-  // delayNode.connectExit('Finished', logNode, 'In');
+  storageNode.connectOutput('value', operationNode, 'valueA');
+  operationNode.connectOutput('result', storageNode, 'value');
+  startNode.connectExit('out', logNode, 'in');
+  logNode.connectExit('out', delayNode, 'in');
+  delayNode.connectExit('finished', operationNode, 'add');
+  operationNode.connectExit('out', logNode, 'in');
+
+  // Lets collapse all the nodes so they take up less space.
+  startNode.collapsed(true);
+  logNode.collapsed(true);
+  delayNode.collapsed(true);
+  operationNode.collapsed(true);
+  storageNode.collapsed(true);
+
 
   // Start execution of the script.
   myPlay.start();

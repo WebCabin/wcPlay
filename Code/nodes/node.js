@@ -1,4 +1,4 @@
-Class.extend('wcNode', 'Node', 'Core', {
+Class.extend('wcNode', 'Node', '', {
   /**
    * @class
    * The foundation class for all nodes.<br>
@@ -14,6 +14,7 @@ Class.extend('wcNode', 'Node', 'Core', {
   init: function(parent, pos, name) {
     this.name = name || this.name;
     this.color = '#FFFFFF';
+    this.colorAccent = '#666666';
 
     this.pos = {
       x: pos && pos.x || 0,
@@ -26,7 +27,12 @@ Class.extend('wcNode', 'Node', 'Core', {
     };
     this.properties = [];
 
-    this._meta = {};
+    this._meta = {
+      flash: false,
+      flashDelta: 0,
+      awake: false,
+      color: null,
+    };
     this._collapsed = false;
     this._awake = false;
     this._parent = parent;
@@ -50,10 +56,12 @@ Class.extend('wcNode', 'Node', 'Core', {
    * @param {String} category - A category where this node will be grouped.
    */
   classInit: function(className, name, category) {
-    this.className = className;
-    this.name = name;
-    this.category = category;
-    wcPlay.registerNodeType(className, name, category, wcPlay.NODE_TYPE.STORAGE);
+    if (category) {
+      this.className = className;
+      this.name = name;
+      this.category = category;
+      wcPlay.registerNodeType(className, name, category, wcPlay.NODE_TYPE.STORAGE);
+    }
   },
 
   /**
@@ -140,12 +148,26 @@ Class.extend('wcNode', 'Node', 'Core', {
   },
 
   /**
+   * Sets, or Gets this node's collapsed state.
+   * @function wcNode#collapsed
+   * @param {Boolean} [enabled] - If supplied, will assign a new debug pause state.
+   * @returns {Boolean} - The current debug pause state.
+   */
+  collapsed: function(enabled) {
+    if (enabled !== undefined) {
+      this._collapsed = enabled;
+    }
+
+    return this._collapsed;
+  },
+
+  /**
    * Awakens this node. This should be used if your node takes time to fully process before it is done. Use {@link wcNode#sleep} when the processes have been completed.
    * @function wcNode#wake
    * @see wcNode#sleep
    */
   wake: function() {
-    // TODO:
+    this._meta.awake = true;
   },
 
   /**
@@ -154,7 +176,7 @@ Class.extend('wcNode', 'Node', 'Core', {
    * @see wcNode#wake
    */
   sleep: function() {
-    // TODO:
+    this._meta.awake = false;
   },
 
   /**
@@ -179,10 +201,6 @@ Class.extend('wcNode', 'Node', 'Core', {
    * @returns {Boolean} - Fails if the entry link name already exists.
    */
   createEntry: function(name) {
-    if (name === undefined) {
-      name = 'In';
-    }
-
     for (var i = 0; i < this.chain.entry.length; ++i) {
       if (this.chain.entry[i].name === name) {
         return false;
@@ -260,7 +278,10 @@ Class.extend('wcNode', 'Node', 'Core', {
   removeEntry: function(name) {
     for (var i = 0; i < this.chain.entry.length; ++i) {
       if (this.chain.entry[i].name === name) {
-        return this.disconnectEntry(name) === wcNode.CONNECT_RESULT.SUCCESS;
+        if (this.disconnectEntry(name) === wcNode.CONNECT_RESULT.SUCCESS) {
+          this.chain.entry.splice(i, 1);
+          return true;
+        }
       }
     }
     return false;
@@ -275,7 +296,10 @@ Class.extend('wcNode', 'Node', 'Core', {
   removeExit: function(name) {
     for (var i = 0; i < this.chain.exit.length; ++i) {
       if (this.chain.exit[i].name === name) {
-        return this.disconnectExit(name) === wcNode.CONNECT_RESULT.SUCCESS;
+        if (this.disconnectExit(name) === wcNode.CONNECT_RESULT.SUCCESS) {
+          this.chain.exit.splice(i, 1);
+          return true;
+        }
       }
     }
     return false;
@@ -290,7 +314,10 @@ Class.extend('wcNode', 'Node', 'Core', {
   removeProperty: function(name) {
     for (var i = 0; i < this.properties.length; ++i) {
       if (this.properties[i].name === name) {
-        return this.disconnectInput(name) === this.disconnectOutput(name) === wcNode.CONNECT_RESULT.SUCCESS;
+        if (this.disconnectInput(name) === this.disconnectOutput(name) === wcNode.CONNECT_RESULT.SUCCESS) {
+          this.properties.splice(i, 1);
+          return true;
+        }
       }
     }
     return false;

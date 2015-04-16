@@ -13,11 +13,8 @@ wcNodeProcess.extend('wcNodeProcessLog', 'Log', 'Core', {
   init: function(parent, pos, name) {
     this._super(parent, pos, name);
 
-    this.createEntry('something');
-    this.createEntry('somethingelse');
-
     // Create the message property so we know what to output in the log.
-    this.createProperty('Message', wcPlay.PROPERTY_TYPE.STRING, 'Log message.');
+    this.createProperty('message', wcPlay.PROPERTY_TYPE.STRING, 'Log message.');
   },
 
   /**
@@ -29,8 +26,8 @@ wcNodeProcess.extend('wcNodeProcessLog', 'Log', 'Core', {
   onTriggered: function(name) {
     this._super(name);
 
-    var msg = this.property('Message');
+    var msg = this.property('message');
     console.log('LOG: ' + msg);
-    this.triggerExit('Out');
+    this.triggerExit('out');
   },
 });

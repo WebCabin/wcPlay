@@ -19,12 +19,28 @@
  */
 
 /**
+ * Bounding information for mouse click events.
+ * @typedef {Object} wcRenderCanvas~BoundingData
+ * @property {wcRenderCanvas~Rect} rect - The bounding rectangle.
+ * @property {String} name - The name of the bounded object.
+ */
+
+/**
  * Data associated with a drawn node.
  * @typedef {Object} wcRenderCanvas~DrawNodeData
  * @property {wcNode} node - The node instance.
  * @property {wcRenderCanvas~Rect} rect - Bounding rectangle of the node (not including links that stick out).
- * @property {wcRenderCanvas~Rect[]} entryLinks - Bounding rectangle of entry links.
- * @property {wcRenderCanvas~Rect[]} exitLinks - Bounding rectangle of exit links.
- * @property {wcRenderCanvas~Rect[]} inputLinks - Bounding rectangle of property input links.
- * @property {wcRenderCanvas~Rect[]} outputLinks - Bounding rectangle of property output links.
+ * @property {wcRenderCanvas~BoundingData[]} entryBounds - Bounding data of entry links.
+ * @property {wcRenderCanvas~BoundingData[]} exitBounds - Bounding data of exit links.
+ * @property {wcRenderCanvas~BoundingData[]} inputBounds - Bounding data of property input links.
+ * @property {wcRenderCanvas~BoundingData[]} outputBounds - Bounding data of property output links.
+ * @property {wcRenderCanvas~BoundingData[]} valueBounds - Bounding data of property value text.
+ */
+
+/**
+ * This object contains bounding data for property values, property input links, and property output links.
+ * @typedef {Object} wcRenderCanvas~DrawPropertyData
+ * @property {wcRenderCanvas~BoundingData[]} inputBounds - Bounding data of property input links.
+ * @property {wcRenderCanvas~BoundingData[]} outputBounds - Bounding data of property output links.
+ * @property {wcRenderCanvas~BoundingData[]} valueBounds - Bounding data of property value text.
  */

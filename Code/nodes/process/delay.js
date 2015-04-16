@@ -14,10 +14,10 @@ wcNodeProcess.extend('wcNodeProcessDelay', 'Delay', 'Core', {
     this._super(parent, pos, name);
 
     // Create a finished exit that only triggers after the delay has elapsed.
-    this.createExit('Finished');
+    this.createExit('finished');
 
     // Create the message property so we know what to output in the log.
-    this.createProperty('Milliseconds', wcPlay.PROPERTY_TYPE.NUMBER, 1000);
+    this.createProperty('milliseconds', wcPlay.PROPERTY_TYPE.NUMBER, 1000);
   },
 
   /**
@@ -29,18 +29,18 @@ wcNodeProcess.extend('wcNodeProcessDelay', 'Delay', 'Core', {
   onTriggered: function(name) {
     this._super(name);
 
-    // Always fire the 'Out' link immediately.
-    this.triggerExit('Out');
+    // Always fire the 'out' link immediately.
+    this.triggerExit('out');
 
     // Notify that this node is starting a synchronous process.
     this.wake();
 
     // Now set a timeout to wait for 'Milliseconds' amount of time.    
     var self = this;
-    var delay = this.property('Milliseconds');
+    var delay = this.property('milliseconds');
     setTimeout(function() {
       // Once the time has completed, fire the 'Finished' link and put the node back to sleep.
-      self.triggerExit('Finished');
+      self.triggerExit('finished');
       self.sleep();
     }, delay);
   },

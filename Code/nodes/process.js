@@ -1,4 +1,4 @@
-wcNode.extend('wcNodeProcess', 'Node Process', 'Core', {
+wcNode.extend('wcNodeProcess', 'Node Process', '', {
   /**
    * @class
    * The base class for all process nodes. These are nodes that make up the bulk of script chains.<br>
@@ -14,10 +14,11 @@ wcNode.extend('wcNodeProcess', 'Node Process', 'Core', {
   init: function(parent, pos, name) {
     this._super(parent, pos, name);
     this.color = '#007ACC';
+    this.colorAccent = '#004A88';
 
     // Create a default links.
-    this.createEntry('In');
-    this.createExit('Out');
+    this.createEntry('in');
+    this.createExit('out');
   },
 
   /**
@@ -30,9 +31,11 @@ wcNode.extend('wcNodeProcess', 'Node Process', 'Core', {
    * @param {String} category - A category where this node will be grouped.
    */
   classInit: function(className, name, category) {
-    this.className = className;
-    this.name = name;
-    this.category = category;
-    wcPlay.registerNodeType(className, name, category, wcPlay.NODE_TYPE.PROCESS);
+    if (category) {
+      this.className = className;
+      this.name = name;
+      this.category = category;
+      wcPlay.registerNodeType(className, name, category, wcPlay.NODE_TYPE.PROCESS);
+    }
   },
 });

@@ -21,7 +21,7 @@ function wcPlay(options) {
   this._isPaused = false;
   this._isStepping = false;
 
-  this._renders = [];
+  this._renderers = [];
 
   // Setup our options.
   this._options = {
@@ -128,6 +128,7 @@ wcPlay.prototype = {
     while (count) {
       count--;
       var item = this._queuedProperties.shift();
+      item.node._meta.flash = true;
       item.node.property(item.name, item.value);
     }
 
@@ -137,6 +138,7 @@ wcPlay.prototype = {
       while (count) {
         count--;
         var item = this._queuedChain.shift();
+        item.node._meta.flash = true;
         item.node.onTriggered(item.name);
       }
     }
@@ -343,6 +345,23 @@ wcPlay.prototype = {
     }
     for (var i = 0; i < this._entryNodes.length; ++i) {
       self = this._entryNodes[i];
+      if (typeof self[func] === 'function') {
+        self[func].apply(self, args);
+      }
+    }
+  },
+
+  /**
+   * Sends a custom notification event to all renderers.
+   * @function wcPlay#__notifyRenderers
+   * @private
+   * @param {String} func - The renderer function to call.
+   * @param {Object[]} args - A list of arguments to forward into the function call.
+   */
+  __notifyRenderers: function(func, args) {
+    var self;
+    for (var i = 0; i < this._renderers.length; ++i) {
+      self = this._renderers[i];
       if (typeof self[func] === 'function') {
         self[func].apply(self, args);
       }

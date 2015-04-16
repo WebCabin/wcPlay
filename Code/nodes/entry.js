@@ -1,4 +1,4 @@
-wcNode.extend('wcNodeEntry', 'Entry Node', 'Core', {
+wcNode.extend('wcNodeEntry', 'Entry Node', '', {
   /**
    * @class
    * The base class for all entry nodes. These are nodes that start script chains.<br>
@@ -14,9 +14,10 @@ wcNode.extend('wcNodeEntry', 'Entry Node', 'Core', {
   init: function(parent, pos, name) {
     this._super(parent, pos, name);
     this.color = '#CCCC00';
+    this.colorAccent = '#888800';
 
     // Create a default exit link.
-    this.createExit('Out');
+    this.createExit('out');
 
     // Add a manual trigger control.
     this.createProperty(wcNode.PROPERTY.TRIGGER, wcPlay.PROPERTY_TYPE.TOGGLE, false);
@@ -32,10 +33,12 @@ wcNode.extend('wcNodeEntry', 'Entry Node', 'Core', {
    * @param {String} category - A category where this node will be grouped.
    */
   classInit: function(className, name, category) {
-    this.className = className;
-    this.name = name;
-    this.category = category;
-    wcPlay.registerNodeType(className, name, category, wcPlay.NODE_TYPE.ENTRY);
+    if (category) {
+      this.className = className;
+      this.name = name;
+      this.category = category;
+      wcPlay.registerNodeType(className, name, category, wcPlay.NODE_TYPE.ENTRY);
+    }
   },
 
   /**
@@ -46,7 +49,7 @@ wcNode.extend('wcNodeEntry', 'Entry Node', 'Core', {
    */
   onTriggered: function(data) {
     if (this.triggerCondition(data)) {
-      this.triggerExit('Out');
+      this.triggerExit('out');
     }
   },
 
@@ -73,7 +76,7 @@ wcNode.extend('wcNodeEntry', 'Entry Node', 'Core', {
 
     // Manually trigger the event.
     if (name === wcNode.PROPERTY.TRIGGER && newValue) {
-      this.triggerExit('Out');
+      this.triggerExit('out');
 
       // Turn the toggle back off so it can be used again.
       this.property(wcNode.PROPERTY.TRIGGER, false);
