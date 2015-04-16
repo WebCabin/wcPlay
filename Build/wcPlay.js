@@ -524,10 +524,10 @@ function wcPlayEditor(container, options) {
   this._nodeLibrary = {};
 
   this._font = {
-    title: {size: 20, family: 'Arial', weight: 'bold'},
-    links: {size: 15, family: 'Arial'},
-    property: {size: 15, family: 'Arial', weight: 'italic'},
-    value: {size: 15, family: 'Arial', weight: 'bold'},
+    title: {size: 15, family: 'Arial', weight: 'bold'},
+    links: {size: 10, family: 'Arial'},
+    property: {size: 10, family: 'Arial', weight: 'italic'},
+    value: {size: 10, family: 'Arial', weight: 'bold'},
   };
 
   this._drawStyle = {
@@ -825,7 +825,7 @@ wcPlayEditor.prototype = {
       __updateFlash(node.properties[i].outputMeta, "#000000", "#FFFF00", "#FFFF00");
     }
 
-    // TODO: Ignore drawing if the node is out of view.
+    // TODO: Ignore drawing if the node is outside of view.
 
     // Take some measurements so we know where everything on the node should be drawn.
     var entryBounds  = this.__measureEntryLinks(node, context, pos);
@@ -851,13 +851,26 @@ wcPlayEditor.prototype = {
     data.rect.left -= this._drawStyle.links.length;
     data.rect.width += this._drawStyle.links.length * 2;
 
+    // context.strokeStyle = "red";
+    // function __drawBoundList(list) {
+    //   for (var i = 0; i < list.length; ++i) {
+    //     context.strokeRect(list[i].rect.left, list[i].rect.top, list[i].rect.width, list[i].rect.height);
+    //   };
+    // }
+    // __drawBoundList(data.entryBounds);
+    // __drawBoundList(data.exitBounds);
+    // __drawBoundList(data.inputBounds);
+    // __drawBoundList(data.outputBounds);
+    // __drawBoundList(data.valueBounds);
+    // context.strokeRect(entryBounds.left, entryBounds.top, entryBounds.width, entryBounds.height);
+    // context.strokeRect(exitBounds.left, exitBounds.top, exitBounds.width, exitBounds.height);
+    // context.strokeRect(centerBounds.left, centerBounds.top, centerBounds.width, centerBounds.height);
     if (node._meta.flashDelta) {
       context.strokeStyle = "red";
-      // context.strokeRect(entryBounds.left, entryBounds.top, entryBounds.width, entryBounds.height);
-      // context.strokeRect(exitBounds.left, exitBounds.top, exitBounds.width, exitBounds.height);
-      // context.strokeRect(centerBounds.left, centerBounds.top, centerBounds.width, centerBounds.height);
       context.strokeRect(data.rect.left, data.rect.top, data.rect.width, data.rect.height);
     }
+
+    node._meta.bounds = data;
     return data;
   },
 
@@ -1092,7 +1105,7 @@ wcPlayEditor.prototype = {
    */
   __drawCenter: function(node, context, rect) {
     var upper = (node.chain.entry.length)? this._font.links.size + this._drawStyle.links.padding: 0;
-    var lower = ((node.chain.exit.length)? this._font.links.size + this._drawStyle.links.padding: 0) - ((this._font.links.size + this._drawStyle.links.padding) - upper);
+    var lower = ((node.chain.exit.length)? this._font.links.size + this._drawStyle.links.padding: 0) - ((this._font.links.size + this._drawStyle.links.padding*2) - upper);
 
     // Node background
     context.save();
@@ -1162,10 +1175,10 @@ wcPlayEditor.prototype = {
 
       result.valueBounds.push({
         rect: {
-          top: upper - this._font.property.size,
-          left: rect.left + rect.width - this._drawStyle.node.margin,
+          top: rect.top + upper - this._font.property.size,
+          left: rect.left + rect.width - this._drawStyle.node.margin - w,
           width: w,
-          height: this._font.property.size,
+          height: this._font.property.size + this._drawStyle.property.spacing,
         },
         name: props[i].name,
       });
