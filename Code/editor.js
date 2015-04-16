@@ -35,7 +35,7 @@ function wcPlayEditor(container, options) {
       spacing: 20,        // Spacing between nodes in the palette view.
     },
     node: {
-      radius: 40,         // The radius to draw node corners.
+      radius: 20,         // The radius to draw node corners.
       margin: 10,         // The pixel space between the property text and the edge of the node border.
     },
     title: {
@@ -66,9 +66,9 @@ function wcPlayEditor(container, options) {
     this._options[prop] = options[prop];
   }
 
-  this.$palette = $('<canvas style="position: absolute; top: 0px; left: 0px; height: 100%; border-right:2px solid black;">');
+  this.$palette = $('<canvas class="wcPlayPalette">');
   this._paletteContext = this.$palette[0].getContext('2d');
-  this.$viewport = $('<canvas style="position: absolute; top: 0px; right: 0px; height: 100%;">');
+  this.$viewport = $('<canvas class="wcPlayViewport">');
   this._viewportContext = this.$viewport[0].getContext('2d');
 
   this.$container.append(this.$palette);
@@ -314,15 +314,18 @@ wcPlayEditor.prototype = {
     }
 
     __updateFlash(node._meta, node.color, "#FFFFFF", "#FF0000", true);
+
+    var blackColor = "#000000";
+    var flashColor = "#FFFF00";
     for (var i = 0; i < node.chain.entry.length; ++i) {
-      __updateFlash(node.chain.entry[i].meta, "#000000", "#FFFF00", "#FFFF00");
+      __updateFlash(node.chain.entry[i].meta, blackColor, flashColor, flashColor);
     }
     for (var i = 0; i < node.chain.exit.length; ++i) {
-      __updateFlash(node.chain.exit[i].meta, "#000000", "#FFFF00", "#FFFF00");
+      __updateFlash(node.chain.exit[i].meta, blackColor, flashColor, flashColor);
     }
     for (var i = 0; i < node.properties.length; ++i) {
-      __updateFlash(node.properties[i].inputMeta, "#000000", "#FFFF00", "#FFFF00");
-      __updateFlash(node.properties[i].outputMeta, "#000000", "#FFFF00", "#FFFF00");
+      __updateFlash(node.properties[i].inputMeta, blackColor, flashColor, flashColor);
+      __updateFlash(node.properties[i].outputMeta, blackColor, flashColor, flashColor);
     }
 
     // TODO: Ignore drawing if the node is outside of view.
@@ -351,6 +354,9 @@ wcPlayEditor.prototype = {
     data.rect.left -= this._drawStyle.links.length;
     data.rect.width += this._drawStyle.links.length * 2;
 
+    data.inner = this.__boundingRect([centerBounds]);
+
+    // DEBUG: Render bounding box geometry.
     // context.strokeStyle = "red";
     // function __drawBoundList(list) {
     //   for (var i = 0; i < list.length; ++i) {
@@ -365,6 +371,10 @@ wcPlayEditor.prototype = {
     // context.strokeRect(entryBounds.left, entryBounds.top, entryBounds.width, entryBounds.height);
     // context.strokeRect(exitBounds.left, exitBounds.top, exitBounds.width, exitBounds.height);
     // context.strokeRect(centerBounds.left, centerBounds.top, centerBounds.width, centerBounds.height);
+    // context.strokeRect(data.rect.left, data.rect.top, data.rect.width, data.rect.height);
+
+
+    // Show the bounding box with the node when it is flashing.
     if (node._meta.flashDelta) {
       context.strokeStyle = "red";
       context.strokeRect(data.rect.left, data.rect.top, data.rect.width, data.rect.height);
@@ -604,8 +614,8 @@ wcPlayEditor.prototype = {
    * @returns {wcPlayEditor~DrawPropertyData} - Contains bounding rectangles for various drawings.
    */
   __drawCenter: function(node, context, rect) {
-    var upper = (node.chain.entry.length)? this._font.links.size + this._drawStyle.links.padding: 0;
-    var lower = ((node.chain.exit.length)? this._font.links.size + this._drawStyle.links.padding: 0) - ((this._font.links.size + this._drawStyle.links.padding*2) - upper);
+    var upper = node.chain.entry.length? this._font.links.size + this._drawStyle.links.padding: 0;
+    var lower = node.chain.exit.length? this._font.links.size + this._drawStyle.links.padding: 0;
 
     // Node background
     context.save();
@@ -618,8 +628,8 @@ wcPlayEditor.prototype = {
       context.lineJoin = "round";
       var radius = this._drawStyle.node.radius;
       context.lineWidth = radius;
-      context.fillRect(rect.left + radius/2, rect.top - upper + radius/2, rect.width - radius, rect.height + lower - radius/2);
-      context.strokeRect(rect.left + radius/2, rect.top - upper + radius/2, rect.width - radius, rect.height + lower - radius/2);
+      context.fillRect(rect.left + radius/2, rect.top - upper + radius/2, rect.width - radius, rect.height + upper + lower - radius);
+      context.strokeRect(rect.left + radius/2, rect.top - upper + radius/2, rect.width - radius, rect.height + upper + lower - radius);
     context.restore();
 
     // Title Upper Bar

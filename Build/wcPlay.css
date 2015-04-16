@@ -1,0 +1,22 @@
+.wcPlayPalette {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  height: 100%;
+  border-right:2px solid black;
+}
+
+.wcPlayViewport {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  height: 100%;
+}
+
+.wcClickable {
+  cursor: pointer;
+}
+
+.wcMoving {
+  cursor: move;
+}

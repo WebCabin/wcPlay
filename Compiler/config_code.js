@@ -31,6 +31,7 @@ var header = '\
  *\n\
  * Author: Jeff Houde (lochemage@webcabin.org)\n\
  * Web: https://play.webcabin.org/\n\
+ * API: https://play.api.webcabin.org/\n\
  *\n\
  * Licensed under\n\
  *   MIT License http://www.opensource.org/licenses/mit-license\n\
@@ -70,45 +71,13 @@ concat({
   dest: '../Build/wcPlay.js',
 });
 
-// concat({
-//   src: [
-//     '../Code/style.css',
-//   ],
-//   dest: '../Build/wcPlay.css',
-// });
-
-// Move the un-minified version to the build folder.
-// concat({
-//   src: [
-//     '../Themes/default.css',
-//   ],
-//   dest: '../Build/Themes/default.css',
-// });
-// concat({
-//   src: [
-//     '../Themes/bigRed.css',
-//   ],
-//   dest: '../Build/Themes/bigRed.css',
-// });
-// concat({
-//   src: [
-//     '../Themes/shadow.css',
-//   ],
-//   dest: '../Build/Themes/shadow.css',
-// });
-// concat({
-//   src: [
-//     '../Themes/ideDark.css',
-//   ],
-//   dest: '../Build/Themes/ideDark.css',
-// });
-
+concat({
+  src: [
+    '../Code/editor.css',
+  ],
+  dest: '../Build/wcPlay.css',
+});
 
 // Now minify them. 
 uglifyJS('../Build/wcPlay.js', '../Build/wcPlay.min.js');
-// uglifyCSS('../Build/wcPlay.css', '../Build/wcPlay.min.css');
-
-// uglifyCSS('../Themes/default.css', '../Build/Themes/default.min.css');
-// uglifyCSS('../Themes/bigRed.css', '../Build/Themes/bigRed.min.css');
-// uglifyCSS('../Themes/shadow.css', '../Build/Themes/shadow.min.css');
-// uglifyCSS('../Themes/ideDark.css', '../Build/Themes/ideDark.min.css');
+uglifyCSS('../Build/wcPlay.css', '../Build/wcPlay.min.css');
