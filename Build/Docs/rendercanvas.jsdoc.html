@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>wcPlay Source: nodes/entry/start.js</title>
+	<title>wcPlay Source: rendercanvas.jsdoc</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -46,37 +46,58 @@
 		<div id="main">
     		
 
-		<h1 class="page-title">Source: nodes/entry/start.js</h1>
+		<h1 class="page-title">Source: rendercanvas.jsdoc</h1>
     
 <section>
 	<article>
 		<pre
-			class="sunlight-highlight-javascript linenums">wcNodeEntry.extend('wcNodeEntryStart', 'Start', 'Core', {
-  /**
-   * @class
-   * An entry node that fires as soon as the script [starts]{@link wcPlay#start}.&lt;br>
-   * When inheriting, make sure to include 'this._super(parent, pos, name);' at the top of your init function.
-   *
-   * @constructor wcNodeEntryStart
-   * @description
-   * @param {String} parent - The parent object of this node.
-   * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
-   * @param {String} [name="Start"] - The name of the node, as displayed on the title bar.
-   */
-  init: function(parent, pos, name) {
-    this._super(parent, pos, name);
-  },
+			class="sunlight-highlight-javascript linenums">/**
+ * Custom options available when constructing a new {@link wcPlay} instance.
+ * @typedef {Object} wcRenderCanvas~Options
+ * @property {Boolean} [readOnly=false] - If true, the script will not be editable.
+ */
 
-  /**
-   * Event that is called as soon as the Play script has started.&lt;br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNodeEntryStart#onStart
-   */
-  onStart: function() {
-    this._super();
-    this.onTriggered();
-  },
-});</pre>
+/**
+ * Custom options for drawing a node on the canvas.
+ * @typedef {Object} wcRenderCanvas~DrawNodeOptions
+ */
+
+/**
+ * The 2D bounds of a rectangle.
+ * @typedef {Object} wcRenderCanvas~Rect
+ * @property {Number} top
+ * @property {Number} left
+ * @property {Number} width
+ * @property {Number} height
+ */
+
+/**
+ * Bounding information for mouse click events.
+ * @typedef {Object} wcRenderCanvas~BoundingData
+ * @property {wcRenderCanvas~Rect} rect - The bounding rectangle.
+ * @property {String} name - The name of the bounded object.
+ */
+
+/**
+ * Data associated with a drawn node.
+ * @typedef {Object} wcRenderCanvas~DrawNodeData
+ * @property {wcNode} node - The node instance.
+ * @property {wcRenderCanvas~Rect} rect - Bounding rectangle of the node (not including links that stick out).
+ * @property {wcRenderCanvas~BoundingData[]} entryBounds - Bounding data of entry links.
+ * @property {wcRenderCanvas~BoundingData[]} exitBounds - Bounding data of exit links.
+ * @property {wcRenderCanvas~BoundingData[]} inputBounds - Bounding data of property input links.
+ * @property {wcRenderCanvas~BoundingData[]} outputBounds - Bounding data of property output links.
+ * @property {wcRenderCanvas~BoundingData[]} valueBounds - Bounding data of property value text.
+ */
+
+/**
+ * This object contains bounding data for property values, property input links, and property output links.
+ * @typedef {Object} wcRenderCanvas~DrawPropertyData
+ * @property {wcRenderCanvas~BoundingData[]} inputBounds - Bounding data of property input links.
+ * @property {wcRenderCanvas~BoundingData[]} outputBounds - Bounding data of property output links.
+ * @property {wcRenderCanvas~BoundingData[]} valueBounds - Bounding data of property value text.
+ */
+</pre>
 	</article>
 </section>
 

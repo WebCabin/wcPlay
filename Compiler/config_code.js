@@ -57,6 +57,7 @@ concat({
   src: [
     '../Code/class.js',
     '../Code/play.js',
+    '../Code/rendercanvas.js',
     '../Code/nodes/node.js',
     '../Code/nodes/entry.js',
     '../Code/nodes/process.js',
@@ -64,6 +65,7 @@ concat({
     '../Code/nodes/entry/start.js',
     '../Code/nodes/process/delay.js',
     '../Code/nodes/process/log.js',
+    '../Code/nodes/process/operation.js',
   ],
   dest: '../Build/wcPlay.js',
 });
