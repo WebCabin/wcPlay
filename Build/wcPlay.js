@@ -564,6 +564,17 @@ function wcPlayEditor(container, options) {
   this._highlightNode = null;
   this._selectedNode = null;
 
+  this._highlightCollapser = false;
+  this._highlightEntryLink = false;
+  this._highlightExitLink = false;
+  this._highlightInputLink = false;
+  this._highlightOutputLink = false;
+
+  this._selectedEntryLink = false;
+  this._selectedExitLink = false;
+  this._selectedInputLink = false;
+  this._selectedOutputLink = false;
+
   // Setup our options.
   this._options = {
     readOnly: false,
@@ -1011,8 +1022,17 @@ wcPlayEditor.prototype = {
       height: this._font.title.size - 4,
     };
 
+    if (this._highlightCollapser && this._highlightNode === node) {
+      context.save();
+      context.fillStyle = "white";
+      context.strokeStyle = "black";
+      context.lineWidth = 1;
+      context.fillRect(data.collapser.left, data.collapser.top, data.collapser.width, data.collapser.height);
+      context.strokeRect(data.collapser.left, data.collapser.top, data.collapser.width, data.collapser.height);
+      context.restore();
+    }
+
     context.save();
-    context.fillStyle = "black";
     context.strokeStyle = "black";
     context.lineWidth = 2;
     context.beginPath();
@@ -1047,7 +1067,7 @@ wcPlayEditor.prototype = {
       if (node._meta.paused) {
         this.__drawRoundedRect(data.inner, "#CC0000", 5, 10, context);
       } else {
-        this.__drawRoundedRect(data.inner, node.color, 5, 10, context);
+        this.__drawRoundedRect(data.inner, "yellow", 2, 10, context);
       }
     }
 
@@ -1207,7 +1227,7 @@ wcPlayEditor.prototype = {
           height: this._drawStyle.links.length,
         };
 
-        context.fillStyle = links[i].meta.color;
+        context.fillStyle = (this._highlightEntryLink && this._highlightEntryLink.name === links[i].name && this._highlightNode === node? "cyan": links[i].meta.color);
         context.strokeStyle = "black";
         context.beginPath();
         context.moveTo(rect.left, rect.top);
@@ -1218,6 +1238,11 @@ wcPlayEditor.prototype = {
         context.closePath();
         context.stroke();
         context.fill();
+
+        // Expand the bounding rect just a little so it is easier to click.
+        rect.left -= 5;
+        rect.width += 10;
+        rect.height += 10;
 
         result.push({
           rect: rect,
@@ -1266,7 +1291,7 @@ wcPlayEditor.prototype = {
           height: this._drawStyle.links.length,
         };
 
-        context.fillStyle = links[i].meta.color;
+        context.fillStyle = (this._highlightExitLink && this._highlightExitLink.name === links[i].name && this._highlightNode === node? "cyan": links[i].meta.color);
         context.strokeStyle = "black";
         context.beginPath();
         context.moveTo(rect.left, rect.top);
@@ -1277,6 +1302,13 @@ wcPlayEditor.prototype = {
         context.closePath();
         context.stroke();
         context.fill();
+
+        // Expand the bounding rect just a little so it is easier to click.
+        rect.top -= 10;
+        rect.left -= 5;
+        rect.width += 10;
+        rect.height += 10;
+
         result.push({
           rect: rect,
           name: links[i].name,
@@ -1393,7 +1425,7 @@ wcPlayEditor.prototype = {
           height: this._drawStyle.links.width,
         };
 
-        context.fillStyle = props[i].inputMeta.color;
+        context.fillStyle = (this._highlightInputLink && this._highlightInputLink.name === props[i].name && this._highlightNode === node? "cyan": props[i].inputMeta.color);
         context.strokeStyle = "black";
         context.beginPath();
         context.moveTo(linkRect.left, linkRect.top);
@@ -1420,7 +1452,7 @@ wcPlayEditor.prototype = {
           height: this._drawStyle.links.width,
         }
 
-        context.fillStyle = props[i].outputMeta.color;
+        context.fillStyle = (this._highlightOutputLink && this._highlightOutputLink.name === props[i].name && this._highlightNode === node? "cyan": props[i].outputMeta.color);
         context.strokeStyle = "black";
         context.beginPath();
         context.moveTo(linkRect.left, linkRect.top);
@@ -1476,12 +1508,13 @@ wcPlayEditor.prototype = {
   __drawNodeChains: function(node, context) {
     for (var i = 0; i < node.chain.exit.length; ++i) {
       var exitLink = node.chain.exit[i];
+
       // Skip links that are not chained with anything.
       if (!exitLink.links.length) {
         continue;
       }
-      var exitRect;
 
+      var exitRect;
       // Find the corresponding meta data for this link.
       for (var a = 0; a < node._meta.bounds.exitBounds.length; ++a) {
         if (node._meta.bounds.exitBounds[a].name === exitLink.name) {
@@ -1613,6 +1646,75 @@ wcPlayEditor.prototype = {
         context);
       }
     }
+
+    // Draw a link to the mouse cursor if we are making a connection.
+    if (this._selectedNode === node && this._selectedEntryLink) {
+      var targetPos = this._mouse;
+      var targetRect = null;
+      if (this._highlightNode && this._highlightExitLink) {
+        targetPos = {
+          x: this._highlightExitLink.rect.left + this._highlightExitLink.rect.width/2,
+          y: this._highlightExitLink.rect.top + this._highlightExitLink.rect.height,
+        };
+        targetRect = this._highlightExitLink.rect;
+      }
+
+      this.__drawChain({
+        x: this._selectedEntryLink.rect.left + this._selectedEntryLink.rect.width/2,
+        y: this._selectedEntryLink.rect.top + this._selectedEntryLink.rect.height/3,
+      }, targetPos, node._meta.bounds.rect, targetRect, context);
+    }
+
+    if (this._selectedNode === node && this._selectedExitLink) {
+      var targetPos = this._mouse;
+      var targetRect = null;
+      if (this._highlightNode && this._highlightEntryLink) {
+        targetPos = {
+          x: this._highlightEntryLink.rect.left + this._highlightEntryLink.rect.width/2,
+          y: this._highlightEntryLink.rect.top + this._highlightEntryLink.rect.height/3,
+        };
+        targetRect = this._highlightEntryLink.rect;
+      }
+
+      this.__drawChain({
+        x: this._selectedExitLink.rect.left + this._selectedExitLink.rect.width/2,
+        y: this._selectedExitLink.rect.top + this._selectedExitLink.rect.height,
+      }, targetPos, node._meta.bounds.rect, targetRect, context);
+    }
+
+    if (this._selectedNode === node && this._selectedInputLink) {
+      var targetPos = this._mouse;
+      var targetRect = null;
+      if (this._highlightNode && this._highlightOutputLink) {
+        targetPos = {
+          x: this._highlightOutputLink.rect.left + this._highlightOutputLink.rect.width,
+          y: this._highlightOutputLink.rect.top + this._highlightOutputLink.rect.height/2,
+        };
+        targetRect = this._highlightOutputLink.rect;
+      }
+
+      this.__drawPropertyChain({
+        x: this._selectedInputLink.rect.left + this._selectedInputLink.rect.width/3,
+        y: this._selectedInputLink.rect.top + this._selectedInputLink.rect.height/2,
+      }, targetPos, node._meta.bounds.rect, targetRect, context);
+    }
+
+    if (this._selectedNode === node && this._selectedOutputLink) {
+      var targetPos = this._mouse;
+      var targetRect = null;
+      if (this._highlightNode && this._highlightInputLink) {
+        targetPos = {
+          x: this._highlightInputLink.rect.left + this._highlightInputLink.rect.width/3,
+          y: this._highlightInputLink.rect.top + this._highlightInputLink.rect.height/2,
+        };
+        targetRect = this._highlightInputLink.rect;
+      }
+
+      this.__drawPropertyChain({
+        x: this._selectedOutputLink.rect.left + this._selectedOutputLink.rect.width,
+        y: this._selectedOutputLink.rect.top + this._selectedOutputLink.rect.height/2,
+      }, targetPos, node._meta.bounds.rect, targetRect, context);
+    }
   },
 
   /**
@@ -1707,9 +1809,55 @@ wcPlayEditor.prototype = {
       return;
     }
 
+    this._mouse = mouse;
+    this._highlightCollapser = false;
+    this._highlightEntryLink = false;
+    this._highlightExitLink = false;
+    this._highlightInputLink = false;
+    this._highlightOutputLink = false;
+
     var node = this.__findNodeAtPos(mouse, this._viewportCamera);
     if (node) {
-      // TODO: Check for link collision.
+      // Collapser button.
+      if (this.__inRect(mouse, node._meta.bounds.collapser, this._viewportCamera)) {
+        this._highlightCollapser = true;
+      }
+
+      // Entry links.
+      for (var i = 0; i < node._meta.bounds.entryBounds.length; ++i) {
+        if (this.__inRect(mouse, node._meta.bounds.entryBounds[i].rect, this._viewportCamera)) {
+          this._highlightNode = node;
+          this._highlightEntryLink = node._meta.bounds.entryBounds[i];
+          break;
+        }
+      }
+
+      // Exit links.
+      for (var i = 0; i < node._meta.bounds.exitBounds.length; ++i) {
+        if (this.__inRect(mouse, node._meta.bounds.exitBounds[i].rect, this._viewportCamera)) {
+          this._highlightNode = node;
+          this._highlightExitLink = node._meta.bounds.exitBounds[i];
+          break;
+        }
+      }
+
+      // Input links.
+      for (var i = 0; i < node._meta.bounds.inputBounds.length; ++i) {
+        if (this.__inRect(mouse, node._meta.bounds.inputBounds[i].rect, this._viewportCamera)) {
+          this._highlightNode = node;
+          this._highlightInputLink = node._meta.bounds.inputBounds[i];
+          break;
+        }
+      }
+
+      // Output links.
+      for (var i = 0; i < node._meta.bounds.outputBounds.length; ++i) {
+        if (this.__inRect(mouse, node._meta.bounds.outputBounds[i].rect, this._viewportCamera)) {
+          this._highlightNode = node;
+          this._highlightOutputLink = node._meta.bounds.outputBounds[i];
+          break;
+        }
+      }
 
       // TODO: Check for property collision.
 
@@ -1739,12 +1887,62 @@ wcPlayEditor.prototype = {
     var hasTarget = false;
     var node = this.__findNodeAtPos(this._mouse, this._viewportCamera);
     if (node) {
+      // Collapser button.
       if (this.__inRect(this._mouse, node._meta.bounds.collapser, this._viewportCamera)) {
-        // Collapse a node.
         hasTarget = true;
         node.collapsed(!node.collapsed());
-      } else if (this.__inRect(this._mouse, node._meta.bounds.inner, this._viewportCamera)) {
-        // Center area of a node to move it.
+      }
+
+      // Entry links.
+      if (!hasTarget) {
+        for (var i = 0; i < node._meta.bounds.entryBounds.length; ++i) {
+          if (this.__inRect(this._mouse, node._meta.bounds.entryBounds[i].rect, this._viewportCamera)) {
+            hasTarget = true;
+            this._selectedNode = node;
+            this._selectedEntryLink = node._meta.bounds.entryBounds[i];
+            break;
+          }
+        }
+      }
+
+      // Exit links.
+      if (!hasTarget) {
+        for (var i = 0; i < node._meta.bounds.exitBounds.length; ++i) {
+          if (this.__inRect(this._mouse, node._meta.bounds.exitBounds[i].rect, this._viewportCamera)) {
+            hasTarget = true;
+            this._selectedNode = node;
+            this._selectedExitLink = node._meta.bounds.exitBounds[i];
+            break;
+          }
+        }
+      }
+
+      // Input links.
+      if (!hasTarget) {
+        for (var i = 0; i < node._meta.bounds.inputBounds.length; ++i) {
+          if (this.__inRect(this._mouse, node._meta.bounds.inputBounds[i].rect, this._viewportCamera)) {
+            hasTarget = true;
+            this._selectedNode = node;
+            this._selectedInputLink = node._meta.bounds.inputBounds[i];
+            break;
+          }
+        }
+      }
+
+      // Output links.
+      if (!hasTarget) {
+        for (var i = 0; i < node._meta.bounds.outputBounds.length; ++i) {
+          if (this.__inRect(this._mouse, node._meta.bounds.outputBounds[i].rect, this._viewportCamera)) {
+            hasTarget = true;
+            this._selectedNode = node;
+            this._selectedOutputLink = node._meta.bounds.outputBounds[i];
+            break;
+          }
+        }
+      }
+
+      // Center area.
+      if (!hasTarget && this.__inRect(this._mouse, node._meta.bounds.inner, this._viewportCamera)) {
         hasTarget = true;
         this._selectedNode = node;
         this._viewportMovingNode = true;
@@ -1766,7 +1964,35 @@ wcPlayEditor.prototype = {
    * @param {Object} elem - The target element.
    */
   __onViewportMouseUp: function(event, elem) {
+
+    // Check for link connections.
+    if (this._selectedNode && this._selectedEntryLink && this._highlightNode && this._highlightExitLink) {
+      if (this._selectedNode.connectEntry(this._selectedEntryLink.name, this._highlightNode, this._highlightExitLink.name) === wcNode.CONNECT_RESULT.ALREADY_CONNECTED) {
+        this._selectedNode.disconnectEntry(this._selectedEntryLink.name, this._highlightNode, this._highlightExitLink.name);
+      }
+    }
+    if (this._selectedNode && this._selectedExitLink && this._highlightNode && this._highlightEntryLink) {
+      if (this._selectedNode.connectExit(this._selectedExitLink.name, this._highlightNode, this._highlightEntryLink.name) === wcNode.CONNECT_RESULT.ALREADY_CONNECTED) {
+        this._selectedNode.disconnectExit(this._selectedExitLink.name, this._highlightNode, this._highlightEntryLink.name);
+      }
+    }
+    if (this._selectedNode && this._selectedInputLink && this._highlightNode && this._highlightOutputLink) {
+      if (this._selectedNode.connectInput(this._selectedInputLink.name, this._highlightNode, this._highlightOutputLink.name) === wcNode.CONNECT_RESULT.ALREADY_CONNECTED) {
+        this._selectedNode.disconnectInput(this._selectedInputLink.name, this._highlightNode, this._highlightOutputLink.name);
+      }
+    }
+    if (this._selectedNode && this._selectedOutputLink && this._highlightNode && this._highlightInputLink) {
+      if (this._selectedNode.connectOutput(this._selectedOutputLink.name, this._highlightNode, this._highlightInputLink.name) === wcNode.CONNECT_RESULT.ALREADY_CONNECTED) {
+        this._selectedNode.disconnectOutput(this._selectedOutputLink.name, this._highlightNode, this._highlightInputLink.name);
+      }
+    }
+
+    this._selectedEntryLink = false;
+    this._selectedExitLink = false;
+    this._selectedInputLink = false;
+    this._selectedOutputLink = false;
     this._viewportMovingNode = false;
+
     if (this._viewportMoving) {
       this._viewportMoving = false;
 
@@ -2353,7 +2579,7 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
-   * Connects a property input link to a target property output link.
+   * Connects a property output link to a target property input link.
    * @function wcNode#connectInput
    * @param {String} name - The name of the property being connected.
    * @param {wcNode} targetNode - The target node to connect with.
@@ -2714,6 +2940,10 @@ Class.extend('wcNode', 'Node', '', {
    * @param {wcNode.LINK_TYPE} targetType - The target link's type.
    */
   onConnect: function(isConnecting, name, type, targetNode, targetName, targetType) {
+    // If we are connecting one of our property outputs to another property, alert them and send your value to them.
+    if (isConnecting && type === wcNode.LINK_TYPE.OUTPUT) {
+      targetNode.triggerProperty(targetName, this.property(name));
+    }
   },
 
   /**

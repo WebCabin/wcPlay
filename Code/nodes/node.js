@@ -543,7 +543,7 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
-   * Connects a property input link to a target property output link.
+   * Connects a property output link to a target property input link.
    * @function wcNode#connectInput
    * @param {String} name - The name of the property being connected.
    * @param {wcNode} targetNode - The target node to connect with.
@@ -904,6 +904,10 @@ Class.extend('wcNode', 'Node', '', {
    * @param {wcNode.LINK_TYPE} targetType - The target link's type.
    */
   onConnect: function(isConnecting, name, type, targetNode, targetName, targetType) {
+    // If we are connecting one of our property outputs to another property, alert them and send your value to them.
+    if (isConnecting && type === wcNode.LINK_TYPE.OUTPUT) {
+      targetNode.triggerProperty(targetName, this.property(name));
+    }
   },
 
   /**

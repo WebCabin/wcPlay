@@ -41,11 +41,11 @@ $(document).ready(function() {
   operationNode.connectExit('out', logNode, 'in');
 
   // Lets collapse all the nodes so they take up less space.
-  startNode.collapsed(true);
-  logNode.collapsed(true);
-  delayNode.collapsed(true);
-  operationNode.collapsed(true);
-  storageNode.collapsed(true);
+  // startNode.collapsed(true);
+  // logNode.collapsed(true);
+  // delayNode.collapsed(true);
+  // operationNode.collapsed(true);
+  // storageNode.collapsed(true);
 
   // Start execution of the script.
   myPlay.start();
