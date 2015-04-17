@@ -5,7 +5,6 @@ wcNodeEntry.extend('wcNodeEntryStart', 'Start', 'Core', {
    * When inheriting, make sure to include 'this._super(parent, pos, name);' at the top of your init function.
    *
    * @constructor wcNodeEntryStart
-   * @description
    * @param {String} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
    * @param {String} [name="Start"] - The name of the node, as displayed on the title bar.

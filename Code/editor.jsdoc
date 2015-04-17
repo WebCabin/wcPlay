@@ -5,11 +5,6 @@
  */
 
 /**
- * Custom options for drawing a node on the canvas.
- * @typedef {Object} wcPlayEditor~DrawNodeOptions
- */
-
-/**
  * The 2D bounds of a rectangle.
  * @typedef {Object} wcPlayEditor~Rect
  * @property {Number} top

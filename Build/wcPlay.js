@@ -76,7 +76,6 @@
  * The main scripting engine.
  *
  * @constructor
- * @description
  * @param {wcPlay~Options} [options] - Custom options.
  */
 function wcPlay(options) {
@@ -503,7 +502,6 @@ wcPlay.prototype = {
  * Provides a visual interface for editing a Play script. Requires HTML5 canvas.
  *
  * @constructor
- * @description
  * @param {external:jQuery~Object|external:jQuery~Selector|external:domNode} container - The container element.
  * @param {wcPlayEditor~Options} [options] - Custom options.
  */
@@ -853,6 +851,12 @@ wcPlayEditor.prototype = {
       this.__drawNodes(this._engine._processNodes, this._viewportContext);
       this.__drawNodes(this._engine._compositeNodes, this._viewportContext);
       this.__drawNodes(this._engine._storageNodes, this._viewportContext);
+
+      // Render chains between nodes.
+      this.__drawChains(this._engine._entryNodes, this._viewportContext);
+      this.__drawChains(this._engine._processNodes, this._viewportContext);
+      this.__drawChains(this._engine._compositeNodes, this._viewportContext);
+      this.__drawChains(this._engine._storageNodes, this._viewportContext);
     }
 
     window.requestAnimationFrame(this.__update.bind(this));
@@ -1424,6 +1428,213 @@ wcPlayEditor.prototype = {
     }
     return result;
   },
+
+  /**
+   * Draws connection chains for a list of nodes.
+   * @function wcPlayEditor#__drawChains
+   * @private
+   * @param {wcNode[]} nodes - A list of nodes to render chains for.
+   * @param {external:Canvas~Context} context - The canvas context.
+   */
+  __drawChains: function(nodes, context) {
+    for (var i = 0; i < nodes.length; ++i) {
+      this.__drawNodeChains(nodes[i], context);
+    }
+  },
+
+  /**
+   * Draws connection chains for a single node.
+   * @function wcPlayEditor#__drawNodeChains
+   * @private
+   * @param {wcNode} node - A node to render chains for.
+   * @param {external:Canvas~Context} context - The canvas context.
+   */
+  __drawNodeChains: function(node, context) {
+    for (var i = 0; i < node.chain.exit.length; ++i) {
+      var exitLink = node.chain.exit[i];
+      // Skip links that are not chained with anything.
+      if (!exitLink.links.length) {
+        continue;
+      }
+      var exitRect;
+
+      // Find the corresponding meta data for this link.
+      for (var a = 0; a < node._meta.bounds.exitBounds.length; ++a) {
+        if (node._meta.bounds.exitBounds[a].name === exitLink.name) {
+          exitRect = node._meta.bounds.exitBounds[a].rect;
+          break;
+        }
+      }
+
+      // Skip links that do not contain meta data (should not happen).
+      if (!exitRect) {
+        console.log('ERROR: Attempted to draw chains for an exit link that has no meta data.');
+        continue;
+      }
+
+      // Follow each chain to their entry links.
+      for (var a = 0; a < exitLink.links.length; ++a) {
+        var targetNode = exitLink.links[a].node;
+        var targetName = exitLink.links[a].name;
+        var entryLink;
+
+        for (var b = 0; b < targetNode.chain.entry.length; ++b) {
+          if (targetNode.chain.entry[b].name === targetName) {
+            entryLink = targetNode.chain.entry[b];
+            break;
+          }
+        }
+
+        // The link for this chain was not found.
+        if (!entryLink) {
+          console.log('ERROR: Attempted to chain an exit link to an entry link that was not found.');
+          continue;
+        }
+
+        // Find the corresponding meta data for this link.
+        var entryRect;
+        for (var b = 0; b < targetNode._meta.bounds.entryBounds.length; ++b) {
+          if (targetNode._meta.bounds.entryBounds[b].name === entryLink.name) {
+            entryRect = targetNode._meta.bounds.entryBounds[b].rect;
+            break;
+          }
+        }
+
+        // Could not find meta data for this link.
+        if (!entryRect) {
+          console.log('ERROR: Attempted to draw chains to an entry link that has no meta data.');
+          continue;
+        }
+
+        // Now we have both our links, lets chain them together!
+        this.__drawChain({
+          x: exitRect.left + exitRect.width/2,
+          y: exitRect.top + exitRect.height,
+        }, {
+          x: entryRect.left + entryRect.width/2,
+          y: entryRect.top + entryRect.height/3,
+        },
+        node._meta.bounds.rect,
+        targetNode._meta.bounds.rect,
+        context);
+      }
+    }
+
+    for (var i = 0; i < node.properties.length; ++i) {
+      var outputProp = node.properties[i];
+
+      // Skip properties with no output links.
+      if (!outputProp.outputs.length) {
+        continue;
+      }
+
+      // Find the corresponding meta data for this link.
+      var outputRect;
+      for (var a = 0; a < node._meta.bounds.outputBounds.length; ++a) {
+        if (node._meta.bounds.outputBounds[a].name === outputProp.name) {
+          outputRect = node._meta.bounds.outputBounds[a].rect;
+          break;
+        }
+      }
+
+      // Failed to find bounds for the output link.
+      if (!outputRect) {
+        console.log('ERROR: Attempted to draw chains for an output link that has no meta data.');
+        continue;
+      }
+
+      // Follow each chain to their input links.
+      for (var a = 0; a < outputProp.outputs.length; ++a) {
+        var targetNode = outputProp.outputs[a].node;
+        var targetName = outputProp.outputs[a].name;
+        var inputProp;
+
+        for (var b = 0; b < targetNode.properties.length; ++b) {
+          if (targetNode.properties[b].name === targetName) {
+            inputProp = targetNode.properties[b];
+          }
+        }
+
+        // Failed to find the input property to link with.
+        if (!inputProp) {
+          console.log('ERROR: Attempted to chain a property link to a property that was not found.');
+          continue;
+        }
+
+        // Find the corresponding meta data for this link.
+        var inputRect;
+        for (var b = 0; b < targetNode._meta.bounds.inputBounds.length; ++b) {
+          if (targetNode._meta.bounds.inputBounds[b].name === inputProp.name) {
+            inputRect = targetNode._meta.bounds.inputBounds[b].rect;
+            break;
+          }
+        }
+
+        // Failed to find the meta data for a property input link.
+        if (!inputRect) {
+          console.log('ERROR: Attempted to draw chains to a property input link that has no meta data.');
+          continue;
+        }
+
+        // Now we have both our links, lets chain them together!
+        this.__drawPropertyChain({
+          x: outputRect.left + outputRect.width,
+          y: outputRect.top + outputRect.height/2,
+        }, {
+          x: inputRect.left + inputRect.width/3,
+          y: inputRect.top + inputRect.height/2,
+        },
+        node._meta.bounds.rect,
+        targetNode._meta.bounds.rect,
+        context);
+      }
+    }
+  },
+
+  /**
+   * Draws a connection chain between an exit link and an entry link.
+   * @function wcPlayEditor#__drawChain
+   * @private
+   * @param {wcPlay~Coordinates} startPos - The start position (the exit link).
+   * @param {wcPlay~Coordinates} endPos - The end position (the entry link).
+   * @param {wcPlayEditor~Rect} startRect - The start node's bounding rect to avoid.
+   * @param {wcPlayEditor~Rect} endPos - The end node's bounding rect to avoid.
+   * @param {external:Canvas~Context} context - The canvas context.
+   */
+  __drawChain: function(startPos, endPos, startRect, endRect, context) {
+    context.save();
+    context.strokeStyle = '#000000';
+    context.lineWidth = 2;
+
+    context.beginPath();
+    context.moveTo(startPos.x, startPos.y);
+    context.lineTo(endPos.x, endPos.y);
+    context.stroke();
+    context.restore();
+  },
+
+  /**
+   * Draws a connection chain between an input link and an output link of properties.
+   * @function wcPlayEditor#__drawPropertyChain
+   * @private
+   * @param {wcPlay~Coordinates} startPos - The start position (the exit link).
+   * @param {wcPlay~Coordinates} endPos - The end position (the entry link).
+   * @param {wcPlayEditor~Rect} startRect - The start node's bounding rect to avoid.
+   * @param {wcPlayEditor~Rect} endPos - The end node's bounding rect to avoid.
+   * @param {external:Canvas~Context} context - The canvas context.
+   */
+  __drawPropertyChain: function(startPos, endPos, startRect, endRect, context) {
+    context.save();
+    context.strokeStyle = '#000000';
+    context.lineWidth = 2;
+
+    context.beginPath();
+    context.moveTo(startPos.x, startPos.y);
+    context.lineTo(endPos.x, endPos.y);
+    context.stroke();
+    context.restore();
+  },
+
 
   /**
    * Initializes user control.
@@ -2727,7 +2938,6 @@ wcNode.extend('wcNodeStorage', 'Storage', 'Core', {
    * When inheriting, make sure to include 'this._super(parent, pos, name);' at the top of your init function.
    *
    * @constructor wcNodeStorage
-   * @description
    * @param {String} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
    * @param {String} [name="Storage"] - The name of the node, as displayed on the title bar.
@@ -2759,7 +2969,6 @@ wcNodeEntry.extend('wcNodeEntryStart', 'Start', 'Core', {
    * When inheriting, make sure to include 'this._super(parent, pos, name);' at the top of your init function.
    *
    * @constructor wcNodeEntryStart
-   * @description
    * @param {String} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
    * @param {String} [name="Start"] - The name of the node, as displayed on the title bar.
@@ -2785,7 +2994,6 @@ wcNodeProcess.extend('wcNodeProcessDelay', 'Delay', 'Core', {
    * When inheriting, make sure to include 'this._super(parent, pos, name);' at the top of your init function.
    *
    * @constructor wcNodeProcessDelay
-   * @description
    * @param {String} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
    * @param {String} [name="Delay"] - The name of the node, as displayed on the title bar.
@@ -2833,7 +3041,6 @@ wcNodeProcess.extend('wcNodeProcessLog', 'Log', 'Core', {
    * When inheriting, make sure to include 'this._super(parent, pos, name);' at the top of your init function.
    *
    * @constructor wcNodeProcessLog
-   * @description
    * @param {String} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
    * @param {String} [name="Log"] - The name of the node, as displayed on the title bar.
@@ -2867,7 +3074,6 @@ wcNodeProcess.extend('wcNodeProcessOperation', 'Operation', 'Core', {
    * When inheriting, make sure to include 'this._super(parent, pos, name);' at the top of your init function.
    *
    * @constructor wcNodeProcessOperation
-   * @description
    * @param {String} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
    * @param {String} [name="Log"] - The name of the node, as displayed on the title bar.

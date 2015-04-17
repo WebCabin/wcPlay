@@ -3,7 +3,6 @@
  * The main scripting engine.
  *
  * @constructor
- * @description
  * @param {wcPlay~Options} [options] - Custom options.
  */
 function wcPlay(options) {
