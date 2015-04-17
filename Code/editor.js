@@ -741,8 +741,8 @@ wcPlayEditor.prototype = {
         context.fill();
 
         // Expand the bounding rect just a little so it is easier to click.
-        rect.left -= 10;
-        rect.width += 20;
+        rect.left -= 5;
+        rect.width += 10;
 
         result.push({
           rect: rect,
@@ -804,8 +804,8 @@ wcPlayEditor.prototype = {
         context.fill();
 
         // Expand the bounding rect just a little so it is easier to click.
-        rect.left -= 10;
-        rect.width += 20;
+        rect.left -= 5;
+        rect.width += 10;
 
         result.push({
           rect: rect,
@@ -936,8 +936,8 @@ wcPlayEditor.prototype = {
         context.fill();
 
         // Expand the bounding rect just a little so it is easier to click.
-        linkRect.top -= 10;
-        linkRect.height += 20;
+        linkRect.top -= 5;
+        linkRect.height += 10;
 
         result.inputBounds.push({
           rect: linkRect,
@@ -967,8 +967,8 @@ wcPlayEditor.prototype = {
         context.fill();
 
         // Expand the bounding rect just a little so it is easier to click.
-        linkRect.top -= 10;
-        linkRect.height += 20;
+        linkRect.top -= 5;
+        linkRect.height += 10;
 
         result.outputBounds.push({
           rect: linkRect,
@@ -1070,7 +1070,7 @@ wcPlayEditor.prototype = {
         }
 
         // Now we have both our links, lets chain them together!
-        this.__drawChain({
+        this.__drawFlowChain({
           x: exitRect.left + exitRect.width/2,
           y: exitRect.top + exitRect.height,
         }, {
@@ -1170,7 +1170,7 @@ wcPlayEditor.prototype = {
         };
       }
 
-      this.__drawChain({
+      this.__drawFlowChain({
         x: this._selectedEntryLink.rect.left + this._selectedEntryLink.rect.width/2,
         y: this._selectedEntryLink.rect.top + this._selectedEntryLink.rect.height/3,
       }, targetPos, node._meta.bounds.rect, targetRect, context);
@@ -1192,7 +1192,7 @@ wcPlayEditor.prototype = {
         };
       }
 
-      this.__drawChain({
+      this.__drawFlowChain({
         x: this._selectedExitLink.rect.left + this._selectedExitLink.rect.width/2,
         y: this._selectedExitLink.rect.top + this._selectedExitLink.rect.height,
       }, targetPos, node._meta.bounds.rect, targetRect, context);
@@ -1245,7 +1245,7 @@ wcPlayEditor.prototype = {
 
   /**
    * Draws a connection chain between an exit link and an entry link.
-   * @function wcPlayEditor#__drawChain
+   * @function wcPlayEditor#__drawFlowChain
    * @private
    * @param {wcPlay~Coordinates} startPos - The start position (the exit link).
    * @param {wcPlay~Coordinates} endPos - The end position (the entry link).
@@ -1253,7 +1253,7 @@ wcPlayEditor.prototype = {
    * @param {wcPlayEditor~Rect} endPos - The end node's bounding rect to avoid.
    * @param {external:Canvas~Context} context - The canvas context.
    */
-  __drawChain: function(startPos, endPos, startRect, endRect, context) {
+  __drawFlowChain: function(startPos, endPos, startRect, endRect, context) {
     context.save();
     context.strokeStyle = '#000000';
     context.lineWidth = 2;
@@ -1424,6 +1424,11 @@ wcPlayEditor.prototype = {
         for (var i = 0; i < node._meta.bounds.entryBounds.length; ++i) {
           if (this.__inRect(this._mouse, node._meta.bounds.entryBounds[i].rect, this._viewportCamera)) {
             hasTarget = true;
+            // Alt click to disconnect all chains from this link.
+            if (event.altKey) {
+              node.disconnectEntry(node._meta.bounds.entryBounds[i].name);
+              break;
+            }
             this._selectedNode = node;
             this._selectedEntryLink = node._meta.bounds.entryBounds[i];
             break;
@@ -1436,6 +1441,16 @@ wcPlayEditor.prototype = {
         for (var i = 0; i < node._meta.bounds.exitBounds.length; ++i) {
           if (this.__inRect(this._mouse, node._meta.bounds.exitBounds[i].rect, this._viewportCamera)) {
             hasTarget = true;
+            // Alt click to disconnect all chains from this link.
+            if (event.altKey) {
+              node.disconnectExit(node._meta.bounds.exitBounds[i].name);
+              break;
+            } 
+            // Shift click to manually fire this exit chain.
+            else if (event.shiftKey) {
+              node.triggerExit(node._meta.bounds.exitBounds[i].name);
+              break;
+            }
             this._selectedNode = node;
             this._selectedExitLink = node._meta.bounds.exitBounds[i];
             break;
@@ -1448,6 +1463,11 @@ wcPlayEditor.prototype = {
         for (var i = 0; i < node._meta.bounds.inputBounds.length; ++i) {
           if (this.__inRect(this._mouse, node._meta.bounds.inputBounds[i].rect, this._viewportCamera)) {
             hasTarget = true;
+            // Alt click to disconnect all chains from this link.
+            if (event.altKey) {
+              node.disconnectInput(node._meta.bounds.inputBounds[i].name);
+              break;
+            }
             this._selectedNode = node;
             this._selectedInputLink = node._meta.bounds.inputBounds[i];
             break;
@@ -1460,6 +1480,11 @@ wcPlayEditor.prototype = {
         for (var i = 0; i < node._meta.bounds.outputBounds.length; ++i) {
           if (this.__inRect(this._mouse, node._meta.bounds.outputBounds[i].rect, this._viewportCamera)) {
             hasTarget = true;
+            // Alt click to disconnect all chains from this link.
+            if (event.altKey) {
+              node.disconnectOutput(node._meta.bounds.outputBounds[i].name);
+              break;
+            }
             this._selectedNode = node;
             this._selectedOutputLink = node._meta.bounds.outputBounds[i];
             break;
