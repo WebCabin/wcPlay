@@ -1649,7 +1649,7 @@ wcPlayEditor.prototype = {
 
     // Draw a link to the mouse cursor if we are making a connection.
     if (this._selectedNode === node && this._selectedEntryLink) {
-      var targetPos = this._mouse;
+      var targetPos;
       var targetRect = null;
       if (this._highlightNode && this._highlightExitLink) {
         targetPos = {
@@ -1657,6 +1657,11 @@ wcPlayEditor.prototype = {
           y: this._highlightExitLink.rect.top + this._highlightExitLink.rect.height,
         };
         targetRect = this._highlightExitLink.rect;
+      } else {
+        targetPos = {
+          x: this._mouse.x - this._viewportCamera.x,
+          y: this._mouse.y - this._viewportCamera.y,
+        };
       }
 
       this.__drawChain({
@@ -1666,7 +1671,7 @@ wcPlayEditor.prototype = {
     }
 
     if (this._selectedNode === node && this._selectedExitLink) {
-      var targetPos = this._mouse;
+      var targetPos;
       var targetRect = null;
       if (this._highlightNode && this._highlightEntryLink) {
         targetPos = {
@@ -1674,6 +1679,11 @@ wcPlayEditor.prototype = {
           y: this._highlightEntryLink.rect.top + this._highlightEntryLink.rect.height/3,
         };
         targetRect = this._highlightEntryLink.rect;
+      } else {
+        targetPos = {
+          x: this._mouse.x - this._viewportCamera.x,
+          y: this._mouse.y - this._viewportCamera.y,
+        };
       }
 
       this.__drawChain({
@@ -1683,7 +1693,7 @@ wcPlayEditor.prototype = {
     }
 
     if (this._selectedNode === node && this._selectedInputLink) {
-      var targetPos = this._mouse;
+      var targetPos;
       var targetRect = null;
       if (this._highlightNode && this._highlightOutputLink) {
         targetPos = {
@@ -1691,6 +1701,11 @@ wcPlayEditor.prototype = {
           y: this._highlightOutputLink.rect.top + this._highlightOutputLink.rect.height/2,
         };
         targetRect = this._highlightOutputLink.rect;
+      } else {
+        targetPos = {
+          x: this._mouse.x - this._viewportCamera.x,
+          y: this._mouse.y - this._viewportCamera.y,
+        };
       }
 
       this.__drawPropertyChain({
@@ -1700,7 +1715,7 @@ wcPlayEditor.prototype = {
     }
 
     if (this._selectedNode === node && this._selectedOutputLink) {
-      var targetPos = this._mouse;
+      var targetPos;
       var targetRect = null;
       if (this._highlightNode && this._highlightInputLink) {
         targetPos = {
@@ -1708,6 +1723,11 @@ wcPlayEditor.prototype = {
           y: this._highlightInputLink.rect.top + this._highlightInputLink.rect.height/2,
         };
         targetRect = this._highlightInputLink.rect;
+      } else {
+        targetPos = {
+          x: this._mouse.x - this._viewportCamera.x,
+          y: this._mouse.y - this._viewportCamera.y,
+        };
       }
 
       this.__drawPropertyChain({
