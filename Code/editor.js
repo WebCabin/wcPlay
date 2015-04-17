@@ -741,9 +741,8 @@ wcPlayEditor.prototype = {
         context.fill();
 
         // Expand the bounding rect just a little so it is easier to click.
-        rect.left -= 5;
-        rect.width += 10;
-        rect.height += 10;
+        rect.left -= 10;
+        rect.width += 20;
 
         result.push({
           rect: rect,
@@ -805,10 +804,8 @@ wcPlayEditor.prototype = {
         context.fill();
 
         // Expand the bounding rect just a little so it is easier to click.
-        rect.top -= 10;
-        rect.left -= 5;
-        rect.width += 10;
-        rect.height += 10;
+        rect.left -= 10;
+        rect.width += 20;
 
         result.push({
           rect: rect,
@@ -938,6 +935,10 @@ wcPlayEditor.prototype = {
         context.stroke();
         context.fill();
 
+        // Expand the bounding rect just a little so it is easier to click.
+        linkRect.top -= 10;
+        linkRect.height += 20;
+
         result.inputBounds.push({
           rect: linkRect,
           name: props[i].name,
@@ -964,6 +965,10 @@ wcPlayEditor.prototype = {
         context.closePath();
         context.stroke();
         context.fill();
+
+        // Expand the bounding rect just a little so it is easier to click.
+        linkRect.top -= 10;
+        linkRect.height += 20;
 
         result.outputBounds.push({
           rect: linkRect,
