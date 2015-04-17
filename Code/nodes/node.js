@@ -145,7 +145,7 @@ Class.extend('wcNode', 'Node', '', {
     }
 
     var engine = this.engine();
-    return engine.debugging() && this._break;
+    return (engine && engine.debugging() && this._break);
   },
 
   /**

@@ -66,6 +66,7 @@ function wcPlayEditor(container, options) {
   this._selectedNode = null;
 
   this._highlightCollapser = false;
+  this._highlightBreakpoint = false;
   this._highlightEntryLink = false;
   this._highlightExitLink = false;
   this._highlightInputLink = false;
@@ -524,17 +525,13 @@ wcPlayEditor.prototype = {
       height: this._font.title.size - 4,
     };
 
-    if (this._highlightCollapser && this._highlightNode === node) {
-      context.save();
-      context.fillStyle = "white";
-      context.strokeStyle = "black";
-      context.lineWidth = 1;
-      context.fillRect(data.collapser.left, data.collapser.top, data.collapser.width, data.collapser.height);
-      context.strokeRect(data.collapser.left, data.collapser.top, data.collapser.width, data.collapser.height);
-      context.restore();
-    }
-
     context.save();
+    context.fillStyle = (this._highlightCollapser && this._highlightNode === node? "darkgray": "white");
+    context.strokeStyle = "black";
+    context.lineWidth = 1;
+    context.fillRect(data.collapser.left, data.collapser.top, data.collapser.width, data.collapser.height);
+    context.strokeRect(data.collapser.left, data.collapser.top, data.collapser.width, data.collapser.height);
+
     context.strokeStyle = "black";
     context.lineWidth = 2;
     context.beginPath();
@@ -545,6 +542,32 @@ wcPlayEditor.prototype = {
       context.lineTo(data.collapser.left + data.collapser.width/2, data.collapser.top + data.collapser.height);
     }
     context.stroke();
+    context.restore();
+
+    // Add breakpoint button to the node in the right margin of the title.
+    data.breakpoint = {
+      left: data.inner.left + data.inner.width - this._drawStyle.node.margin + 2,
+      top: data.inner.top + 4 + (node.chain.entry.length? this._font.links.size + this._drawStyle.links.padding: 0),
+      width: this._drawStyle.node.margin - 5,
+      height: this._font.title.size - 4,
+    };
+
+    context.save();
+    var gradient = context.createRadialGradient(
+      data.breakpoint.left + data.breakpoint.width/2,
+      data.breakpoint.top + data.breakpoint.height/2,
+      0,
+      data.breakpoint.left + data.breakpoint.width/2,
+      data.breakpoint.top + data.breakpoint.height/2,
+      Math.min(data.breakpoint.width*0.5, data.breakpoint.height*0.5));
+    gradient.addColorStop(0, (node._break? "darkred": "gray"));
+    gradient.addColorStop(1, (this._highlightBreakpoint && this._highlightNode === node? "darkgray": "white"));
+    context.fillStyle = gradient;
+    context.fillRect(data.breakpoint.left, data.breakpoint.top, data.breakpoint.width, data.breakpoint.height);
+
+    context.strokeStyle = "black";
+    context.lineWidth = 1;
+    context.strokeRect(data.breakpoint.left, data.breakpoint.top, data.breakpoint.width, data.breakpoint.height);
     context.restore();
 
     // DEBUG: Render bounding box geometry.
@@ -1344,6 +1367,7 @@ wcPlayEditor.prototype = {
 
     this._mouse = mouse;
     this._highlightCollapser = false;
+    this._highlightBreakpoint = false;
     this._highlightEntryLink = false;
     this._highlightExitLink = false;
     this._highlightInputLink = false;
@@ -1354,6 +1378,11 @@ wcPlayEditor.prototype = {
       // Collapser button.
       if (this.__inRect(mouse, node._meta.bounds.collapser, this._viewportCamera)) {
         this._highlightCollapser = true;
+      }
+
+      // Breakpoint button.
+      if (this.__inRect(mouse, node._meta.bounds.breakpoint, this._viewportCamera)) {
+        this._highlightBreakpoint = true;
       }
 
       // Entry links.
@@ -1424,6 +1453,12 @@ wcPlayEditor.prototype = {
       if (this.__inRect(this._mouse, node._meta.bounds.collapser, this._viewportCamera)) {
         hasTarget = true;
         node.collapsed(!node.collapsed());
+      }
+
+      // Breakpoint button.
+      if (this.__inRect(this._mouse, node._meta.bounds.breakpoint, this._viewportCamera)) {
+        hasTarget = true;
+        node.debugBreak(!node._break);
       }
 
       // Entry links.
