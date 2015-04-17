@@ -518,7 +518,7 @@ wcPlayEditor.prototype = {
     // Add a collapse button to the node in the left margin of the title.
     data.collapser = {
       left: data.inner.left + 4,
-      top: data.inner.top + 4 + this._font.links.size + this._drawStyle.links.padding,
+      top: data.inner.top + 4 + (node.chain.entry.length? this._font.links.size + this._drawStyle.links.padding: 0),
       width: this._drawStyle.node.margin - 5,
       height: this._font.title.size - 4,
     };
