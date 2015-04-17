@@ -1569,6 +1569,8 @@ wcPlayEditor.prototype = {
           continue;
         }
 
+        var flash = (exitLink.meta.flashDelta > 0 || entryLink.meta.flashDelta > 0);
+
         // Now we have both our links, lets chain them together!
         this.__drawFlowChain({
           x: exitRect.left + exitRect.width/2,
@@ -1579,7 +1581,7 @@ wcPlayEditor.prototype = {
         },
         node._meta.bounds.rect,
         targetNode._meta.bounds.rect,
-        context);
+        context, flash);
       }
     }
 
@@ -1639,6 +1641,8 @@ wcPlayEditor.prototype = {
           continue;
         }
 
+        var flash = (outputProp.outputMeta.flashDelta > 0 || inputProp.inputMeta.flashDelta > 0);
+
         // Now we have both our links, lets chain them together!
         this.__drawPropertyChain({
           x: outputRect.left + outputRect.width,
@@ -1649,7 +1653,7 @@ wcPlayEditor.prototype = {
         },
         node._meta.bounds.rect,
         targetNode._meta.bounds.rect,
-        context);
+        context, flash);
       }
     }
 
@@ -1779,7 +1783,7 @@ wcPlayEditor.prototype = {
    */
   __drawPropertyChain: function(startPos, endPos, startRect, endRect, context, flash) {
     context.save();
-    context.strokeStyle = (flash? '#CCCC00': '#33CC33');
+    context.strokeStyle = (flash? '#55FF00': '#33CC33');
     context.lineWidth = 2;
 
     context.beginPath();
