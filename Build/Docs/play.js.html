@@ -27,7 +27,7 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessLog.html">wcNodeProcessLog</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcRenderCanvas.html">wcRenderCanvas</a></li>
+					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessLog.html">wcNodeProcessLog</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
 				</ul>
 			</li>
 			
@@ -74,7 +74,7 @@ function wcPlay(options) {
   this._isPaused = false;
   this._isStepping = false;
 
-  this._renderers = [];
+  this._editors = [];
 
   // Setup our options.
   this._options = {
@@ -463,15 +463,15 @@ wcPlay.prototype = {
 
   /**
    * Sends a custom notification event to all renderers.
-   * @function wcPlay#__notifyRenderers
+   * @function wcPlay#__notifyEditors
    * @private
    * @param {String} func - The renderer function to call.
    * @param {Object[]} args - A list of arguments to forward into the function call.
    */
-  __notifyRenderers: function(func, args) {
+  __notifyEditors: function(func, args) {
     var self;
-    for (var i = 0; i &lt; this._renderers.length; ++i) {
-      self = this._renderers[i];
+    for (var i = 0; i &lt; this._editors.length; ++i) {
+      self = this._editors[i];
       if (typeof self[func] === 'function') {
         self[func].apply(self, args);
       }

@@ -27,7 +27,7 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessLog.html">wcNodeProcessLog</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcRenderCanvas.html">wcRenderCanvas</a></li>
+					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessLog.html">wcNodeProcessLog</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
 				</ul>
 			</li>
 			
@@ -88,12 +88,12 @@
     };
     this._collapsed = false;
     this._awake = false;
+    this._log = false;
+    this._break = false;
     this._parent = parent;
 
     // Give the node its default properties.
     this.createProperty(wcNode.PROPERTY.ENABLED, wcPlay.PROPERTY_TYPE.TOGGLE, true);
-    this.createProperty(wcNode.PROPERTY.LOG, wcPlay.PROPERTY_TYPE.TOGGLE, false);
-    this.createProperty(wcNode.PROPERTY.BREAK, wcPlay.PROPERTY_TYPE.TOGGLE, false);
 
     var engine = this.engine();
     engine &amp;&amp; engine.__addNode(this);
@@ -179,11 +179,11 @@
    */
   debugLog: function(enabled) {
     if (enabled !== undefined) {
-      this.property(wcNode.PROPERTY.LOG, enabled? true: false);
+      this._log = enabled? true: false;
     }
 
     var engine = this.engine();
-    return (!engine || engine.isSilent())? false: this.property(wcNode.PROPERTY.LOG);
+    return (!engine || engine.isSilent())? false: this._log;
   },
 
   /**
@@ -194,11 +194,11 @@
    */
   debugBreak: function(enabled) {
     if (enabled !== undefined) {
-      this.property(wcNode.PROPERTY.BREAK, enabled? true: false);
+      this._break = enabled? true: false;
     }
 
     var engine = this.engine();
-    return engine.debugging() &amp;&amp; this.property(wcNode.PROPERTY.BREAK);
+    return engine.debugging() &amp;&amp; this._break;
   },
 
   /**
@@ -1085,9 +1085,6 @@ wcNode.CONNECT_RESULT = {
  */
 wcNode.PROPERTY = {
   ENABLED: 'enabled',
-  LOG: 'debug log',
-  BREAK: 'breakpoint',
-  TRIGGER: 'trigger',
 };</pre>
 	</article>
 </section>
