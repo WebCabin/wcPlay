@@ -924,6 +924,7 @@ wcPlayEditor.prototype = {
     __updateFlash(node._meta, color, "#FFFFFF", "#FFFFFF", true, 0.5);
 
     var blackColor = "#000000";
+    var propColor  = "#117711";
     var flashColor = "#FFFF00";
     for (var i = 0; i < node.chain.entry.length; ++i) {
       __updateFlash(node.chain.entry[i].meta, blackColor, flashColor, flashColor, false, 0.9);
@@ -932,8 +933,8 @@ wcPlayEditor.prototype = {
       __updateFlash(node.chain.exit[i].meta, blackColor, flashColor, flashColor, false, 0.9);
     }
     for (var i = 0; i < node.properties.length; ++i) {
-      __updateFlash(node.properties[i].inputMeta, blackColor, flashColor, flashColor, false, 0.9);
-      __updateFlash(node.properties[i].outputMeta, blackColor, flashColor, flashColor, false, 0.9);
+      __updateFlash(node.properties[i].inputMeta, propColor, flashColor, flashColor, false, 0.9);
+      __updateFlash(node.properties[i].outputMeta, propColor, flashColor, flashColor, false, 0.9);
     }
   },
 
@@ -1750,11 +1751,12 @@ wcPlayEditor.prototype = {
    * @param {wcPlay~Coordinates} endPos - The end position (the entry link).
    * @param {wcPlayEditor~Rect} startRect - The start node's bounding rect to avoid.
    * @param {wcPlayEditor~Rect} endPos - The end node's bounding rect to avoid.
+   * @param {Boolean} [flash] - If true, will flash the link.
    * @param {external:Canvas~Context} context - The canvas context.
    */
-  __drawFlowChain: function(startPos, endPos, startRect, endRect, context) {
+  __drawFlowChain: function(startPos, endPos, startRect, endRect, context, flash) {
     context.save();
-    context.strokeStyle = '#000000';
+    context.strokeStyle = (flash? '#CCCC00': '#000000');
     context.lineWidth = 2;
 
     context.beginPath();
@@ -1772,11 +1774,12 @@ wcPlayEditor.prototype = {
    * @param {wcPlay~Coordinates} endPos - The end position (the entry link).
    * @param {wcPlayEditor~Rect} startRect - The start node's bounding rect to avoid.
    * @param {wcPlayEditor~Rect} endPos - The end node's bounding rect to avoid.
+   * @param {Boolean} [flash] - If true, will flash the link.
    * @param {external:Canvas~Context} context - The canvas context.
    */
-  __drawPropertyChain: function(startPos, endPos, startRect, endRect, context) {
+  __drawPropertyChain: function(startPos, endPos, startRect, endRect, context, flash) {
     context.save();
-    context.strokeStyle = '#000000';
+    context.strokeStyle = (flash? '#CCCC00': '#33CC33');
     context.lineWidth = 2;
 
     context.beginPath();
