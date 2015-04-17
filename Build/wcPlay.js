@@ -531,7 +531,7 @@ function wcPlayEditor(container, options) {
     },
     node: {
       radius: 10,         // The radius to draw node corners.
-      margin: 10,         // The pixel space between the property text and the edge of the node border.
+      margin: 15,         // The pixel space between the property text and the edge of the node border.
     },
     title: {
       spacing: 5,         // The pixel space between the title text and the bar that separates the properties.
@@ -983,11 +983,13 @@ wcPlayEditor.prototype = {
     data.outputBounds = propBounds.outputBounds;
     data.valueBounds = propBounds.valueBounds;
 
+    data.inner = this.__expandRect([centerBounds]);
     data.rect = this.__expandRect([entryBounds, centerBounds, exitBounds]);
+    data.inner.left = data.rect.left;
+    data.inner.width = data.rect.width;
     data.rect.left -= this._drawStyle.links.length;
     data.rect.width += this._drawStyle.links.length * 2;
 
-    data.inner = this.__expandRect([centerBounds]);
     if (node.chain.entry.length) {
       data.inner.top -= this._drawStyle.links.padding + this._font.links.size;
       data.inner.height += this._drawStyle.links.padding + this._font.links.size;
@@ -1000,6 +1002,28 @@ wcPlayEditor.prototype = {
     } else {
       data.rect.height += this._drawStyle.links.length;
     }
+
+    // Add a collapse button to the node in the left margin of the title.
+    data.collapser = {
+      left: data.inner.left + 4,
+      top: data.inner.top + 4 + this._font.links.size + this._drawStyle.links.padding,
+      width: this._drawStyle.node.margin - 5,
+      height: this._font.title.size - 4,
+    };
+
+    context.save();
+    context.fillStyle = "black";
+    context.strokeStyle = "black";
+    context.lineWidth = 2;
+    context.beginPath();
+    context.moveTo(data.collapser.left, data.collapser.top + data.collapser.height/2);
+    context.lineTo(data.collapser.left + data.collapser.width, data.collapser.top + data.collapser.height/2);
+    if (node.collapsed()) {
+      context.moveTo(data.collapser.left + data.collapser.width/2, data.collapser.top);
+      context.lineTo(data.collapser.left + data.collapser.width/2, data.collapser.top + data.collapser.height);
+    }
+    context.stroke();
+    context.restore();
 
     // DEBUG: Render bounding box geometry.
     // context.strokeStyle = "red";
@@ -1015,7 +1039,7 @@ wcPlayEditor.prototype = {
     // __drawBoundList(data.valueBounds);
     // context.strokeRect(entryBounds.left, entryBounds.top, entryBounds.width, entryBounds.height);
     // context.strokeRect(exitBounds.left, exitBounds.top, exitBounds.width, exitBounds.height);
-    // context.strokeRect(centerBounds.left, centerBounds.top, centerBounds.width, centerBounds.height);
+    // context.strokeRect(data.inner.left, data.inner.top, data.inner.width, data.inner.height);
     // context.strokeRect(data.rect.left, data.rect.top, data.rect.width, data.rect.height);
 
     // Increase the nodes border thickness when flashing.
@@ -1684,20 +1708,21 @@ wcPlayEditor.prototype = {
     }
 
     var node = this.__findNodeAtPos(mouse, this._viewportCamera);
-    if (this._highlightNode !== node) {
-      if (node) {
-        // TODO: Check for link collision.
+    if (node) {
+      // TODO: Check for link collision.
 
-        // TODO: Check for property collision.
+      // TODO: Check for property collision.
 
-        // Check for main node collision.
-        if (this.__inRect(mouse, node._meta.bounds.inner, this._viewportCamera)) {
-          this._highlightNode = node;
-        }
+      // Check for main node collision.
+      if (this.__inRect(mouse, node._meta.bounds.inner, this._viewportCamera)) {
+        this._highlightNode = node;
+        this.$viewport.addClass('wcClickable');
       } else {
-        this._highlightNode = null;
+        this.$viewport.removeClass('wcClickable');
       }
-      this.$viewport.toggleClass('wcClickable', this._highlightNode != null);
+    } else {
+      this._highlightNode = null;
+      this.$viewport.removeClass('wcClickable');
     }
   },
 
@@ -1711,12 +1736,23 @@ wcPlayEditor.prototype = {
   __onViewportMouseDown: function(event, elem) {
     this._mouse = this.__mouse(event, this.$viewport.offset());
 
+    var hasTarget = false;
     var node = this.__findNodeAtPos(this._mouse, this._viewportCamera);
     if (node) {
-      this._selectedNode = node;
-      this._viewportMovingNode = true;
-    } else {
-      // Click outside of a node begins the canvas drag process.
+      if (this.__inRect(this._mouse, node._meta.bounds.collapser, this._viewportCamera)) {
+        // Collapse a node.
+        hasTarget = true;
+        node.collapsed(!node.collapsed());
+      } else if (this.__inRect(this._mouse, node._meta.bounds.inner, this._viewportCamera)) {
+        // Center area of a node to move it.
+        hasTarget = true;
+        this._selectedNode = node;
+        this._viewportMovingNode = true;
+      }
+    }
+
+    // Click outside of a node begins the canvas drag process.
+    if (!hasTarget) {
       this._viewportMoving = true;
       this._viewportMoved = false;
     }
