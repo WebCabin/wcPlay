@@ -500,7 +500,7 @@ wcPlay.prototype = {
 };
 /**
  * @class
- * Renders the Play script using an HTML5 canvas element (among other things).
+ * Provides a visual interface for editing a Play script. Requires HTML5 canvas.
  *
  * @constructor
  * @description
@@ -553,11 +553,11 @@ function wcPlayEditor(container, options) {
 
   // Update properties.
   this._lastUpdate = 0;
-  this._elapsed = 0;
 
   // Control properties.
   this._viewportCamera = {x: 0, y: 0, z: 1};
   this._paletteCamera = {x: 0, y: 0, z: 1};
+  this._viewportMovingNode = false;
   this._viewportMoving = false;
   this._viewportMoved = false;
   this._paletteMoving = false;
@@ -646,22 +646,23 @@ wcPlayEditor.prototype = {
    * @function wcPlayEditor#__mouse
    * @private
    * @param {Object} event - The mouse event.
-   * @param {wcPlayEditor~Offset} [offset] - An optional offset to apply to the pos.
+   * @param {wcPlayEditor~Offset} [offset] - An optional screen offset to apply to the pos.
+   * @param {wcPlay~Coordinates} [translation] - An optional camera translation to apply to the pos.
    * @return {wcPlay~Coordinates} - The mouse position.
    */
-  __mouse: function(event, offset) {
+  __mouse: function(event, offset, translation) {
     if (event.originalEvent && (event.originalEvent.touches || event.originalEvent.changedTouches)) {
       var touch = event.originalEvent.touches[0] || event.originalEvent.changedTouches[0];
       return {
-        x: touch.clientX - (offset? offset.left: 0),
-        y: touch.clientY - (offset? offset.top: 0),
+        x: touch.clientX - (offset? offset.left: 0) - (translation? translation.x: 0),
+        y: touch.clientY - (offset? offset.top: 0) - (translation? translation.y: 0),
         which: 1,
       };
     }
 
     return {
-      x: (event.clientX || event.pageX) - (offset? offset.left: 0),
-      y: (event.clientY || event.pageY) - (offset? offset.top: 0),
+      x: (event.clientX || event.pageX) - (offset? offset.left: 0) - (translation? translation.x: 0),
+      y: (event.clientY || event.pageY) - (offset? offset.top: 0) - (translation? translation.y: 0),
       which: event.which || 1,
     };
   },
@@ -693,16 +694,22 @@ wcPlayEditor.prototype = {
   },
 
   /**
-   * Blends two colors together.
+   * Blends two colors together. Color strings can be in hex string {'#ffffff'} or rgb string {'rgb(250,250,250)'} formats.
    * @function wcPlayEditor#__blendColors
    * @private
-   * @param {String} c0 - The first color, must be in hex string format: "#FFFFFF".
-   * @param {String} c1 - The second color, must be in hex string format: "#FFFFFF".
+   * @param {String} c0 - The first color string.
+   * @param {String} c1 - The second color string.
    * @param {Number} p - a multiplier to blend the colors by.
    */
   __blendColors: function(c0, c1, p) {
-    var f=parseInt(c0.slice(1),16),t=parseInt(c1.slice(1),16),R1=f>>16,G1=f>>8&0x00FF,B1=f&0x0000FF,R2=t>>16,G2=t>>8&0x00FF,B2=t&0x0000FF;
-    return "#"+(0x1000000+(Math.round((R2-R1)*p)+R1)*0x10000+(Math.round((G2-G1)*p)+G1)*0x100+(Math.round((B2-B1)*p)+B1)).toString(16).slice(1);
+      var n=p<0?p*-1:p,u=Math.round,w=parseInt;
+      if(c0.length>7){
+          var f=c0.split(","),t=(c1?c1:p<0?"rgb(0,0,0)":"rgb(255,255,255)").split(","),R=w(f[0].slice(4)),G=w(f[1]),B=w(f[2]);
+          return "rgb("+(u((w(t[0].slice(4))-R)*n)+R)+","+(u((w(t[1])-G)*n)+G)+","+(u((w(t[2])-B)*n)+B)+")"
+      }else{
+          var f=w(c0.slice(1),16),t=w((c1?c1:p<0?"#000000":"#FFFFFF").slice(1),16),R1=f>>16,G1=f>>8&0x00FF,B1=f&0x0000FF;
+          return "#"+(0x1000000+(u(((t>>16)-R1)*n)+R1)*0x10000+(u(((t>>8&0x00FF)-G1)*n)+G1)*0x100+(u(((t&0x0000FF)-B1)*n)+B1)).toString(16).slice(1)
+      }
   },
 
   /**
@@ -744,13 +751,21 @@ wcPlayEditor.prototype = {
    * @private
    * @param {wcPlay~Coordinates} pos - The position to test.
    * @param {wcPlayEditor~Rect} rect - The bounding rectangle.
+   * @param {wcPlay~Coordinates} [trans] - An optional camera translation to apply to the pos.
    * @returns {Boolean} - Whether there is a collision.
    */
-  __inRect: function(pos, rect) {
-    if (pos.y >= rect.top &&
-        pos.x >= rect.left &&
-        pos.y <= rect.top + rect.height &&
-        pos.x <= rect.left + rect.width) {
+  __inRect: function(pos, rect, trans) {
+    if (trans === undefined) {
+      trans = {
+        x: 0,
+        y: 0,
+      };
+    }
+
+    if (pos.y - trans.y >= rect.top &&
+        pos.x - trans.x >= rect.left &&
+        pos.y - trans.y <= rect.top + rect.height &&
+        pos.x - trans.x <= rect.left + rect.width) {
       return true;
     }
     return false;
@@ -793,7 +808,7 @@ wcPlayEditor.prototype = {
     if (!this._lastUpdate) {
       this._lastUpdate = timestamp;
     }
-    this._elapsed = (timestamp - this._lastUpdate) / 1000;
+    var elapsed = (timestamp - this._lastUpdate) / 1000;
     this._lastUpdate = timestamp;
 
     this.onResized();
@@ -810,7 +825,8 @@ wcPlayEditor.prototype = {
 
         // Make sure an instance of the node exists so we can render it.
         if (!this._nodeLibrary[data.category].hasOwnProperty(data.name)) {
-          this._nodeLibrary[data.category][data.name] = new window[data.name](null);
+          var node = this._nodeLibrary[data.category][data.name] = new window[data.name](null);
+          this.__updateNode(node, 0);
         }
       }
 
@@ -825,6 +841,12 @@ wcPlayEditor.prototype = {
         }
       }
 
+      // Update nodes.
+      this.__updateNodes(this._engine._entryNodes, elapsed);
+      this.__updateNodes(this._engine._processNodes, elapsed);
+      this.__updateNodes(this._engine._compositeNodes, elapsed);
+      this.__updateNodes(this._engine._storageNodes, elapsed);
+
       // Render the nodes in the main script.
       this._viewportContext.clearRect(-this._viewportCamera.x, -this._viewportCamera.y, this.$viewport.width(), this.$viewport.height());
       this.__drawNodes(this._engine._entryNodes, this._viewportContext);
@@ -837,10 +859,74 @@ wcPlayEditor.prototype = {
   },
 
   /**
+   * Updates the status of a list of nodes.
+   * @function wcPlayEditor#__updateNodes
+   * @private
+   * @param {wcNode[]} nodes - The nodes to update.
+   * @param {Number} elapsed - Elapsed time since last update.
+   */
+  __updateNodes: function(nodes, elapsed) {
+    for (var i = 0; i < nodes.length; ++i) {
+      this.__updateNode(nodes[i], elapsed);
+    }
+  },
+
+  /**
+   * Updates the status of a node.
+   * @function wcPlayEditor#__updateNode
+   * @private
+   * @param {wcNode} node - The Node to update.
+   * @param {Number} elapsed - Elapsed time since last update.
+   */
+  __updateNode: function(node, elapsed) {
+    // Update flash state.
+    var self = this;
+    function __updateFlash(meta, darkColor, lightColor, pauseColor, keepPaused, colorMul) {
+      if (meta.flash) {
+        meta.flashDelta += elapsed * 10.0;
+        if (meta.flashDelta >= 1.0) {
+          meta.flashDelta = 1.0;
+
+          if (!meta.awake && (!meta.paused || (!keepPaused && !self._engine.paused()))) {
+            meta.flash = false;
+          }
+        }
+      } else if (meta.flashDelta > 0.0) {
+        meta.flashDelta -= elapsed * 5.0;
+        if (meta.flashDelta <= 0.0) {
+          meta.flashDelta = 0;
+          meta.paused = keepPaused? meta.paused: false;
+        }
+      }
+
+      meta.color = self.__blendColors(darkColor, meta.paused? pauseColor: lightColor, meta.flashDelta * colorMul);
+    }
+
+    var color = node.color;
+    if (this._highlightNode === node) {
+      color = this.__blendColors(node.color, "#00FFFF", 0.5);
+    }
+    __updateFlash(node._meta, color, "#FFFFFF", "#FFFFFF", true, 0.5);
+
+    var blackColor = "#000000";
+    var flashColor = "#FFFF00";
+    for (var i = 0; i < node.chain.entry.length; ++i) {
+      __updateFlash(node.chain.entry[i].meta, blackColor, flashColor, flashColor, false, 0.9);
+    }
+    for (var i = 0; i < node.chain.exit.length; ++i) {
+      __updateFlash(node.chain.exit[i].meta, blackColor, flashColor, flashColor, false, 0.9);
+    }
+    for (var i = 0; i < node.properties.length; ++i) {
+      __updateFlash(node.properties[i].inputMeta, blackColor, flashColor, flashColor, false, 0.9);
+      __updateFlash(node.properties[i].outputMeta, blackColor, flashColor, flashColor, false, 0.9);
+    }
+  },
+
+  /**
    * Draws a list of nodes on the canvas.
    * @function wcPlayEditor#__drawNodes
    * @private
-   * @param {wcNode[]} node - The node to render.
+   * @param {wcNode[]} nodes - The node to render.
    * @param {external:Canvas~Context} context - The canvas context to render on.
    * @param {wcPlayEditor~DrawNodeOptions} [options] - Custom options.
    */
@@ -870,48 +956,6 @@ wcPlayEditor.prototype = {
         height: 0,
       },
     };
-
-    // Update flash state.
-    var self = this;
-    function __updateFlash(meta, darkColor, lightColor, pauseColor, keepPaused, colorMul) {
-      if (meta.flash) {
-        meta.flashDelta += self._elapsed * 10.0;
-        if (meta.flashDelta >= 1.0) {
-          meta.flashDelta = 1.0;
-
-          if (!meta.awake && (!meta.paused || (!keepPaused && !self._engine.paused()))) {
-            meta.flash = false;
-          }
-        }
-      } else if (meta.flashDelta > 0.0) {
-        meta.flashDelta -= self._elapsed * 5.0;
-        if (meta.flashDelta <= 0.0) {
-          meta.flashDelta = 0;
-          meta.paused = keepPaused? meta.paused: false;
-        }
-      }
-
-      meta.color = self.__blendColors(darkColor, meta.paused? pauseColor: lightColor, meta.flashDelta * colorMul);
-    }
-
-    var color = node.color;
-    if (this._highlightNode === node) {
-      color = this.__blendColors(node.color, "#00FFFF", 0.5);
-    }
-    __updateFlash(node._meta, color, "#FFFFFF", "#FFFFFF", true, 0.5);
-
-    var blackColor = "#000000";
-    var flashColor = "#FFFF00";
-    for (var i = 0; i < node.chain.entry.length; ++i) {
-      __updateFlash(node.chain.entry[i].meta, blackColor, flashColor, flashColor, false, 0.9);
-    }
-    for (var i = 0; i < node.chain.exit.length; ++i) {
-      __updateFlash(node.chain.exit[i].meta, blackColor, flashColor, flashColor, false, 0.9);
-    }
-    for (var i = 0; i < node.properties.length; ++i) {
-      __updateFlash(node.properties[i].inputMeta, blackColor, flashColor, flashColor, false, 0.9);
-      __updateFlash(node.properties[i].outputMeta, blackColor, flashColor, flashColor, false, 0.9);
-    }
 
     // TODO: Ignore drawing if the node is outside of view.
 
@@ -970,7 +1014,7 @@ wcPlayEditor.prototype = {
     // context.strokeRect(centerBounds.left, centerBounds.top, centerBounds.width, centerBounds.height);
     // context.strokeRect(data.rect.left, data.rect.top, data.rect.width, data.rect.height);
 
-    // Show the bounding box with the node when it is flashing.
+    // Increase the nodes border thickness when flashing.
     if (node._meta.flashDelta) {
       if (node._meta.paused) {
         this.__drawRoundedRect(data.inner, "#CC0000", 5, 10, context);
@@ -979,6 +1023,7 @@ wcPlayEditor.prototype = {
       }
     }
 
+    // Show an additional bounding rect around selected nodes.
     if (node === this._selectedNode) {
       this.__drawRoundedRect(data.rect, "cyan", 2, 10, context);
     }
@@ -1411,10 +1456,38 @@ wcPlayEditor.prototype = {
       this._viewportCamera.y += moveY;
       this._viewportContext.translate(moveX, moveY);
       this._mouse = mouse;
-      this._viewportMoved = true;
+      if (!this._viewportMoved) {
+        this._viewportMoved = true;
+        this.$viewport.addClass('wcMoving');
+      }
+      return;
     }
 
-    this._highlightNode = this.__findNodeAtPos(mouse, this._viewportCamera);
+    if (this._viewportMovingNode) {
+      var moveX = mouse.x - this._mouse.x;
+      var moveY = mouse.y - this._mouse.y;
+      this._selectedNode.pos.x += moveX;
+      this._selectedNode.pos.y += moveY;
+      this._mouse = mouse;
+      return;
+    }
+
+    var node = this.__findNodeAtPos(mouse, this._viewportCamera);
+    if (this._highlightNode !== node) {
+      if (node) {
+        // TODO: Check for link collision.
+
+        // TODO: Check for property collision.
+
+        // Check for main node collision.
+        if (this.__inRect(mouse, node._meta.bounds.inner, this._viewportCamera)) {
+          this._highlightNode = node;
+        }
+      } else {
+        this._highlightNode = null;
+      }
+      this.$viewport.toggleClass('wcClickable', this._highlightNode != null);
+    }
   },
 
   /**
@@ -1430,6 +1503,7 @@ wcPlayEditor.prototype = {
     var node = this.__findNodeAtPos(this._mouse, this._viewportCamera);
     if (node) {
       this._selectedNode = node;
+      this._viewportMovingNode = true;
     } else {
       // Click outside of a node begins the canvas drag process.
       this._viewportMoving = true;
@@ -1445,11 +1519,15 @@ wcPlayEditor.prototype = {
    * @param {Object} elem - The target element.
    */
   __onViewportMouseUp: function(event, elem) {
+    this._viewportMovingNode = false;
     if (this._viewportMoving) {
       this._viewportMoving = false;
 
       if (!this._viewportMoved) {
         this._selectedNode = null;
+      } else {
+        this._viewportMoved = false;
+        this.$viewport.removeClass('wcMoving');
       }
     }
   },
@@ -1464,16 +1542,11 @@ wcPlayEditor.prototype = {
    */
   __findNodeAtPos: function(pos, camera) {
     if (this._engine) {
-      var translatedPos = {
-        x: pos.x - camera.x,
-        y: pos.y - camera.y,
-      };
-
       var self = this;
       function __test(nodes) {
         // Iterate backwards so we always test the nodes that are drawn on top first.
         for (var i = nodes.length-1; i >= 0; --i) {
-          if (nodes[i]._meta.bounds && self.__inRect(translatedPos, nodes[i]._meta.bounds.inner)) {
+          if (nodes[i]._meta.bounds && self.__inRect(pos, nodes[i]._meta.bounds.rect, camera)) {
             return nodes[i];
           }
         }
