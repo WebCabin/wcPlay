@@ -694,22 +694,25 @@ wcPlayEditor.prototype = {
 
     // Measure the title bar area.
     this.__setCanvasFont(this._font.title, context);
-    bounds.width = context.measureText(node.name).width;
+    bounds.width = context.measureText(node.type + (node.name? ': ' + node.name: '')).width;
 
     // Measure properties.
     var collapsed = node.collapsed();
     var props = node.properties;
     for (var i = 0; i < props.length; ++i) {
-      bounds.height += this._font.property.size + this._drawStyle.property.spacing;
+      // Skip properties that are collapsible if it is not chained.
+      if (!collapsed || !props[i].options.collapsible || props[i].inputs.length || props[i].outputs.length) {
+        bounds.height += this._font.property.size + this._drawStyle.property.spacing;
 
-      // Property name.
-      this.__setCanvasFont(this._font.property, context);
-      var w = context.measureText(props[i].name + ': ').width;
+        // Property name.
+        this.__setCanvasFont(this._font.property, context);
+        var w = context.measureText(props[i].name + ': ').width;
 
-      // Property value.
-      this.__setCanvasFont(this._font.value, context);
-      w += context.measureText('[' + this.__clampString(node.property(props[i].name).toString(), this._drawStyle.property.strLen) + ']').width;
-      bounds.width = Math.max(w, bounds.width);
+        // Property value.
+        this.__setCanvasFont(this._font.value, context);
+        w += context.measureText('[' + this.__clampString(node.property(props[i].name).toString(), this._drawStyle.property.strLen) + ']').width;
+        bounds.width = Math.max(w, bounds.width);
+      }
     }
 
     bounds.left -= bounds.width/2 + this._drawStyle.node.margin;
@@ -770,6 +773,10 @@ wcPlayEditor.prototype = {
 
         result.push({
           rect: rect,
+          point: {
+            x: rect.left + rect.width/2,
+            y: rect.top + rect.height/3,
+          },
           name: links[i].name,
         });
 
@@ -833,6 +840,10 @@ wcPlayEditor.prototype = {
 
         result.push({
           rect: rect,
+          point: {
+            x: rect.left + rect.width/2,
+            y: rect.top + rect.height,
+          },
           name: links[i].name,
         });
 
@@ -888,11 +899,14 @@ wcPlayEditor.prototype = {
     }
 
     // Title Text
+    context.save();
     upper += this._font.title.size;
     context.fillStyle = "black";
     context.strokeStyle = "black";
+    context.textAlign = "center";
     this.__setCanvasFont(this._font.title, context);
-    context.fillText(node.name, rect.left + this._drawStyle.node.margin, rect.top + upper);
+    context.fillText(node.type + (node.name? ': ' + node.name: ''), rect.left + rect.width/2, rect.top + upper);
+    context.restore();
 
     // Title Lower Bar
     upper += this._drawStyle.title.spacing;
@@ -914,93 +928,105 @@ wcPlayEditor.prototype = {
     var collapsed = node.collapsed();
     var props = node.properties;
     for (var i = 0; i < props.length; ++i) {
-      upper += this._font.property.size;
 
-      // Property name.
-      context.fillStyle = "black";
-      context.textAlign = "left";
-      this.__setCanvasFont(this._font.property, context);
-      context.fillText(props[i].name + ': ', rect.left + this._drawStyle.node.margin, rect.top + upper);
+      // Skip properties that are collapsible if it is not chained.
+      if (!collapsed || !props[i].options.collapsible || props[i].inputs.length || props[i].outputs.length) {
+        upper += this._font.property.size;
 
-      // Property value.
-      context.textAlign = "right";
-      this.__setCanvasFont(this._font.value, context);
-      context.fillText('[' + this.__clampString(node.property(props[i].name).toString(), this._drawStyle.property.strLen) + ']', rect.left + rect.width - this._drawStyle.node.margin, rect.top + upper);
-      var w = context.measureText('[' + this.__clampString(node.property(props[i].name).toString(), this._drawStyle.property.strLen) + ']').width;
+        // Property name.
+        context.fillStyle = "black";
+        context.textAlign = "left";
+        this.__setCanvasFont(this._font.property, context);
+        context.fillText(props[i].name + ': ', rect.left + this._drawStyle.node.margin, rect.top + upper);
 
-      result.valueBounds.push({
-        rect: {
-          top: rect.top + upper - this._font.property.size,
-          left: rect.left + rect.width - this._drawStyle.node.margin - w,
-          width: w,
-          height: this._font.property.size + this._drawStyle.property.spacing,
-        },
-        name: props[i].name,
-      });
+        // Property value.
+        context.textAlign = "right";
+        this.__setCanvasFont(this._font.value, context);
+        context.fillText('[' + this.__clampString(node.property(props[i].name).toString(), this._drawStyle.property.strLen) + ']', rect.left + rect.width - this._drawStyle.node.margin, rect.top + upper);
+        var w = context.measureText('[' + this.__clampString(node.property(props[i].name).toString(), this._drawStyle.property.strLen) + ']').width;
 
-      // Property input.
-      if (!collapsed || props[i].inputs.length) {
-        linkRect = {
-          top: rect.top + upper - this._font.property.size/3 - this._drawStyle.links.width/2,
-          left: rect.left - this._drawStyle.links.length,
-          width: this._drawStyle.links.length,
-          height: this._drawStyle.links.width,
-        };
-
-        context.fillStyle = (this._highlightInputLink && this._highlightInputLink.name === props[i].name && this._highlightNode === node? "cyan": props[i].inputMeta.color);
-        context.strokeStyle = "black";
-        context.beginPath();
-        context.moveTo(linkRect.left, linkRect.top);
-        context.lineTo(linkRect.left + linkRect.width, linkRect.top);
-        context.lineTo(linkRect.left + linkRect.width, linkRect.top + linkRect.height);
-        context.lineTo(linkRect.left, linkRect.top + linkRect.height);
-        context.lineTo(linkRect.left + linkRect.width/3, linkRect.top + linkRect.height/2);
-        context.closePath();
-        context.stroke();
-        context.fill();
-
-        // Expand the bounding rect just a little so it is easier to click.
-        linkRect.top -= 5;
-        linkRect.height += 10;
-
-        result.inputBounds.push({
-          rect: linkRect,
+        result.valueBounds.push({
+          rect: {
+            top: rect.top + upper - this._font.property.size,
+            left: rect.left + rect.width - this._drawStyle.node.margin - w,
+            width: w,
+            height: this._font.property.size + this._drawStyle.property.spacing,
+          },
           name: props[i].name,
         });
-      }
 
-      // Property output.
-      if (!collapsed || props[i].outputs.length) {
-        linkRect = {
-          top: rect.top + upper - this._font.property.size/3 - this._drawStyle.links.width/2,
-          left: rect.left + rect.width,
-          width: this._drawStyle.links.length,
-          height: this._drawStyle.links.width,
+        // Property input.
+        if (!collapsed || props[i].inputs.length) {
+          linkRect = {
+            top: rect.top + upper - this._font.property.size/3 - this._drawStyle.links.width/2,
+            left: rect.left - this._drawStyle.links.length,
+            width: this._drawStyle.links.length,
+            height: this._drawStyle.links.width,
+          };
+
+          context.fillStyle = (this._highlightInputLink && this._highlightInputLink.name === props[i].name && this._highlightNode === node? "cyan": props[i].inputMeta.color);
+          context.strokeStyle = "black";
+          context.beginPath();
+          context.moveTo(linkRect.left, linkRect.top);
+          context.lineTo(linkRect.left + linkRect.width, linkRect.top);
+          context.lineTo(linkRect.left + linkRect.width, linkRect.top + linkRect.height);
+          context.lineTo(linkRect.left, linkRect.top + linkRect.height);
+          context.lineTo(linkRect.left + linkRect.width/3, linkRect.top + linkRect.height/2);
+          context.closePath();
+          context.stroke();
+          context.fill();
+
+          // Expand the bounding rect just a little so it is easier to click.
+          linkRect.top -= 5;
+          linkRect.height += 10;
+
+          result.inputBounds.push({
+            rect: linkRect,
+            point: {
+              x: linkRect.left + linkRect.width/3,
+              y: linkRect.top + linkRect.height/2,
+            },
+            name: props[i].name,
+          });
         }
 
-        context.fillStyle = (this._highlightOutputLink && this._highlightOutputLink.name === props[i].name && this._highlightNode === node? "cyan": props[i].outputMeta.color);
-        context.strokeStyle = "black";
-        context.beginPath();
-        context.moveTo(linkRect.left, linkRect.top);
-        context.lineTo(linkRect.left + linkRect.width/2, linkRect.top);
-        context.lineTo(linkRect.left + linkRect.width, linkRect.top + linkRect.height/2);
-        context.lineTo(linkRect.left + linkRect.width/2, linkRect.top + linkRect.height);
-        context.lineTo(linkRect.left, linkRect.top + linkRect.height);
-        context.closePath();
-        context.stroke();
-        context.fill();
+        // Property output.
+        if (!collapsed || props[i].outputs.length) {
+          linkRect = {
+            top: rect.top + upper - this._font.property.size/3 - this._drawStyle.links.width/2,
+            left: rect.left + rect.width,
+            width: this._drawStyle.links.length,
+            height: this._drawStyle.links.width,
+          }
 
-        // Expand the bounding rect just a little so it is easier to click.
-        linkRect.top -= 5;
-        linkRect.height += 10;
+          context.fillStyle = (this._highlightOutputLink && this._highlightOutputLink.name === props[i].name && this._highlightNode === node? "cyan": props[i].outputMeta.color);
+          context.strokeStyle = "black";
+          context.beginPath();
+          context.moveTo(linkRect.left, linkRect.top);
+          context.lineTo(linkRect.left + linkRect.width/2, linkRect.top);
+          context.lineTo(linkRect.left + linkRect.width, linkRect.top + linkRect.height/2);
+          context.lineTo(linkRect.left + linkRect.width/2, linkRect.top + linkRect.height);
+          context.lineTo(linkRect.left, linkRect.top + linkRect.height);
+          context.closePath();
+          context.stroke();
+          context.fill();
 
-        result.outputBounds.push({
-          rect: linkRect,
-          name: props[i].name,
-        });
+          // Expand the bounding rect just a little so it is easier to click.
+          linkRect.top -= 5;
+          linkRect.height += 10;
+
+          result.outputBounds.push({
+            rect: linkRect,
+            point: {
+              x: linkRect.left + linkRect.width,
+              y: linkRect.top + linkRect.height/2,
+            },
+            name: props[i].name,
+          });
+        }
+
+        upper += this._drawStyle.property.spacing;
       }
-
-      upper += this._drawStyle.property.spacing;
     }
     context.restore();
 
@@ -1044,17 +1070,17 @@ wcPlayEditor.prototype = {
         continue;
       }
 
-      var exitRect;
+      var exitPoint;
       // Find the corresponding meta data for this link.
       for (var a = 0; a < node._meta.bounds.exitBounds.length; ++a) {
         if (node._meta.bounds.exitBounds[a].name === exitLink.name) {
-          exitRect = node._meta.bounds.exitBounds[a].rect;
+          exitPoint = node._meta.bounds.exitBounds[a].point;
           break;
         }
       }
 
       // Skip links that do not contain meta data (should not happen).
-      if (!exitRect) {
+      if (!exitPoint) {
         console.log('ERROR: Attempted to draw chains for an exit link that has no meta data.');
         continue;
       }
@@ -1079,16 +1105,16 @@ wcPlayEditor.prototype = {
         }
 
         // Find the corresponding meta data for this link.
-        var entryRect;
+        var entryPoint;
         for (var b = 0; b < targetNode._meta.bounds.entryBounds.length; ++b) {
           if (targetNode._meta.bounds.entryBounds[b].name === entryLink.name) {
-            entryRect = targetNode._meta.bounds.entryBounds[b].rect;
+            entryPoint = targetNode._meta.bounds.entryBounds[b].point;
             break;
           }
         }
 
         // Could not find meta data for this link.
-        if (!entryRect) {
+        if (!entryPoint) {
           console.log('ERROR: Attempted to draw chains to an entry link that has no meta data.');
           continue;
         }
@@ -1096,16 +1122,7 @@ wcPlayEditor.prototype = {
         var flash = (exitLink.meta.flashDelta > 0 || entryLink.meta.flashDelta > 0);
 
         // Now we have both our links, lets chain them together!
-        this.__drawFlowChain({
-          x: exitRect.left + exitRect.width/2,
-          y: exitRect.top + exitRect.height,
-        }, {
-          x: entryRect.left + entryRect.width/2,
-          y: entryRect.top + entryRect.height/3,
-        },
-        node._meta.bounds.rect,
-        targetNode._meta.bounds.rect,
-        context, flash);
+        this.__drawFlowChain(exitPoint, entryPoint, node._meta.bounds.rect, targetNode._meta.bounds.rect, context, flash);
       }
     }
 
@@ -1118,16 +1135,16 @@ wcPlayEditor.prototype = {
       }
 
       // Find the corresponding meta data for this link.
-      var outputRect;
+      var outputPoint;
       for (var a = 0; a < node._meta.bounds.outputBounds.length; ++a) {
         if (node._meta.bounds.outputBounds[a].name === outputProp.name) {
-          outputRect = node._meta.bounds.outputBounds[a].rect;
+          outputPoint = node._meta.bounds.outputBounds[a].point;
           break;
         }
       }
 
       // Failed to find bounds for the output link.
-      if (!outputRect) {
+      if (!outputPoint) {
         console.log('ERROR: Attempted to draw chains for an output link that has no meta data.');
         continue;
       }
@@ -1151,16 +1168,16 @@ wcPlayEditor.prototype = {
         }
 
         // Find the corresponding meta data for this link.
-        var inputRect;
+        var inputPoint;
         for (var b = 0; b < targetNode._meta.bounds.inputBounds.length; ++b) {
           if (targetNode._meta.bounds.inputBounds[b].name === inputProp.name) {
-            inputRect = targetNode._meta.bounds.inputBounds[b].rect;
+            inputPoint = targetNode._meta.bounds.inputBounds[b].point;
             break;
           }
         }
 
         // Failed to find the meta data for a property input link.
-        if (!inputRect) {
+        if (!inputPoint) {
           console.log('ERROR: Attempted to draw chains to a property input link that has no meta data.');
           continue;
         }
@@ -1168,16 +1185,7 @@ wcPlayEditor.prototype = {
         var flash = (outputProp.outputMeta.flashDelta > 0 || inputProp.inputMeta.flashDelta > 0);
 
         // Now we have both our links, lets chain them together!
-        this.__drawPropertyChain({
-          x: outputRect.left + outputRect.width,
-          y: outputRect.top + outputRect.height/2,
-        }, {
-          x: inputRect.left + inputRect.width/3,
-          y: inputRect.top + inputRect.height/2,
-        },
-        node._meta.bounds.rect,
-        targetNode._meta.bounds.rect,
-        context, flash);
+        this.__drawPropertyChain(outputPoint, inputPoint, node._meta.bounds.rect, targetNode._meta.bounds.rect, context, flash);
       }
     }
 
@@ -1186,10 +1194,7 @@ wcPlayEditor.prototype = {
       var targetPos;
       var targetRect = null;
       if (this._highlightNode && this._highlightExitLink) {
-        targetPos = {
-          x: this._highlightExitLink.rect.left + this._highlightExitLink.rect.width/2,
-          y: this._highlightExitLink.rect.top + this._highlightExitLink.rect.height,
-        };
+        targetPos = this._highlightExitLink.point;
         targetRect = this._highlightExitLink.rect;
       } else {
         targetPos = {
@@ -1198,20 +1203,14 @@ wcPlayEditor.prototype = {
         };
       }
 
-      this.__drawFlowChain({
-        x: this._selectedEntryLink.rect.left + this._selectedEntryLink.rect.width/2,
-        y: this._selectedEntryLink.rect.top + this._selectedEntryLink.rect.height/3,
-      }, targetPos, node._meta.bounds.rect, targetRect, context);
+      this.__drawFlowChain(this._selectedEntryLink.point, targetPos, node._meta.bounds.rect, targetRect, context);
     }
 
     if (this._selectedNode === node && this._selectedExitLink) {
       var targetPos;
       var targetRect = null;
       if (this._highlightNode && this._highlightEntryLink) {
-        targetPos = {
-          x: this._highlightEntryLink.rect.left + this._highlightEntryLink.rect.width/2,
-          y: this._highlightEntryLink.rect.top + this._highlightEntryLink.rect.height/3,
-        };
+        targetPos = this._highlightEntryLink.point;
         targetRect = this._highlightEntryLink.rect;
       } else {
         targetPos = {
@@ -1220,20 +1219,14 @@ wcPlayEditor.prototype = {
         };
       }
 
-      this.__drawFlowChain({
-        x: this._selectedExitLink.rect.left + this._selectedExitLink.rect.width/2,
-        y: this._selectedExitLink.rect.top + this._selectedExitLink.rect.height,
-      }, targetPos, node._meta.bounds.rect, targetRect, context);
+      this.__drawFlowChain(this._selectedExitLink.point, targetPos, node._meta.bounds.rect, targetRect, context);
     }
 
     if (this._selectedNode === node && this._selectedInputLink) {
       var targetPos;
       var targetRect = null;
       if (this._highlightNode && this._highlightOutputLink) {
-        targetPos = {
-          x: this._highlightOutputLink.rect.left + this._highlightOutputLink.rect.width,
-          y: this._highlightOutputLink.rect.top + this._highlightOutputLink.rect.height/2,
-        };
+        targetPos = this._highlightOutputLink.point;
         targetRect = this._highlightOutputLink.rect;
       } else {
         targetPos = {
@@ -1242,20 +1235,14 @@ wcPlayEditor.prototype = {
         };
       }
 
-      this.__drawPropertyChain({
-        x: this._selectedInputLink.rect.left + this._selectedInputLink.rect.width/3,
-        y: this._selectedInputLink.rect.top + this._selectedInputLink.rect.height/2,
-      }, targetPos, node._meta.bounds.rect, targetRect, context);
+      this.__drawPropertyChain(this._selectedInputLink.point, targetPos, node._meta.bounds.rect, targetRect, context);
     }
 
     if (this._selectedNode === node && this._selectedOutputLink) {
       var targetPos;
       var targetRect = null;
       if (this._highlightNode && this._highlightInputLink) {
-        targetPos = {
-          x: this._highlightInputLink.rect.left + this._highlightInputLink.rect.width/3,
-          y: this._highlightInputLink.rect.top + this._highlightInputLink.rect.height/2,
-        };
+        targetPos = this._highlightInputLink.point;
         targetRect = this._highlightInputLink.rect;
       } else {
         targetPos = {
@@ -1264,10 +1251,7 @@ wcPlayEditor.prototype = {
         };
       }
 
-      this.__drawPropertyChain({
-        x: this._selectedOutputLink.rect.left + this._selectedOutputLink.rect.width,
-        y: this._selectedOutputLink.rect.top + this._selectedOutputLink.rect.height/2,
-      }, targetPos, node._meta.bounds.rect, targetRect, context);
+      this.__drawPropertyChain(this._selectedOutputLink.point, targetPos, node._meta.bounds.rect, targetRect, context);
     }
   },
 
@@ -1327,6 +1311,7 @@ wcPlayEditor.prototype = {
     var self = this;
     this.$viewport.on('mousemove',  function(event){self.__onViewportMouseMove(event, this);});
     this.$viewport.on('mousedown',  function(event){self.__onViewportMouseDown(event, this);});
+    this.$viewport.on('dblclick',   function(event){self.__onViewportMouseDoubleClick(event, this);});
     this.$viewport.on('mouseup',    function(event){self.__onViewportMouseUp(event, this);});
     // this.$viewport.on('mouseleave', function(event){self.__onViewportMouseUp(event, this);});
   },
@@ -1539,6 +1524,43 @@ wcPlayEditor.prototype = {
         hasTarget = true;
         this._selectedNode = node;
         this._viewportMovingNode = true;
+      }
+    }
+
+    // Click outside of a node begins the canvas drag process.
+    if (!hasTarget) {
+      this._viewportMoving = true;
+      this._viewportMoved = false;
+    }
+  },
+
+  /**
+   * Handle mouse double click events over the viewport canvas.
+   * @function wcPlayEditor#__onViewportMouseDoubleClick
+   * @private
+   * @param {Object} event - The mouse event.
+   * @param {Object} elem - The target element.
+   */
+  __onViewportMouseDoubleClick: function(event, elem) {
+    this._mouse = this.__mouse(event, this.$viewport.offset());
+
+    var hasTarget = false;
+    var node = this.__findNodeAtPos(this._mouse, this._viewportCamera);
+    if (node) {
+      // Collapser button.
+      if (this.__inRect(this._mouse, node._meta.bounds.collapser, this._viewportCamera)) {
+        hasTarget = true;
+      }
+
+      // Breakpoint button.
+      if (this.__inRect(this._mouse, node._meta.bounds.breakpoint, this._viewportCamera)) {
+        hasTarget = true;
+      }
+
+      // Center area.
+      if (!hasTarget && this.__inRect(this._mouse, node._meta.bounds.inner, this._viewportCamera)) {
+        hasTarget = true;
+        node.collapsed(!node.collapsed());
       }
     }
 

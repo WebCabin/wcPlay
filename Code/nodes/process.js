@@ -2,7 +2,7 @@ wcNode.extend('wcNodeProcess', 'Node Process', '', {
   /**
    * @class
    * The base class for all process nodes. These are nodes that make up the bulk of script chains.<br>
-   * When inheriting, make sure to include 'this._super(parent, pos, name);' at the top of your init function.
+   * When inheriting, make sure to include 'this._super(parent, pos, type);' at the top of your init function.
    *
    * @constructor wcNodeProcess
    * @description
@@ -11,8 +11,8 @@ wcNode.extend('wcNodeProcess', 'Node Process', '', {
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
    * @param {String} [name="Node Process"] - The name of the node, as displayed on the title bar.
    */
-  init: function(parent, pos, name) {
-    this._super(parent, pos, name);
+  init: function(parent, pos, type) {
+    this._super(parent, pos, type);
     this.color = '#007ACC';
 
     // Create a default links.

@@ -2,7 +2,8 @@ $(document).ready(function() {
   // Create an instance of our Play engine.
   var myPlay = new wcPlay({
     silent: false,
-    updateRate: 25,
+    updateRate: 10,
+    updateLimit: 1,
     debugging: false,
   });
 

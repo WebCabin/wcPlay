@@ -2,15 +2,15 @@ wcNodeProcess.extend('wcNodeProcessDelay', 'Delay', 'Core', {
   /**
    * @class
    * Waits for a specified amount of time before continuing the node chain.<br>
-   * When inheriting, make sure to include 'this._super(parent, pos, name);' at the top of your init function.
+   * When inheriting, make sure to include 'this._super(parent, pos, type);' at the top of your init function.
    *
    * @constructor wcNodeProcessDelay
    * @param {String} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
    * @param {String} [name="Delay"] - The name of the node, as displayed on the title bar.
    */
-  init: function(parent, pos, name) {
-    this._super(parent, pos, name);
+  init: function(parent, pos, type) {
+    this._super(parent, pos, type);
 
     // Create a finished exit that only triggers after the delay has elapsed.
     this.createExit('finished');

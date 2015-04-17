@@ -26,6 +26,7 @@ function wcPlay(options) {
   this._options = {
     silent: false,
     updateRate: 25,
+    updateLimit: 100,
     debugging: true,
   };
   for (var prop in options) {
@@ -124,7 +125,7 @@ wcPlay.prototype = {
     }
 
     // Update a queued property if any
-    var count = this._queuedProperties.length;
+    var count = Math.min(this._queuedProperties.length, this._options.updateLimit);
     while (count) {
       count--;
       var item = this._queuedProperties.shift();
@@ -135,7 +136,7 @@ wcPlay.prototype = {
 
     // Update a queued node entry only if there are no more properties to update.
     if (!this._queuedProperties.length) {
-      count = this._queuedChain.length;
+      count = Math.min(this._queuedChain.length, this._options.updateLimit - count);
       while (count) {
         count--;
         var item = this._queuedChain.shift();

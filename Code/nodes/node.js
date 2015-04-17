@@ -2,17 +2,18 @@ Class.extend('wcNode', 'Node', '', {
   /**
    * @class
    * The foundation class for all nodes.<br>
-   * When inheriting, make sure to include 'this._super(parent, pos, name);' at the top of your init functions.
+   * When inheriting, make sure to include 'this._super(parent, pos, type);' at the top of your init functions.
    *
    * @constructor wcNode
    * @description
    * <b>Should be inherited and never constructed directly.</b>
    * @param {String} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
-   * @param {String} [name="Node"] - The name of the node, as displayed on the title bar.
+   * @param {String} [type="Node"] - The type name of the node, as displayed on the title bar.
    */
-  init: function(parent, pos, name) {
-    this.name = name || this.name;
+  init: function(parent, pos, type) {
+    this.type = type || this.name;
+    this.name = '';
     this.color = '#FFFFFF';
 
     this.pos = {
@@ -40,7 +41,7 @@ Class.extend('wcNode', 'Node', '', {
     this._parent = parent;
 
     // Give the node its default properties.
-    this.createProperty(wcNode.PROPERTY.ENABLED, wcPlay.PROPERTY_TYPE.TOGGLE, true);
+    this.createProperty(wcNode.PROPERTY.ENABLED, wcPlay.PROPERTY_TYPE.TOGGLE, true, {collapsible: true});
 
     var engine = this.engine();
     engine && engine.__addNode(this);

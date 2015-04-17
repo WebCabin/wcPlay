@@ -2,7 +2,7 @@ wcNode.extend('wcNodeEntry', 'Entry Node', '', {
   /**
    * @class
    * The base class for all entry nodes. These are nodes that start script chains.<br>
-   * When inheriting, make sure to include 'this._super(parent, pos, name);' at the top of your init function.
+   * When inheriting, make sure to include 'this._super(parent, pos, type);' at the top of your init function.
    *
    * @constructor wcNodeEntry
    * @description
@@ -11,8 +11,8 @@ wcNode.extend('wcNodeEntry', 'Entry Node', '', {
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
    * @param {String} [name="Entry Node"] - The name of the node, as displayed on the title bar.
    */
-  init: function(parent, pos, name) {
-    this._super(parent, pos, name);
+  init: function(parent, pos, type) {
+    this._super(parent, pos, type);
     this.color = '#CCCC00';
 
     // Create a default exit link.
