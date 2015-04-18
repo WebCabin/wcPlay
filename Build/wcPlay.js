@@ -1658,7 +1658,7 @@ wcPlayEditor.prototype = {
           continue;
         }
 
-        var flash = (exitLink.meta.flashDelta > 0 || entryLink.meta.flashDelta > 0);
+        var flash = (exitLink.meta.flashDelta > 0 && entryLink.meta.flashDelta > 0);
 
         // Now we have both our links, lets chain them together!
         this.__drawFlowChain(exitPoint, entryPoint, node._meta.bounds.rect, targetNode._meta.bounds.rect, context, flash);
@@ -1721,7 +1721,7 @@ wcPlayEditor.prototype = {
           continue;
         }
 
-        var flash = (outputProp.outputMeta.flashDelta > 0 || inputProp.inputMeta.flashDelta > 0);
+        var flash = (outputProp.outputMeta.flashDelta > 0 && inputProp.inputMeta.flashDelta > 0);
 
         // Now we have both our links, lets chain them together!
         this.__drawPropertyChain(outputPoint, inputPoint, node._meta.bounds.rect, targetNode._meta.bounds.rect, context, flash);
@@ -1732,9 +1732,11 @@ wcPlayEditor.prototype = {
     if (this._selectedNode === node && this._selectedEntryLink) {
       var targetPos;
       var targetRect = null;
+      var highlight = false;
       if (this._highlightNode && this._highlightExitLink) {
         targetPos = this._highlightExitLink.point;
         targetRect = this._highlightExitLink.rect;
+        highlight = true;
       } else {
         targetPos = {
           x: this._mouse.x - this._viewportCamera.x,
@@ -1742,15 +1744,25 @@ wcPlayEditor.prototype = {
         };
       }
 
-      this.__drawFlowChain(this._selectedEntryLink.point, targetPos, node._meta.bounds.rect, targetRect, context);
+      // In case our selected node gets uncollapsed, get the current position of the link.
+      var point;
+      for (var i = 0; i < node._meta.bounds.entryBounds.length; ++i) {
+        if (node._meta.bounds.entryBounds[i].name === this._selectedEntryLink.name) {
+          point = node._meta.bounds.entryBounds[i].point;
+        }
+      }
+
+      this.__drawFlowChain(point, targetPos, node._meta.bounds.rect, targetRect, context, highlight);
     }
 
     if (this._selectedNode === node && this._selectedExitLink) {
       var targetPos;
       var targetRect = null;
+      var highlight = false;
       if (this._highlightNode && this._highlightEntryLink) {
         targetPos = this._highlightEntryLink.point;
         targetRect = this._highlightEntryLink.rect;
+        highlight = true;
       } else {
         targetPos = {
           x: this._mouse.x - this._viewportCamera.x,
@@ -1758,15 +1770,25 @@ wcPlayEditor.prototype = {
         };
       }
 
-      this.__drawFlowChain(this._selectedExitLink.point, targetPos, node._meta.bounds.rect, targetRect, context);
+      // In case our selected node gets uncollapsed, get the current position of the link.
+      var point;
+      for (var i = 0; i < node._meta.bounds.exitBounds.length; ++i) {
+        if (node._meta.bounds.exitBounds[i].name === this._selectedExitLink.name) {
+          point = node._meta.bounds.exitBounds[i].point;
+        }
+      }
+
+      this.__drawFlowChain(point, targetPos, node._meta.bounds.rect, targetRect, context, highlight);
     }
 
     if (this._selectedNode === node && this._selectedInputLink) {
       var targetPos;
       var targetRect = null;
+      var highlight = false;
       if (this._highlightNode && this._highlightOutputLink) {
         targetPos = this._highlightOutputLink.point;
         targetRect = this._highlightOutputLink.rect;
+        highlight = true;
       } else {
         targetPos = {
           x: this._mouse.x - this._viewportCamera.x,
@@ -1774,15 +1796,25 @@ wcPlayEditor.prototype = {
         };
       }
 
-      this.__drawPropertyChain(this._selectedInputLink.point, targetPos, node._meta.bounds.rect, targetRect, context);
+      // In case our selected node gets uncollapsed, get the current position of the link.
+      var point;
+      for (var i = 0; i < node._meta.bounds.inputBounds.length; ++i) {
+        if (node._meta.bounds.inputBounds[i].name === this._selectedInputLink.name) {
+          point = node._meta.bounds.inputBounds[i].point;
+        }
+      }
+
+      this.__drawPropertyChain(point, targetPos, node._meta.bounds.rect, targetRect, context, highlight);
     }
 
     if (this._selectedNode === node && this._selectedOutputLink) {
       var targetPos;
       var targetRect = null;
+      var highlight = false;
       if (this._highlightNode && this._highlightInputLink) {
         targetPos = this._highlightInputLink.point;
         targetRect = this._highlightInputLink.rect;
+        highlight = true;
       } else {
         targetPos = {
           x: this._mouse.x - this._viewportCamera.x,
@@ -1790,7 +1822,15 @@ wcPlayEditor.prototype = {
         };
       }
 
-      this.__drawPropertyChain(this._selectedOutputLink.point, targetPos, node._meta.bounds.rect, targetRect, context);
+      // In case our selected node gets uncollapsed, get the current position of the link.
+      var point;
+      for (var i = 0; i < node._meta.bounds.outputBounds.length; ++i) {
+        if (node._meta.bounds.outputBounds[i].name === this._selectedOutputLink.name) {
+          point = node._meta.bounds.outputBounds[i].point;
+        }
+      }
+
+      this.__drawPropertyChain(point, targetPos, node._meta.bounds.rect, targetRect, context, highlight);
     }
   },
 
