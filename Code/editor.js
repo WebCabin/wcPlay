@@ -535,11 +535,11 @@ wcPlayEditor.prototype = {
     context.strokeStyle = "black";
     context.lineWidth = 2;
     context.beginPath();
-    context.moveTo(data.collapser.left, data.collapser.top + data.collapser.height/2);
-    context.lineTo(data.collapser.left + data.collapser.width, data.collapser.top + data.collapser.height/2);
+    context.moveTo(data.collapser.left + 1, data.collapser.top + data.collapser.height/2);
+    context.lineTo(data.collapser.left + data.collapser.width - 1, data.collapser.top + data.collapser.height/2);
     if (node.collapsed()) {
-      context.moveTo(data.collapser.left + data.collapser.width/2, data.collapser.top);
-      context.lineTo(data.collapser.left + data.collapser.width/2, data.collapser.top + data.collapser.height);
+      context.moveTo(data.collapser.left + data.collapser.width/2, data.collapser.top + 1);
+      context.lineTo(data.collapser.left + data.collapser.width/2, data.collapser.top + data.collapser.height - 1);
     }
     context.stroke();
     context.restore();
