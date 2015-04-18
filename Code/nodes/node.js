@@ -16,6 +16,8 @@ Class.extend('wcNode', 'Node', '', {
     this.name = '';
     this.color = '#FFFFFF';
 
+    this._viewportSize = null;
+
     this.pos = {
       x: pos && pos.x || 0,
       y: pos && pos.y || 0,
@@ -252,11 +254,11 @@ Class.extend('wcNode', 'Node', '', {
    * @function wcNode#createProperty
    * @param {String} name - The name of the property.
    * @param {wcPlay.PROPERTY_TYPE} [controlType=wcPlay.PROPERTY_TYPE.STRING] - The type of property.
-   * @param {Object} [defaultValue] - A default value for this property.
+   * @param {Object} [initialValue] - A initial value for this property when the script starts.
    * @param {Object} [options] - Additional options for this property, see {@link wcPlay.PROPERTY_TYPE}.
    * @returns {Boolean} - Failes if the property does not exist.
    */
-  createProperty: function(name, controlType, defaultValue, options) {
+  createProperty: function(name, controlType, initialValue, options) {
     // Make sure this property doesn't already exist.
     for (var i = 0; i < this.properties.length; ++i) {
       if (this.properties[i].name === name) {
@@ -271,8 +273,8 @@ Class.extend('wcNode', 'Node', '', {
 
     this.properties.push({
       name: name,
-      value: defaultValue,
-      defaultValue: defaultValue,
+      value: initialValue,
+      initialValue: initialValue,
       controlType: controlType,
       inputs: [],
       outputs: [],
@@ -878,19 +880,52 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
-   * Gets, or Sets the default value of a property.
-   * @function wcNode#defaultValue
+   * Gets, or Sets the initial value of a property.
+   * @function wcNode#initialValue
    * @param {String} name - The name of the property.
    * @param {Object} [value] - If supplied, will assign a new default value to the property.
    * @returns {Object|undefined} - The default value of the property, or undefined if not found.
    */
-  defaultValue: function(name, value) {
+  initialValue: function(name, value) {
     for (var i = 0; i < this.properties.length; ++i) {
       var prop = this.properties[i];
       if (prop.name === name) {
-        prop.defaultValue = value;
+        prop.initialValue = value;
       }
     }
+  },
+
+  /**
+   * Sets a size for the custom viewport.<br>
+   * The custom viewport is a rectangular area embedded into the node's visual display in which you can 'draw' whatever you wish. It appears below the title text and above properties.
+   * @function wcNode#viewportSize
+   * @param {Number} [width] - If supplied, assigns the width of the viewport desired. Use 0 or null to disable the viewport.
+   * @param {Number} [height] - If supplied, assigns the height of the viewport desired. Use 0 or null to disable the viewport.
+   * @returns {wcPlay~Coordinates} - The current size of the viewport.
+   */
+  viewportSize: function(width, height) {
+    if (width !== undefined && height !== undefined) {
+      if (!width || !height) {
+        this._viewportSize = null;
+      } else {
+        this._viewportSize = {
+          x: width,
+          y: height,
+        };
+      }
+    }
+
+    return {x: this._viewportSize.x, y: this._viewportSize.y};
+  },
+
+  /**
+   * Event that is called when it is time to draw the contents of your custom viewport.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onViewport
+   * @param {external:Canvas~Context} context - The canvas context to draw on, coordinates 0,0 will be the top left corner of your viewport. It is up to you to stay within the [viewport bounds]{@link wcNode#viewportSize} you have assigned.
+   * @see wcNode#viewportSize
+   */
+  onViewport: function(context) {
   },
 
   /**

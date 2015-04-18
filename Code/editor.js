@@ -697,6 +697,12 @@ wcPlayEditor.prototype = {
     this.__setCanvasFont(this._font.title, context);
     bounds.width = context.measureText(node.type + (node.name? ': ' + node.name: '')).width;
 
+    // Measure the viewport.
+    if (node._viewportSize) {
+      bounds.width = Math.max(bounds.width, node._viewportSize.x);
+      bounds.height += node._viewportSize.y + this._drawStyle.property.spacing;
+    }
+
     // Measure properties.
     var collapsed = node.collapsed();
     var props = node.properties;
@@ -917,6 +923,28 @@ wcPlayEditor.prototype = {
     // context.moveTo(rect.left, rect.top + upper);
     // context.lineTo(rect.left + rect.width, rect.top + upper);
     // context.stroke();
+
+    // Draw the node's viewport.
+    if (node._viewportSize) {
+      // Calculate the translation to make the viewport 0,0.
+      var corner = {
+        x: -this._viewportCamera.x + rect.left + (rect.width/2 - node._viewportSize.x/2),
+        y: -this._viewportCamera.y + rect.top + upper,
+      };
+
+      context.save();
+      // Translate the canvas so 0,0 is the beginning of the viewport.
+      context.translate(corner.x, corner.y);
+
+      // Draw the viewport.
+      node.onViewport(context);
+
+      // Now revert the translation.
+      context.translate(-corner.x, -corner.y);
+      context.restore();
+
+      upper += node._viewportSize.y + this._drawStyle.property.spacing;
+    }
 
     // Properties
     var result = {
