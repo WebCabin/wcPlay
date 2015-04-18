@@ -19,7 +19,7 @@ wcNodeProcess.extend('wcNodeProcessLog', 'Log', 'Core', {
   /**
    * Event that is called when an entry link has been triggered.<br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNode#onTriggered
+   * @function wcNodeProcessDelay#onTriggered
    * @param {String} name - The name of the entry link triggered.
    */
   onTriggered: function(name) {

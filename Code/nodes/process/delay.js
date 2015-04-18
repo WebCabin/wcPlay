@@ -22,7 +22,7 @@ wcNodeProcess.extend('wcNodeProcessDelay', 'Delay', 'Core', {
   /**
    * Event that is called when an entry link has been triggered.<br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNode#onTriggered
+   * @function wcNodeProcessDelay#onTriggered
    * @param {String} name - The name of the entry link triggered.
    */
   onTriggered: function(name) {
@@ -31,16 +31,16 @@ wcNodeProcess.extend('wcNodeProcessDelay', 'Delay', 'Core', {
     // Always fire the 'out' link immediately.
     this.triggerExit('out');
 
-    // Notify that this node is starting a synchronous process.
-    this.wake();
-
     // Now set a timeout to wait for 'Milliseconds' amount of time.    
     var self = this;
     var delay = this.property('milliseconds');
+
+    // Start a new thread that will keep the node alive until we are finished.
+    var thread = this.beginThread();
     setTimeout(function() {
-      // Once the time has completed, fire the 'Finished' link and put the node back to sleep.
+      // Once the time has completed, fire the 'Finished' link and finish our thread.
       self.triggerExit('finished');
-      self.sleep();
+      self.finishThread(thread);
     }, delay);
   },
 });
