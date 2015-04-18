@@ -1,19 +1,35 @@
-wcNode.extend('wcNodeStorage', 'Storage', 'Core', {
+wcNode.extend('wcNodeStorage', 'Storage', '', {
   /**
    * @class
-   * The base class for all storage nodes. These are nodes that interact with script variables and exchange data.<br>
-   * When inheriting, make sure to include 'this._super(parent, pos, type);' at the top of your init function.
+   * The base class for all storage nodes. These are nodes designed solely for managing data.<br>
+   * When inheriting, make sure to include 'this._super(parent, pos, type);' at the top of your init function.<br>
+   * Also when inheriting, a 'value' property MUST be created as the storage value.
    *
    * @constructor wcNodeStorage
    * @param {String} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
-   * @param {String} [name="Storage"] - The name of the node, as displayed on the title bar.
+   * @param {String} [type="Storage"] - The type name of the node, as displayed on the title bar.
    */
   init: function(parent, pos, type) {
     this._super(parent, pos, type);
     this.color = '#009900';
+  },
 
-    this.createProperty('value', wcPlay.PROPERTY_TYPE.STRING, '');
+  /**
+   * Magic function that is called whenever any new class type is extended from this one.<br>
+   * Handles initializing of the class as well as registering the new node type.
+   * @function wcNodeEntry#classInit
+   * @param {String} className - The name of the class constructor.
+   * @param {String} name - A display name for the node.
+   * @param {String} category - A category where this node will be grouped.
+   */
+  classInit: function(className, name, category) {
+    if (category) {
+      this.className = className;
+      this.name = name;
+      this.category = category;
+      wcPlay.registerNodeType(className, name, category, wcPlay.NODE_TYPE.STORAGE);
+    }
   },
 
   /**

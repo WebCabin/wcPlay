@@ -73,6 +73,7 @@ function wcPlayEditor(container, options) {
   this._highlightExitLink = false;
   this._highlightInputLink = false;
   this._highlightOutputLink = false;
+  this._highlightPropertyValue = false;
 
   this._selectedEntryLink = false;
   this._selectedExitLink = false;
@@ -272,13 +273,14 @@ wcPlayEditor.prototype = {
       trans = {
         x: 0,
         y: 0,
+        z: 1,
       };
     }
 
-    if (pos.y - trans.y >= rect.top &&
-        pos.x - trans.x >= rect.left &&
-        pos.y - trans.y <= rect.top + rect.height &&
-        pos.x - trans.x <= rect.left + rect.width) {
+    if ((pos.y - trans.y) / trans.z >= rect.top &&
+        (pos.x - trans.x) / trans.z >= rect.left &&
+        (pos.y - trans.y) / trans.z <= rect.top + rect.height &&
+        (pos.x - trans.x) / trans.z <= rect.left + rect.width) {
       return true;
     }
     return false;
@@ -354,6 +356,14 @@ wcPlayEditor.prototype = {
         }
       }
 
+      // Setup viewport canvas.
+      this._viewportContext.clearRect(0, 0, this.$viewport.width(), this.$viewport.height());
+
+      this._viewportContext.save();
+      this._viewportContext.translate(this._viewportCamera.x, this._viewportCamera.y);
+      this._viewportContext.scale(this._viewportCamera.z, this._viewportCamera.z);
+      // this._viewportContext.translate(this._viewportCamera.x / this._viewportCamera.z, this._viewportCamera.y / this._viewportCamera.z);
+
       // Update nodes.
       this.__updateNodes(this._engine._entryNodes, elapsed);
       this.__updateNodes(this._engine._processNodes, elapsed);
@@ -361,7 +371,6 @@ wcPlayEditor.prototype = {
       this.__updateNodes(this._engine._storageNodes, elapsed);
 
       // Render the nodes in the main script.
-      this._viewportContext.clearRect(-this._viewportCamera.x, -this._viewportCamera.y, this.$viewport.width(), this.$viewport.height());
       this.__drawNodes(this._engine._entryNodes, this._viewportContext);
       this.__drawNodes(this._engine._processNodes, this._viewportContext);
       this.__drawNodes(this._engine._compositeNodes, this._viewportContext);
@@ -372,6 +381,7 @@ wcPlayEditor.prototype = {
       this.__drawChains(this._engine._processNodes, this._viewportContext);
       this.__drawChains(this._engine._compositeNodes, this._viewportContext);
       this.__drawChains(this._engine._storageNodes, this._viewportContext);
+      this._viewportContext.restore();
     }
 
     window.requestAnimationFrame(this.__update.bind(this));
@@ -981,10 +991,9 @@ wcPlayEditor.prototype = {
         // Property value.
         context.textAlign = "right";
         this.__setCanvasFont(this._font.value, context);
-        context.fillText('[' + this.__clampString(node.property(props[i].name).toString(), this._drawStyle.property.strLen) + ']', rect.left + rect.width - this._drawStyle.node.margin, rect.top + upper);
         var w = context.measureText('[' + this.__clampString(node.property(props[i].name).toString(), this._drawStyle.property.strLen) + ']').width;
 
-        result.valueBounds.push({
+        var valueBound = {
           rect: {
             top: rect.top + upper - this._font.property.size,
             left: rect.left + rect.width - this._drawStyle.node.margin - w,
@@ -992,7 +1001,16 @@ wcPlayEditor.prototype = {
             height: this._font.property.size + this._drawStyle.property.spacing,
           },
           name: props[i].name,
-        });
+        };
+        result.valueBounds.push(valueBound);
+
+        // Highlight hovered values.
+        if (this._highlightNode === node && this._highlightPropertyValue && this._highlightPropertyValue.name === props[i].name) {
+          context.fillStyle = "darkgray";
+          context.fillRect(valueBound.rect.left, valueBound.rect.top, valueBound.rect.width, valueBound.rect.height);
+        }
+        context.fillStyle = "black";
+        context.fillText('[' + this.__clampString(node.property(props[i].name).toString(), this._drawStyle.property.strLen) + ']', rect.left + rect.width - this._drawStyle.node.margin, rect.top + upper);
 
         // Property input.
         if (!collapsed || props[i].inputs.length) {
@@ -1239,8 +1257,8 @@ wcPlayEditor.prototype = {
         highlight = true;
       } else {
         targetPos = {
-          x: this._mouse.x - this._viewportCamera.x,
-          y: this._mouse.y - this._viewportCamera.y,
+          x: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z,
+          y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z,
         };
       }
 
@@ -1265,8 +1283,8 @@ wcPlayEditor.prototype = {
         highlight = true;
       } else {
         targetPos = {
-          x: this._mouse.x - this._viewportCamera.x,
-          y: this._mouse.y - this._viewportCamera.y,
+          x: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z,
+          y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z,
         };
       }
 
@@ -1291,8 +1309,8 @@ wcPlayEditor.prototype = {
         highlight = true;
       } else {
         targetPos = {
-          x: this._mouse.x - this._viewportCamera.x,
-          y: this._mouse.y - this._viewportCamera.y,
+          x: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z,
+          y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z,
         };
       }
 
@@ -1317,8 +1335,8 @@ wcPlayEditor.prototype = {
         highlight = true;
       } else {
         targetPos = {
-          x: this._mouse.x - this._viewportCamera.x,
-          y: this._mouse.y - this._viewportCamera.y,
+          x: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z,
+          y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z,
         };
       }
 
@@ -1388,8 +1406,89 @@ wcPlayEditor.prototype = {
    * @param {Object} property - The property data.
    * @param {wcPlayEditor~BoundingData} bounds - The bounding data for this property.
    */
-  _drawPropertyEditor: function(node, property, bounds) {
+  __drawPropertyEditor: function(node, property, bounds) {
+    var $control = null;
+    var cancelled = false;
+    var enterConfirms = true;
 
+    var type = property.type;
+    if (type === wcPlay.PROPERTY_TYPE.DYNAMIC) {
+      var value = node.property(property.name);
+      if (typeof value === 'string') {
+        type = wcPlay.PROPERTY_TYPE.STRING;
+      } else if (typeof value === 'bool') {
+        type = wcPlay.PROPERTY_TYPE.TOGGLE;
+      } else if (typeof value === 'number') {
+        type = wcPlay.PROPERTY_TYPE.NUMBER;
+      }
+    }
+
+    // Determine what editor to use for the property.
+    switch (type) {
+      case wcPlay.PROPERTY_TYPE.TOGGLE:
+        // Toggles do not show an editor, instead, they just toggle their state.
+        node.property(property.name, !node.property(property.name));
+        break;
+      case wcPlay.PROPERTY_TYPE.NUMBER:
+        $control = $('<input type="number"' + (property.options.min? ' min="' + property.options.min + '"': '') + (property.options.max? ' max="' + property.options.max + '"': '') + (property.options.step? ' step="' + property.options.step + '"': '') + '>');
+        $control.val(parseFloat(node.property(property.name)));
+        $control.change(function() {
+          if (!cancelled) {
+            node.property(property.name, $control.val());
+          }
+        });
+        break;
+      case wcPlay.PROPERTY_TYPE.STRING:
+        if (property.options.multiline) {
+          $control = $('<textarea' + (property.options.maxlength? ' maxlength="' + property.options.maxlength + '"': '') + '>');
+          enterConfirms = false;
+        } else {
+          $control = $('<input type="text" maxlength="' + (property.options.maxlength || 524288) + '">');
+        }
+        $control.val(node.property(property.name).toString());
+        $control.change(function() {
+          if (!cancelled) {
+            node.property(property.name, $control.val());
+          }
+        });
+        break;
+      case wcPlay.PROPERTY_TYPE.SELECT:
+        break;
+    }
+
+    if ($control) {
+      var offset = this.$viewport.offset();
+      this.$container.append($control);
+
+      $control.addClass('wcPlayEditorControl');
+      $control.focus();
+      $control.select();
+
+      // Clicking away will close the editor control.
+      $control.blur(function() {
+        $(this).remove();
+      });
+
+      $control.keyup(function(event) {
+        switch (event.keyCode) {
+          case 13: // Enter.to confirm.
+            if (enterConfirms || event.shiftKey) {
+              $control.blur();
+            }
+            break;
+          case 27: // Escape to cancel.
+            cancelled = true;
+            $control.blur();
+            break;
+        }
+        return false;
+      });
+
+      $control.css('top', offset.top + bounds.rect.top * this._viewportCamera.z + this._viewportCamera.y)
+        .css('left', offset.left + bounds.rect.left * this._viewportCamera.z + this._viewportCamera.x)
+        .css('width', 200)
+        .css('height', Math.max(bounds.rect.height * this._viewportCamera.z * 0.8, 15));
+    }
   },
 
   /**
@@ -1405,6 +1504,7 @@ wcPlayEditor.prototype = {
     this.$viewport.on('dblclick',   function(event){self.__onViewportMouseDoubleClick(event, this);});
     this.$viewport.on('mouseup',    function(event){self.__onViewportMouseUp(event, this);});
     // this.$viewport.on('mouseleave', function(event){self.__onViewportMouseUp(event, this);});
+    this.$viewport.on('mousewheel DOMMouseScroll', function(event) {self.__onViewportMouseWheel(event, this);});
   },
 
   /**
@@ -1416,7 +1516,9 @@ wcPlayEditor.prototype = {
    */
   __onViewportMouseMove: function(event, elem) {
     var mouse = this.__mouse(event, this.$viewport.offset());
-    this._mouseMoved = true;
+    if (mouse.x !== this._mouse.x || mouse.y !== this._mouse.y) {
+      this._mouseMoved = true;
+    }
 
     // Viewport panning.
     if (this._viewportMoving) {
@@ -1424,7 +1526,6 @@ wcPlayEditor.prototype = {
       var moveY = mouse.y - this._mouse.y;
       this._viewportCamera.x += moveX;
       this._viewportCamera.y += moveY;
-      this._viewportContext.translate(moveX, moveY);
       this._mouse = mouse;
       if (!this._viewportMoved) {
         this._viewportMoved = true;
@@ -1436,8 +1537,8 @@ wcPlayEditor.prototype = {
     if (this._viewportMovingNode) {
       var moveX = mouse.x - this._mouse.x;
       var moveY = mouse.y - this._mouse.y;
-      this._selectedNode.pos.x += moveX;
-      this._selectedNode.pos.y += moveY;
+      this._selectedNode.pos.x += moveX / this._viewportCamera.z;
+      this._selectedNode.pos.y += moveY / this._viewportCamera.z;
       this._mouse = mouse;
       return;
     }
@@ -1449,6 +1550,7 @@ wcPlayEditor.prototype = {
     this._highlightExitLink = false;
     this._highlightInputLink = false;
     this._highlightOutputLink = false;
+    this._highlightPropertyValue = false;
 
     var node = this.__findNodeAtPos(mouse, this._viewportCamera);
     if (node) {
@@ -1496,6 +1598,25 @@ wcPlayEditor.prototype = {
           this._highlightNode = node;
           this._highlightOutputLink = node._meta.bounds.outputBounds[i];
           break;
+        }
+      }
+
+      // Property values.
+      var propBounds;
+      for (var i = 0; i < node._meta.bounds.valueBounds.length; ++i) {
+        if (this.__inRect(this._mouse, node._meta.bounds.valueBounds[i].rect, this._viewportCamera)) {
+          propBounds = node._meta.bounds.valueBounds[i];
+          break;
+        }
+      }
+
+      if (propBounds) {
+        for (var i = 0; i < node.properties.length; ++i) {
+          if (node.properties[i].name === propBounds.name) {
+            this._highlightNode = node;
+            this._highlightPropertyValue = propBounds;
+            break;
+          }
         }
       }
 
@@ -1675,7 +1796,7 @@ wcPlayEditor.prototype = {
         if (propBounds) {
           for (var i = 0; i < node.properties.length; ++i) {
             if (node.properties[i].name === propBounds.name) {
-              this._drawPropertyEditor(node, node.properties[i], propBounds);
+              this.__drawPropertyEditor(node, node.properties[i], propBounds);
               break;
             }
           }
@@ -1705,6 +1826,14 @@ wcPlayEditor.prototype = {
       // Breakpoint button.
       if (this.__inRect(this._mouse, node._meta.bounds.breakpoint, this._viewportCamera)) {
         hasTarget = true;
+      }
+
+      // Property values.
+      for (var i = 0; i < node._meta.bounds.valueBounds.length; ++i) {
+        if (this.__inRect(this._mouse, node._meta.bounds.valueBounds[i].rect, this._viewportCamera)) {
+          hasTarget = true;
+          break;
+        }
       }
 
       // Exit links.
@@ -1780,6 +1909,22 @@ wcPlayEditor.prototype = {
         this.$viewport.removeClass('wcMoving');
       }
     }
+  },
+
+  __onViewportMouseWheel: function(event, elem) {
+    var oldZoom = this._viewportCamera.z;
+    var mouse = this.__mouse(event, this.$viewport.offset());
+
+    if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) {
+      // scroll up to zoom in.
+      this._viewportCamera.z = Math.min(this._viewportCamera.z * 1.25, 5);
+    } else {
+      // scroll down to zoom out.
+      this._viewportCamera.z = Math.max(this._viewportCamera.z * 0.75, 0.1);
+    }
+
+    this._viewportCamera.x = (this._viewportCamera.x - mouse.x) / (oldZoom / this._viewportCamera.z) + mouse.x;
+    this._viewportCamera.y = (this._viewportCamera.y - mouse.y) / (oldZoom / this._viewportCamera.z) + mouse.y;
   },
 
   /**

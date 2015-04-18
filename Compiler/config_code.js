@@ -67,6 +67,9 @@ concat({
     '../Code/nodes/process/delay.js',
     '../Code/nodes/process/log.js',
     '../Code/nodes/process/operation.js',
+    '../Code/nodes/storage/toggle.js',
+    '../Code/nodes/storage/number.js',
+    '../Code/nodes/storage/string.js',
   ],
   dest: '../Build/wcPlay.js',
 });

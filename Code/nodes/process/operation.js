@@ -7,7 +7,7 @@ wcNodeProcess.extend('wcNodeProcessOperation', 'Operation', 'Core', {
    * @constructor wcNodeProcessOperation
    * @param {String} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
-   * @param {String} [name="Log"] - The name of the node, as displayed on the title bar.
+   * @param {String} [type="Operation"] - The type name of the node, as displayed on the title bar.
    */
   init: function(parent, pos, type) {
     this._super(parent, pos, type);

@@ -13,9 +13,15 @@
  */
 
 /**
+ * Options for a [STRING]{@link wcPlay.PROPERTY_TYPE} value.
+ * @typedef {Object} wcNode~StringOptions
+ * @property {Number} [maxlength=Infinity] - The maximum number of characters allowed.
+ * @property {Boolean} [multiline=false] - Whether to use a multi-line text editor for this property.
+ */
+
+/**
  * Options for a [SELECT]{@link wcPlay.PROPERTY_TYPE} value.
  * @typedef {Object} wcNode~SelectOptions
  * @property {String[]} items - A list of items to display in the combo box.
- * @property {Boolean} asString - When the value is selected, does it record the string value, or item index number?
+ * @property {Boolean} isIndex - When an item is selected, does it record the item index number, or the item text itself?
  */
- 

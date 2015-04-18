@@ -9,7 +9,7 @@ wcNode.extend('wcNodeEntry', 'Entry Node', '', {
    * <b>Should be inherited and never constructed directly.</b>
    * @param {String} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
-   * @param {String} [name="Entry Node"] - The name of the node, as displayed on the title bar.
+   * @param {String} [type="Entry Node"] - The type name of the node, as displayed on the title bar.
    */
   init: function(parent, pos, type) {
     this._super(parent, pos, type);
@@ -23,7 +23,6 @@ wcNode.extend('wcNodeEntry', 'Entry Node', '', {
    * Magic function that is called whenever any new class type is extended from this one.<br>
    * Handles initializing of the class as well as registering the new node type.
    * @function wcNodeEntry#classInit
-   * @param {wcNode} this - The new class type.
    * @param {String} className - The name of the class constructor.
    * @param {String} name - A display name for the node.
    * @param {String} category - A category where this node will be grouped.

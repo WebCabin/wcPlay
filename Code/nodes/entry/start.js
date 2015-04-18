@@ -7,7 +7,7 @@ wcNodeEntry.extend('wcNodeEntryStart', 'Start', 'Core', {
    * @constructor wcNodeEntryStart
    * @param {String} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
-   * @param {String} [name="Start"] - The name of the node, as displayed on the title bar.
+   * @param {String} [type="Start"] - The type name of the node, as displayed on the title bar.
    */
   init: function(parent, pos, type) {
     this._super(parent, pos, type);

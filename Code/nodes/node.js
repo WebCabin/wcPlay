@@ -52,24 +52,6 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
-   * Magic function that is called whenever any new class type is extended from this one.<br>
-   * Handles initializing of the class as well as registering the new node type.
-   * @function wcNodeStorage#classInit
-   * @param {wcNode} this - The new class type.
-   * @param {String} className - The name of the class constructor.
-   * @param {String} name - A display name for the node.
-   * @param {String} category - A category where this node will be grouped.
-   */
-  classInit: function(className, name, category) {
-    if (category) {
-      this.className = className;
-      this.name = name;
-      this.category = category;
-      wcPlay.registerNodeType(className, name, category, wcPlay.NODE_TYPE.STORAGE);
-    }
-  },
-
-  /**
    * Destroys and removes the node.
    * @function wcNode#destroy
    */
@@ -288,12 +270,12 @@ Class.extend('wcNode', 'Node', '', {
    * Creates a new property.
    * @function wcNode#createProperty
    * @param {String} name - The name of the property.
-   * @param {wcPlay.PROPERTY_TYPE} [controlType=wcPlay.PROPERTY_TYPE.STRING] - The type of property.
+   * @param {wcPlay.PROPERTY_TYPE} type - The type of property.
    * @param {Object} [initialValue] - A initial value for this property when the script starts.
    * @param {Object} [options] - Additional options for this property, see {@link wcPlay.PROPERTY_TYPE}.
    * @returns {Boolean} - Failes if the property does not exist.
    */
-  createProperty: function(name, controlType, initialValue, options) {
+  createProperty: function(name, type, initialValue, options) {
     // Make sure this property doesn't already exist.
     for (var i = 0; i < this.properties.length; ++i) {
       if (this.properties[i].name === name) {
@@ -301,16 +283,15 @@ Class.extend('wcNode', 'Node', '', {
       }
     }
 
-    // Make sure the type is valid.
-    if (!wcPlay.PROPERTY_TYPE.hasOwnProperty(controlType)) {
-      controlType = wcPlay.PROPERTY_TYPE.STRING;
+    if (initialValue === undefined) {
+      initialValue = 0;
     }
 
     this.properties.push({
       name: name,
       value: initialValue,
       initialValue: initialValue,
-      controlType: controlType,
+      type: type,
       inputs: [],
       outputs: [],
       options: options || {},
@@ -821,7 +802,7 @@ Class.extend('wcNode', 'Node', '', {
    */
   triggerExit: function(name) {
     if (this.debugLog()) {
-      console.log('DEBUG: Node "' + this.category + '.' + this.name + '" Triggered Exit link "' + name + '"');
+      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Triggered Exit link "' + name + '"');
     }
 
     for (var i = 0; i < this.chain.exit.length; ++i) {
@@ -851,10 +832,10 @@ Class.extend('wcNode', 'Node', '', {
    * @function wcNode#property
    * @param {String} name - The name of the property.
    * @param {Object} [value] - If supplied, will assign a new value to the property.
-   * @param {Boolean} [forceChange] - If value is supplied, set this to true if you want to force the change event to be sent to all chained properties.
+   * @param {Boolean} [forceOrSilent] - If supplied, true will force the change event to be sent to all chained properties even if this value didn't change while false will force the change to not be chained.
    * @returns {Object|undefined} - The value of the property, or undefined if not found.
    */
-  property: function(name, value, forceChange) {
+  property: function(name, value, forceOrSilent) {
     for (var i = 0; i < this.properties.length; ++i) {
       var prop = this.properties[i];
       if (prop.name === name) {
@@ -869,19 +850,21 @@ Class.extend('wcNode', 'Node', '', {
           }
 
           // Notify about to change event.
-          if (forceChange || prop.value !== value) {
+          if (forceOrSilent || prop.value !== value) {
             value = this.onPropertyChanging(prop.name, oldValue, value) || value;
           }
 
-          if (forceChange || prop.value !== value) {
+          if (forceOrSilent || prop.value !== value) {
             prop.value = value;
 
             // Notify that the property has changed.
             this.onPropertyChanged(prop.name, oldValue, value);
 
             // Now follow any output links and assign the new value to them as well.
-            for (a = 0; a < prop.outputs.length; ++a) {
-              prop.outputs[a].node && prop.outputs[a].node.triggerProperty(prop.outputs[a].name, value);
+            if (forceOrSilent === undefined || forceOrSilent) {
+              for (a = 0; a < prop.outputs.length; ++a) {
+                prop.outputs[a].node && prop.outputs[a].node.triggerProperty(prop.outputs[a].name, value);
+              }
             }
           }
         }
@@ -988,7 +971,7 @@ Class.extend('wcNode', 'Node', '', {
    */
   onStart: function() {
     if (this.debugLog()) {
-      console.log('DEBUG: Node "' + this.category + '.' + this.name + '" started!');
+      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" started!');
     }
   },
 
@@ -1000,7 +983,7 @@ Class.extend('wcNode', 'Node', '', {
    */
   onTriggered: function(name) {
     if (this.debugLog()) {
-      console.log('DEBUG: Node "' + this.category + '.' + this.name + '" Triggered Entry link "' + name + '"');
+      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Triggered Entry link "' + name + '"');
     }
   },
 
@@ -1015,7 +998,7 @@ Class.extend('wcNode', 'Node', '', {
    */
   onPropertyChanging: function(name, oldValue, newValue) {
     // if (this.debugLog()) {
-    //   console.log('DEBUG: Node "' + this.category + '.' + this.name + '" Changing Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
+    //   console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Changing Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
     // }
   },
 
@@ -1029,7 +1012,7 @@ Class.extend('wcNode', 'Node', '', {
    */
   onPropertyChanged: function(name, oldValue, newValue) {
     if (this.debugLog()) {
-      console.log('DEBUG: Node "' + this.category + '.' + this.name + '" Changed Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
+      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Changed Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
     }
   },
 
@@ -1041,7 +1024,7 @@ Class.extend('wcNode', 'Node', '', {
    */
   onPropertyGet: function(name) {
     // if (this.debugLog()) {
-    //   console.log('DEBUG: Node "' + this.category + '.' + this.name + '" Requested Property "' + name + '"');
+    //   console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Requested Property "' + name + '"');
     // }
   },
 
@@ -1053,29 +1036,31 @@ Class.extend('wcNode', 'Node', '', {
    */
   onPropertyGot: function(name) {
     if (this.debugLog()) {
-      console.log('DEBUG: Node "' + this.category + '.' + this.name + '" Got Property "' + name + '"');
+      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Got Property "' + name + '"');
     }
   },
 
   /**
    * Event that is called when a global property value has changed.
-   * Overload this in inherited nodes.
-   * @function wcNode#onGlobalPropertyChanged
+   * Overload this in inherited nodes.<br>
+   * <b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.
+   * @function wcNode#onSharedPropertyChanged
    * @param {String} name - The name of the global property.
    * @param {Object} oldValue - The old value of the global property.
    * @param {Object} newValue - The new value of the global property.
    */
-  // onGlobalPropertyChanged: function(name, oldValue, newValue) {
+  // onSharedPropertyChanged: function(name, oldValue, newValue) {
   // },
 
   /**
    * Event that is called when a global property has been renamed.
-   * Overload this in inherited nodes.
-   * @function wcNode#onGlobalPropertyRenamed
+   * Overload this in inherited nodes.<br>
+   * <b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.
+   * @function wcNode#onSharedPropertyRenamed
    * @param {String} oldName - The old name of the global property.
    * @param {String} newName - The new name of the global property.
    */
-  // onGlobalPropertyRenamed: function(oldName, newName) {
+  // onSharedPropertyRenamed: function(oldName, newName) {
   // },
 });
 

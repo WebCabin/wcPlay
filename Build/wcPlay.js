@@ -112,16 +112,16 @@ function wcPlay(options) {
  * @enum {String}
  */
 wcPlay.PROPERTY_TYPE = {
+  /** Displays the property based on the type of data it holds. Options depend on the property type it holds, you can include properties from all the types together as they do not share option values. */
+  DYNAMIC: 'dynamic',
   /** Displays the property as a checkbox. No options are used. */
   TOGGLE: 'toggle',
   /** Displays the property as a number control. [Number options]{@link wcNode~NumberOptions} are used. */
   NUMBER: 'number',
-  /** Displays the property as a text field. No options are used. */
+  /** Displays the property as a text field. [String options]{@link wcNode~StringOptions} are used. */
   STRING: 'string',
   /** Displays the property as a combo box control. [Select options]{@link wcNode~SelectOptions} are used. */
   SELECT: 'select',
-  /** Displays the property as a color picker button. No options are used. */
-  COLOR: 'color',
 };
 
 /**
@@ -270,12 +270,12 @@ wcPlay.prototype = {
   /**
    * Creates a new global property.
    * @param {String} name - The name of the property.
-   * @param {wcPlay.PROPERTY_TYPE} [controlType=wcPlay.PROPERTY_TYPE.STRING] - The type of property.
+   * @param {wcPlay.PROPERTY_TYPE} type - The type of property.
    * @param {Object} [defaultValue] - A default value for this property.
    * @param {Object} [options] - Additional options for this property, see {@link wcPlay.PROPERTY_TYPE}.
    * @returns {Boolean} - Failes if the property does not exist.
    */
-  createProperty: function(name, controlType, defaultValue, options) {
+  createProperty: function(name, type, defaultValue, options) {
     // Make sure this property doesn't already exist.
     for (var i = 0; i < this._properties.length; ++i) {
       if (this._properties[i].name === name) {
@@ -284,15 +284,15 @@ wcPlay.prototype = {
     }
 
     // Make sure the type is valid.
-    if (!wcPlay.PROPERTY_TYPE.hasOwnProperty(controlType)) {
-      controlType = wcPlay.PROPERTY_TYPE.STRING;
+    if (!wcPlay.PROPERTY_TYPE.hasOwnProperty(type)) {
+      type = wcPlay.PROPERTY_TYPE.STRING;
     }
 
     this._properties.push({
       name: name,
       value: defaultValue,
       defaultValue: defaultValue,
-      controlType: controlType,
+      type: type,
       options: options || {},
     });
     return true;
@@ -322,7 +322,7 @@ wcPlay.prototype = {
     }
 
     prop.name = newName;
-    this.__notifyNodes('onGlobalPropertyRenamed', [name, newName]);
+    this.__notifyNodes('onSharedPropertyRenamed', [name, newName]);
   },
 
   /**
@@ -348,7 +348,7 @@ wcPlay.prototype = {
     if (value !== undefined && value !== prop.value) {
       var oldValue = prop.value;
       prop.value = value;
-      this.__notifyNodes('onGlobalPropertyChanged', [prop.name, oldValue, prop.value]);
+      this.__notifyNodes('onSharedPropertyChanged', [prop.name, oldValue, prop.value]);
     }
   },
 
@@ -573,6 +573,7 @@ function wcPlayEditor(container, options) {
   this._highlightExitLink = false;
   this._highlightInputLink = false;
   this._highlightOutputLink = false;
+  this._highlightPropertyValue = false;
 
   this._selectedEntryLink = false;
   this._selectedExitLink = false;
@@ -772,13 +773,14 @@ wcPlayEditor.prototype = {
       trans = {
         x: 0,
         y: 0,
+        z: 1,
       };
     }
 
-    if (pos.y - trans.y >= rect.top &&
-        pos.x - trans.x >= rect.left &&
-        pos.y - trans.y <= rect.top + rect.height &&
-        pos.x - trans.x <= rect.left + rect.width) {
+    if ((pos.y - trans.y) / trans.z >= rect.top &&
+        (pos.x - trans.x) / trans.z >= rect.left &&
+        (pos.y - trans.y) / trans.z <= rect.top + rect.height &&
+        (pos.x - trans.x) / trans.z <= rect.left + rect.width) {
       return true;
     }
     return false;
@@ -854,6 +856,14 @@ wcPlayEditor.prototype = {
         }
       }
 
+      // Setup viewport canvas.
+      this._viewportContext.clearRect(0, 0, this.$viewport.width(), this.$viewport.height());
+
+      this._viewportContext.save();
+      this._viewportContext.translate(this._viewportCamera.x, this._viewportCamera.y);
+      this._viewportContext.scale(this._viewportCamera.z, this._viewportCamera.z);
+      // this._viewportContext.translate(this._viewportCamera.x / this._viewportCamera.z, this._viewportCamera.y / this._viewportCamera.z);
+
       // Update nodes.
       this.__updateNodes(this._engine._entryNodes, elapsed);
       this.__updateNodes(this._engine._processNodes, elapsed);
@@ -861,7 +871,6 @@ wcPlayEditor.prototype = {
       this.__updateNodes(this._engine._storageNodes, elapsed);
 
       // Render the nodes in the main script.
-      this._viewportContext.clearRect(-this._viewportCamera.x, -this._viewportCamera.y, this.$viewport.width(), this.$viewport.height());
       this.__drawNodes(this._engine._entryNodes, this._viewportContext);
       this.__drawNodes(this._engine._processNodes, this._viewportContext);
       this.__drawNodes(this._engine._compositeNodes, this._viewportContext);
@@ -872,6 +881,7 @@ wcPlayEditor.prototype = {
       this.__drawChains(this._engine._processNodes, this._viewportContext);
       this.__drawChains(this._engine._compositeNodes, this._viewportContext);
       this.__drawChains(this._engine._storageNodes, this._viewportContext);
+      this._viewportContext.restore();
     }
 
     window.requestAnimationFrame(this.__update.bind(this));
@@ -1481,10 +1491,9 @@ wcPlayEditor.prototype = {
         // Property value.
         context.textAlign = "right";
         this.__setCanvasFont(this._font.value, context);
-        context.fillText('[' + this.__clampString(node.property(props[i].name).toString(), this._drawStyle.property.strLen) + ']', rect.left + rect.width - this._drawStyle.node.margin, rect.top + upper);
         var w = context.measureText('[' + this.__clampString(node.property(props[i].name).toString(), this._drawStyle.property.strLen) + ']').width;
 
-        result.valueBounds.push({
+        var valueBound = {
           rect: {
             top: rect.top + upper - this._font.property.size,
             left: rect.left + rect.width - this._drawStyle.node.margin - w,
@@ -1492,7 +1501,16 @@ wcPlayEditor.prototype = {
             height: this._font.property.size + this._drawStyle.property.spacing,
           },
           name: props[i].name,
-        });
+        };
+        result.valueBounds.push(valueBound);
+
+        // Highlight hovered values.
+        if (this._highlightNode === node && this._highlightPropertyValue && this._highlightPropertyValue.name === props[i].name) {
+          context.fillStyle = "darkgray";
+          context.fillRect(valueBound.rect.left, valueBound.rect.top, valueBound.rect.width, valueBound.rect.height);
+        }
+        context.fillStyle = "black";
+        context.fillText('[' + this.__clampString(node.property(props[i].name).toString(), this._drawStyle.property.strLen) + ']', rect.left + rect.width - this._drawStyle.node.margin, rect.top + upper);
 
         // Property input.
         if (!collapsed || props[i].inputs.length) {
@@ -1739,8 +1757,8 @@ wcPlayEditor.prototype = {
         highlight = true;
       } else {
         targetPos = {
-          x: this._mouse.x - this._viewportCamera.x,
-          y: this._mouse.y - this._viewportCamera.y,
+          x: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z,
+          y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z,
         };
       }
 
@@ -1765,8 +1783,8 @@ wcPlayEditor.prototype = {
         highlight = true;
       } else {
         targetPos = {
-          x: this._mouse.x - this._viewportCamera.x,
-          y: this._mouse.y - this._viewportCamera.y,
+          x: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z,
+          y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z,
         };
       }
 
@@ -1791,8 +1809,8 @@ wcPlayEditor.prototype = {
         highlight = true;
       } else {
         targetPos = {
-          x: this._mouse.x - this._viewportCamera.x,
-          y: this._mouse.y - this._viewportCamera.y,
+          x: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z,
+          y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z,
         };
       }
 
@@ -1817,8 +1835,8 @@ wcPlayEditor.prototype = {
         highlight = true;
       } else {
         targetPos = {
-          x: this._mouse.x - this._viewportCamera.x,
-          y: this._mouse.y - this._viewportCamera.y,
+          x: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z,
+          y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z,
         };
       }
 
@@ -1888,8 +1906,89 @@ wcPlayEditor.prototype = {
    * @param {Object} property - The property data.
    * @param {wcPlayEditor~BoundingData} bounds - The bounding data for this property.
    */
-  _drawPropertyEditor: function(node, property, bounds) {
+  __drawPropertyEditor: function(node, property, bounds) {
+    var $control = null;
+    var cancelled = false;
+    var enterConfirms = true;
 
+    var type = property.type;
+    if (type === wcPlay.PROPERTY_TYPE.DYNAMIC) {
+      var value = node.property(property.name);
+      if (typeof value === 'string') {
+        type = wcPlay.PROPERTY_TYPE.STRING;
+      } else if (typeof value === 'bool') {
+        type = wcPlay.PROPERTY_TYPE.TOGGLE;
+      } else if (typeof value === 'number') {
+        type = wcPlay.PROPERTY_TYPE.NUMBER;
+      }
+    }
+
+    // Determine what editor to use for the property.
+    switch (type) {
+      case wcPlay.PROPERTY_TYPE.TOGGLE:
+        // Toggles do not show an editor, instead, they just toggle their state.
+        node.property(property.name, !node.property(property.name));
+        break;
+      case wcPlay.PROPERTY_TYPE.NUMBER:
+        $control = $('<input type="number"' + (property.options.min? ' min="' + property.options.min + '"': '') + (property.options.max? ' max="' + property.options.max + '"': '') + (property.options.step? ' step="' + property.options.step + '"': '') + '>');
+        $control.val(parseFloat(node.property(property.name)));
+        $control.change(function() {
+          if (!cancelled) {
+            node.property(property.name, $control.val());
+          }
+        });
+        break;
+      case wcPlay.PROPERTY_TYPE.STRING:
+        if (property.options.multiline) {
+          $control = $('<textarea' + (property.options.maxlength? ' maxlength="' + property.options.maxlength + '"': '') + '>');
+          enterConfirms = false;
+        } else {
+          $control = $('<input type="text" maxlength="' + (property.options.maxlength || 524288) + '">');
+        }
+        $control.val(node.property(property.name).toString());
+        $control.change(function() {
+          if (!cancelled) {
+            node.property(property.name, $control.val());
+          }
+        });
+        break;
+      case wcPlay.PROPERTY_TYPE.SELECT:
+        break;
+    }
+
+    if ($control) {
+      var offset = this.$viewport.offset();
+      this.$container.append($control);
+
+      $control.addClass('wcPlayEditorControl');
+      $control.focus();
+      $control.select();
+
+      // Clicking away will close the editor control.
+      $control.blur(function() {
+        $(this).remove();
+      });
+
+      $control.keyup(function(event) {
+        switch (event.keyCode) {
+          case 13: // Enter.to confirm.
+            if (enterConfirms || event.shiftKey) {
+              $control.blur();
+            }
+            break;
+          case 27: // Escape to cancel.
+            cancelled = true;
+            $control.blur();
+            break;
+        }
+        return false;
+      });
+
+      $control.css('top', offset.top + bounds.rect.top * this._viewportCamera.z + this._viewportCamera.y)
+        .css('left', offset.left + bounds.rect.left * this._viewportCamera.z + this._viewportCamera.x)
+        .css('width', 200)
+        .css('height', Math.max(bounds.rect.height * this._viewportCamera.z * 0.8, 15));
+    }
   },
 
   /**
@@ -1905,6 +2004,7 @@ wcPlayEditor.prototype = {
     this.$viewport.on('dblclick',   function(event){self.__onViewportMouseDoubleClick(event, this);});
     this.$viewport.on('mouseup',    function(event){self.__onViewportMouseUp(event, this);});
     // this.$viewport.on('mouseleave', function(event){self.__onViewportMouseUp(event, this);});
+    this.$viewport.on('mousewheel DOMMouseScroll', function(event) {self.__onViewportMouseWheel(event, this);});
   },
 
   /**
@@ -1916,7 +2016,9 @@ wcPlayEditor.prototype = {
    */
   __onViewportMouseMove: function(event, elem) {
     var mouse = this.__mouse(event, this.$viewport.offset());
-    this._mouseMoved = true;
+    if (mouse.x !== this._mouse.x || mouse.y !== this._mouse.y) {
+      this._mouseMoved = true;
+    }
 
     // Viewport panning.
     if (this._viewportMoving) {
@@ -1924,7 +2026,6 @@ wcPlayEditor.prototype = {
       var moveY = mouse.y - this._mouse.y;
       this._viewportCamera.x += moveX;
       this._viewportCamera.y += moveY;
-      this._viewportContext.translate(moveX, moveY);
       this._mouse = mouse;
       if (!this._viewportMoved) {
         this._viewportMoved = true;
@@ -1936,8 +2037,8 @@ wcPlayEditor.prototype = {
     if (this._viewportMovingNode) {
       var moveX = mouse.x - this._mouse.x;
       var moveY = mouse.y - this._mouse.y;
-      this._selectedNode.pos.x += moveX;
-      this._selectedNode.pos.y += moveY;
+      this._selectedNode.pos.x += moveX / this._viewportCamera.z;
+      this._selectedNode.pos.y += moveY / this._viewportCamera.z;
       this._mouse = mouse;
       return;
     }
@@ -1949,6 +2050,7 @@ wcPlayEditor.prototype = {
     this._highlightExitLink = false;
     this._highlightInputLink = false;
     this._highlightOutputLink = false;
+    this._highlightPropertyValue = false;
 
     var node = this.__findNodeAtPos(mouse, this._viewportCamera);
     if (node) {
@@ -1996,6 +2098,25 @@ wcPlayEditor.prototype = {
           this._highlightNode = node;
           this._highlightOutputLink = node._meta.bounds.outputBounds[i];
           break;
+        }
+      }
+
+      // Property values.
+      var propBounds;
+      for (var i = 0; i < node._meta.bounds.valueBounds.length; ++i) {
+        if (this.__inRect(this._mouse, node._meta.bounds.valueBounds[i].rect, this._viewportCamera)) {
+          propBounds = node._meta.bounds.valueBounds[i];
+          break;
+        }
+      }
+
+      if (propBounds) {
+        for (var i = 0; i < node.properties.length; ++i) {
+          if (node.properties[i].name === propBounds.name) {
+            this._highlightNode = node;
+            this._highlightPropertyValue = propBounds;
+            break;
+          }
         }
       }
 
@@ -2175,7 +2296,7 @@ wcPlayEditor.prototype = {
         if (propBounds) {
           for (var i = 0; i < node.properties.length; ++i) {
             if (node.properties[i].name === propBounds.name) {
-              this._drawPropertyEditor(node, node.properties[i], propBounds);
+              this.__drawPropertyEditor(node, node.properties[i], propBounds);
               break;
             }
           }
@@ -2205,6 +2326,14 @@ wcPlayEditor.prototype = {
       // Breakpoint button.
       if (this.__inRect(this._mouse, node._meta.bounds.breakpoint, this._viewportCamera)) {
         hasTarget = true;
+      }
+
+      // Property values.
+      for (var i = 0; i < node._meta.bounds.valueBounds.length; ++i) {
+        if (this.__inRect(this._mouse, node._meta.bounds.valueBounds[i].rect, this._viewportCamera)) {
+          hasTarget = true;
+          break;
+        }
       }
 
       // Exit links.
@@ -2280,6 +2409,22 @@ wcPlayEditor.prototype = {
         this.$viewport.removeClass('wcMoving');
       }
     }
+  },
+
+  __onViewportMouseWheel: function(event, elem) {
+    var oldZoom = this._viewportCamera.z;
+    var mouse = this.__mouse(event, this.$viewport.offset());
+
+    if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) {
+      // scroll up to zoom in.
+      this._viewportCamera.z = Math.min(this._viewportCamera.z * 1.25, 5);
+    } else {
+      // scroll down to zoom out.
+      this._viewportCamera.z = Math.max(this._viewportCamera.z * 0.75, 0.1);
+    }
+
+    this._viewportCamera.x = (this._viewportCamera.x - mouse.x) / (oldZoom / this._viewportCamera.z) + mouse.x;
+    this._viewportCamera.y = (this._viewportCamera.y - mouse.y) / (oldZoom / this._viewportCamera.z) + mouse.y;
   },
 
   /**
@@ -2362,24 +2507,6 @@ Class.extend('wcNode', 'Node', '', {
 
     var engine = this.engine();
     engine && engine.__addNode(this);
-  },
-
-  /**
-   * Magic function that is called whenever any new class type is extended from this one.<br>
-   * Handles initializing of the class as well as registering the new node type.
-   * @function wcNodeStorage#classInit
-   * @param {wcNode} this - The new class type.
-   * @param {String} className - The name of the class constructor.
-   * @param {String} name - A display name for the node.
-   * @param {String} category - A category where this node will be grouped.
-   */
-  classInit: function(className, name, category) {
-    if (category) {
-      this.className = className;
-      this.name = name;
-      this.category = category;
-      wcPlay.registerNodeType(className, name, category, wcPlay.NODE_TYPE.STORAGE);
-    }
   },
 
   /**
@@ -2601,12 +2728,12 @@ Class.extend('wcNode', 'Node', '', {
    * Creates a new property.
    * @function wcNode#createProperty
    * @param {String} name - The name of the property.
-   * @param {wcPlay.PROPERTY_TYPE} [controlType=wcPlay.PROPERTY_TYPE.STRING] - The type of property.
+   * @param {wcPlay.PROPERTY_TYPE} type - The type of property.
    * @param {Object} [initialValue] - A initial value for this property when the script starts.
    * @param {Object} [options] - Additional options for this property, see {@link wcPlay.PROPERTY_TYPE}.
    * @returns {Boolean} - Failes if the property does not exist.
    */
-  createProperty: function(name, controlType, initialValue, options) {
+  createProperty: function(name, type, initialValue, options) {
     // Make sure this property doesn't already exist.
     for (var i = 0; i < this.properties.length; ++i) {
       if (this.properties[i].name === name) {
@@ -2614,16 +2741,15 @@ Class.extend('wcNode', 'Node', '', {
       }
     }
 
-    // Make sure the type is valid.
-    if (!wcPlay.PROPERTY_TYPE.hasOwnProperty(controlType)) {
-      controlType = wcPlay.PROPERTY_TYPE.STRING;
+    if (initialValue === undefined) {
+      initialValue = 0;
     }
 
     this.properties.push({
       name: name,
       value: initialValue,
       initialValue: initialValue,
-      controlType: controlType,
+      type: type,
       inputs: [],
       outputs: [],
       options: options || {},
@@ -3134,7 +3260,7 @@ Class.extend('wcNode', 'Node', '', {
    */
   triggerExit: function(name) {
     if (this.debugLog()) {
-      console.log('DEBUG: Node "' + this.category + '.' + this.name + '" Triggered Exit link "' + name + '"');
+      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Triggered Exit link "' + name + '"');
     }
 
     for (var i = 0; i < this.chain.exit.length; ++i) {
@@ -3164,10 +3290,10 @@ Class.extend('wcNode', 'Node', '', {
    * @function wcNode#property
    * @param {String} name - The name of the property.
    * @param {Object} [value] - If supplied, will assign a new value to the property.
-   * @param {Boolean} [forceChange] - If value is supplied, set this to true if you want to force the change event to be sent to all chained properties.
+   * @param {Boolean} [forceOrSilent] - If supplied, true will force the change event to be sent to all chained properties even if this value didn't change while false will force the change to not be chained.
    * @returns {Object|undefined} - The value of the property, or undefined if not found.
    */
-  property: function(name, value, forceChange) {
+  property: function(name, value, forceOrSilent) {
     for (var i = 0; i < this.properties.length; ++i) {
       var prop = this.properties[i];
       if (prop.name === name) {
@@ -3182,19 +3308,21 @@ Class.extend('wcNode', 'Node', '', {
           }
 
           // Notify about to change event.
-          if (forceChange || prop.value !== value) {
+          if (forceOrSilent || prop.value !== value) {
             value = this.onPropertyChanging(prop.name, oldValue, value) || value;
           }
 
-          if (forceChange || prop.value !== value) {
+          if (forceOrSilent || prop.value !== value) {
             prop.value = value;
 
             // Notify that the property has changed.
             this.onPropertyChanged(prop.name, oldValue, value);
 
             // Now follow any output links and assign the new value to them as well.
-            for (a = 0; a < prop.outputs.length; ++a) {
-              prop.outputs[a].node && prop.outputs[a].node.triggerProperty(prop.outputs[a].name, value);
+            if (forceOrSilent === undefined || forceOrSilent) {
+              for (a = 0; a < prop.outputs.length; ++a) {
+                prop.outputs[a].node && prop.outputs[a].node.triggerProperty(prop.outputs[a].name, value);
+              }
             }
           }
         }
@@ -3301,7 +3429,7 @@ Class.extend('wcNode', 'Node', '', {
    */
   onStart: function() {
     if (this.debugLog()) {
-      console.log('DEBUG: Node "' + this.category + '.' + this.name + '" started!');
+      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" started!');
     }
   },
 
@@ -3313,7 +3441,7 @@ Class.extend('wcNode', 'Node', '', {
    */
   onTriggered: function(name) {
     if (this.debugLog()) {
-      console.log('DEBUG: Node "' + this.category + '.' + this.name + '" Triggered Entry link "' + name + '"');
+      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Triggered Entry link "' + name + '"');
     }
   },
 
@@ -3328,7 +3456,7 @@ Class.extend('wcNode', 'Node', '', {
    */
   onPropertyChanging: function(name, oldValue, newValue) {
     // if (this.debugLog()) {
-    //   console.log('DEBUG: Node "' + this.category + '.' + this.name + '" Changing Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
+    //   console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Changing Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
     // }
   },
 
@@ -3342,7 +3470,7 @@ Class.extend('wcNode', 'Node', '', {
    */
   onPropertyChanged: function(name, oldValue, newValue) {
     if (this.debugLog()) {
-      console.log('DEBUG: Node "' + this.category + '.' + this.name + '" Changed Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
+      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Changed Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
     }
   },
 
@@ -3354,7 +3482,7 @@ Class.extend('wcNode', 'Node', '', {
    */
   onPropertyGet: function(name) {
     // if (this.debugLog()) {
-    //   console.log('DEBUG: Node "' + this.category + '.' + this.name + '" Requested Property "' + name + '"');
+    //   console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Requested Property "' + name + '"');
     // }
   },
 
@@ -3366,29 +3494,31 @@ Class.extend('wcNode', 'Node', '', {
    */
   onPropertyGot: function(name) {
     if (this.debugLog()) {
-      console.log('DEBUG: Node "' + this.category + '.' + this.name + '" Got Property "' + name + '"');
+      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Got Property "' + name + '"');
     }
   },
 
   /**
    * Event that is called when a global property value has changed.
-   * Overload this in inherited nodes.
-   * @function wcNode#onGlobalPropertyChanged
+   * Overload this in inherited nodes.<br>
+   * <b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.
+   * @function wcNode#onSharedPropertyChanged
    * @param {String} name - The name of the global property.
    * @param {Object} oldValue - The old value of the global property.
    * @param {Object} newValue - The new value of the global property.
    */
-  // onGlobalPropertyChanged: function(name, oldValue, newValue) {
+  // onSharedPropertyChanged: function(name, oldValue, newValue) {
   // },
 
   /**
    * Event that is called when a global property has been renamed.
-   * Overload this in inherited nodes.
-   * @function wcNode#onGlobalPropertyRenamed
+   * Overload this in inherited nodes.<br>
+   * <b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.
+   * @function wcNode#onSharedPropertyRenamed
    * @param {String} oldName - The old name of the global property.
    * @param {String} newName - The new name of the global property.
    */
-  // onGlobalPropertyRenamed: function(oldName, newName) {
+  // onSharedPropertyRenamed: function(oldName, newName) {
   // },
 });
 
@@ -3433,7 +3563,7 @@ wcNode.extend('wcNodeEntry', 'Entry Node', '', {
    * <b>Should be inherited and never constructed directly.</b>
    * @param {String} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
-   * @param {String} [name="Entry Node"] - The name of the node, as displayed on the title bar.
+   * @param {String} [type="Entry Node"] - The type name of the node, as displayed on the title bar.
    */
   init: function(parent, pos, type) {
     this._super(parent, pos, type);
@@ -3447,7 +3577,6 @@ wcNode.extend('wcNodeEntry', 'Entry Node', '', {
    * Magic function that is called whenever any new class type is extended from this one.<br>
    * Handles initializing of the class as well as registering the new node type.
    * @function wcNodeEntry#classInit
-   * @param {wcNode} this - The new class type.
    * @param {String} className - The name of the class constructor.
    * @param {String} name - A display name for the node.
    * @param {String} category - A category where this node will be grouped.
@@ -3516,7 +3645,7 @@ wcNode.extend('wcNodeProcess', 'Node Process', '', {
    * <b>Should be inherited and never constructed directly.</b>
    * @param {String} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
-   * @param {String} [name="Node Process"] - The name of the node, as displayed on the title bar.
+   * @param {String} [type="Node Process"] - The type name of the node, as displayed on the title bar.
    */
   init: function(parent, pos, type) {
     this._super(parent, pos, type);
@@ -3531,7 +3660,6 @@ wcNode.extend('wcNodeProcess', 'Node Process', '', {
    * Magic function that is called whenever any new class type is extended from this one.<br>
    * Handles initializing of the class as well as registering the new node type.
    * @function wcNodeProcess#classInit
-   * @param {wcNode} this - The new class type.
    * @param {String} className - The name of the class constructor.
    * @param {String} name - A display name for the node.
    * @param {String} category - A category where this node will be grouped.
@@ -3546,22 +3674,38 @@ wcNode.extend('wcNodeProcess', 'Node Process', '', {
   },
 });
 
-wcNode.extend('wcNodeStorage', 'Storage', 'Core', {
+wcNode.extend('wcNodeStorage', 'Storage', '', {
   /**
    * @class
-   * The base class for all storage nodes. These are nodes that interact with script variables and exchange data.<br>
-   * When inheriting, make sure to include 'this._super(parent, pos, type);' at the top of your init function.
+   * The base class for all storage nodes. These are nodes designed solely for managing data.<br>
+   * When inheriting, make sure to include 'this._super(parent, pos, type);' at the top of your init function.<br>
+   * Also when inheriting, a 'value' property MUST be created as the storage value.
    *
    * @constructor wcNodeStorage
    * @param {String} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
-   * @param {String} [name="Storage"] - The name of the node, as displayed on the title bar.
+   * @param {String} [type="Storage"] - The type name of the node, as displayed on the title bar.
    */
   init: function(parent, pos, type) {
     this._super(parent, pos, type);
     this.color = '#009900';
+  },
 
-    this.createProperty('value', wcPlay.PROPERTY_TYPE.STRING, '');
+  /**
+   * Magic function that is called whenever any new class type is extended from this one.<br>
+   * Handles initializing of the class as well as registering the new node type.
+   * @function wcNodeEntry#classInit
+   * @param {String} className - The name of the class constructor.
+   * @param {String} name - A display name for the node.
+   * @param {String} category - A category where this node will be grouped.
+   */
+  classInit: function(className, name, category) {
+    if (category) {
+      this.className = className;
+      this.name = name;
+      this.category = category;
+      wcPlay.registerNodeType(className, name, category, wcPlay.NODE_TYPE.STORAGE);
+    }
   },
 
   /**
@@ -3586,7 +3730,7 @@ wcNodeEntry.extend('wcNodeEntryStart', 'Start', 'Core', {
    * @constructor wcNodeEntryStart
    * @param {String} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
-   * @param {String} [name="Start"] - The name of the node, as displayed on the title bar.
+   * @param {String} [type="Start"] - The type name of the node, as displayed on the title bar.
    */
   init: function(parent, pos, type) {
     this._super(parent, pos, type);
@@ -3611,7 +3755,7 @@ wcNodeProcess.extend('wcNodeProcessDelay', 'Delay', 'Core', {
    * @constructor wcNodeProcessDelay
    * @param {String} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
-   * @param {String} [name="Delay"] - The name of the node, as displayed on the title bar.
+   * @param {String} [type="Delay"] - The type name of the node, as displayed on the title bar.
    */
   init: function(parent, pos, type) {
     this._super(parent, pos, type);
@@ -3658,13 +3802,13 @@ wcNodeProcess.extend('wcNodeProcessLog', 'Log', 'Core', {
    * @constructor wcNodeProcessLog
    * @param {String} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
-   * @param {String} [name="Log"] - The name of the node, as displayed on the title bar.
+   * @param {String} [type="Log"] - The type name of the node, as displayed on the title bar.
    */
   init: function(parent, pos, type) {
     this._super(parent, pos, type);
 
     // Create the message property so we know what to output in the log.
-    this.createProperty('message', wcPlay.PROPERTY_TYPE.STRING, 'Log message.');
+    this.createProperty('message', wcPlay.PROPERTY_TYPE.STRING, 'Log message.', {multiline: true});
   },
 
   /**
@@ -3691,7 +3835,7 @@ wcNodeProcess.extend('wcNodeProcessOperation', 'Operation', 'Core', {
    * @constructor wcNodeProcessOperation
    * @param {String} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
-   * @param {String} [name="Log"] - The name of the node, as displayed on the title bar.
+   * @param {String} [type="Operation"] - The type name of the node, as displayed on the title bar.
    */
   init: function(parent, pos, type) {
     this._super(parent, pos, type);
@@ -3733,5 +3877,59 @@ wcNodeProcess.extend('wcNodeProcessOperation', 'Operation', 'Core', {
 
     this.property('result', result);
     this.triggerExit('out');
+  },
+});
+
+wcNodeStorage.extend('wcNodeStorageToggle', 'Toggle', 'Core', {
+  /**
+   * @class
+   * Stores a boolean (toggleable) value.
+   * When inheriting, make sure to include 'this._super(parent, pos, type);' at the top of your init function.
+   *
+   * @constructor wcNodeStorageToggle
+   * @param {String} parent - The parent object of this node.
+   * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
+   * @param {String} [type="Toggle"] - The type name of the node, as displayed on the title bar.
+   */
+  init: function(parent, pos, type) {
+    this._super(parent, pos, type);
+
+    this.createProperty('value', wcPlay.PROPERTY_TYPE.TOGGLE, false);
+  },
+});
+
+wcNodeStorage.extend('wcNodeStorageNumber', 'Number', 'Core', {
+  /**
+   * @class
+   * Stores a number value.<br>
+   * When inheriting, make sure to include 'this._super(parent, pos, type);' at the top of your init function.
+   *
+   * @constructor wcNodeStorageNumber
+   * @param {String} parent - The parent object of this node.
+   * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
+   * @param {String} [type="Number"] - The type name of the node, as displayed on the title bar.
+   */
+  init: function(parent, pos, type) {
+    this._super(parent, pos, type);
+
+    this.createProperty('value', wcPlay.PROPERTY_TYPE.NUMBER);
+  },
+});
+
+wcNodeStorage.extend('wcNodeStorageString', 'String', 'Core', {
+  /**
+   * @class
+   * The base class for all storage nodes. These are nodes that interact with script variables and exchange data.<br>
+   * When inheriting, make sure to include 'this._super(parent, pos, type);' at the top of your init function.
+   *
+   * @constructor wcNodeStorageString
+   * @param {String} parent - The parent object of this node.
+   * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
+   * @param {String} [type="String"] - The type name of the node, as displayed on the title bar.
+   */
+  init: function(parent, pos, type) {
+    this._super(parent, pos, type);
+
+    this.createProperty('value', wcPlay.PROPERTY_TYPE.STRING, '', {multiline: true});
   },
 });

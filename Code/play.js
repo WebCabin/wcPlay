@@ -39,16 +39,16 @@ function wcPlay(options) {
  * @enum {String}
  */
 wcPlay.PROPERTY_TYPE = {
+  /** Displays the property based on the type of data it holds. Options depend on the property type it holds, you can include properties from all the types together as they do not share option values. */
+  DYNAMIC: 'dynamic',
   /** Displays the property as a checkbox. No options are used. */
   TOGGLE: 'toggle',
   /** Displays the property as a number control. [Number options]{@link wcNode~NumberOptions} are used. */
   NUMBER: 'number',
-  /** Displays the property as a text field. No options are used. */
+  /** Displays the property as a text field. [String options]{@link wcNode~StringOptions} are used. */
   STRING: 'string',
   /** Displays the property as a combo box control. [Select options]{@link wcNode~SelectOptions} are used. */
   SELECT: 'select',
-  /** Displays the property as a color picker button. No options are used. */
-  COLOR: 'color',
 };
 
 /**
@@ -197,12 +197,12 @@ wcPlay.prototype = {
   /**
    * Creates a new global property.
    * @param {String} name - The name of the property.
-   * @param {wcPlay.PROPERTY_TYPE} [controlType=wcPlay.PROPERTY_TYPE.STRING] - The type of property.
+   * @param {wcPlay.PROPERTY_TYPE} type - The type of property.
    * @param {Object} [defaultValue] - A default value for this property.
    * @param {Object} [options] - Additional options for this property, see {@link wcPlay.PROPERTY_TYPE}.
    * @returns {Boolean} - Failes if the property does not exist.
    */
-  createProperty: function(name, controlType, defaultValue, options) {
+  createProperty: function(name, type, defaultValue, options) {
     // Make sure this property doesn't already exist.
     for (var i = 0; i < this._properties.length; ++i) {
       if (this._properties[i].name === name) {
@@ -211,15 +211,15 @@ wcPlay.prototype = {
     }
 
     // Make sure the type is valid.
-    if (!wcPlay.PROPERTY_TYPE.hasOwnProperty(controlType)) {
-      controlType = wcPlay.PROPERTY_TYPE.STRING;
+    if (!wcPlay.PROPERTY_TYPE.hasOwnProperty(type)) {
+      type = wcPlay.PROPERTY_TYPE.STRING;
     }
 
     this._properties.push({
       name: name,
       value: defaultValue,
       defaultValue: defaultValue,
-      controlType: controlType,
+      type: type,
       options: options || {},
     });
     return true;
@@ -249,7 +249,7 @@ wcPlay.prototype = {
     }
 
     prop.name = newName;
-    this.__notifyNodes('onGlobalPropertyRenamed', [name, newName]);
+    this.__notifyNodes('onSharedPropertyRenamed', [name, newName]);
   },
 
   /**
@@ -275,7 +275,7 @@ wcPlay.prototype = {
     if (value !== undefined && value !== prop.value) {
       var oldValue = prop.value;
       prop.value = value;
-      this.__notifyNodes('onGlobalPropertyChanged', [prop.name, oldValue, prop.value]);
+      this.__notifyNodes('onSharedPropertyChanged', [prop.name, oldValue, prop.value]);
     }
   },
 

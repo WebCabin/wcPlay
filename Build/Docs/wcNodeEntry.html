@@ -27,7 +27,7 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessLog.html">wcNodeProcessLog</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
+					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessLog.html">wcNodeProcessLog</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
 				</ul>
 			</li>
 			
@@ -67,7 +67,7 @@
         
 <hr>
 <dt>
-    <h4 class="name" id="wcNodeEntry"><toc class="small"><i></i></toc><toc> </toc><toc>new </toc><toc><b>wcNodeEntry</b>(parent, pos, <span class="optional">name</span>)</toc>
+    <h4 class="name" id="wcNodeEntry"><toc class="small"><i></i></toc><toc> </toc><toc>new </toc><toc><b>wcNodeEntry</b>(parent, pos, <span class="optional">type</span>)</toc>
         
     </h4>
 
@@ -186,7 +186,7 @@
 
         <tr>
             
-                <td class="name"><code>name</code></td>
+                <td class="name"><code>type</code></td>
             
 
             <td class="type">
@@ -218,7 +218,7 @@
                 </td>
             
 
-            <td class="description last">The name of the node, as displayed on the title bar.</td>
+            <td class="description last">The type name of the node, as displayed on the title bar.</td>
         </tr>
 
 	
@@ -317,7 +317,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="classInit"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>classInit</b>(this, className, name, category)</toc>
+    <h4 class="name" id="classInit"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>classInit</b>(className, name, category)</toc>
         
     </h4>
 
@@ -362,13 +362,13 @@
 
         <tr>
             
-                <td class="name"><code>this</code></td>
+                <td class="name"><code>className</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><a href="wcNode.html">wcNode</a></span>
+<span class="param-type">String</span>
 
 
             
@@ -378,9 +378,174 @@
 
             
 
-            <td class="description last">The new class type.</td>
+            <td class="description last">The name of the class constructor.</td>
         </tr>
 
+	
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">A display name for the node.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>category</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">A category where this node will be grouped.</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="nodes_storage.js.html">nodes/storage.js</a>,
+     <a href="nodes_storage.js.html#sunlight-1-line-18">line 18</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="nodes_storage.js.html">nodes/storage.js</a>,
+				 <a href="nodes_storage.js.html#sunlight-1-line-18">line 18</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="classInit"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>classInit</b>(className, name, category)</toc>
+        
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p style="margin-left: 20px;">Magic function that is called whenever any new class type is extended from this one.<br>Handles initializing of the class as well as registering the new node type.</p>
+    </div>
+    
+
+    
+
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
 	
 
         <tr>
@@ -657,13 +822,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_entry.js.html">nodes/entry.js</a>,
-     <a href="nodes_entry.js.html#sunlight-1-line-40">line 40</a>
+     <a href="nodes_entry.js.html#sunlight-1-line-39">line 39</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_entry.js.html">nodes/entry.js</a>,
-				 <a href="nodes_entry.js.html#sunlight-1-line-40">line 40</a>
+				 <a href="nodes_entry.js.html#sunlight-1-line-39">line 39</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -837,13 +1002,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_entry.js.html">nodes/entry.js</a>,
-     <a href="nodes_entry.js.html#sunlight-1-line-52">line 52</a>
+     <a href="nodes_entry.js.html#sunlight-1-line-51">line 51</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_entry.js.html">nodes/entry.js</a>,
-				 <a href="nodes_entry.js.html#sunlight-1-line-52">line 52</a>
+				 <a href="nodes_entry.js.html#sunlight-1-line-51">line 51</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -893,7 +1058,7 @@
 		
 		<span class="jsdoc-message">
 			Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta3</a>
-			on 2015-04-17 using the <a
+			on 2015-04-18 using the <a
 			href="https://github.com/WebCabin/docstrap">Web Cabin DocStrap template</a>.
 		</span>
 		</footer>

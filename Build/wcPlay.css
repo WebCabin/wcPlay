@@ -20,3 +20,8 @@
 .wcMoving {
   cursor: move;
 }
+
+.wcPlayEditorControl {
+  position: absolute;
+  
+}
