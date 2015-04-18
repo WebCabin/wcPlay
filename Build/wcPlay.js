@@ -564,6 +564,8 @@ function wcPlayEditor(container, options) {
   this._mouse = null;
   this._highlightNode = null;
   this._selectedNode = null;
+  this._expandedNode = null;
+  this._expandedNodeWasCollapsed = false;
 
   this._highlightCollapser = false;
   this._highlightBreakpoint = false;
@@ -1017,6 +1019,13 @@ wcPlayEditor.prototype = {
       data.rect.height += this._drawStyle.links.length;
     }
 
+    data.farRect = {
+      top: data.inner.top - data.inner.height/4,
+      left: data.inner.left - data.inner.width/4,
+      width: data.inner.width * 1.5,
+      height: data.inner.height * 1.5,
+    };
+
     // Add a collapse button to the node in the left margin of the title.
     data.collapser = {
       left: data.inner.left + 4,
@@ -1197,7 +1206,7 @@ wcPlayEditor.prototype = {
     this.__setCanvasFont(this._font.title, context);
     bounds.width = context.measureText(node.type + (node.name? ': ' + node.name: '')).width;
 
-    // Measure the viewport.
+    // Measure the node's viewport.
     if (node._viewportSize) {
       bounds.width = Math.max(bounds.width, node._viewportSize.x);
       bounds.height += node._viewportSize.y + this._drawStyle.property.spacing;
@@ -1235,7 +1244,7 @@ wcPlayEditor.prototype = {
    * @param {external:Canvas~Context} context - The canvas context.
    * @param {wcPlay~Coordinates} pos - The (top, center) position to draw the links on the canvas.
    * @param {Number} width - The width of the area to draw in.
-   * @returns {wcPlayEditor~LinkBoundingData[]} - An array of bounding rectangles, one for each link 'nub'.
+   * @returns {wcPlayEditor~BoundingData[]} - An array of bounding rectangles, one for each link 'nub'.
    */
   __drawEntryLinks: function(node, context, pos, width) {
     var xPos = pos.x - width/2 + this._drawStyle.links.margin;
@@ -1302,7 +1311,7 @@ wcPlayEditor.prototype = {
    * @param {external:Canvas~Context} context - The canvas context.
    * @param {wcPlay~Coordinates} pos - The (top, center) position to draw the links on the canvas.
    * @param {Number} width - The width of the area to draw in.
-   * @returns {wcPlayEditor~LinkBoundingData[]} - An array of bounding rectangles, one for each link 'nub'.
+   * @returns {wcPlayEditor~BoundingData[]} - An array of bounding rectangles, one for each link 'nub'.
    */
   __drawExitLinks: function(node, context, pos, width) {
     var xPos = pos.x - width/2 + this._drawStyle.links.margin;
@@ -1831,6 +1840,17 @@ wcPlayEditor.prototype = {
     context.restore();
   },
 
+  /**
+   * Draws the editor control for a property.
+   * @function wcPlayEditor#__drawPropertyEditor
+   * @private
+   * @param {wcNode} node - The node to draw for.
+   * @param {Object} property - The property data.
+   * @param {wcPlayEditor~BoundingData} bounds - The bounding data for this property.
+   */
+  _drawPropertyEditor: function(node, property, bounds) {
+
+  },
 
   /**
    * Initializes user control.
@@ -1841,6 +1861,7 @@ wcPlayEditor.prototype = {
     var self = this;
     this.$viewport.on('mousemove',  function(event){self.__onViewportMouseMove(event, this);});
     this.$viewport.on('mousedown',  function(event){self.__onViewportMouseDown(event, this);});
+    this.$viewport.on('click',      function(event){self.__onViewportMouseClick(event, this);});
     this.$viewport.on('dblclick',   function(event){self.__onViewportMouseDoubleClick(event, this);});
     this.$viewport.on('mouseup',    function(event){self.__onViewportMouseUp(event, this);});
     // this.$viewport.on('mouseleave', function(event){self.__onViewportMouseUp(event, this);});
@@ -1855,6 +1876,7 @@ wcPlayEditor.prototype = {
    */
   __onViewportMouseMove: function(event, elem) {
     var mouse = this.__mouse(event, this.$viewport.offset());
+    this._mouseMoved = true;
 
     // Viewport panning.
     if (this._viewportMoving) {
@@ -1890,6 +1912,7 @@ wcPlayEditor.prototype = {
 
     var node = this.__findNodeAtPos(mouse, this._viewportCamera);
     if (node) {
+
       // Collapser button.
       if (this.__inRect(mouse, node._meta.bounds.collapser, this._viewportCamera)) {
         this._highlightCollapser = true;
@@ -1936,8 +1959,6 @@ wcPlayEditor.prototype = {
         }
       }
 
-      // TODO: Check for property collision.
-
       // Check for main node collision.
       if (this.__inRect(mouse, node._meta.bounds.inner, this._viewportCamera)) {
         this._highlightNode = node;
@@ -1948,6 +1969,30 @@ wcPlayEditor.prototype = {
     } else {
       this._highlightNode = null;
       this.$viewport.removeClass('wcClickable');
+    }
+
+    // If you hover over a node that is not currently expanded by hovering, force the expanded node to collapse again.
+    if (this._expandedNode && this._expandedNode !== this._highlightNode) {
+      // If we are not highlighting a new node, only uncollapse the previously hovered node if we are far from it.
+      if (this._highlightNode || !this.__inRect(mouse, this._expandedNode._meta.bounds.farRect, this._viewportCamera)) {
+        // Recollapse our previous node, if necessary.
+        if (this._expandedNodeWasCollapsed) {
+          this._expandedNode.collapsed(true);
+        }
+
+        this._expandedNode = null;
+      }
+    }
+
+    // If the user is creating a new connection and hovering over another node, uncollapse it temporarily to expose links.
+    if (!this._expandedNode && this._highlightNode &&
+        (this._selectedEntryLink || this._selectedExitLink ||
+        this._selectedInputLink || this._selectedOutputLink) && 
+        this.__inRect(mouse, node._meta.bounds.inner, this._viewportCamera)) {
+
+      this._expandedNode = this._highlightNode;
+      this._expandedNodeWasCollapsed = this._expandedNode.collapsed();
+      this._expandedNode.collapsed(false);
     }
   },
 
@@ -1961,21 +2006,11 @@ wcPlayEditor.prototype = {
   __onViewportMouseDown: function(event, elem) {
     this._mouse = this.__mouse(event, this.$viewport.offset());
 
+    this._mouseMoved = false;
+
     var hasTarget = false;
     var node = this.__findNodeAtPos(this._mouse, this._viewportCamera);
     if (node) {
-      // Collapser button.
-      if (this.__inRect(this._mouse, node._meta.bounds.collapser, this._viewportCamera)) {
-        hasTarget = true;
-        node.collapsed(!node.collapsed());
-      }
-
-      // Breakpoint button.
-      if (this.__inRect(this._mouse, node._meta.bounds.breakpoint, this._viewportCamera)) {
-        hasTarget = true;
-        node.debugBreak(!node._break);
-      }
-
       // Entry links.
       if (!hasTarget) {
         for (var i = 0; i < node._meta.bounds.entryBounds.length; ++i) {
@@ -2065,6 +2100,51 @@ wcPlayEditor.prototype = {
   },
 
   /**
+   * Handle mouse click events over the viewport canvas.
+   * @function wcPlayEditor#__onViewportMouseDown
+   * @private
+   * @param {Object} event - The mouse event.
+   * @param {Object} elem - The target element.
+   */
+  __onViewportMouseClick: function(event, elem) {
+    if (!this._mouseMoved) {
+      this._mouse = this.__mouse(event, this.$viewport.offset());
+
+      var hasTarget = false;
+      var node = this.__findNodeAtPos(this._mouse, this._viewportCamera);
+      if (node) {
+        // Collapser button.
+        if (this.__inRect(this._mouse, node._meta.bounds.collapser, this._viewportCamera)) {
+          node.collapsed(!node.collapsed());
+        }
+
+        // Breakpoint button.
+        if (this.__inRect(this._mouse, node._meta.bounds.breakpoint, this._viewportCamera)) {
+          node.debugBreak(!node._break);
+        }
+
+        // Property values.
+        var propBounds;
+        for (var i = 0; i < node._meta.bounds.valueBounds.length; ++i) {
+          if (this.__inRect(this._mouse, node._meta.bounds.valueBounds[i].rect, this._viewportCamera)) {
+            propBounds = node._meta.bounds.valueBounds[i];
+            break;
+          }
+        }
+
+        if (propBounds) {
+          for (var i = 0; i < node.properties.length; ++i) {
+            if (node.properties[i].name === propBounds.name) {
+              this._drawPropertyEditor(node, node.properties[i], propBounds);
+              break;
+            }
+          }
+        }
+      }
+    }
+  },
+
+  /**
    * Handle mouse double click events over the viewport canvas.
    * @function wcPlayEditor#__onViewportMouseDoubleClick
    * @private
@@ -2138,6 +2218,12 @@ wcPlayEditor.prototype = {
       }
     }
 
+    // Re-collapse the node, if necessary.
+    if (this._expandedNode && this._expandedNodeWasCollapsed) {
+      this._expandedNode.collapsed(true);
+    }
+
+    this._expandedNode = null;
     this._selectedEntryLink = false;
     this._selectedExitLink = false;
     this._selectedInputLink = false;
