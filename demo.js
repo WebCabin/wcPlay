@@ -17,7 +17,7 @@ $(document).ready(function() {
 
   // Add some nodes.
   var startNode = new wcNodeEntryStart(myPlay, {x: 400, y: 30});
-  var logNode = new wcNodeProcessLog(myPlay, {x: 400, y: 200});
+  var logNode = new wcNodeProcessConsoleLog(myPlay, {x: 400, y: 200});
   var delayNode = new wcNodeProcessDelay(myPlay, {x: 400, y: 400});
   var operationNode = new wcNodeProcessOperation(myPlay, {x: 400, y: 600});
   var numberNode = new wcNodeStorageNumber(myPlay, {x: 150, y: 650});

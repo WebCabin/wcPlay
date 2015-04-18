@@ -4,6 +4,28 @@
   left: 0px;
   height: 100%;
   border-right:2px solid black;
+  text-align: center;
+}
+
+.wcPlayTypeArea {
+  position: absolute;
+  top: 25px;
+  left: 0px;
+  right: 0px;
+  height: auto;
+}
+
+.wcPlayTypeCategory {
+  width: 100%;
+  height: auto;
+}
+
+.wcPlayTypeCategoryArea {
+  width: 100%;
+}
+
+.wcPlayCategoryButton {
+  width: 100%;
 }
 
 .wcPlayViewport {
@@ -23,5 +45,12 @@
 
 .wcPlayEditorControl {
   position: absolute;
-  
+}
+
+.wcToggled {
+  border-style: inset;
+}
+
+.wcPlayHidden {
+  display: none;
 }
