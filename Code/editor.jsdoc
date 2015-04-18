@@ -14,9 +14,10 @@
  */
 
 /**
- * Bounding information for mouse click events.
- * @typedef {Object} wcPlayEditor~BoundingData
+ * Bounding information for links on a node.
+ * @typedef {Object} wcPlayEditor~LinkBoundingData
  * @property {wcPlayEditor~Rect} rect - The bounding rectangle.
+ * @property {wcPlay~Coordinates} point - The anchor point where lines will attach to this link.
  * @property {String} name - The name of the bounded object.
  */
 
@@ -25,17 +26,17 @@
  * @typedef {Object} wcPlayEditor~DrawNodeData
  * @property {wcNode} node - The node instance.
  * @property {wcPlayEditor~Rect} rect - Bounding rectangle of the node (not including links that stick out).
- * @property {wcPlayEditor~BoundingData[]} entryBounds - Bounding data of entry links.
- * @property {wcPlayEditor~BoundingData[]} exitBounds - Bounding data of exit links.
- * @property {wcPlayEditor~BoundingData[]} inputBounds - Bounding data of property input links.
- * @property {wcPlayEditor~BoundingData[]} outputBounds - Bounding data of property output links.
- * @property {wcPlayEditor~BoundingData[]} valueBounds - Bounding data of property value text.
+ * @property {wcPlayEditor~LinkBoundingData[]} entryBounds - Bounding data of entry links.
+ * @property {wcPlayEditor~LinkBoundingData[]} exitBounds - Bounding data of exit links.
+ * @property {wcPlayEditor~LinkBoundingData[]} inputBounds - Bounding data of property input links.
+ * @property {wcPlayEditor~LinkBoundingData[]} outputBounds - Bounding data of property output links.
+ * @property {wcPlayEditor~LinkBoundingData[]} valueBounds - Bounding data of property value text.
  */
 
 /**
  * This object contains bounding data for property values, property input links, and property output links.
  * @typedef {Object} wcPlayEditor~DrawPropertyData
- * @property {wcPlayEditor~BoundingData[]} inputBounds - Bounding data of property input links.
- * @property {wcPlayEditor~BoundingData[]} outputBounds - Bounding data of property output links.
- * @property {wcPlayEditor~BoundingData[]} valueBounds - Bounding data of property value text.
+ * @property {wcPlayEditor~LinkBoundingData[]} inputBounds - Bounding data of property input links.
+ * @property {wcPlayEditor~LinkBoundingData[]} outputBounds - Bounding data of property output links.
+ * @property {wcPlayEditor~LinkBoundingData[]} valueBounds - Bounding data of property value text.
  */

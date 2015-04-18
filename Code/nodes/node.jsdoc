@@ -1,8 +1,9 @@
 /**
  * @typedef {Object} wcNode~PropertyOptions
+ * @property {String} [description] - An optional description to display as a tooltip for this property.
  * @property {Boolean} [collapsible] - If true, this property will be hidden on a collapsed node (unless links are connected to it).
  */
- 
+
 /**
  * Options for a [NUMBER]{@link wcPlay.PROPERTY_TYPE} value.
  * @typedef {Object} wcNode~NumberOptions

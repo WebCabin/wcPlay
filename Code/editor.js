@@ -347,7 +347,7 @@ wcPlayEditor.prototype = {
       var xPos = this.$palette.width() / 2;
       for (var cat in this._nodeLibrary) {
         for (var node in this._nodeLibrary[cat]) {
-          var drawData = this.__drawNode(this._nodeLibrary[cat][node], {x: this._paletteCamera.x + xPos, y: this._paletteCamera.y + yPos}, this._paletteContext);
+          var drawData = this.__drawNode(this._nodeLibrary[cat][node], {x: this._paletteCamera.x + xPos, y: this._paletteCamera.y + yPos}, this._paletteContext, true);
           yPos += drawData.rect.height + this._drawStyle.palette.spacing;
         }
       }
@@ -446,11 +446,11 @@ wcPlayEditor.prototype = {
    * @private
    * @param {wcNode[]} nodes - The node to render.
    * @param {external:Canvas~Context} context - The canvas context to render on.
-   * @param {wcPlayEditor~DrawNodeOptions} [options] - Custom options.
+   * @param {Boolean} [hideCollapsible] - If true, all collapsible properties will be hidden, even if the node is not collapsed.
    */
-  __drawNodes: function(nodes, context, options) {
+  __drawNodes: function(nodes, context, hideCollapsible) {
     for (var i = 0; i < nodes.length; ++i) {
-      this.__drawNode(nodes[i], nodes[i].pos, context, options);
+      this.__drawNode(nodes[i], nodes[i].pos, context, hideCollapsible);
     }
   },
 
@@ -461,10 +461,10 @@ wcPlayEditor.prototype = {
    * @param {wcNode} node - The node to render.
    * @param {wcPlay~Coordinates} pos - The position to render the node in the canvas, relative to the top-middle of the node.
    * @param {external:Canvas~Context} context - The canvas context to render on.
-   * @param {wcPlayEditor~DrawNodeOptions} [options] - Custom options.
+   * @param {Boolean} [hideCollapsible] - If true, all collapsible properties will be hidden, even if the node is not collapsed.
    * @returns {wcPlayEditor~DrawNodeData} - Data associated with the newly drawn node.
    */
-  __drawNode: function(node, pos, context, options) {
+  __drawNode: function(node, pos, context, hideCollapsible) {
     var data = {
       node: node,
       rect: {
@@ -479,7 +479,7 @@ wcPlayEditor.prototype = {
 
     // Take some measurements so we know where everything on the node should be drawn.
     var entryBounds  = this.__measureEntryLinks(node, context, pos);
-    var centerBounds = this.__measureCenter(node, context, {x: pos.x, y: pos.y + entryBounds.height});
+    var centerBounds = this.__measureCenter(node, context, {x: pos.x, y: pos.y + entryBounds.height}, hideCollapsible);
     var exitBounds   = this.__measureExitLinks(node, context, {x: pos.x, y: pos.y + entryBounds.height + centerBounds.height});
 
     var bounds = this.__expandRect([entryBounds, centerBounds, exitBounds]);
@@ -487,7 +487,7 @@ wcPlayEditor.prototype = {
     bounds.height = centerBounds.height;
 
     // Now use our measurements to draw our node.
-    var propBounds  = this.__drawCenter(node, context, bounds);
+    var propBounds  = this.__drawCenter(node, context, bounds, hideCollapsible);
     var entryLinkBounds = this.__drawEntryLinks(node, context, pos, entryBounds.width);
     var exitLinkBounds = this.__drawExitLinks(node, context, {x: pos.x, y: pos.y + entryBounds.height + centerBounds.height}, exitBounds.width);
 
@@ -682,9 +682,10 @@ wcPlayEditor.prototype = {
    * @param {wcNode} node - The node to measure.
    * @param {external:Canvas~Context} context - The canvas context.
    * @param {wcPlay~Coordinates} pos - The (top, center) position to measure.
+   * @param {Boolean} [hideCollapsible] - If true, all collapsible properties will be hidden, even if the node is not collapsed.
    * @returns {wcPlayEditor~Rect} - A bounding rectangle. The height is only the amount of space rendered within the node bounds (links stick out).
    */
-  __measureCenter: function(node, context, pos) {
+  __measureCenter: function(node, context, pos, hideCollapsible) {
     var bounds = {
       top: pos.y,
       left: pos.x,
@@ -701,7 +702,7 @@ wcPlayEditor.prototype = {
     var props = node.properties;
     for (var i = 0; i < props.length; ++i) {
       // Skip properties that are collapsible if it is not chained.
-      if (!collapsed || !props[i].options.collapsible || props[i].inputs.length || props[i].outputs.length) {
+      if ((!collapsed && !hideCollapsible) || !props[i].options.collapsible || props[i].inputs.length || props[i].outputs.length) {
         bounds.height += this._font.property.size + this._drawStyle.property.spacing;
 
         // Property name.
@@ -728,7 +729,7 @@ wcPlayEditor.prototype = {
    * @param {external:Canvas~Context} context - The canvas context.
    * @param {wcPlay~Coordinates} pos - The (top, center) position to draw the links on the canvas.
    * @param {Number} width - The width of the area to draw in.
-   * @returns {wcPlayEditor~BoundingData[]} - An array of bounding rectangles, one for each link 'nub'.
+   * @returns {wcPlayEditor~LinkBoundingData[]} - An array of bounding rectangles, one for each link 'nub'.
    */
   __drawEntryLinks: function(node, context, pos, width) {
     var xPos = pos.x - width/2 + this._drawStyle.links.margin;
@@ -795,7 +796,7 @@ wcPlayEditor.prototype = {
    * @param {external:Canvas~Context} context - The canvas context.
    * @param {wcPlay~Coordinates} pos - The (top, center) position to draw the links on the canvas.
    * @param {Number} width - The width of the area to draw in.
-   * @returns {wcPlayEditor~BoundingData[]} - An array of bounding rectangles, one for each link 'nub'.
+   * @returns {wcPlayEditor~LinkBoundingData[]} - An array of bounding rectangles, one for each link 'nub'.
    */
   __drawExitLinks: function(node, context, pos, width) {
     var xPos = pos.x - width/2 + this._drawStyle.links.margin;
@@ -861,9 +862,10 @@ wcPlayEditor.prototype = {
    * @param {wcNode} node - The node to draw.
    * @param {external:Canvas~Context} context - The canvas context.
    * @param {wcPlayEditor~Rect} rect - The bounding area to draw in.
+   * @param {Boolean} [hideCollapsible] - If true, all collapsible properties will be hidden, even if the node is not collapsed.
    * @returns {wcPlayEditor~DrawPropertyData} - Contains bounding rectangles for various drawings.
    */
-  __drawCenter: function(node, context, rect) {
+  __drawCenter: function(node, context, rect, hideCollapsible) {
     var upper = node.chain.entry.length? this._font.links.size + this._drawStyle.links.padding: 0;
     var lower = node.chain.exit.length? this._font.links.size + this._drawStyle.links.padding: 0;
 
@@ -930,7 +932,7 @@ wcPlayEditor.prototype = {
     for (var i = 0; i < props.length; ++i) {
 
       // Skip properties that are collapsible if it is not chained.
-      if (!collapsed || !props[i].options.collapsible || props[i].inputs.length || props[i].outputs.length) {
+      if ((!collapsed && !hideCollapsible) || !props[i].options.collapsible || props[i].inputs.length || props[i].outputs.length) {
         upper += this._font.property.size;
 
         // Property name.
@@ -1557,17 +1559,23 @@ wcPlayEditor.prototype = {
         hasTarget = true;
       }
 
+      // Exit links.
+      if (!hasTarget) {
+        for (var i = 0; i < node._meta.bounds.exitBounds.length; ++i) {
+          if (this.__inRect(this._mouse, node._meta.bounds.exitBounds[i].rect, this._viewportCamera)) {
+            hasTarget = true;
+            // Double click to manually fire this exit chain.
+            node.triggerExit(node._meta.bounds.exitBounds[i].name);
+            break;
+          }
+        }
+      }
+
       // Center area.
       if (!hasTarget && this.__inRect(this._mouse, node._meta.bounds.inner, this._viewportCamera)) {
         hasTarget = true;
         node.collapsed(!node.collapsed());
       }
-    }
-
-    // Click outside of a node begins the canvas drag process.
-    if (!hasTarget) {
-      this._viewportMoving = true;
-      this._viewportMoved = false;
     }
   },
 

@@ -3,8 +3,8 @@ $(document).ready(function() {
   var myPlay = new wcPlay({
     silent: false,
     updateRate: 10,
-    updateLimit: 1,
-    debugging: false,
+    updateLimit: 100,
+    debugging: true,
   });
 
   // Create an instance of our script editor.
@@ -42,18 +42,18 @@ $(document).ready(function() {
   operationNode.connectExit('out', logNode, 'in');
 
   // Lets collapse all the nodes so they take up less space.
-  // startNode.collapsed(true);
-  // logNode.collapsed(true);
-  // delayNode.collapsed(true);
-  // operationNode.collapsed(true);
-  // storageNode.collapsed(true);
+  startNode.collapsed(true);
+  logNode.collapsed(true);
+  delayNode.collapsed(true);
+  operationNode.collapsed(true);
+  storageNode.collapsed(true);
 
   // Start execution of the script.
   myPlay.start();
 
-  setTimeout(function() {
-    operationNode.debugBreak(true);
-  }, 500);
+  // setTimeout(function() {
+  //   operationNode.debugBreak(true);
+  // }, 500);
 
   $('body').on('keyup', function(event) {
     switch (event.keyCode) {

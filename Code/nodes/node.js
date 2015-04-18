@@ -36,12 +36,12 @@ Class.extend('wcNode', 'Node', '', {
     };
     this._collapsed = false;
     this._awake = false;
-    this._log = false;
     this._break = false;
     this._parent = parent;
 
     // Give the node its default properties.
     this.createProperty(wcNode.PROPERTY.ENABLED, wcPlay.PROPERTY_TYPE.TOGGLE, true, {collapsible: true});
+    this.createProperty(wcNode.PROPERTY.DEBUG_LOG, wcPlay.PROPERTY_TYPE.TOGGLE, false, {collapsible: true});
 
     var engine = this.engine();
     engine && engine.__addNode(this);
@@ -127,11 +127,11 @@ Class.extend('wcNode', 'Node', '', {
    */
   debugLog: function(enabled) {
     if (enabled !== undefined) {
-      this._log = enabled? true: false;
+      this.property(wcNode.PROPERTY.DEBUG_LOG, enabled? true: false);
     }
 
     var engine = this.engine();
-    return (!engine || engine.isSilent())? false: this._log;
+    return (!engine || engine.isSilent())? false: this.property(wcNode.PROPERTY.DEBUG_LOG);
   },
 
   /**
@@ -1037,4 +1037,5 @@ wcNode.CONNECT_RESULT = {
  */
 wcNode.PROPERTY = {
   ENABLED: 'enabled',
+  DEBUG_LOG: 'debug log',
 };
