@@ -1,0 +1,18 @@
+{
+  "name": "wcUndoManager",
+  "homepage": "http://undo.webcabin.org/",
+  "license": "MIT",
+  "ignore": [
+    "/.*",
+    "index.html"
+  ],
+  "_release": "b1a7df34d3",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "b1a7df34d32427b6c76e8c7068f198165d8f564b"
+  },
+  "_source": "git://github.com/WebCabin/wcUndoManager.git",
+  "_target": "master",
+  "_originalSource": "wc-undo-manager"
+}

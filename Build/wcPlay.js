@@ -188,6 +188,36 @@ wcPlay.prototype = {
   },
 
   /**
+   * Retrieves a node from a given ID, if it exists in this script.
+   * @function wcPlay#nodeById
+   * @param {Number} id - The ID of the node.
+   * @returns {wcNode|null} - Either the found node, or null.
+   */
+  nodeById: function(id) {
+    for (var i = 0; i < this._storageNodes.length; ++i) {
+      if (this._storageNodes[i].id === id) {
+        return this._storageNodes[i];
+      }
+    }
+    for (var i = 0; i < this._processNodes.length; ++i) {
+      if (this._processNodes[i].id === id) {
+        return this._processNodes[i];
+      }
+    }
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      if (this._compositeNodes[i].id === id) {
+        return this._compositeNodes[i];
+      }
+    }
+    for (var i = 0; i < this._entryNodes.length; ++i) {
+      if (this._entryNodes[i].id === id) {
+        return this._entryNodes[i];
+      }
+    }
+    return null;
+  },
+
+  /**
    * Update handler.
    * @function wcPlay#update
    */
@@ -579,8 +609,15 @@ function wcPlayEditor(container, options) {
   this._selectedExitLink = false;
   this._selectedInputLink = false;
   this._selectedOutputLink = false;
+  this._selectedNodeOrigin = null;
 
   this._draggingNodeData = null;
+
+  // Undo management is optional.
+  this._undoManager = null;
+  if (window.wcUndoManager) {
+    this._undoManager = new wcUndoManager();
+  }
 
   // Setup our options.
   this._options = {
@@ -2069,17 +2106,44 @@ wcPlayEditor.prototype = {
       }
     }
 
+    var self = this;
+    function undoChange(node, name, oldValue, newValue) {
+      self._undoManager && self._undoManager.addEvent('Property "' + name + '" changed for Node "' + node.category + '.' + node.type + '"',
+      {
+        id: node.id,
+        name: name,
+        oldValue: oldValue,
+        newValue: newValue,
+        editor: self,
+      },
+      // Undo
+      function() {
+        var myNode = this.editor._engine.nodeById(this.id);
+        // Always reset the new value to the 'current' new value, the script may have changed it through execution.
+        this.newValue = myNode.property(this.name);
+        myNode.property(this.name, this.oldValue);
+      },
+      // Redo
+      function() {
+        var myNode = this.editor._engine.nodeById(this.id);
+        myNode.property(this.name, this.newValue);
+      });
+    };
+
     // Determine what editor to use for the property.
     switch (type) {
       case wcPlay.PROPERTY_TYPE.TOGGLE:
         // Toggles do not show an editor, instead, they just toggle their state.
-        node.property(property.name, !node.property(property.name));
+        var state = node.property(property.name);
+        undoChange(node, property.name, state, !state);
+        node.property(property.name, !state);
         break;
       case wcPlay.PROPERTY_TYPE.NUMBER:
         $control = $('<input type="number"' + (property.options.min? ' min="' + property.options.min + '"': '') + (property.options.max? ' max="' + property.options.max + '"': '') + (property.options.step? ' step="' + property.options.step + '"': '') + '>');
         $control.val(parseFloat(node.property(property.name)));
         $control.change(function() {
           if (!cancelled) {
+            undoChange(node, property.name, node.property(property.name), $control.val());
             node.property(property.name, $control.val());
           }
         });
@@ -2094,6 +2158,7 @@ wcPlayEditor.prototype = {
         $control.val(node.property(property.name).toString());
         $control.change(function() {
           if (!cancelled) {
+            undoChange(node, property.name, node.property(property.name), $control.val());
             node.property(property.name, $control.val());
           }
         });
@@ -2177,9 +2242,77 @@ wcPlayEditor.prototype = {
     switch (event.keyCode) {
       case 46: // Delete key to delete selected nodes.
         if (this._selectedNode) {
+          this._undoManager && this._undoManager.addEvent('Removed Node "' + this._selectedNode.category + '.' + this._selectedNode.type + '"',
+          {
+            id: this._selectedNode.id,
+            className: this._selectedNode.className,
+            pos: {
+              x: this._selectedNode.pos.x,
+              y: this._selectedNode.pos.y,
+            },
+            collapsed: this._selectedNode.collapsed(),
+            breakpoint: this._selectedNode._break,
+            properties: this._selectedNode.listProperties(),
+            entryChains: this._selectedNode.listEntryChains(),
+            exitChains: this._selectedNode.listExitChains(),
+            inputChains: this._selectedNode.listInputChains(),
+            outputChains: this._selectedNode.listOutputChains(),
+            editor: this,
+          },
+          // Undo
+          function() {
+            var myNode = new window[this.className](this.editor._engine, this.pos);
+            myNode.id = this.id;
+            myNode.collapsed(this.collapsed);
+            myNode.debugBreak(this.breakpoint);
+            // Restore property values.
+            for (var i = 0; i < this.properties.length; ++i) {
+              myNode.initialProperty(this.properties[i].name, this.properties[i].initialValue);
+              myNode.property(this.properties[i].name, this.properties[i].value);
+            }
+            // Re-connect all chains.
+            for (var i = 0; i < this.entryChains.length; ++i) {
+              var chain = this.entryChains[i];
+              var targetNode = this.editor._engine.nodeById(chain.outNodeId);
+              myNode.connectEntry(chain.inName, targetNode, chain.outName);
+            }
+            for (var i = 0; i < this.exitChains.length; ++i) {
+              var chain = this.exitChains[i];
+              var targetNode = this.editor._engine.nodeById(chain.inNodeId);
+              myNode.connectExit(chain.outName, targetNode, chain.inName);
+            }
+            for (var i = 0; i < this.inputChains.length; ++i) {
+              var chain = this.inputChains[i];
+              var targetNode = this.editor._engine.nodeById(chain.outNodeId);
+              myNode.connectInput(chain.inName, targetNode, chain.outName);
+            }
+            for (var i = 0; i < this.outputChains.length; ++i) {
+              var chain = this.outputChains[i];
+              var targetNode = this.editor._engine.nodeById(chain.outNodeId);
+              myNode.connectOutput(chain.inName, targetNode, chain.outName);
+            }
+          },
+          // Redo
+          function() {
+            var myNode = this.editor._engine.nodeById(this.id);
+            myNode.destroy();
+          });
+
           this._selectedNode.destroy();
           this._selectedNode = null;
         }
+      case 'Z'.charCodeAt(0): // Ctrl+Z to undo last action.
+        if (event.ctrlKey && !event.shiftKey) {
+          this._undoManager && this._undoManager.undo();
+        }
+        if (!event.shiftKey) {
+          break;
+        }
+      case 'Y'.charCodeAt(0): // Ctrl+Shift+Z or Ctrl+Y to redo action.
+        if (event.ctrlKey) {
+          this._undoManager && this._undoManager.redo();
+        }
+        break;
     }
   },
 
@@ -2482,6 +2615,30 @@ wcPlayEditor.prototype = {
             hasTarget = true;
             // Alt click to disconnect all chains from this link.
             if (event.altKey) {
+              var chains = node.listEntryChains(node._meta.bounds.entryBounds[i].name);
+              if (chains.length) {
+                this._undoManager && this._undoManager.addEvent('Disconnected Entry Links for "' + node.category + '.' + node.type + '.' + node._meta.bounds.entryBounds[i].name + '"',
+                  {
+                    id: node.id,
+                    name: node._meta.bounds.entryBounds[i].name,
+                    chains: chains,
+                    editor: this,
+                  },
+                  // Undo
+                  function() {
+                    var myNode = this.editor._engine.nodeById(this.id);
+                    for (var i = 0; i < this.chains.length; ++i) {
+                      var targetNode = this.editor._engine.nodeById(this.chains[i].outNodeId);
+                      var targetName = this.chains[i].outName;
+                      myNode.connectEntry(this.name, targetNode, targetName);
+                    }
+                  },
+                  // Redo
+                  function() {
+                    var myNode = this.editor._engine.nodeById(this.id);
+                    myNode.disconnectEntry(this.name);
+                  });
+              }
               node.disconnectEntry(node._meta.bounds.entryBounds[i].name);
               break;
             }
@@ -2499,6 +2656,30 @@ wcPlayEditor.prototype = {
             hasTarget = true;
             // Alt click to disconnect all chains from this link.
             if (event.altKey) {
+              var chains = node.listExitChains(node._meta.bounds.exitBounds[i].name);
+              if (chains.length) {
+                this._undoManager && this._undoManager.addEvent('Disconnected Exit Links for "' + node.category + '.' + node.type + '.' + node._meta.bounds.exitBounds[i].name + '"',
+                  {
+                    id: node.id,
+                    name: node._meta.bounds.exitBounds[i].name,
+                    chains: chains,
+                    editor: this,
+                  },
+                  // Undo
+                  function() {
+                    var myNode = this.editor._engine.nodeById(this.id);
+                    for (var i = 0; i < this.chains.length; ++i) {
+                      var targetNode = this.editor._engine.nodeById(this.chains[i].inNodeId);
+                      var targetName = this.chains[i].inName;
+                      myNode.connectExit(this.name, targetNode, targetName);
+                    }
+                  },
+                  // Redo
+                  function() {
+                    var myNode = this.editor._engine.nodeById(this.id);
+                    myNode.disconnectExit(this.name);
+                  });
+              }
               node.disconnectExit(node._meta.bounds.exitBounds[i].name);
               break;
             } 
@@ -2521,6 +2702,30 @@ wcPlayEditor.prototype = {
             hasTarget = true;
             // Alt click to disconnect all chains from this link.
             if (event.altKey) {
+              var chains = node.listInputChains(node._meta.bounds.inputBounds[i].name);
+              if (chains.length) {
+                this._undoManager && this._undoManager.addEvent('Disconnected Property Input Links for "' + node.category + '.' + node.type + '.' + node._meta.bounds.inputBounds[i].name + '"',
+                  {
+                    id: node.id,
+                    name: node._meta.bounds.inputBounds[i].name,
+                    chains: chains,
+                    editor: this,
+                  },
+                  // Undo
+                  function() {
+                    var myNode = this.editor._engine.nodeById(this.id);
+                    for (var i = 0; i < this.chains.length; ++i) {
+                      var targetNode = this.editor._engine.nodeById(this.chains[i].outNodeId);
+                      var targetName = this.chains[i].outName;
+                      myNode.connectInput(this.name, targetNode, targetName);
+                    }
+                  },
+                  // Redo
+                  function() {
+                    var myNode = this.editor._engine.nodeById(this.id);
+                    myNode.disconnectInput(this.name);
+                  });
+              }
               node.disconnectInput(node._meta.bounds.inputBounds[i].name);
               break;
             }
@@ -2538,6 +2743,30 @@ wcPlayEditor.prototype = {
             hasTarget = true;
             // Alt click to disconnect all chains from this link.
             if (event.altKey) {
+              var chains = node.listOutputChains(node._meta.bounds.outputBounds[i].name);
+              if (chains.length) {
+                this._undoManager && this._undoManager.addEvent('Disconnected Property Output Links for "' + node.category + '.' + node.type + '.' + node._meta.bounds.outputBounds[i].name + '"',
+                  {
+                    id: node.id,
+                    name: node._meta.bounds.outputBounds[i].name,
+                    chains: chains,
+                    editor: this,
+                  },
+                  // Undo
+                  function() {
+                    var myNode = this.editor._engine.nodeById(this.id);
+                    for (var i = 0; i < this.chains.length; ++i) {
+                      var targetNode = this.editor._engine.nodeById(this.chains[i].inNodeId);
+                      var targetName = this.chains[i].inName;
+                      myNode.connectOutput(this.name, targetNode, targetName);
+                    }
+                  },
+                  // Redo
+                  function() {
+                    var myNode = this.editor._engine.nodeById(this.id);
+                    myNode.disconnectOutput(this.name);
+                  });
+              }
               node.disconnectOutput(node._meta.bounds.outputBounds[i].name);
               break;
             }
@@ -2553,6 +2782,10 @@ wcPlayEditor.prototype = {
         hasTarget = true;
         this._selectedNode = node;
         this._viewportMovingNode = true;
+        this._selectedNodeOrigin = {
+          x: node.pos.x,
+          y: node.pos.y,
+        };
       }
     }
 
@@ -2579,12 +2812,46 @@ wcPlayEditor.prototype = {
       if (node) {
         // Collapser button.
         if (this.__inRect(this._mouse, node._meta.bounds.collapser, this._viewportCamera)) {
-          node.collapsed(!node.collapsed());
+          var state = !node.collapsed();
+          node.collapsed(state);
+          this._undoManager && this._undoManager.addEvent((state? 'Collapsed': 'Expanded') + ' Node "' + node.category + '.' + node.type + '"',
+          {
+            id: node.id,
+            state: state,
+            editor: this,
+          },
+          // Undo
+          function() {
+            var myNode = this.editor._engine.nodeById(this.id);
+            myNode.collapsed(!this.state);
+          },
+          // Redo
+          function() {
+            var myNode = this.editor._engine.nodeById(this.id);
+            myNode.collapsed(this.state);
+          });
         }
 
         // Breakpoint button.
         if (this.__inRect(this._mouse, node._meta.bounds.breakpoint, this._viewportCamera)) {
-          node.debugBreak(!node._break);
+          var state = !node._break;
+          node.debugBreak(state);
+          this._undoManager && this._undoManager.addEvent((state? 'Enabled': 'Disabled') + ' Breakpoint on Node "' + node.category + '.' + node.type + '"',
+          {
+            id: node.id,
+            state: state,
+            editor: this,
+          },
+          // Undo
+          function() {
+            var myNode = this.editor._engine.nodeById(this.id);
+            myNode.debugBreak(!this.state);
+          },
+          // Redo
+          function() {
+            var myNode = this.editor._engine.nodeById(this.id);
+            myNode.debugBreak(this.state);
+          });
         }
 
         // Property values.
@@ -2687,6 +2954,27 @@ wcPlayEditor.prototype = {
         y: (mouse.y + this._draggingNodeData.offset.y) / this._viewportCamera.z,
       });
 
+      this._undoManager && this._undoManager.addEvent('Created Node "' + newNode.category + '.' + newNode.type + '"',
+      {
+        id: newNode.id,
+        className: newNode.className,
+        pos: {
+          x: newNode.pos.x,
+          y: newNode.pos.y,
+        },
+        editor: this,
+      },
+      // Undo
+      function() {
+        var myNode = this.editor._engine.nodeById(this.id);
+        myNode.destroy();
+      },
+      // Redo
+      function() {
+        var myNode = new window[this.className](this.editor._engine, this.pos);
+        myNode.id = this.id;
+      });
+
       this._draggingNodeData.$canvas.remove();
       this._draggingNodeData.$canvas = null;
       this._draggingNodeData = null;
@@ -2694,25 +2982,221 @@ wcPlayEditor.prototype = {
       this.$viewport.removeClass('wcMoving');
     }
 
+    // Finished moving a node.
+    if (this._selectedNode && this._selectedNodeOrigin) {
+      if (this._selectedNode.pos.x !== this._selectedNodeOrigin.x || this._selectedNode.pos.y !== this._selectedNodeOrigin.y) {
+        this._undoManager && this._undoManager.addEvent('Moved Node "' + this._selectedNode.category + '.' + this._selectedNode.type + '"',
+        {
+          id: this._selectedNode.id,
+          start: {
+            x: this._selectedNodeOrigin.x,
+            y: this._selectedNodeOrigin.y,
+          },
+          end: {
+            x: this._selectedNode.pos.x,
+            y: this._selectedNode.pos.y,
+          },
+          editor: this,
+        },
+        // Undo
+        function() {
+          var myNode = this.editor._engine.nodeById(this.id);
+          myNode.pos.x = this.start.x;
+          myNode.pos.y = this.start.y;
+        },
+        // Redo
+        function() {
+          var myNode = this.editor._engine.nodeById(this.id);
+          myNode.pos.x = this.end.x;
+          myNode.pos.y = this.end.y;
+        });
+      }
+      this._selectedNodeOrigin = null;
+    }
+
     // Check for link connections.
     if (this._selectedNode && this._selectedEntryLink && this._highlightNode && this._highlightExitLink) {
       if (this._selectedNode.connectEntry(this._selectedEntryLink.name, this._highlightNode, this._highlightExitLink.name) === wcNode.CONNECT_RESULT.ALREADY_CONNECTED) {
         this._selectedNode.disconnectEntry(this._selectedEntryLink.name, this._highlightNode, this._highlightExitLink.name);
+        this._undoManager && this._undoManager.addEvent('Disconnected Entry Link "' + this._selectedNode.category + '.' + this._selectedNode.type + '.' + this._selectedEntryLink.name + '" to Exit Link "' + this._highlightNode.category + '.' + this._highlightNode.type + '.' + this._highlightExitLink.name + '"',
+        {
+          id: this._selectedNode.id,
+          name: this._selectedEntryLink.name,
+          targetId: this._highlightNode.id,
+          targetName: this._highlightExitLink.name,
+          editor: this,
+        },
+        // Undo
+        function() {
+          var myNode = this.editor._engine.nodeById(this.id);
+          var targetNode = this.editor._engine.nodeById(this.targetId);
+          myNode.connectEntry(this.name, targetNode, this.targetName);
+        },
+        // Redo
+        function() {
+          var myNode = this.editor._engine.nodeById(this.id);
+          var targetNode = this.editor._engine.nodeById(this.targetId);
+          myNode.disconnectEntry(this.name, targetNode, this.targetName);
+        });
+      } else {
+        this._undoManager && this._undoManager.addEvent('Connected Entry Link "' + this._selectedNode.category + '.' + this._selectedNode.type + '.' + this._selectedEntryLink.name + '" to Exit Link "' + this._highlightNode.category + '.' + this._highlightNode.type + '.' + this._highlightExitLink.name + '"',
+        {
+          id: this._selectedNode.id,
+          name: this._selectedEntryLink.name,
+          targetId: this._highlightNode.id,
+          targetName: this._highlightExitLink.name,
+          editor: this,
+        },
+        // Undo
+        function() {
+          var myNode = this.editor._engine.nodeById(this.id);
+          var targetNode = this.editor._engine.nodeById(this.targetId);
+          myNode.disconnectEntry(this.name, targetNode, this.targetName);
+        },
+        // Redo
+        function() {
+          var myNode = this.editor._engine.nodeById(this.id);
+          var targetNode = this.editor._engine.nodeById(this.targetId);
+          myNode.connectEntry(this.name, targetNode, this.targetName);
+        });
       }
     }
     if (this._selectedNode && this._selectedExitLink && this._highlightNode && this._highlightEntryLink) {
       if (this._selectedNode.connectExit(this._selectedExitLink.name, this._highlightNode, this._highlightEntryLink.name) === wcNode.CONNECT_RESULT.ALREADY_CONNECTED) {
         this._selectedNode.disconnectExit(this._selectedExitLink.name, this._highlightNode, this._highlightEntryLink.name);
+        this._undoManager && this._undoManager.addEvent('Disconnected Exit Link "' + this._selectedNode.category + '.' + this._selectedNode.type + '.' + this._selectedExitLink.name + '" to Entry Link "' + this._highlightNode.category + '.' + this._highlightNode.type + '.' + this._highlightEntryLink.name + '"',
+        {
+          id: this._selectedNode.id,
+          name: this._selectedExitLink.name,
+          targetId: this._highlightNode.id,
+          targetName: this._highlightEntryLink.name,
+          editor: this,
+        },
+        // Undo
+        function() {
+          var myNode = this.editor._engine.nodeById(this.id);
+          var targetNode = this.editor._engine.nodeById(this.targetId);
+          myNode.connectExit(this.name, targetNode, this.targetName);
+        },
+        // Redo
+        function() {
+          var myNode = this.editor._engine.nodeById(this.id);
+          var targetNode = this.editor._engine.nodeById(this.targetId);
+          myNode.disconnectExit(this.name, targetNode, this.targetName);
+        });
+      } else {
+        this._undoManager && this._undoManager.addEvent('Connected Exit Link "' + this._selectedNode.category + '.' + this._selectedNode.type + '.' + this._selectedExitLink.name + '" to Entry Link "' + this._highlightNode.category + '.' + this._highlightNode.type + '.' + this._highlightEntryLink.name + '"',
+        {
+          id: this._selectedNode.id,
+          name: this._selectedExitLink.name,
+          targetId: this._highlightNode.id,
+          targetName: this._highlightEntryLink.name,
+          editor: this,
+        },
+        // Undo
+        function() {
+          var myNode = this.editor._engine.nodeById(this.id);
+          var targetNode = this.editor._engine.nodeById(this.targetId);
+          myNode.disconnectExit(this.name, targetNode, this.targetName);
+        },
+        // Redo
+        function() {
+          var myNode = this.editor._engine.nodeById(this.id);
+          var targetNode = this.editor._engine.nodeById(this.targetId);
+          myNode.connectExit(this.name, targetNode, this.targetName);
+        });
       }
     }
     if (this._selectedNode && this._selectedInputLink && this._highlightNode && this._highlightOutputLink) {
       if (this._selectedNode.connectInput(this._selectedInputLink.name, this._highlightNode, this._highlightOutputLink.name) === wcNode.CONNECT_RESULT.ALREADY_CONNECTED) {
         this._selectedNode.disconnectInput(this._selectedInputLink.name, this._highlightNode, this._highlightOutputLink.name);
+        this._undoManager && this._undoManager.addEvent('Disconnected Property Input Link "' + this._selectedNode.category + '.' + this._selectedNode.type + '.' + this._selectedInputLink.name + '" to Property Output Link "' + this._highlightNode.category + '.' + this._highlightNode.type + '.' + this._highlightOutputLink.name + '"',
+        {
+          id: this._selectedNode.id,
+          name: this._selectedInputLink.name,
+          targetId: this._highlightNode.id,
+          targetName: this._highlightOutputLink.name,
+          editor: this,
+        },
+        // Undo
+        function() {
+          var myNode = this.editor._engine.nodeById(this.id);
+          var targetNode = this.editor._engine.nodeById(this.targetId);
+          myNode.connectInput(this.name, targetNode, this.targetName);
+        },
+        // Redo
+        function() {
+          var myNode = this.editor._engine.nodeById(this.id);
+          var targetNode = this.editor._engine.nodeById(this.targetId);
+          myNode.disconnectInput(this.name, targetNode, this.targetName);
+        });
+      } else {
+        this._undoManager && this._undoManager.addEvent('Connected Property Input Link "' + this._selectedNode.category + '.' + this._selectedNode.type + '.' + this._selectedInputLink.name + '" to Property Output Link "' + this._highlightNode.category + '.' + this._highlightNode.type + '.' + this._highlightOutputLink.name + '"',
+        {
+          id: this._selectedNode.id,
+          name: this._selectedInputLink.name,
+          targetId: this._highlightNode.id,
+          targetName: this._highlightOutputLink.name,
+          editor: this,
+        },
+        // Undo
+        function() {
+          var myNode = this.editor._engine.nodeById(this.id);
+          var targetNode = this.editor._engine.nodeById(this.targetId);
+          myNode.disconnectInput(this.name, targetNode, this.targetName);
+        },
+        // Redo
+        function() {
+          var myNode = this.editor._engine.nodeById(this.id);
+          var targetNode = this.editor._engine.nodeById(this.targetId);
+          myNode.connectInput(this.name, targetNode, this.targetName);
+        });
       }
     }
     if (this._selectedNode && this._selectedOutputLink && this._highlightNode && this._highlightInputLink) {
       if (this._selectedNode.connectOutput(this._selectedOutputLink.name, this._highlightNode, this._highlightInputLink.name) === wcNode.CONNECT_RESULT.ALREADY_CONNECTED) {
         this._selectedNode.disconnectOutput(this._selectedOutputLink.name, this._highlightNode, this._highlightInputLink.name);
+        this._undoManager && this._undoManager.addEvent('Disconnected Property Output Link "' + this._selectedNode.category + '.' + this._selectedNode.type + '.' + this._selectedOutputLink.name + '" to Property Input Link "' + this._highlightNode.category + '.' + this._highlightNode.type + '.' + this._highlightInputLink.name + '"',
+        {
+          id: this._selectedNode.id,
+          name: this._selectedOutputLink.name,
+          targetId: this._highlightNode.id,
+          targetName: this._highlightInputLink.name,
+          editor: this,
+        },
+        // Undo
+        function() {
+          var myNode = this.editor._engine.nodeById(this.id);
+          var targetNode = this.editor._engine.nodeById(this.targetId);
+          myNode.connectOutput(this.name, targetNode, this.targetName);
+        },
+        // Redo
+        function() {
+          var myNode = this.editor._engine.nodeById(this.id);
+          var targetNode = this.editor._engine.nodeById(this.targetId);
+          myNode.disconnectOutput(this.name, targetNode, this.targetName);
+        });
+      } else {
+        this._undoManager && this._undoManager.addEvent('Connected Property Output Link "' + this._selectedNode.category + '.' + this._selectedNode.type + '.' + this._selectedOutputLink.name + '" to Property Input Link "' + this._highlightNode.category + '.' + this._highlightNode.type + '.' + this._highlightInputLink.name + '"',
+        {
+          id: this._selectedNode.id,
+          name: this._selectedOutputLink.name,
+          targetId: this._highlightNode.id,
+          targetName: this._highlightInputLink.name,
+          editor: this,
+        },
+        // Undo
+        function() {
+          var myNode = this.editor._engine.nodeById(this.id);
+          var targetNode = this.editor._engine.nodeById(this.targetId);
+          myNode.disconnectOutput(this.name, targetNode, this.targetName);
+        },
+        // Redo
+        function() {
+          var myNode = this.editor._engine.nodeById(this.id);
+          var targetNode = this.editor._engine.nodeById(this.targetId);
+          myNode.connectOutput(this.name, targetNode, this.targetName);
+        });
       }
     }
 
@@ -2820,6 +3304,7 @@ wcPlayEditor.prototype = {
 
   },
 };
+var wcNodeNextID = 0;
 Class.extend('wcNode', 'Node', '', {
   /**
    * @class
@@ -2834,6 +3319,7 @@ Class.extend('wcNode', 'Node', '', {
    * @param {String} [type="Node"] - The type name of the node, as displayed on the title bar.
    */
   init: function(parent, pos, type) {
+    this.id = ++wcNodeNextID;
     this.type = type || this.name;
     this.name = '';
     this.color = '#FFFFFF';
@@ -3594,6 +4080,125 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
+   * Retrieves a list of all chains connected to an entry link on this node.
+   * @function wcNode#listEntryChains
+   * @param {String} [name] - The entry link, if omitted, all link chains are retrieved.
+   * @returns {wcNode~ChainData[]} - A list of all chains connected to this link, if the link was not found, an empty list is returned.
+   */
+  listEntryChains: function(name) {
+    var result = [];
+    for (var i = 0; i < this.chain.entry.length; ++i) {
+      if (!name || this.chain.entry[i].name === name) {
+        var myLink = this.chain.entry[i];
+        for (var a = 0; a < myLink.links.length; ++a) {
+          result.push({
+            inName: myLink.name,
+            inNodeId: this.id,
+            outName: myLink.links[a].name,
+            outNodeId: myLink.links[a].node.id,
+          });
+        }
+      }
+    }
+
+    return result;
+  },
+
+  /**
+   * Retrieves a list of all chains connected to an exit link on this node.
+   * @function wcNode#listExitChains
+   * @param {String} [name] - The exit link, if omitted, all link chains are retrieved.
+   * @returns {wcNode~ChainData[]} - A list of all chains connected to this link, if the link was not found, an empty list is returned.
+   */
+  listExitChains: function(name) {
+    var result = [];
+    for (var i = 0; i < this.chain.exit.length; ++i) {
+      if (!name || this.chain.exit[i].name === name) {
+        var myLink = this.chain.exit[i];
+        for (var a = 0; a < myLink.links.length; ++a) {
+          result.push({
+            inName: myLink.links[a].name,
+            inNodeId: myLink.links[a].node.id,
+            outName: myLink.name,
+            outNodeId: this.id,
+          });
+        }
+      }
+    }
+
+    return result;
+  },
+
+  /**
+   * Retrieves a list of all chains connected to a property input link on this node.
+   * @function wcNode#listInputChains
+   * @param {String} [name] - The property input link, if omitted, all link chains are retrieved.
+   * @returns {wcNode~ChainData[]} - A list of all chains connected to this link, if the link was not found, an empty list is returned.
+   */
+  listInputChains: function(name) {
+    var result = [];
+    for (var i = 0; i < this.properties.length; ++i) {
+      if (!name || this.properties[i].name === name) {
+        var myProp = this.properties[i];
+        for (var a = 0; a < myProp.inputs.length; ++a) {
+          result.push({
+            inName: myProp.name,
+            inNodeId: this.id,
+            outName: myProp.inputs[a].name,
+            outNodeId: myProp.inputs[a].node.id,
+          });
+        }
+      }
+    }
+
+    return result;
+  },
+
+  /**
+   * Retrieves a list of all chains connected to a property output link on this node.
+   * @function wcNode#listOutputChains
+   * @param {String} [name] - The property output link, if omitted, all link chains are retrieved.
+   * @returns {wcNode~ChainData[]} - A list of all chains connected to this link, if the link was not found, an empty list is returned.
+   */
+  listOutputChains: function(name) {
+    var result = [];
+    for (var i = 0; i < this.properties.length; ++i) {
+      if (!name || this.properties[i].name === name) {
+        var myProp = this.properties[i];
+        for (var a = 0; a < myProp.outputs.length; ++a) {
+          result.push({
+            inName: myProp.outputs[a].name,
+            inNodeId: myProp.outputs[a].node.id,
+            outName: myProp.name,
+            outNodeId: this.id,
+          });
+        }
+      }
+    }
+
+    return result;
+  },
+
+  /**
+   * Retrieves a list of all properties and their values for this node.
+   * @function wcNode#listProperties
+   * @returns {wcNode~PropertyData[]} - A list of all property data.
+   */
+  listProperties: function() {
+    var result = [];
+    for (var i = 0; i < this.properties.length; ++i) {
+      var myProp = this.properties[i];
+      result.push({
+        name: myProp.name,
+        value: myProp.value,
+        initialValue: myProp.initialValue,
+      });
+    }
+
+    return result;
+  },
+
+  /**
    * Triggers an entry link and activates this node.
    * @function wcNode#triggerEntry
    * @param {String} name - The name of the entry link to trigger.
@@ -3697,6 +4302,22 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
+   * Gets, or Sets the initial value of a property.
+   * @function wcNode#initialProperty
+   * @param {String} name - The name of the property.
+   * @param {Object} [value] - If supplied, will assign a new default value to the property.
+   * @returns {Object|undefined} - The default value of the property, or undefined if not found.
+   */
+  initialProperty: function(name, value) {
+    for (var i = 0; i < this.properties.length; ++i) {
+      var prop = this.properties[i];
+      if (prop.name === name) {
+        prop.initialValue = value;
+      }
+    }
+  },
+
+  /**
    * Triggers a property that is about to be changed by the output of another property.
    * @function wcNode#triggerProperty
    * @param {String} name - The name of the property.
@@ -3715,22 +4336,6 @@ Class.extend('wcNode', 'Node', '', {
         if (this.debugBreak() || (engine && engine.stepping())) {
           prop.inputMeta.paused = true;
         }
-      }
-    }
-  },
-
-  /**
-   * Gets, or Sets the initial value of a property.
-   * @function wcNode#initialValue
-   * @param {String} name - The name of the property.
-   * @param {Object} [value] - If supplied, will assign a new default value to the property.
-   * @returns {Object|undefined} - The default value of the property, or undefined if not found.
-   */
-  initialValue: function(name, value) {
-    for (var i = 0; i < this.properties.length; ++i) {
-      var prop = this.properties[i];
-      if (prop.name === name) {
-        prop.initialValue = value;
       }
     }
   },

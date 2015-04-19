@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>wcPlay Class: wcNodeEntryStart</title>
+	<title>wcPlay Class: wcNodeProcessConsoleLog</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -46,16 +46,16 @@
 		<div id="main">
     		
 
-	<h1 class="page-title">Class: wcNodeEntryStart</h1>
+	<h1 class="page-title">Class: wcNodeProcessConsoleLog</h1>
 <section>
 
 <header>
     
         <h2>
-        wcNodeEntryStart
+        wcNodeProcessConsoleLog
         </h2>
         
-            <div class="class-description"><p style="margin-left:20px;">An entry node that fires as soon as the script <a href="wcPlay.html#start">starts</a>.<br>When inheriting, make sure to include 'this._super(parent, pos, type);' at the top of your init function.</p></div>
+            <div class="class-description"><p style="margin-left:20px;">For debugging purposes, will print out a message into the console log the moment it is activated. <a href="wcPlay.html#~Options">Silent mode</a> will silence this node.<br>When inheriting, make sure to include 'this._super(parent, pos, type);' at the top of your init function.</p></div>
         
     
 </header>
@@ -67,7 +67,7 @@
         
 <hr>
 <dt>
-    <h4 class="name" id="wcNodeEntryStart"><toc class="small"><i></i></toc><toc> </toc><toc>new </toc><toc><b>wcNodeEntryStart</b>(parent, pos, <span class="optional">type</span>)</toc>
+    <h4 class="name" id="wcNodeProcessConsoleLog"><toc class="small"><i></i></toc><toc> </toc><toc>new </toc><toc><b>wcNodeProcessConsoleLog</b>(parent, pos, <span class="optional">type</span>)</toc>
         
     </h4>
 
@@ -209,7 +209,7 @@
             
                 <td class="default">
                 
-                    "Start"
+                    "Log"
                 
                 </td>
             
@@ -269,14 +269,14 @@
 
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="nodes_entry_start.js.html">nodes/entry/start.js</a>,
-     <a href="nodes_entry_start.js.html#sunlight-1-line-2">line 2</a>
+    <a href="nodes_process_consolelog.js.html">nodes/process/consolelog.js</a>,
+     <a href="nodes_process_consolelog.js.html#sunlight-1-line-2">line 2</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="nodes_entry_start.js.html">nodes/entry/start.js</a>,
-				 <a href="nodes_entry_start.js.html#sunlight-1-line-2">line 2</a>
+				<a href="nodes_process_consolelog.js.html">nodes/process/consolelog.js</a>,
+				 <a href="nodes_process_consolelog.js.html#sunlight-1-line-2">line 2</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -313,7 +313,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="onStart"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onStart</b>()</toc>
+    <h4 class="name" id="onTriggered"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onTriggered</b>(name)</toc>
         
     </h4>
 
@@ -323,7 +323,7 @@
     
     
     <div class="description">
-        <p style="margin-left: 20px;">Event that is called as soon as the Play script has started.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
+        <p style="margin-left: 20px;">Event that is called when an entry link has been triggered.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
     </div>
     
 
@@ -332,6 +332,55 @@
     
     
     
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The name of the entry link triggered.</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
     
     
     
@@ -380,14 +429,14 @@
 
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="nodes_entry_start.js.html">nodes/entry/start.js</a>,
-     <a href="nodes_entry_start.js.html#sunlight-1-line-16">line 16</a>
+    <a href="nodes_process_consolelog.js.html">nodes/process/consolelog.js</a>,
+     <a href="nodes_process_consolelog.js.html#sunlight-1-line-19">line 19</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="nodes_entry_start.js.html">nodes/entry/start.js</a>,
-				 <a href="nodes_entry_start.js.html#sunlight-1-line-16">line 16</a>
+				<a href="nodes_process_consolelog.js.html">nodes/process/consolelog.js</a>,
+				 <a href="nodes_process_consolelog.js.html#sunlight-1-line-19">line 19</a>
 			</li>
 		</ul>
 	</dd> -->

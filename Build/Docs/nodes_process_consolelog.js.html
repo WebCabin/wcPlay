@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>wcPlay Classes</title>
+	<title>wcPlay Source: nodes/process/consolelog.js</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -41,139 +41,60 @@
 <div class="row">
 
 	
-	<div class="col-xs-8 col-sm-8 col-md-8 col-xs-offset-1">
+	<div class="col-md-10 col-md-offset-1">
 	
 		<div id="main">
     		
 
-	<h1 class="page-title">Classes</h1>
+		<h1 class="page-title">Source: nodes/process/consolelog.js</h1>
+    
 <section>
+	<article>
+		<pre
+			class="sunlight-highlight-javascript linenums">wcNodeProcess.extend('wcNodeProcessConsoleLog', 'Console Log', 'Debugging', {
+  /**
+   * @class
+   * For debugging purposes, will print out a message into the console log the moment it is activated. [Silent mode]{@link wcPlay~Options} will silence this node.&lt;br>
+   * When inheriting, make sure to include 'this._super(parent, pos, type);' at the top of your init function.
+   *
+   * @constructor wcNodeProcessConsoleLog
+   * @param {String} parent - The parent object of this node.
+   * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
+   * @param {String} [type="Log"] - The type name of the node, as displayed on the title bar.
+   */
+  init: function(parent, pos, type) {
+    this._super(parent, pos, type);
 
-<header>
-    
-        <h2>
-        
-        </h2>
-        
-    
-</header>
+    // Create the message property so we know what to output in the log.
+    this.createProperty('message', wcPlay.PROPERTY_TYPE.STRING, 'Log message.', {multiline: true});
+  },
 
+  /**
+   * Event that is called when an entry link has been triggered.&lt;br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeProcessConsoleLog#onTriggered
+   * @param {String} name - The name of the entry link triggered.
+   */
+  onTriggered: function(name) {
+    this._super(name);
 
-<article>
-    <div class="container-overview">
-    
-        
+    // Always trigger the out immediately.
+    this.triggerExit('out');
 
-        
-<dl class="details">
-	
+    // Cancel the log in silent mode.
+    var engine = this.engine();
+    if (!engine || engine.isSilent()) {
+      return;
+    }
 
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-        
-    
-    </div>
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Classes</h3>
-
-        <dl>
-            <dt><a href="wcNode.html">wcNode</a></dt>
-            <dd></dd>
-        
-            <dt><a href="wcNodeEntry.html">wcNodeEntry</a></dt>
-            <dd></dd>
-        
-            <dt><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></dt>
-            <dd></dd>
-        
-            <dt><a href="wcNodeProcess.html">wcNodeProcess</a></dt>
-            <dd></dd>
-        
-            <dt><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></dt>
-            <dd></dd>
-        
-            <dt><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></dt>
-            <dd></dd>
-        
-            <dt><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></dt>
-            <dd></dd>
-        
-            <dt><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></dt>
-            <dd></dd>
-        
-            <dt><a href="wcNodeStorage.html">wcNodeStorage</a></dt>
-            <dd></dd>
-        
-            <dt><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></dt>
-            <dd></dd>
-        
-            <dt><a href="wcNodeStorageString.html">wcNodeStorageString</a></dt>
-            <dd></dd>
-        
-            <dt><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></dt>
-            <dd></dd>
-        
-            <dt><a href="wcPlay.html">wcPlay</a></dt>
-            <dd></dd>
-        
-            <dt><a href="wcPlayEditor.html">wcPlayEditor</a></dt>
-            <dd></dd>
-        </dl>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</article>
-
+    var msg = this.property('message');
+    console.log(msg);
+  },
+});
+</pre>
+	</article>
 </section>
+
 
 
 
@@ -184,16 +105,12 @@
 	<div class="clearfix"></div>
 
 	
-		<div class="col-md-3">
-			<div id="toc" class="col-xs-3 col-sm-3 col-md-3 small"></div>
-		</div>
-	
 
 </div>
 
 <div class="row">
 	
-	<div class="col-xs-8 col-sm-8 col-md-8 col-xs-offset-1">
+	<div class="col-md-10 col-md-offset-1">
 	
 		<footer>
 		

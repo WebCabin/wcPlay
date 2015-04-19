@@ -25,3 +25,20 @@
  * @property {String[]} items - A list of items to display in the combo box.
  * @property {Boolean} isIndex - When an item is selected, does it record the item index number, or the item text itself?
  */
+
+/**
+ * Basic information about a chain connection.
+ * @typedef {Object} wcNode~ChainData
+ * @property {String} inName    - The name of the input or entry link this chain is connected to.
+ * @property {Number} inNodeId  - The ID of the input or entry node this chain is connected to.
+ * @property {String} outName   - The name of the output or exit link this chain is connected to.
+ * @property {Number} outNodeId - The ID of the output or exit node this chain is connected to.
+ */
+
+/**
+ * Basic information for a property.
+ * @typedef {Object} wcNode~PropertyData
+ * @property {String} name - The name of the property.
+ * @property {Object} value - The current value of the property.
+ * @property {Object} initialValue - The initial value of the property.
+ */

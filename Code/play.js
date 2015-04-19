@@ -115,6 +115,36 @@ wcPlay.prototype = {
   },
 
   /**
+   * Retrieves a node from a given ID, if it exists in this script.
+   * @function wcPlay#nodeById
+   * @param {Number} id - The ID of the node.
+   * @returns {wcNode|null} - Either the found node, or null.
+   */
+  nodeById: function(id) {
+    for (var i = 0; i < this._storageNodes.length; ++i) {
+      if (this._storageNodes[i].id === id) {
+        return this._storageNodes[i];
+      }
+    }
+    for (var i = 0; i < this._processNodes.length; ++i) {
+      if (this._processNodes[i].id === id) {
+        return this._processNodes[i];
+      }
+    }
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      if (this._compositeNodes[i].id === id) {
+        return this._compositeNodes[i];
+      }
+    }
+    for (var i = 0; i < this._entryNodes.length; ++i) {
+      if (this._entryNodes[i].id === id) {
+        return this._entryNodes[i];
+      }
+    }
+    return null;
+  },
+
+  /**
    * Update handler.
    * @function wcPlay#update
    */

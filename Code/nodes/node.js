@@ -1,3 +1,4 @@
+var wcNodeNextID = 0;
 Class.extend('wcNode', 'Node', '', {
   /**
    * @class
@@ -12,6 +13,7 @@ Class.extend('wcNode', 'Node', '', {
    * @param {String} [type="Node"] - The type name of the node, as displayed on the title bar.
    */
   init: function(parent, pos, type) {
+    this.id = ++wcNodeNextID;
     this.type = type || this.name;
     this.name = '';
     this.color = '#FFFFFF';
@@ -772,6 +774,125 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
+   * Retrieves a list of all chains connected to an entry link on this node.
+   * @function wcNode#listEntryChains
+   * @param {String} [name] - The entry link, if omitted, all link chains are retrieved.
+   * @returns {wcNode~ChainData[]} - A list of all chains connected to this link, if the link was not found, an empty list is returned.
+   */
+  listEntryChains: function(name) {
+    var result = [];
+    for (var i = 0; i < this.chain.entry.length; ++i) {
+      if (!name || this.chain.entry[i].name === name) {
+        var myLink = this.chain.entry[i];
+        for (var a = 0; a < myLink.links.length; ++a) {
+          result.push({
+            inName: myLink.name,
+            inNodeId: this.id,
+            outName: myLink.links[a].name,
+            outNodeId: myLink.links[a].node.id,
+          });
+        }
+      }
+    }
+
+    return result;
+  },
+
+  /**
+   * Retrieves a list of all chains connected to an exit link on this node.
+   * @function wcNode#listExitChains
+   * @param {String} [name] - The exit link, if omitted, all link chains are retrieved.
+   * @returns {wcNode~ChainData[]} - A list of all chains connected to this link, if the link was not found, an empty list is returned.
+   */
+  listExitChains: function(name) {
+    var result = [];
+    for (var i = 0; i < this.chain.exit.length; ++i) {
+      if (!name || this.chain.exit[i].name === name) {
+        var myLink = this.chain.exit[i];
+        for (var a = 0; a < myLink.links.length; ++a) {
+          result.push({
+            inName: myLink.links[a].name,
+            inNodeId: myLink.links[a].node.id,
+            outName: myLink.name,
+            outNodeId: this.id,
+          });
+        }
+      }
+    }
+
+    return result;
+  },
+
+  /**
+   * Retrieves a list of all chains connected to a property input link on this node.
+   * @function wcNode#listInputChains
+   * @param {String} [name] - The property input link, if omitted, all link chains are retrieved.
+   * @returns {wcNode~ChainData[]} - A list of all chains connected to this link, if the link was not found, an empty list is returned.
+   */
+  listInputChains: function(name) {
+    var result = [];
+    for (var i = 0; i < this.properties.length; ++i) {
+      if (!name || this.properties[i].name === name) {
+        var myProp = this.properties[i];
+        for (var a = 0; a < myProp.inputs.length; ++a) {
+          result.push({
+            inName: myProp.name,
+            inNodeId: this.id,
+            outName: myProp.inputs[a].name,
+            outNodeId: myProp.inputs[a].node.id,
+          });
+        }
+      }
+    }
+
+    return result;
+  },
+
+  /**
+   * Retrieves a list of all chains connected to a property output link on this node.
+   * @function wcNode#listOutputChains
+   * @param {String} [name] - The property output link, if omitted, all link chains are retrieved.
+   * @returns {wcNode~ChainData[]} - A list of all chains connected to this link, if the link was not found, an empty list is returned.
+   */
+  listOutputChains: function(name) {
+    var result = [];
+    for (var i = 0; i < this.properties.length; ++i) {
+      if (!name || this.properties[i].name === name) {
+        var myProp = this.properties[i];
+        for (var a = 0; a < myProp.outputs.length; ++a) {
+          result.push({
+            inName: myProp.outputs[a].name,
+            inNodeId: myProp.outputs[a].node.id,
+            outName: myProp.name,
+            outNodeId: this.id,
+          });
+        }
+      }
+    }
+
+    return result;
+  },
+
+  /**
+   * Retrieves a list of all properties and their values for this node.
+   * @function wcNode#listProperties
+   * @returns {wcNode~PropertyData[]} - A list of all property data.
+   */
+  listProperties: function() {
+    var result = [];
+    for (var i = 0; i < this.properties.length; ++i) {
+      var myProp = this.properties[i];
+      result.push({
+        name: myProp.name,
+        value: myProp.value,
+        initialValue: myProp.initialValue,
+      });
+    }
+
+    return result;
+  },
+
+  /**
    * Triggers an entry link and activates this node.
    * @function wcNode#triggerEntry
    * @param {String} name - The name of the entry link to trigger.
@@ -875,6 +996,22 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
+   * Gets, or Sets the initial value of a property.
+   * @function wcNode#initialProperty
+   * @param {String} name - The name of the property.
+   * @param {Object} [value] - If supplied, will assign a new default value to the property.
+   * @returns {Object|undefined} - The default value of the property, or undefined if not found.
+   */
+  initialProperty: function(name, value) {
+    for (var i = 0; i < this.properties.length; ++i) {
+      var prop = this.properties[i];
+      if (prop.name === name) {
+        prop.initialValue = value;
+      }
+    }
+  },
+
+  /**
    * Triggers a property that is about to be changed by the output of another property.
    * @function wcNode#triggerProperty
    * @param {String} name - The name of the property.
@@ -893,22 +1030,6 @@ Class.extend('wcNode', 'Node', '', {
         if (this.debugBreak() || (engine && engine.stepping())) {
           prop.inputMeta.paused = true;
         }
-      }
-    }
-  },
-
-  /**
-   * Gets, or Sets the initial value of a property.
-   * @function wcNode#initialValue
-   * @param {String} name - The name of the property.
-   * @param {Object} [value] - If supplied, will assign a new default value to the property.
-   * @returns {Object|undefined} - The default value of the property, or undefined if not found.
-   */
-  initialValue: function(name, value) {
-    for (var i = 0; i < this.properties.length; ++i) {
-      var prop = this.properties[i];
-      if (prop.name === name) {
-        prop.initialValue = value;
       }
     }
   },
