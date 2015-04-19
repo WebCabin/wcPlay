@@ -1,3 +1,3 @@
 # wcPlay
-Node based scripting editor tool.
+Node based visual scripting tool.
 Currently under construction.
