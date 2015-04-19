@@ -1006,7 +1006,11 @@ Class.extend('wcNode', 'Node', '', {
     for (var i = 0; i < this.properties.length; ++i) {
       var prop = this.properties[i];
       if (prop.name === name) {
-        prop.initialValue = value;
+        if (value !== undefined) {
+          prop.initialValue = value;
+        }
+
+        return prop.initialValue;
       }
     }
   },
