@@ -85,9 +85,6 @@ function wcPlayEditor(container, options) {
 
   // Undo management is optional.
   this._undoManager = null;
-  if (window.wcUndoManager) {
-    this._undoManager = new wcUndoManager();
-  }
 
   // Setup our options.
   this._options = {
@@ -123,18 +120,25 @@ wcPlayEditor.prototype = {
    * @returns {wcPlay} - The current {@link wcPlay} engine.
    */
   engine: function(engine) {
-    if (engine !== undefined) {
+    if (engine !== undefined && engine !== this._engine) {
       if (this._engine) {
         var index = this._engine._editors.indexOf(this);
         if (index > -1) {
           this._engine._editors.splice(index, 1);
         }
+        this._engine._undoManager = this._undoManager;
+        this._undoManager = null;
       }
 
       this._engine = engine;
 
       if (this._engine) {
         this._engine._editors.push(this);
+        this._undoManager = this._engine._undoManager;
+        if (!this._undoManager && window.wcUndoManager) {
+          this._undoManager = new wcUndoManager();
+          this._engine._undoManager = this._undoManager;
+        }
       }
     }
 
