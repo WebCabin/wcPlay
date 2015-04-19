@@ -579,6 +579,10 @@ function wcPlayEditor(container, options) {
     property: {
       spacing: 5,         // The pixel space between adjacent properties.
       strLen: 10,         // The maximum character length a property value can display.
+      valueWrapL: '',    // The left string to wrap around a property value.
+      valueWrapR: '  ',    // The right string to wrap around a property value.
+      initialWrapL: '(',  // The left string to wrap around a property initial value.
+      initialWrapR: ')',  // The right string to wrap around a property initial value.
     },
   };
 
@@ -1426,11 +1430,11 @@ wcPlayEditor.prototype = {
 
         // Property value.
         this.__setCanvasFont(this._font.value, context);
-        w += context.measureText(' ' + this.__clampString(node.property(props[i].name).toString(), this._drawStyle.property.strLen) + ' ').width;
+        w += context.measureText(this._drawStyle.property.valueWrapL + this.__clampString(node.property(props[i].name).toString(), this._drawStyle.property.strLen) + this._drawStyle.property.valueWrapR).width;
 
         // Property initial value.
         this.__setCanvasFont(this._font.initialValue, context);
-        w += context.measureText('(' + this.__clampString(node.initialProperty(props[i].name).toString(), this._drawStyle.property.strLen) + ')').width;
+        w += context.measureText(this._drawStyle.property.initialWrapL + this.__clampString(node.initialProperty(props[i].name).toString(), this._drawStyle.property.strLen) + this._drawStyle.property.initialWrapR).width;
         bounds.width = Math.max(w, bounds.width);
       }
     }
@@ -1686,7 +1690,7 @@ wcPlayEditor.prototype = {
         // Initial property value.
         context.textAlign = "right";
         this.__setCanvasFont(this._font.initialValue, context);
-        var w = context.measureText('(' + this.__clampString(node.initialProperty(props[i].name).toString(), this._drawStyle.property.strLen) + ')').width;
+        var w = context.measureText(this._drawStyle.property.initialWrapL + this.__clampString(node.initialProperty(props[i].name).toString(), this._drawStyle.property.strLen) + this._drawStyle.property.initialWrapR).width;
 
         var initialBound = {
           rect: {
@@ -1701,7 +1705,7 @@ wcPlayEditor.prototype = {
 
         // Property value.
         this.__setCanvasFont(this._font.value, context);
-        var vw = context.measureText(' ' + this.__clampString(node.property(props[i].name).toString(), this._drawStyle.property.strLen) + ' ').width;
+        var vw = context.measureText(this._drawStyle.property.valueWrapL + this.__clampString(node.property(props[i].name).toString(), this._drawStyle.property.strLen) + this._drawStyle.property.valueWrapR).width;
 
         var valueBound = {
           rect: {
@@ -1726,11 +1730,11 @@ wcPlayEditor.prototype = {
 
         this.__setCanvasFont(this._font.initialValue, context);
         context.fillStyle = "#444444";
-        context.fillText('(' + this.__clampString(node.initialProperty(props[i].name).toString(), this._drawStyle.property.strLen) + ')', rect.left + rect.width - this._drawStyle.node.margin, rect.top + upper);
+        context.fillText(this._drawStyle.property.initialWrapL + this.__clampString(node.initialProperty(props[i].name).toString(), this._drawStyle.property.strLen) + this._drawStyle.property.initialWrapR, rect.left + rect.width - this._drawStyle.node.margin, rect.top + upper);
 
         this.__setCanvasFont(this._font.value, context);
         context.fillStyle = "black";
-        context.fillText(' ' + this.__clampString(node.property(props[i].name).toString(), this._drawStyle.property.strLen) + ' ', rect.left + rect.width - this._drawStyle.node.margin - w, rect.top + upper);
+        context.fillText(this._drawStyle.property.valueWrapL + this.__clampString(node.property(props[i].name).toString(), this._drawStyle.property.strLen) + this._drawStyle.property.valueWrapR, rect.left + rect.width - this._drawStyle.node.margin - w, rect.top + upper);
 
         // Property input.
         if (!collapsed || props[i].inputs.length) {
@@ -1898,8 +1902,12 @@ wcPlayEditor.prototype = {
 
         var flash = (exitLink.meta.flashDelta > 0 && entryLink.meta.flashDelta > 0);
 
+        var highlight = 
+          (this._highlightNode === targetNode && this._highlightEntryLink && this._highlightEntryLink.name === entryLink.name) ||
+          (this._highlightNode === node && this._highlightExitLink && this._highlightExitLink.name === exitLink.name);
+
         // Now we have both our links, lets chain them together!
-        this.__drawFlowChain(exitPoint, entryPoint, node._meta.bounds.rect, targetNode._meta.bounds.rect, context, flash);
+        this.__drawFlowChain(exitPoint, entryPoint, node._meta.bounds.rect, targetNode._meta.bounds.rect, context, flash, highlight);
       }
     }
 
@@ -1960,9 +1968,12 @@ wcPlayEditor.prototype = {
         }
 
         var flash = (outputProp.outputMeta.flashDelta > 0 && inputProp.inputMeta.flashDelta > 0);
+        var highlight =
+          (this._highlightNode === targetNode && this._highlightInputLink && this._highlightInputLink.name === inputProp.name) ||
+          (this._highlightNode === node && this._highlightOutputLink && this._highlightOutputLink.name === outputProp.name);
 
         // Now we have both our links, lets chain them together!
-        this.__drawPropertyChain(outputPoint, inputPoint, node._meta.bounds.rect, targetNode._meta.bounds.rect, context, flash);
+        this.__drawPropertyChain(outputPoint, inputPoint, node._meta.bounds.rect, targetNode._meta.bounds.rect, context, flash, highlight);
       }
     }
 
@@ -2083,9 +2094,9 @@ wcPlayEditor.prototype = {
    * @param {Boolean} [flash] - If true, will flash the link.
    * @param {external:Canvas~Context} context - The canvas context.
    */
-  __drawFlowChain: function(startPos, endPos, startRect, endRect, context, flash) {
+  __drawFlowChain: function(startPos, endPos, startRect, endRect, context, flash, highlight) {
     context.save();
-    context.strokeStyle = (flash? '#CCCC00': '#000000');
+    context.strokeStyle = (highlight? 'cyan': (flash? '#CCCC00': '#000000'));
     context.lineWidth = 2;
     context.lineCap = "round";
 
@@ -2107,9 +2118,9 @@ wcPlayEditor.prototype = {
    * @param {Boolean} [flash] - If true, will flash the link.
    * @param {external:Canvas~Context} context - The canvas context.
    */
-  __drawPropertyChain: function(startPos, endPos, startRect, endRect, context, flash) {
+  __drawPropertyChain: function(startPos, endPos, startRect, endRect, context, flash, highlight) {
     context.save();
-    context.strokeStyle = (flash? '#55FF00': '#33CC33');
+    context.strokeStyle = (highlight? 'cyan': (flash? '#55FF00': '#33CC33'));
     context.lineWidth = 2;
     context.lineCap = "round";
 
