@@ -2121,7 +2121,7 @@ wcPlayEditor.prototype = {
 
       $control.keyup(function(event) {
         switch (event.keyCode) {
-          case 13: // Enter.to confirm.
+          case 13: // Enter to confirm.
             if (enterConfirms || event.shiftKey) {
               $control.blur();
             }
@@ -2162,6 +2162,25 @@ wcPlayEditor.prototype = {
     this.$viewport.on('mouseup',    function(event){self.__onViewportMouseUp(event, this);});
     // this.$viewport.on('mouseleave', function(event){self.__onViewportMouseUp(event, this);});
     this.$viewport.on('mousewheel DOMMouseScroll', function(event) {self.__onViewportMouseWheel(event, this);});
+
+    $('body').keyup(function(event) {self.__onKey(event, this);});
+  },
+
+  /**
+   * Handle key press events.
+   * @function wcPlayEditor#__onKey
+   * @private
+   * @param {Object} event - The mouse event.
+   * @param {Object} elem - The target element.
+   */
+  __onKey: function(event, elem) {
+    switch (event.keyCode) {
+      case 46: // Delete key to delete selected nodes.
+        if (this._selectedNode) {
+          this._selectedNode.destroy();
+          this._selectedNode = null;
+        }
+    }
   },
 
   /**
