@@ -597,8 +597,10 @@ function wcPlayEditor(container, options) {
   this._paletteMoving = false;
 
   this._mouse = {x: 0, y: 0};
+  this._highlightRect = null;
   this._highlightNode = null;
   this._selectedNode = null;
+  this._selectedNodes = [];
   this._expandedNode = null;
   this._expandedNodeWasCollapsed = false;
 
@@ -615,7 +617,7 @@ function wcPlayEditor(container, options) {
   this._selectedExitLink = false;
   this._selectedInputLink = false;
   this._selectedOutputLink = false;
-  this._selectedNodeOrigin = null;
+  this._selectedNodeOrigins = [];
 
   this._draggingNodeData = null;
 
@@ -843,6 +845,21 @@ wcPlayEditor.prototype = {
   },
 
   /**
+   * Tests whether a given rectangle is within a bounding rectangle.
+   * @function wcPlayEditor#__rectInRect
+   * @private
+   * @param {wcPlayEditor~Rect} rectA - The first rectangle.
+   * @param {wcPlayEditor~Rect} rectB - The second rectangle.
+   * @returns {Boolean} - Whether there is a collision.
+   */
+  __rectInRect: function(rectA, rectB) {
+    return !(rectB.left > rectA.left + rectA.width ||
+            rectB.left + rectB.width < rectA.left ||
+            rectB.top > rectA.top + rectA.height ||
+            rectB.top + rectB.height < rectA.top);
+  },
+
+  /**
    * Draws a bounding rectangle.
    * @function wcPlayEditor#__drawRect
    * @private
@@ -914,6 +931,11 @@ wcPlayEditor.prototype = {
       this.__drawChains(this._engine._processNodes, this._viewportContext);
       this.__drawChains(this._engine._compositeNodes, this._viewportContext);
       this.__drawChains(this._engine._storageNodes, this._viewportContext);
+
+      if (this._highlightRect) {
+        this._viewportContext.strokeStyle = 'cyan';
+        this._viewportContext.strokeRect(this._highlightRect.left, this._highlightRect.top, this._highlightRect.width, this._highlightRect.height);
+      }
       this._viewportContext.restore();
     }
 
@@ -1310,7 +1332,7 @@ wcPlayEditor.prototype = {
     }
 
     // Show an additional bounding rect around selected nodes.
-    if (node === this._selectedNode) {
+    if (this._selectedNodes.indexOf(node) > -1) {
       this.__drawRoundedRect(data.rect, "cyan", 2, 10, context);
     }
 
@@ -2323,65 +2345,71 @@ wcPlayEditor.prototype = {
   __onKey: function(event, elem) {
     switch (event.keyCode) {
       case 46: // Delete key to delete selected nodes.
-        if (this._selectedNode) {
-          this._undoManager && this._undoManager.addEvent('Removed Node "' + this._selectedNode.category + '.' + this._selectedNode.type + '"',
-          {
-            id: this._selectedNode.id,
-            className: this._selectedNode.className,
-            pos: {
-              x: this._selectedNode.pos.x,
-              y: this._selectedNode.pos.y,
-            },
-            collapsed: this._selectedNode.collapsed(),
-            breakpoint: this._selectedNode._break,
-            properties: this._selectedNode.listProperties(),
-            entryChains: this._selectedNode.listEntryChains(),
-            exitChains: this._selectedNode.listExitChains(),
-            inputChains: this._selectedNode.listInputChains(),
-            outputChains: this._selectedNode.listOutputChains(),
-            editor: this,
-          },
-          // Undo
-          function() {
-            var myNode = new window[this.className](this.editor._engine, this.pos);
-            myNode.id = this.id;
-            myNode.collapsed(this.collapsed);
-            myNode.debugBreak(this.breakpoint);
-            // Restore property values.
-            for (var i = 0; i < this.properties.length; ++i) {
-              myNode.initialProperty(this.properties[i].name, this.properties[i].initialValue);
-              myNode.property(this.properties[i].name, this.properties[i].value);
-            }
-            // Re-connect all chains.
-            for (var i = 0; i < this.entryChains.length; ++i) {
-              var chain = this.entryChains[i];
-              var targetNode = this.editor._engine.nodeById(chain.outNodeId);
-              myNode.connectEntry(chain.inName, targetNode, chain.outName);
-            }
-            for (var i = 0; i < this.exitChains.length; ++i) {
-              var chain = this.exitChains[i];
-              var targetNode = this.editor._engine.nodeById(chain.inNodeId);
-              myNode.connectExit(chain.outName, targetNode, chain.inName);
-            }
-            for (var i = 0; i < this.inputChains.length; ++i) {
-              var chain = this.inputChains[i];
-              var targetNode = this.editor._engine.nodeById(chain.outNodeId);
-              myNode.connectInput(chain.inName, targetNode, chain.outName);
-            }
-            for (var i = 0; i < this.outputChains.length; ++i) {
-              var chain = this.outputChains[i];
-              var targetNode = this.editor._engine.nodeById(chain.outNodeId);
-              myNode.connectOutput(chain.inName, targetNode, chain.outName);
-            }
-          },
-          // Redo
-          function() {
-            var myNode = this.editor._engine.nodeById(this.id);
-            myNode.destroy();
-          });
+        if (this._selectedNodes.length) {
+          this._undoManager && this._undoManager.beginGroup('Removed Nodes');
+          for (var i = 0; i < this._selectedNodes.length; ++i) {
+            var node = this._selectedNodes[i];
 
-          this._selectedNode.destroy();
-          this._selectedNode = null;
+            this._undoManager && this._undoManager.addEvent('',
+            {
+              id: node.id,
+              className: node.className,
+              pos: {
+                x: node.pos.x,
+                y: node.pos.y,
+              },
+              collapsed: node.collapsed(),
+              breakpoint: node._break,
+              properties: node.listProperties(),
+              entryChains: node.listEntryChains(),
+              exitChains: node.listExitChains(),
+              inputChains: node.listInputChains(),
+              outputChains: node.listOutputChains(),
+              editor: this,
+            },
+            // Undo
+            function() {
+              var myNode = new window[this.className](this.editor._engine, this.pos);
+              myNode.id = this.id;
+              myNode.collapsed(this.collapsed);
+              myNode.debugBreak(this.breakpoint);
+              // Restore property values.
+              for (var i = 0; i < this.properties.length; ++i) {
+                myNode.initialProperty(this.properties[i].name, this.properties[i].initialValue);
+                myNode.property(this.properties[i].name, this.properties[i].value);
+              }
+              // Re-connect all chains.
+              for (var i = 0; i < this.entryChains.length; ++i) {
+                var chain = this.entryChains[i];
+                var targetNode = this.editor._engine.nodeById(chain.outNodeId);
+                myNode.connectEntry(chain.inName, targetNode, chain.outName);
+              }
+              for (var i = 0; i < this.exitChains.length; ++i) {
+                var chain = this.exitChains[i];
+                var targetNode = this.editor._engine.nodeById(chain.inNodeId);
+                myNode.connectExit(chain.outName, targetNode, chain.inName);
+              }
+              for (var i = 0; i < this.inputChains.length; ++i) {
+                var chain = this.inputChains[i];
+                var targetNode = this.editor._engine.nodeById(chain.outNodeId);
+                myNode.connectInput(chain.inName, targetNode, chain.outName);
+              }
+              for (var i = 0; i < this.outputChains.length; ++i) {
+                var chain = this.outputChains[i];
+                var targetNode = this.editor._engine.nodeById(chain.outNodeId);
+                myNode.connectOutput(chain.inName, targetNode, chain.outName);
+              }
+            },
+            // Redo
+            function() {
+              var myNode = this.editor._engine.nodeById(this.id);
+              myNode.destroy();
+            });
+
+            node.destroy();
+            node = null;
+          }
+          this._undoManager && this._undoManager.endGroup();
         }
       case 'Z'.charCodeAt(0): // Ctrl+Z to undo last action.
         if (event.ctrlKey && !event.shiftKey) {
@@ -2527,6 +2555,39 @@ wcPlayEditor.prototype = {
       return;
     }
 
+    // Box selection.
+    if (this._highlightRect && this._engine) {
+      this._highlightRect.x = ((mouse.x - this._viewportCamera.x) / this._viewportCamera.z) - this._highlightRect.ox;
+      this._highlightRect.y = ((mouse.y - this._viewportCamera.y) / this._viewportCamera.z) - this._highlightRect.oy;
+
+      this._highlightRect.width = this._highlightRect.x;
+      this._highlightRect.height = this._highlightRect.y;
+      if (this._highlightRect.width < 0) {
+        this._highlightRect.left = this._highlightRect.ox + this._highlightRect.width;
+        this._highlightRect.width *= -1;
+      }
+      if (this._highlightRect.height < 0) {
+        this._highlightRect.top = this._highlightRect.oy + this._highlightRect.height;
+        this._highlightRect.height *= -1;
+      }
+
+
+      this._selectedNodes = [];
+      var self = this;
+      function __nodesInRect(nodes) {
+        for (var i = 0; i < nodes.length; ++i) {
+          if (self.__rectInRect(nodes[i]._meta.bounds.inner, self._highlightRect)) {
+            self._selectedNodes.push(nodes[i]);
+          }
+        }
+      };
+      __nodesInRect(this._engine._storageNodes);
+      __nodesInRect(this._engine._compositeNodes);
+      __nodesInRect(this._engine._processNodes);
+      __nodesInRect(this._engine._entryNodes);
+      return;
+    }
+
     // Viewport panning.
     if (this._viewportMoving) {
       var moveX = mouse.x - this._mouse.x;
@@ -2544,8 +2605,10 @@ wcPlayEditor.prototype = {
     if (this._viewportMovingNode) {
       var moveX = mouse.x - this._mouse.x;
       var moveY = mouse.y - this._mouse.y;
-      this._selectedNode.pos.x += moveX / this._viewportCamera.z;
-      this._selectedNode.pos.y += moveY / this._viewportCamera.z;
+      for (var i = 0; i < this._selectedNodes.length; ++i) {
+        this._selectedNodes[i].pos.x += moveX / this._viewportCamera.z;
+        this._selectedNodes[i].pos.y += moveY / this._viewportCamera.z;
+      }
       this._mouse = mouse;
       return;
     }
@@ -2704,8 +2767,22 @@ wcPlayEditor.prototype = {
    */
   __onViewportMouseDown: function(event, elem) {
     this._mouse = this.__mouse(event, this.$viewport.offset());
-
     this._mouseMoved = false;
+
+    // Control+drag to box select.
+    if (event.ctrlKey) {
+      this._highlightRect = {
+        top: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z,
+        left: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z,
+        oy: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z,
+        ox: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z,
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0,
+      };
+      return;
+    }
 
     var hasTarget = false;
     var node = this.__findNodeAtPos(this._mouse, this._viewportCamera);
@@ -2745,6 +2822,7 @@ wcPlayEditor.prototype = {
               break;
             }
             this._selectedNode = node;
+            this._selectedNodes = [node];
             this._selectedEntryLink = node._meta.bounds.entryBounds[i];
             break;
           }
@@ -2791,6 +2869,7 @@ wcPlayEditor.prototype = {
               break;
             }
             this._selectedNode = node;
+            this._selectedNodes = [node];
             this._selectedExitLink = node._meta.bounds.exitBounds[i];
             break;
           }
@@ -2832,6 +2911,7 @@ wcPlayEditor.prototype = {
               break;
             }
             this._selectedNode = node;
+            this._selectedNodes = [node];
             this._selectedInputLink = node._meta.bounds.inputBounds[i];
             break;
           }
@@ -2873,6 +2953,7 @@ wcPlayEditor.prototype = {
               break;
             }
             this._selectedNode = node;
+            this._selectedNodes = [node];
             this._selectedOutputLink = node._meta.bounds.outputBounds[i];
             break;
           }
@@ -2882,12 +2963,19 @@ wcPlayEditor.prototype = {
       // Center area.
       if (!hasTarget && this.__inRect(this._mouse, node._meta.bounds.inner, this._viewportCamera)) {
         hasTarget = true;
-        this._selectedNode = node;
+        if (!this._selectedNodes.length || this._selectedNodes.indexOf(node) === -1) {
+          this._selectedNode = node;
+          this._selectedNodes = [node];
+        }
         this._viewportMovingNode = true;
-        this._selectedNodeOrigin = {
-          x: node.pos.x,
-          y: node.pos.y,
-        };
+        this._selectedNodeOrigins = [];
+        for (var i = 0; i < this._selectedNodes.length; ++i) {
+          var myNode = this._selectedNodes[i];
+          this._selectedNodeOrigins.push({
+            x: myNode.pos.x,
+            y: myNode.pos.y,
+          });
+        }
       }
     }
 
@@ -3101,36 +3189,44 @@ wcPlayEditor.prototype = {
       this.$viewport.removeClass('wcMoving');
     }
 
+    if (this._highlightRect && this._engine) {
+      this._highlightRect = null;
+      return;
+    }
+
     // Finished moving a node.
-    if (this._selectedNode && this._selectedNodeOrigin) {
-      if (this._selectedNode.pos.x !== this._selectedNodeOrigin.x || this._selectedNode.pos.y !== this._selectedNodeOrigin.y) {
-        this._undoManager && this._undoManager.addEvent('Moved Node "' + this._selectedNode.category + '.' + this._selectedNode.type + '"',
-        {
-          id: this._selectedNode.id,
-          start: {
-            x: this._selectedNodeOrigin.x,
-            y: this._selectedNodeOrigin.y,
+    if (this._selectedNodes.length && this._selectedNodeOrigins.length) {
+      for (var i = 0; i < this._selectedNodes.length; ++i) {
+        var node = this._selectedNodes[i];
+        if (node.pos.x !== this._selectedNodeOrigins[i].x || node.pos.y !== this._selectedNodeOrigins[i].y) {
+          this._undoManager && this._undoManager.addEvent('Moved Node "' + node.category + '.' + node.type + '"',
+          {
+            id: node.id,
+            start: {
+              x: this._selectedNodeOrigins[i].x,
+              y: this._selectedNodeOrigins[i].y,
+            },
+            end: {
+              x: node.pos.x,
+              y: node.pos.y,
+            },
+            editor: this,
           },
-          end: {
-            x: this._selectedNode.pos.x,
-            y: this._selectedNode.pos.y,
+          // Undo
+          function() {
+            var myNode = this.editor._engine.nodeById(this.id);
+            myNode.pos.x = this.start.x;
+            myNode.pos.y = this.start.y;
           },
-          editor: this,
-        },
-        // Undo
-        function() {
-          var myNode = this.editor._engine.nodeById(this.id);
-          myNode.pos.x = this.start.x;
-          myNode.pos.y = this.start.y;
-        },
-        // Redo
-        function() {
-          var myNode = this.editor._engine.nodeById(this.id);
-          myNode.pos.x = this.end.x;
-          myNode.pos.y = this.end.y;
-        });
+          // Redo
+          function() {
+            var myNode = this.editor._engine.nodeById(this.id);
+            myNode.pos.x = this.end.x;
+            myNode.pos.y = this.end.y;
+          });
+        }
       }
-      this._selectedNodeOrigin = null;
+      this._selectedNodeOrigins = [];
     }
 
     // Check for link connections.
@@ -3336,6 +3432,7 @@ wcPlayEditor.prototype = {
 
       if (!this._viewportMoved) {
         this._selectedNode = null;
+        this._selectedNodes = [];
       } else {
         this._viewportMoved = false;
         this.$viewport.removeClass('wcMoving');
