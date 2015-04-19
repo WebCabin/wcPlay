@@ -1642,8 +1642,6 @@ wcPlayEditor.prototype = {
       // Undo
       function() {
         var myNode = this.editor._engine.nodeById(this.id);
-        // Always reset the new value to the 'current' new value, the script may have changed it through execution.
-        this.newValue = myNode.property(this.name);
         myNode.property(this.name, this.oldValue);
       },
       // Redo
