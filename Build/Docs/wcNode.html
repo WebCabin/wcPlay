@@ -55,7 +55,8 @@
         wcNode
         </h2>
         
-            <div class="class-description"><p style="margin-left:20px;">The foundation class for all nodes.<br>When inheriting, make sure to include 'this._super(parent, pos, type);' at the top of your init functions.</p></div>
+            <div class="class-description"><p style="margin-left:20px;">The foundation class for all nodes.<br>
+When inheriting, make sure to include 'this._super(parent, pos, type);' at the top of your init functions.</p></div>
         
     
 </header>
@@ -938,7 +939,9 @@
     
     
     <div class="description">
-        <p style="margin-left: 20px;">If your node takes time to process, call this to begin a thread that will keep the node 'active' until you close the thread with <a href="wcNode.html#finishThread">wcNode#finishThread</a>.<br>This ensures that, even if a node is executed more than once at the same time, each 'thread' is kept track of individually.<br><b>Note:</b> This is not necessary if your node executes immediately without a timeout.</p>
+        <p style="margin-left: 20px;">If your node takes time to process, call this to begin a thread that will keep the node 'active' until you close the thread with <a href="wcNode.html#finishThread">wcNode#finishThread</a>.<br>
+This ensures that, even if a node is executed more than once at the same time, each 'thread' is kept track of individually.<br>
+<b>Note:</b> This is not necessary if your node executes immediately without a timeout.</p>
     </div>
     
 
@@ -976,7 +979,24 @@
     
         <h5>Example:</h5>
         
-    <pre class="sunlight-highlight-javascript">onTriggered: function(name) {   this._super(name);   // Always fire the &#x27;out&#x27; link immediately.   this.triggerExit(&#x27;out&#x27;);   // Now set a timeout to wait for &#x27;Milliseconds&#x27; amount of time.   var self = this;   var delay = this.property(&#x27;milliseconds&#x27;);   // Start a new thread that will keep the node alive until we are finished.   var thread = this.beginThread();   setTimeout(function() {     // Once the time has completed, fire the &#x27;Finished&#x27; link and finish our thread.     self.triggerExit(&#x27;finished&#x27;);     self.finishThread(thread);   }, delay); },</pre>
+    <pre class="sunlight-highlight-javascript">onTriggered: function(name) {
+   this._super(name);
+
+   // Always fire the &#x27;out&#x27; link immediately.
+   this.triggerExit(&#x27;out&#x27;);
+
+   // Now set a timeout to wait for &#x27;Milliseconds&#x27; amount of time.
+   var self = this;
+   var delay = this.property(&#x27;milliseconds&#x27;);
+
+   // Start a new thread that will keep the node alive until we are finished.
+   var thread = this.beginThread();
+   setTimeout(function() {
+     // Once the time has completed, fire the &#x27;Finished&#x27; link and finish our thread.
+     self.triggerExit(&#x27;finished&#x27;);
+     self.finishThread(thread);
+   }, delay);
+ },</pre>
 
 
     
@@ -4326,7 +4346,8 @@
     
     
     <div class="description">
-        <p style="margin-left: 20px;">Finishes a previously started thread from <a href="wcNode.html#beginThread">wcNode#beginThread</a>.<br><b>Note:</b> If you do not properly finish a thread that was generated, your node will remain forever in its active state.</p>
+        <p style="margin-left: 20px;">Finishes a previously started thread from <a href="wcNode.html#beginThread">wcNode#beginThread</a>.<br>
+<b>Note:</b> If you do not properly finish a thread that was generated, your node will remain forever in its active state.</p>
     </div>
     
 
@@ -5482,7 +5503,8 @@
     
     
     <div class="description">
-        <p style="margin-left: 20px;">Event that is called when a connection has been made.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
+        <p style="margin-left: 20px;">Event that is called when a connection has been made.<br>
+Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
     </div>
     
 
@@ -5739,7 +5761,8 @@
     
     
     <div class="description">
-        <p style="margin-left: 20px;">Event that is called when a property has changed.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
+        <p style="margin-left: 20px;">Event that is called when a property has changed.<br>
+Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
     </div>
     
 
@@ -5934,7 +5957,8 @@
     
     
     <div class="description">
-        <p style="margin-left: 20px;">Event that is called when a property is about to be changed.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
+        <p style="margin-left: 20px;">Event that is called when a property is about to be changed.<br>
+Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
     </div>
     
 
@@ -6134,7 +6158,8 @@
     
     
     <div class="description">
-        <p style="margin-left: 20px;">Event that is called when the property is being asked its value, before the value is actually retrieved.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
+        <p style="margin-left: 20px;">Event that is called when the property is being asked its value, before the value is actually retrieved.<br>
+Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
     </div>
     
 
@@ -6276,7 +6301,8 @@
     
     
     <div class="description">
-        <p style="margin-left: 20px;">Event that is called when the property has had its value retrieved.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
+        <p style="margin-left: 20px;">Event that is called when the property has had its value retrieved.<br>
+Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
     </div>
     
 
@@ -6418,7 +6444,9 @@
     
     
     <div class="description">
-        <p style="margin-left: 20px;">Event that is called when a global property value has changed.Overload this in inherited nodes.<br><b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.</p>
+        <p style="margin-left: 20px;">Event that is called when a global property value has changed.
+Overload this in inherited nodes.<br>
+<b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.</p>
     </div>
     
 
@@ -6606,7 +6634,9 @@
     
     
     <div class="description">
-        <p style="margin-left: 20px;">Event that is called when a global property has been renamed.Overload this in inherited nodes.<br><b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.</p>
+        <p style="margin-left: 20px;">Event that is called when a global property has been renamed.
+Overload this in inherited nodes.<br>
+<b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.</p>
     </div>
     
 
@@ -6771,7 +6801,8 @@
     
     
     <div class="description">
-        <p style="margin-left: 20px;">Event that is called as soon as the Play script has started.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
+        <p style="margin-left: 20px;">Event that is called as soon as the Play script has started.<br>
+Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
     </div>
     
 
@@ -6864,7 +6895,8 @@
     
     
     <div class="description">
-        <p style="margin-left: 20px;">Event that is called when an entry link has been triggered.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
+        <p style="margin-left: 20px;">Event that is called when an entry link has been triggered.<br>
+Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
     </div>
     
 
@@ -7006,7 +7038,8 @@
     
     
     <div class="description">
-        <p style="margin-left: 20px;">Event that is called when it is time to draw the contents of your custom viewport.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
+        <p style="margin-left: 20px;">Event that is called when it is time to draw the contents of your custom viewport.<br>
+Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
     </div>
     
 
@@ -8548,7 +8581,8 @@
     
     
     <div class="description">
-        <p style="margin-left: 20px;">Sets a size for the custom viewport.<br>The custom viewport is a rectangular area embedded into the node's visual display in which you can 'draw' whatever you wish. It appears below the title text and above properties.</p>
+        <p style="margin-left: 20px;">Sets a size for the custom viewport.<br>
+The custom viewport is a rectangular area embedded into the node's visual display in which you can 'draw' whatever you wish. It appears below the title text and above properties.</p>
     </div>
     
 

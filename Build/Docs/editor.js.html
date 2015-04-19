@@ -1536,6 +1536,12 @@ wcPlayEditor.prototype = {
           x: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z,
           y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z,
         };
+        targetRect = {
+          left: targetPos.x,
+          top: targetPos.y,
+          width: 1,
+          height: 1,
+        };
       }
 
       // In case our selected node gets uncollapsed, get the current position of the link.
@@ -1546,7 +1552,7 @@ wcPlayEditor.prototype = {
         }
       }
 
-      this.__drawFlowChain(point, targetPos, node._meta.bounds.rect, targetRect, context, highlight);
+      this.__drawFlowChain(targetPos, point, targetRect, node._meta.bounds.rect, context, highlight);
     }
 
     if (this._selectedNode === node &amp;&amp; this._selectedExitLink) {
@@ -1561,6 +1567,12 @@ wcPlayEditor.prototype = {
         targetPos = {
           x: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z,
           y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z,
+        };
+        targetRect = {
+          left: targetPos.x,
+          top: targetPos.y,
+          width: 1,
+          height: 1,
         };
       }
 
@@ -1588,6 +1600,12 @@ wcPlayEditor.prototype = {
           x: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z,
           y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z,
         };
+        targetRect = {
+          left: targetPos.x,
+          top: targetPos.y,
+          width: 1,
+          height: 1,
+        };
       }
 
       // In case our selected node gets uncollapsed, get the current position of the link.
@@ -1598,7 +1616,7 @@ wcPlayEditor.prototype = {
         }
       }
 
-      this.__drawPropertyChain(point, targetPos, node._meta.bounds.rect, targetRect, context, highlight);
+      this.__drawPropertyChain(targetPos, point, targetRect, node._meta.bounds.rect, context, highlight);
     }
 
     if (this._selectedNode === node &amp;&amp; this._selectedOutputLink) {
@@ -1613,6 +1631,12 @@ wcPlayEditor.prototype = {
         targetPos = {
           x: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z,
           y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z,
+        };
+        targetRect = {
+          left: targetPos.x,
+          top: targetPos.y,
+          width: 1,
+          height: 1,
         };
       }
 
@@ -1644,9 +1668,69 @@ wcPlayEditor.prototype = {
     context.strokeStyle = (highlight? 'cyan': (flash? '#CCCC00': '#000000'));
     context.lineWidth = 2;
     context.lineCap = "round";
-
+    context.lineJoin = "round";
     context.beginPath();
     context.moveTo(startPos.x, startPos.y);
+
+    var coreRadius = 25;
+
+    // If the exit link is above the entry link
+    if (startPos.y + coreRadius &lt; endPos.y &amp;&amp; startPos.x !== endPos.x) {
+      var midx = (endPos.x + startPos.x) / 2;
+      var midy = (endPos.y + startPos.y) / 2;
+      var radius = Math.min(coreRadius, Math.abs(endPos.x - startPos.x)/2, Math.abs(endPos.y - startPos.y)/2);
+      context.arcTo(startPos.x, midy, midx, midy, radius);
+      context.arcTo(endPos.x, midy, endPos.x, endPos.y, radius);
+    }
+    // If the start rect is to the left side of the end rect.
+    else if (startRect.left + startRect.width + coreRadius &lt; endRect.left) {
+      var midx = (endRect.left + startRect.left + startRect.width) / 2;
+      var midy = (endPos.y + startPos.y) / 2;
+      var leftx = (midx + startPos.x) / 2;
+      var rightx = (endPos.x + midx) / 2;
+      var radius = Math.min(coreRadius, Math.abs(endPos.y - startPos.y)/4, Math.abs(midx - leftx), Math.abs(midx - rightx));
+      context.arcTo(startPos.x, startPos.y + radius, leftx, startPos.y + radius, radius);
+      context.arcTo(midx, startPos.y + radius, midx, midy, radius);
+      context.arcTo(midx, endPos.y - radius, rightx, endPos.y - radius, radius);
+      context.arcTo(endPos.x, endPos.y - radius, endPos.x, endPos.y, radius);
+    }
+    // If the start rect is to the right side of the end rect.
+    else if (startRect.left - coreRadius > endRect.left + endRect.width) {
+      var midx = (startRect.left + endRect.left + endRect.width) / 2;
+      var midy = (endPos.y + startPos.y) / 2;
+      var leftx = (midx + endPos.x) / 2;
+      var rightx = (startPos.x + midx) / 2;
+      var radius = Math.min(coreRadius, Math.abs(endPos.y - startPos.y)/4, Math.abs(midx - leftx), Math.abs(midx - rightx));
+      context.arcTo(startPos.x, startPos.y + radius, rightx, startPos.y + radius, radius);
+      context.arcTo(midx, startPos.y + radius, midx, midy, radius);
+      context.arcTo(midx, endPos.y - radius, leftx, endPos.y - radius, radius);
+      context.arcTo(endPos.x, endPos.y - radius, endPos.x, endPos.y, radius);
+    }
+    // If the start link is below the end link. Makes a loop around the nodes.
+    else if (startPos.y > endPos.y) {
+      var x = startPos.x;
+      var bottom = Math.max(startRect.top + startRect.height + coreRadius, endRect.top + endRect.height + coreRadius);
+      var midy = (startPos.y + endPos.y) / 2;
+      // Choose left or right.
+      if (startPos.x > endPos.x) {
+        // Left
+        x = Math.min(startRect.left - coreRadius, endRect.left - coreRadius);
+        bottom -= 2;
+      } else {
+        // Right
+        x = Math.max(startRect.left + startRect.width + coreRadius, endRect.left + endRect.width + coreRadius);
+        bottom += 2;
+      }
+      var midx = (startPos.x + x) / 2;
+      var radius = Math.min(coreRadius, Math.abs(x - endPos.x)/2);
+
+      context.arcTo(startPos.x, bottom, midx, bottom, radius);
+      context.arcTo(x, bottom, x, midy, radius);
+      context.arcTo(x, endPos.y - radius, midx, endPos.y - radius, radius);
+      context.arcTo(endPos.x, endPos.y - radius, endPos.x, endPos.y, radius);
+    }
+
+    // Finish our line to the end position.
     context.lineTo(endPos.x, endPos.y);
     context.stroke();
     context.restore();
@@ -1668,9 +1752,68 @@ wcPlayEditor.prototype = {
     context.strokeStyle = (highlight? 'cyan': (flash? '#55FF00': '#33CC33'));
     context.lineWidth = 2;
     context.lineCap = "round";
-
+    context.lineJoin = "round";
     context.beginPath();
     context.moveTo(startPos.x, startPos.y);
+
+    var coreRadius = 25;
+
+    // If the output link is to the right the input link
+    if (startPos.x + coreRadius &lt; endPos.x &amp;&amp; startPos.y !== endPos.y) {
+      var midx = (endPos.x + startPos.x) / 2;
+      var midy = (endPos.y + startPos.y) / 2;
+      var radius = Math.min(coreRadius, Math.abs(endPos.x - startPos.x)/2, Math.abs(endPos.y - startPos.y)/2);
+      context.arcTo(midx, startPos.y, midx, midy, radius);
+      context.arcTo(midx, endPos.y, endPos.x, endPos.y, radius);
+    }
+    // If the start rect is below the end rect.
+    else if (startRect.top + startRect.height + coreRadius &lt; endRect.top) {
+      var midx = (endPos.x + startPos.x) / 2;
+      var midy = (endRect.top + startRect.top + startRect.height) / 2 - 2;
+      var topy = (midy + startPos.y) / 2;
+      var bottomy = (endPos.y + midy) / 2;
+      var radius = Math.min(coreRadius, Math.abs(endPos.x - startPos.x)/4, Math.abs(midy - topy), Math.abs(midy - bottomy));
+      context.arcTo(startPos.x + radius, startPos.y, startPos.x + radius, topy, radius);
+      context.arcTo(startPos.x + radius, midy, midx, midy, radius);
+      context.arcTo(endPos.x - radius, midy, endPos.x - radius, bottomy, radius);
+      context.arcTo(endPos.x - radius, endPos.y, endPos.x, endPos.y, radius);
+    }
+    // If the start rect above the end rect.
+    else if (startRect.top - coreRadius > endRect.top + endRect.height) {
+      var midx = (endPos.x + startPos.x) / 2;
+      var midy = (startRect.top + endRect.top + endRect.height) / 2 + 2;
+      var topy = (midy + endPos.y) / 2;
+      var bottomy = (startPos.y + midy) / 2;
+      var radius = Math.min(coreRadius, Math.abs(endPos.x - startPos.x)/4, Math.abs(midy - topy), Math.abs(midy - bottomy));
+      context.arcTo(startPos.x + radius, startPos.y, startPos.x + radius, bottomy, radius);
+      context.arcTo(startPos.x + radius, midy, midx, midy, radius);
+      context.arcTo(endPos.x - radius, midy, endPos.x - radius, topy, radius);
+      context.arcTo(endPos.x - radius, endPos.y, endPos.x, endPos.y, radius);
+    }
+    // If the start link is to the right of the end link.
+    else if (startPos.x > endPos.x) {
+      var y = startPos.y;
+      var right = Math.max(startRect.left + startRect.width + coreRadius, endRect.left + endRect.width + coreRadius);
+      var midx = (startPos.x + endPos.x) / 2;
+      // Choose top or bottom.
+      if (startPos.y > endPos.y) {
+        // Top
+        y = Math.min(startRect.top - coreRadius, endRect.top - coreRadius);
+        right -= 2;
+      } else {
+        // Bottom
+        y = Math.max(startRect.top + startRect.height + coreRadius, endRect.top + endRect.height + coreRadius);
+        right += 2;
+      }
+      var midy = (startPos.y + y) / 2;
+      var radius = Math.min(coreRadius, Math.abs(y - endPos.y)/2);
+
+      context.arcTo(right, startPos.y, right, midy, radius);
+      context.arcTo(right, y, midx, y, radius);
+      context.arcTo(endPos.x - radius, y, endPos.x - radius, midy, radius);
+      context.arcTo(endPos.x - radius, endPos.y, endPos.x, endPos.y, radius);
+    }
+
     context.lineTo(endPos.x, endPos.y);
     context.stroke();
     context.restore();
