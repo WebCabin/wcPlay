@@ -2664,8 +2664,8 @@ wcPlayEditor.prototype = {
       // Create an instance of the node and add it to the script.
       var mouse = this.__mouse(event, this.$viewport.offset(), this._viewportCamera);
       var newNode = new window[this._draggingNodeData.node.className](this._engine, {
-        x: mouse.x / this._viewportCamera.z,
-        y: mouse.y / this._viewportCamera.z,
+        x: (mouse.x + (this._draggingNodeData.$canvas.width()/2 + this._draggingNodeData.offset.x)) / this._viewportCamera.z,
+        y: (mouse.y + this._draggingNodeData.offset.y) / this._viewportCamera.z,
       });
 
       this._draggingNodeData.$canvas.remove();
