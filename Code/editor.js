@@ -80,6 +80,8 @@ function wcPlayEditor(container, options) {
   this._selectedInputLink = false;
   this._selectedOutputLink = false;
 
+  this._draggingNodeData = null;
+
   // Setup our options.
   this._options = {
     readOnly: false,
@@ -89,8 +91,11 @@ function wcPlayEditor(container, options) {
   }
 
   this.$palette = $('<div class="wcPlayPalette">');
+  this.$paletteInner = $('<div class="wcPlayPaletteInner">');
   this.$viewport = $('<canvas class="wcPlayViewport">');
   this._viewportContext = this.$viewport[0].getContext('2d');
+
+  this.$palette.append(this.$paletteInner);
 
   this.$container.append(this.$palette);
   this.$container.append(this.$viewport);
@@ -170,6 +175,8 @@ wcPlayEditor.prototype = {
       return {
         x: touch.clientX - (offset? offset.left: 0) - (translation? translation.x: 0),
         y: touch.clientY - (offset? offset.top: 0) - (translation? translation.y: 0),
+        gx: touch.clientX,
+        gy: touch.clientY,
         which: 1,
       };
     }
@@ -177,6 +184,8 @@ wcPlayEditor.prototype = {
     return {
       x: (event.clientX || event.pageX) - (offset? offset.left: 0) - (translation? translation.x: 0),
       y: (event.clientY || event.pageY) - (offset? offset.top: 0) - (translation? translation.y: 0),
+      gx: (event.clientX || event.pageX),
+      gy: (event.clientY || event.pageY),
       which: event.which || 1,
     };
   },
@@ -331,12 +340,7 @@ wcPlayEditor.prototype = {
     if (this._engine) {
 
       // Render the palette.
-      // this._paletteContext.clearRect(0, 0, this.$palette.width(), this.$palette.height());
-      // this._paletteContext.save();
-      // this._viewportContext.translate(this._paletteCamera.x, this._paletteCamera.y);
-
-      // Render the palette node type selection bar.
-      this.__drawPalette();
+      this.__drawPalette(elapsed);
 
       // Setup viewport canvas.
       this._viewportContext.clearRect(0, 0, this.$viewport.width(), this.$viewport.height());
@@ -435,6 +439,21 @@ wcPlayEditor.prototype = {
   },
 
   /**
+   * Retrieves the index for a node type.
+   * @function wcPlayEditor#__typeIndex
+   * @private
+   * @param {wcPlay.NODE_TYPE} type - The node type.
+   * @returns {Number} - The type index.
+   */
+  __typeIndex: function(type) {
+    switch (type) {
+      case wcPlay.NODE_TYPE.ENTRY: return 0;
+      case wcPlay.NODE_TYPE.PROCESS: return 1;
+      case wcPlay.NODE_TYPE.STORAGE: return 2;
+    }
+  },
+
+  /**
    * Initializes the palette view.
    * @function wcPlayEditor#__setupPalette
    * @private
@@ -451,9 +470,9 @@ wcPlayEditor.prototype = {
     this.$typeArea.push($('<div class="wcPlayTypeArea">'));
     this.$typeArea.push($('<div class="wcPlayTypeArea wcPlayHidden">'));
     this.$typeArea.push($('<div class="wcPlayTypeArea wcPlayHidden">'));
-    this.$palette.append(this.$typeArea[0]);
-    this.$palette.append(this.$typeArea[1]);
-    this.$palette.append(this.$typeArea[2]);
+    this.$paletteInner.append(this.$typeArea[0]);
+    this.$paletteInner.append(this.$typeArea[1]);
+    this.$paletteInner.append(this.$typeArea[2]);
 
     // Initialize our node library.
     for (var i = 0; i < wcPlay.NODE_LIBRARY.length; ++i) {
@@ -476,17 +495,7 @@ wcPlayEditor.prototype = {
         typeData.context = typeData.$canvas[0].getContext('2d');
         typeData.$category.append(typeData.$button);
         typeData.$category.append(typeData.$canvas);
-        switch (data.type) {
-          case wcPlay.NODE_TYPE.ENTRY:
-            this.$typeArea[0].append(typeData.$category);
-            break;
-          case wcPlay.NODE_TYPE.PROCESS:
-            this.$typeArea[1].append(typeData.$category);
-            break;
-          case wcPlay.NODE_TYPE.STORAGE:
-            this.$typeArea[2].append(typeData.$category);
-            break;
-        }
+        this.$typeArea[this.__typeIndex(data.type)].append(typeData.$category);
 
         (function __setupCollapseHandler(d) {
           d.$button.click(function() {
@@ -513,9 +522,9 @@ wcPlayEditor.prototype = {
     for (var cat in this._nodeLibrary) {
       for (var type in this._nodeLibrary[cat]) {
         var typeData = this._nodeLibrary[cat][type];
-        typeData.$canvas.attr('width', this.$palette.width());
+        typeData.$canvas.attr('width', this.$paletteInner.width());
         var yPos = this._drawStyle.palette.spacing;
-        var xPos = this.$palette.width() / 2;
+        var xPos = this.$paletteInner.width() / 2;
         for (var i = 0; i < typeData.nodes.length; ++i) {
           var drawData = this.__drawNode(typeData.nodes[i], {x: xPos, y: yPos}, typeData.context, true);
           yPos += drawData.rect.height + this._drawStyle.palette.spacing;
@@ -558,17 +567,33 @@ wcPlayEditor.prototype = {
    * Draws each node in the palette view.
    * @function wcPlayEditor#__drawPalette
    * @private
+   * @param {Number} elapsed - Elapsed time since last update.
    */
-  __drawPalette: function() {
+  __drawPalette: function(elapsed) {
     for (var cat in this._nodeLibrary) {
       for (var type in this._nodeLibrary[cat]) {
+
+        // Ignore types that are not visible.
+        if (!this.$typeButton[this.__typeIndex(type)].hasClass('wcToggled')) continue;
+
         var typeData = this._nodeLibrary[cat][type];
+
+        // Ignore categories that are not visible.
+        if (typeData.$button.hasClass('wcToggled')) continue;
+
         var yPos = this._drawStyle.palette.spacing;
-        var xPos = this.$palette.width() / 2;
+        var xPos = this.$paletteInner.width() / 2;
+        typeData.$canvas.attr('width', this.$paletteInner.width());
+        typeData.context.clearRect(0, 0, typeData.$canvas.width(), typeData.$canvas.height());
+        typeData.context.save();
+        this.__updateNodes(typeData.nodes, elapsed);
+
         for (var i = 0; i < typeData.nodes.length; ++i) {
           var drawData = this.__drawNode(typeData.nodes[i], {x: xPos, y: yPos}, typeData.context, true);
           yPos += drawData.rect.height + this._drawStyle.palette.spacing;
         }
+
+        typeData.context.restore();
       }
     }
   },
@@ -1625,7 +1650,9 @@ wcPlayEditor.prototype = {
     var self = this;
 
     // Palette
-    this.$viewport.on('mousemove',  function(event){self.__onPaletteMouseMove(event, this);});
+    this.$palette.on('mousemove',  function(event){self.__onPaletteMouseMove(event, this);});
+    this.$palette.on('mousedown',  function(event){self.__onPaletteMouseDown(event, this);});
+    this.$palette.on('mouseup',  function(event){self.__onPaletteMouseUp(event, this);});
 
     // Viewport
     this.$viewport.on('mousemove',  function(event){self.__onViewportMouseMove(event, this);});
@@ -1638,153 +1665,107 @@ wcPlayEditor.prototype = {
   },
 
   /**
-   * Handle mouse move events over the viewport canvas.
-   * @function wcPlayEditor#__onViewportMouseMove
+   * Handle mouse move events over the palette view.
+   * @function wcPlayEditor#__onPaletteMouseMove
    * @private
    * @param {Object} event - The mouse event.
    * @param {Object} elem - The target element.
    */
   __onPaletteMouseMove: function(event, elem) {
-    var mouse = this.__mouse(event, this.$palette.offset());
-    if (mouse.x !== this._mouse.x || mouse.y !== this._mouse.y) {
-      this._mouseMoved = true;
+    var mouse = this.__mouse(event);
+
+    this._highlightCollapser = false;
+    this._highlightBreakpoint = false;
+    this._highlightEntryLink = false;
+    this._highlightExitLink = false;
+    this._highlightInputLink = false;
+    this._highlightOutputLink = false;
+    this._highlightPropertyValue = false;
+
+    // Dragging a node from the palette view.
+    if (this._draggingNodeData) {
+      var pos = {
+        x: mouse.gx + this._draggingNodeData.offset.x,
+        y: mouse.gy + this._draggingNodeData.offset.y,
+      };
+
+      this._draggingNodeData.$canvas.css('left', pos.x).css('top', pos.y);
+      return;
     }
 
-    // // Viewport panning.
-    // if (this._viewportMoving) {
-    //   var moveX = mouse.x - this._mouse.x;
-    //   var moveY = mouse.y - this._mouse.y;
-    //   this._viewportCamera.x += moveX;
-    //   this._viewportCamera.y += moveY;
-    //   this._mouse = mouse;
-    //   if (!this._viewportMoved) {
-    //     this._viewportMoved = true;
-    //     this.$viewport.addClass('wcMoving');
-    //   }
-    //   return;
-    // }
+    var categoryData = this.__findCategoryAreaAtPos(mouse);
+    if (categoryData) {
+      var offset = categoryData.$canvas.offset();
+      mouse = this.__mouse(event, offset);
+      var node = this.__findNodeAtPos(mouse, undefined, categoryData.nodes);
+      if (node) {
+        this._highlightNode = node;
+        this.$palette.addClass('wcClickable');
+      } else {
+        this._highlightNode = null;
+        this.$palette.removeClass('wcClickable');
+      }
+    }
+  },
 
-    // if (this._viewportMovingNode) {
-    //   var moveX = mouse.x - this._mouse.x;
-    //   var moveY = mouse.y - this._mouse.y;
-    //   this._selectedNode.pos.x += moveX / this._viewportCamera.z;
-    //   this._selectedNode.pos.y += moveY / this._viewportCamera.z;
-    //   this._mouse = mouse;
-    //   return;
-    // }
+  /**
+   * Handle mouse down events over the palette view.
+   * @function wcPlayEditor#__onPaletteMouseDown
+   * @private
+   * @param {Object} event - The mouse event.
+   * @param {Object} elem - The target element.
+   */
+  __onPaletteMouseDown: function(event, elem) {
+    if (this._highlightNode) {
+      this.__onPaletteMouseUp(event, elem);
+      var mouse = this.__mouse(event);
+      var rect = this._highlightNode._meta.bounds.rect;
+      var categoryData = this.__findCategoryAreaAtPos(mouse);
+      if (categoryData) {
+        var offset = categoryData.$canvas.offset();
 
-    // this._mouse = mouse;
-    // this._highlightCollapser = false;
-    // this._highlightBreakpoint = false;
-    // this._highlightEntryLink = false;
-    // this._highlightExitLink = false;
-    // this._highlightInputLink = false;
-    // this._highlightOutputLink = false;
-    // this._highlightPropertyValue = false;
+        this._draggingNodeData = {
+          node: this._highlightNode,
+          $canvas: $('<canvas class="wcPlayHoverCanvas">'),
+          offset: {x: 0, y: 0}
+        };
+        this.$container.append(this._draggingNodeData.$canvas);
 
-    // var node = this.__findNodeAtPos(mouse, this._viewportCamera);
-    // if (node) {
+        this.$palette.addClass('wcMoving');
+        this.$viewport.addClass('wcMoving');
 
-    //   // Collapser button.
-    //   if (this.__inRect(mouse, node._meta.bounds.collapser, this._viewportCamera)) {
-    //     this._highlightCollapser = true;
-    //   }
+        this._draggingNodeData.$canvas.css('left', rect.left + offset.left).css('top', rect.top + offset.top);
+        this._draggingNodeData.$canvas.attr('width', rect.width).css('width', rect.width);
+        this._draggingNodeData.$canvas.attr('height', rect.height).css('height', rect.height);
 
-    //   // Breakpoint button.
-    //   if (this.__inRect(mouse, node._meta.bounds.breakpoint, this._viewportCamera)) {
-    //     this._highlightBreakpoint = true;
-    //   }
+        this._draggingNodeData.offset.x = (rect.left + offset.left) - mouse.x;
+        this._draggingNodeData.offset.y = (rect.top + offset.top) - mouse.y;
 
-    //   // Entry links.
-    //   for (var i = 0; i < node._meta.bounds.entryBounds.length; ++i) {
-    //     if (this.__inRect(mouse, node._meta.bounds.entryBounds[i].rect, this._viewportCamera)) {
-    //       this._highlightNode = node;
-    //       this._highlightEntryLink = node._meta.bounds.entryBounds[i];
-    //       break;
-    //     }
-    //   }
+        var yPos = 0;
+        if (!this._highlightNode.chain.entry.length) {
+          yPos += this._drawStyle.links.length;
+        }
 
-    //   // Exit links.
-    //   for (var i = 0; i < node._meta.bounds.exitBounds.length; ++i) {
-    //     if (this.__inRect(mouse, node._meta.bounds.exitBounds[i].rect, this._viewportCamera)) {
-    //       this._highlightNode = node;
-    //       this._highlightExitLink = node._meta.bounds.exitBounds[i];
-    //       break;
-    //     }
-    //   }
+        this.__drawNode(this._highlightNode, {x: rect.width/2, y: yPos}, this._draggingNodeData.$canvas[0].getContext('2d'), true);
+      }
+    }
+  },
 
-    //   // Input links.
-    //   for (var i = 0; i < node._meta.bounds.inputBounds.length; ++i) {
-    //     if (this.__inRect(mouse, node._meta.bounds.inputBounds[i].rect, this._viewportCamera)) {
-    //       this._highlightNode = node;
-    //       this._highlightInputLink = node._meta.bounds.inputBounds[i];
-    //       break;
-    //     }
-    //   }
-
-    //   // Output links.
-    //   for (var i = 0; i < node._meta.bounds.outputBounds.length; ++i) {
-    //     if (this.__inRect(mouse, node._meta.bounds.outputBounds[i].rect, this._viewportCamera)) {
-    //       this._highlightNode = node;
-    //       this._highlightOutputLink = node._meta.bounds.outputBounds[i];
-    //       break;
-    //     }
-    //   }
-
-    //   // Property values.
-    //   var propBounds;
-    //   for (var i = 0; i < node._meta.bounds.valueBounds.length; ++i) {
-    //     if (this.__inRect(this._mouse, node._meta.bounds.valueBounds[i].rect, this._viewportCamera)) {
-    //       propBounds = node._meta.bounds.valueBounds[i];
-    //       break;
-    //     }
-    //   }
-
-    //   if (propBounds) {
-    //     for (var i = 0; i < node.properties.length; ++i) {
-    //       if (node.properties[i].name === propBounds.name) {
-    //         this._highlightNode = node;
-    //         this._highlightPropertyValue = propBounds;
-    //         break;
-    //       }
-    //     }
-    //   }
-
-    //   // Check for main node collision.
-    //   if (this.__inRect(mouse, node._meta.bounds.inner, this._viewportCamera)) {
-    //     this._highlightNode = node;
-    //     this.$viewport.addClass('wcClickable');
-    //   } else {
-    //     this.$viewport.removeClass('wcClickable');
-    //   }
-    // } else {
-    //   this._highlightNode = null;
-    //   this.$viewport.removeClass('wcClickable');
-    // }
-
-    // // If you hover over a node that is not currently expanded by hovering, force the expanded node to collapse again.
-    // if (this._expandedNode && this._expandedNode !== this._highlightNode) {
-    //   // If we are not highlighting a new node, only uncollapse the previously hovered node if we are far from it.
-    //   if (this._highlightNode || !this.__inRect(mouse, this._expandedNode._meta.bounds.farRect, this._viewportCamera)) {
-    //     // Recollapse our previous node, if necessary.
-    //     if (this._expandedNodeWasCollapsed) {
-    //       this._expandedNode.collapsed(true);
-    //     }
-
-    //     this._expandedNode = null;
-    //   }
-    // }
-
-    // // If the user is creating a new connection and hovering over another node, uncollapse it temporarily to expose links.
-    // if (!this._expandedNode && this._highlightNode &&
-    //     (this._selectedEntryLink || this._selectedExitLink ||
-    //     this._selectedInputLink || this._selectedOutputLink) && 
-    //     this.__inRect(mouse, node._meta.bounds.inner, this._viewportCamera)) {
-
-    //   this._expandedNode = this._highlightNode;
-    //   this._expandedNodeWasCollapsed = this._expandedNode.collapsed();
-    //   this._expandedNode.collapsed(false);
-    // }
+  /**
+   * Handle mouse up events over the palette view.
+   * @function wcPlayEditor#__onPaletteMouseDown
+   * @private
+   * @param {Object} event - The mouse event.
+   * @param {Object} elem - The target element.
+   */
+  __onPaletteMouseUp: function(event, elem) {
+    if (this._draggingNodeData) {
+      this._draggingNodeData.$canvas.remove();
+      this._draggingNodeData.$canvas = null;
+      this._draggingNodeData = null;
+      this.$palette.removeClass('wcMoving');
+      this.$viewport.removeClass('wcMoving');
+    }
   },
 
   /**
@@ -1798,6 +1779,17 @@ wcPlayEditor.prototype = {
     var mouse = this.__mouse(event, this.$viewport.offset());
     if (mouse.x !== this._mouse.x || mouse.y !== this._mouse.y) {
       this._mouseMoved = true;
+    }
+
+    // Dragging a node from the palette view.
+    if (this._draggingNodeData) {
+      var pos = {
+        x: mouse.gx + this._draggingNodeData.offset.x,
+        y: mouse.gy + this._draggingNodeData.offset.y,
+      };
+
+      this._draggingNodeData.$canvas.css('left', pos.x).css('top', pos.y);
+      return;
     }
 
     // Viewport panning.
@@ -1836,66 +1828,78 @@ wcPlayEditor.prototype = {
     if (node) {
 
       // Collapser button.
-      if (this.__inRect(mouse, node._meta.bounds.collapser, this._viewportCamera)) {
-        this._highlightCollapser = true;
-      }
+      if (!this._selectedEntryLink && !this._selectedExitLink && !this._selectedInputLink && !this._selectedOutputLink) {
+        if (this.__inRect(mouse, node._meta.bounds.collapser, this._viewportCamera)) {
+          this._highlightCollapser = true;
+        }
 
-      // Breakpoint button.
-      if (this.__inRect(mouse, node._meta.bounds.breakpoint, this._viewportCamera)) {
-        this._highlightBreakpoint = true;
+        // Breakpoint button.
+        if (this.__inRect(mouse, node._meta.bounds.breakpoint, this._viewportCamera)) {
+          this._highlightBreakpoint = true;
+        }
       }
 
       // Entry links.
-      for (var i = 0; i < node._meta.bounds.entryBounds.length; ++i) {
-        if (this.__inRect(mouse, node._meta.bounds.entryBounds[i].rect, this._viewportCamera)) {
-          this._highlightNode = node;
-          this._highlightEntryLink = node._meta.bounds.entryBounds[i];
-          break;
+      if (!this._selectedEntryLink && !this._selectedInputLink && !this._selectedOutputLink) {
+        for (var i = 0; i < node._meta.bounds.entryBounds.length; ++i) {
+          if (this.__inRect(mouse, node._meta.bounds.entryBounds[i].rect, this._viewportCamera)) {
+            this._highlightNode = node;
+            this._highlightEntryLink = node._meta.bounds.entryBounds[i];
+            break;
+          }
         }
       }
 
       // Exit links.
-      for (var i = 0; i < node._meta.bounds.exitBounds.length; ++i) {
-        if (this.__inRect(mouse, node._meta.bounds.exitBounds[i].rect, this._viewportCamera)) {
-          this._highlightNode = node;
-          this._highlightExitLink = node._meta.bounds.exitBounds[i];
-          break;
+      if (!this._selectedExitLink && !this._selectedInputLink && !this._selectedOutputLink) {
+        for (var i = 0; i < node._meta.bounds.exitBounds.length; ++i) {
+          if (this.__inRect(mouse, node._meta.bounds.exitBounds[i].rect, this._viewportCamera)) {
+            this._highlightNode = node;
+            this._highlightExitLink = node._meta.bounds.exitBounds[i];
+            break;
+          }
         }
       }
 
       // Input links.
-      for (var i = 0; i < node._meta.bounds.inputBounds.length; ++i) {
-        if (this.__inRect(mouse, node._meta.bounds.inputBounds[i].rect, this._viewportCamera)) {
-          this._highlightNode = node;
-          this._highlightInputLink = node._meta.bounds.inputBounds[i];
-          break;
+      if (!this._selectedEntryLink && !this._selectedExitLink && !this._selectedInputLink) {
+        for (var i = 0; i < node._meta.bounds.inputBounds.length; ++i) {
+          if (this.__inRect(mouse, node._meta.bounds.inputBounds[i].rect, this._viewportCamera)) {
+            this._highlightNode = node;
+            this._highlightInputLink = node._meta.bounds.inputBounds[i];
+            break;
+          }
         }
       }
 
-      // Output links.
-      for (var i = 0; i < node._meta.bounds.outputBounds.length; ++i) {
-        if (this.__inRect(mouse, node._meta.bounds.outputBounds[i].rect, this._viewportCamera)) {
-          this._highlightNode = node;
-          this._highlightOutputLink = node._meta.bounds.outputBounds[i];
-          break;
+        // Output links.
+      if (!this._selectedEntryLink && !this._selectedExitLink && !this._selectedOutputLink) {
+        for (var i = 0; i < node._meta.bounds.outputBounds.length; ++i) {
+          if (this.__inRect(mouse, node._meta.bounds.outputBounds[i].rect, this._viewportCamera)) {
+            this._highlightNode = node;
+            this._highlightOutputLink = node._meta.bounds.outputBounds[i];
+            break;
+          }
         }
       }
 
       // Property values.
-      var propBounds;
-      for (var i = 0; i < node._meta.bounds.valueBounds.length; ++i) {
-        if (this.__inRect(this._mouse, node._meta.bounds.valueBounds[i].rect, this._viewportCamera)) {
-          propBounds = node._meta.bounds.valueBounds[i];
-          break;
-        }
-      }
-
-      if (propBounds) {
-        for (var i = 0; i < node.properties.length; ++i) {
-          if (node.properties[i].name === propBounds.name) {
-            this._highlightNode = node;
-            this._highlightPropertyValue = propBounds;
+      if (!this._selectedEntryLink && !this._selectedExitLink && !this._selectedInputLink && !this._selectedOutputLink) {
+        var propBounds;
+        for (var i = 0; i < node._meta.bounds.valueBounds.length; ++i) {
+          if (this.__inRect(this._mouse, node._meta.bounds.valueBounds[i].rect, this._viewportCamera)) {
+            propBounds = node._meta.bounds.valueBounds[i];
             break;
+          }
+        }
+
+        if (propBounds) {
+          for (var i = 0; i < node.properties.length; ++i) {
+            if (node.properties[i].name === propBounds.name) {
+              this._highlightNode = node;
+              this._highlightPropertyValue = propBounds;
+              break;
+            }
           }
         }
       }
@@ -2128,6 +2132,18 @@ wcPlayEditor.prototype = {
         }
       }
 
+      // Output links.
+      if (!hasTarget) {
+        for (var i = 0; i < node._meta.bounds.outputBounds.length; ++i) {
+          if (this.__inRect(this._mouse, node._meta.bounds.outputBounds[i].rect, this._viewportCamera)) {
+            hasTarget = true;
+            // Double click to manually fire this output chain.
+            node.property(node._meta.bounds.outputBounds[i].name, node.property(node._meta.bounds.outputBounds[i].name), true);
+            break;
+          }
+        }
+      }
+
       // Center area.
       if (!hasTarget && this.__inRect(this._mouse, node._meta.bounds.inner, this._viewportCamera)) {
         hasTarget = true;
@@ -2144,6 +2160,20 @@ wcPlayEditor.prototype = {
    * @param {Object} elem - The target element.
    */
   __onViewportMouseUp: function(event, elem) {
+    if (this._draggingNodeData) {
+      // Create an instance of the node and add it to the script.
+      var mouse = this.__mouse(event, this.$viewport.offset(), this._viewportCamera);
+      var newNode = new window[this._draggingNodeData.node.className](this._engine, {
+        x: mouse.x / this._viewportCamera.z,
+        y: mouse.y / this._viewportCamera.z,
+      });
+
+      this._draggingNodeData.$canvas.remove();
+      this._draggingNodeData.$canvas = null;
+      this._draggingNodeData = null;
+      this.$palette.removeClass('wcMoving');
+      this.$viewport.removeClass('wcMoving');
+    }
 
     // Check for link connections.
     if (this._selectedNode && this._selectedEntryLink && this._highlightNode && this._highlightExitLink) {
@@ -2213,9 +2243,10 @@ wcPlayEditor.prototype = {
    * @private
    * @param {wcPlay~Coordinates} pos - The position.
    * @param {wcPlay~Coordinates} camera - The position of the camera.
+   * @param {wcNode[]} [nodes] - If supplied, will only search this list of nodes, otherwise will search all nodes in the viewport.
    * @returns {wcNode|null} - A node at the given position, or null if none was found.
    */
-  __findNodeAtPos: function(pos, camera) {
+  __findNodeAtPos: function(pos, camera, nodes) {
     if (this._engine) {
       var self = this;
       function __test(nodes) {
@@ -2228,11 +2259,45 @@ wcPlayEditor.prototype = {
         return null;
       };
 
-      return __test(this._engine._storageNodes) ||
-             __test(this._engine._compositeNodes) ||
-             __test(this._engine._processNodes) ||
-             __test(this._engine._entryNodes);
+      if (nodes === undefined) {
+        return __test(this._engine._storageNodes) ||
+               __test(this._engine._compositeNodes) ||
+               __test(this._engine._processNodes) ||
+               __test(this._engine._entryNodes);
+      } else {
+        return __test(nodes);
+      }
     }
     return null;
+  },
+
+  /**
+   * Finds the category area of the palette at a given position.
+   * @function wcPlayEditor#__findCategoryAreaAtPos
+   * @private
+   * @param {wcPlay~Coordinates} pos - The position.
+   * @returns {Object|null} - The category data found, or null if not found.
+   */
+  __findCategoryAreaAtPos: function(pos) {
+    for (var cat in this._nodeLibrary) {
+      for (var type in this._nodeLibrary[cat]) {
+
+        // Ignore types that are not visible.
+        if (!this.$typeButton[this.__typeIndex(type)].hasClass('wcToggled')) continue;
+
+        var typeData = this._nodeLibrary[cat][type];
+
+        // Ignore categories that are not visible.
+        if (typeData.$button.hasClass('wcToggled')) continue;
+
+        var rect = typeData.$canvas.offset();
+        rect.width = typeData.$canvas.width();
+        rect.height = typeData.$canvas.height();
+        if (this.__inRect(pos, rect)) {
+          return typeData;
+        }
+      }
+    }
+
   },
 };
