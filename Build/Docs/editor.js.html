@@ -2676,8 +2676,8 @@ wcPlayEditor.prototype = {
     this._mouse = this.__mouse(event, this.$viewport.offset());
     this._mouseMoved = false;
 
-    // Control+drag to box select.
-    if (event.ctrlKey) {
+    // Control+drag or middle+drag to box select.
+    if (event.ctrlKey || this._mouse.which === 2) {
       this._highlightRect = {
         top: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z,
         left: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z,
