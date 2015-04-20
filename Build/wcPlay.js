@@ -5379,7 +5379,7 @@ wcNode.extend('wcNodeStorage', 'Storage', '', {
   /**
    * Magic function that is called whenever any new class type is extended from this one.<br>
    * Handles initializing of the class as well as registering the new node type.
-   * @function wcNodeEntry#classInit
+   * @function wcNodeStorage#classInit
    * @param {String} className - The name of the class constructor.
    * @param {String} name - A display name for the node.
    * @param {String} category - A category where this node will be grouped.
@@ -5591,7 +5591,7 @@ wcNodeProcess.extend('wcNodeProcessOperation', 'Operation', 'Core', {
   /**
    * Event that is called when an entry link has been triggered.<br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNodeProcessDelay#onTriggered
+   * @function wcNodeProcessOperation#onTriggered
    * @param {String} name - The name of the entry link triggered.
    */
   onTriggered: function(name) {
