@@ -991,7 +991,7 @@ wcPlayEditor.prototype = {
           rect: rect,
           point: {
             x: rect.left + rect.width/2,
-            y: rect.top + rect.height/3,
+            y: rect.top + rect.height/3 - 2,
           },
           name: links[i].name,
         });
@@ -1058,7 +1058,7 @@ wcPlayEditor.prototype = {
           rect: rect,
           point: {
             x: rect.left + rect.width/2,
-            y: rect.top + rect.height,
+            y: rect.top + rect.height + 1,
           },
           name: links[i].name,
         });
@@ -1256,7 +1256,7 @@ wcPlayEditor.prototype = {
           result.inputBounds.push({
             rect: linkRect,
             point: {
-              x: linkRect.left + linkRect.width/3,
+              x: linkRect.left + linkRect.width/3 - 2,
               y: linkRect.top + linkRect.height/2,
             },
             name: props[i].name,
@@ -1291,7 +1291,7 @@ wcPlayEditor.prototype = {
           result.outputBounds.push({
             rect: linkRect,
             point: {
-              x: linkRect.left + linkRect.width,
+              x: linkRect.left + linkRect.width + 1,
               y: linkRect.top + linkRect.height/2,
             },
             name: props[i].name,
@@ -1696,7 +1696,7 @@ wcPlayEditor.prototype = {
    */
   __drawPropertyChain: function(startPos, endPos, startRect, endRect, context, flash, highlight) {
     context.save();
-    context.strokeStyle = (highlight? 'cyan': (flash? '#55FF00': '#33CC33'));
+    context.strokeStyle = (highlight? 'cyan': (flash? '#AAFF33': '#33CC33'));
     context.lineWidth = 2;
     context.lineCap = "round";
     context.lineJoin = "round";
@@ -1779,6 +1779,7 @@ wcPlayEditor.prototype = {
     var $control = null;
     var cancelled = false;
     var enterConfirms = true;
+    var propFn = (initial? 'initialProperty': 'property');
 
     var type = property.type;
     if (type === wcPlay.PROPERTY_TYPE.DYNAMIC) {
@@ -1798,7 +1799,7 @@ wcPlayEditor.prototype = {
       {
         id: node.id,
         name: name,
-        initial: initial,
+        propFn: propFn,
         oldValue: oldValue,
         newValue: newValue,
         editor: self,
@@ -1806,20 +1807,12 @@ wcPlayEditor.prototype = {
       // Undo
       function() {
         var myNode = this.editor._engine.nodeById(this.id);
-        if (this.initial) {
-          myNode.initialProperty(this.name, this.oldValue);
-        } else {
-          myNode.property(this.name, this.oldValue);
-        }
+        myNode[this.propFn](this.name, this.oldValue);
       },
       // Redo
       function() {
         var myNode = this.editor._engine.nodeById(this.id);
-        if (this.initial) {
-          myNode.initialProperty(this.name, this.newValue);
-        } else {
-          myNode.property(this.name, this.newValue);
-        }
+        myNode[this.propFn](this.name, this.newValue);
       });
     };
 
@@ -1827,32 +1820,17 @@ wcPlayEditor.prototype = {
     switch (type) {
       case wcPlay.PROPERTY_TYPE.TOGGLE:
         // Toggles do not show an editor, instead, they just toggle their state.
-        if (initial) {
-          var state = node.initialProperty(property.name);
-          undoChange(node, property.name, state, !state);
-          node.initialProperty(property.name, !state);
-        } else {
-          var state = node.property(property.name);
-          undoChange(node, property.name, state, !state);
-          node.property(property.name, !state);
-        }
+        var state = node[propFn](property.name);
+        undoChange(node, property.name, state, !state);
+        node[propFn](property.name, !state);
         break;
       case wcPlay.PROPERTY_TYPE.NUMBER:
         $control = $('<input type="number"' + (property.options.min? ' min="' + property.options.min + '"': '') + (property.options.max? ' max="' + property.options.max + '"': '') + (property.options.step? ' step="' + property.options.step + '"': '') + '>');
-        if (initial) {
-          $control.val(parseFloat(node.initialProperty(property.name)));
-        } else {
-          $control.val(parseFloat(node.property(property.name)));
-        }
+        $control.val(parseFloat(node[propFn](property.name)));
         $control.change(function() {
           if (!cancelled) {
-            if (initial) {
-              undoChange(node, property.name, node.initialProperty(property.name), $control.val());
-              node.initialProperty(property.name, $control.val());
-            } else {
-              undoChange(node, property.name, node.property(property.name), $control.val());
-              node.property(property.name, $control.val());
-            }
+            undoChange(node, property.name, node[propFn](property.name), $control.val());
+            node[propFn](property.name, $control.val());
           }
         });
         break;
@@ -1863,20 +1841,11 @@ wcPlayEditor.prototype = {
         } else {
           $control = $('<input type="text" maxlength="' + (property.options.maxlength || 524288) + '">');
         }
-        if (initial) {
-          $control.val(node.initialProperty(property.name).toString());
-        } else {
-          $control.val(node.property(property.name).toString());
-        }
+        $control.val(node[propFn](property.name).toString());
         $control.change(function() {
           if (!cancelled) {
-            if (initial) {
-              undoChange(node, property.name, node.initialProperty(property.name), $control.val());
-              node.initialProperty(property.name, $control.val());
-            } else {
-              undoChange(node, property.name, node.property(property.name), $control.val());
-              node.property(property.name, $control.val());
-            }
+            undoChange(node, property.name, node[propFn](property.name), $control.val());
+            node[propFn](property.name, $control.val());
           }
         });
         break;
@@ -1904,7 +1873,7 @@ wcPlayEditor.prototype = {
       $control.keyup(function(event) {
         switch (event.keyCode) {
           case 13: // Enter to confirm.
-            if (enterConfirms || event.shiftKey) {
+            if (enterConfirms || event.ctrlKey) {
               $control.blur();
             }
             break;

@@ -93,7 +93,7 @@ Assuming all saveable actions are recorded as undo events, the manager can also 
 
 [MIT License](http://www.opensource.org/licenses/mit-license.php)
 
-&copy; 2014 Jeff P. Houde ([lochemage@gmail.com](mailto:lochemage@gmail.com))
+&copy; 2014 Jeff P. Houde ([lochemage@webcabin.org](mailto:lochemage@webcabin.org))
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
@@ -103,6 +103,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 ****
 ## Suggestions/Comments? ##
-Please feel free to contact me, Jeff Houde ([lochemage@gmail.com](mailto:lochemage@gmail.com)), for any information or to give feedback and suggestions.
+Please feel free to contact me, Jeff Houde ([lochemage@webcabin.org](mailto:lochemage@webcabin.org)), for any information or to give feedback and suggestions.
 
 Thank you

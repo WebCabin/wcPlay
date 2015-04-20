@@ -209,7 +209,7 @@ wcUndoManager.prototype = {
       this._undoList.push(event);
 
       // Limit the size of undo events available.
-      while (ARPG.UNDO_LIMIT > 0 && this._undoList.length > ARPG.UNDO_LIMIT) {
+      while (this._undoLimit > 0 && this._undoList.length > this._undoLimit) {
         this._undoList.pop(0);
         if (this._currentEvent > -1) {
           this._currentEvent--;
