@@ -463,7 +463,7 @@ wcPlay.prototype = {
       var oldValue = prop.initialValue;
       prop.initialValue = value;
 
-      if (prop.value === oldValue) {
+      if (prop.value == oldValue) {
         prop.value = value;
         this.__notifyNodes('onSharedPropertyChanged', [prop.name, oldValue, prop.value]);
       }
@@ -2334,7 +2334,7 @@ wcPlayEditor.prototype = {
     context.beginPath();
     context.moveTo(startPos.x, startPos.y);
 
-    var coreRadius = 25;
+    var coreRadius = 15;
 
     // If the exit link is above the entry link
     if (startPos.y < endPos.y) {
@@ -2418,7 +2418,7 @@ wcPlayEditor.prototype = {
     context.beginPath();
     context.moveTo(startPos.x, startPos.y);
 
-    var coreRadius = 25;
+    var coreRadius = 15;
 
     // If the output link is to the right the input link
     if (startPos.x < endPos.x) {
@@ -3174,7 +3174,7 @@ wcPlayEditor.prototype = {
             if (node.properties[i].name === propBounds.name) {
               this._highlightNode = node;
               this._highlightPropertyValue = propBounds;
-              this.$viewport.attr('title', 'Click to change the current value of this property.');
+              this.$viewport.attr('title', 'Click to change the current value of this property.\n' + node.properties[i].value);
               break;
             }
           }
@@ -3193,7 +3193,7 @@ wcPlayEditor.prototype = {
             if (node.properties[i].name === propInitialBounds.name) {
               this._highlightNode = node;
               this._highlightPropertyInitialValue = propInitialBounds;
-              this.$viewport.attr('title', 'Click to change the initial value of this property.');
+              this.$viewport.attr('title', 'Click to change the initial value of this property.\n' + node.properties[i].initialValue);
               break;
             }
           }
@@ -5025,7 +5025,7 @@ Class.extend('wcNode', 'Node', '', {
       var prop = this.properties[i];
       if (prop.name === name) {
         if (value !== undefined) {
-          if (prop.value === prop.initialValue) {
+          if (prop.value == prop.initialValue) {
             this.property(name, value);
           }
           prop.initialValue = value;
@@ -5405,7 +5405,7 @@ wcNode.extend('wcNodeStorage', 'Storage', '', {
     this._super();
 
     // Force a property change event so all connected nodes receive our value.
-    this.property('value', this.property('value'), true);
+    // this.property('value', this.property('value'), true);
   },
 });
 

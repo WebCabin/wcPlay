@@ -41,6 +41,6 @@ wcNode.extend('wcNodeStorage', 'Storage', '', {
     this._super();
 
     // Force a property change event so all connected nodes receive our value.
-    this.property('value', this.property('value'), true);
+    // this.property('value', this.property('value'), true);
   },
 });

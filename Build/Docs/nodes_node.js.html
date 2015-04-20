@@ -1081,7 +1081,7 @@ Class.extend('wcNode', 'Node', '', {
       var prop = this.properties[i];
       if (prop.name === name) {
         if (value !== undefined) {
-          if (prop.value === prop.initialValue) {
+          if (prop.value == prop.initialValue) {
             this.property(name, value);
           }
           prop.initialValue = value;

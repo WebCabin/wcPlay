@@ -390,7 +390,7 @@ wcPlay.prototype = {
       var oldValue = prop.initialValue;
       prop.initialValue = value;
 
-      if (prop.value === oldValue) {
+      if (prop.value == oldValue) {
         prop.value = value;
         this.__notifyNodes('onSharedPropertyChanged', [prop.name, oldValue, prop.value]);
       }
