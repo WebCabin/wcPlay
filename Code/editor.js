@@ -858,12 +858,13 @@ wcPlayEditor.prototype = {
     context.fillStyle = (this._highlightBreakpoint && this._highlightNode === node? "darkgray": "white");
     context.fillRect(data.breakpoint.left, data.breakpoint.top, data.breakpoint.width, data.breakpoint.height);
 
-    if (node._break) {
-      context.fillStyle = "darkred";
-      context.beginPath();
-      context.arc(data.breakpoint.left + data.breakpoint.width/2, data.breakpoint.top + data.breakpoint.height/2, Math.min(data.breakpoint.width/2-1, data.breakpoint.height/2-1), 0, 2 * Math.PI);
-      context.fill();
-    }
+    context.strokeStyle = (node._break? "darkred": "black");
+    context.fillStyle = "darkred";
+    context.lineWidth = 2;
+    context.beginPath();
+    context.arc(data.breakpoint.left + data.breakpoint.width/2, data.breakpoint.top + data.breakpoint.height/2, Math.min(data.breakpoint.width/2-2, data.breakpoint.height/2-2), 0, 2 * Math.PI);
+    node._break && context.fill();
+    context.stroke();
 
     context.strokeStyle = "black";
     context.lineWidth = 1;
