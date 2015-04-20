@@ -3294,6 +3294,9 @@ wcPlayEditor.prototype = {
         myNode.id = this.id;
       });
 
+      this._selectedNode = newNode;
+      this._selectedNodes = [newNode];
+
       this._draggingNodeData.$canvas.remove();
       this._draggingNodeData.$canvas = null;
       this._draggingNodeData = null;
