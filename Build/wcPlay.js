@@ -1006,6 +1006,7 @@ wcPlayEditor.prototype = {
     $('.wcPlayEditorMenuOptionSilence').children(':first-child, span:first-child').toggleClass('fa-volume-off', this._engine.silent()).toggleClass('fa-volume-up', !this._engine.silent());
     $('.wcPlayEditorMenuOptionPausePlay').children('i:first-child, span:first-child').toggleClass('fa-play', this._engine.paused()).toggleClass('fa-pause', !this._engine.paused());
     $('.wcPlayEditorMenuOptionDelete').toggleClass('disabled', this._selectedNodes.length === 0);
+    $('.wcPlayEditorMenuOptionComposite').toggleClass('disabled', this._selectedNodes.length === 0);
 
 
     this.onResized();
@@ -1128,6 +1129,7 @@ wcPlayEditor.prototype = {
       case wcPlay.NODE_TYPE.ENTRY: return 0;
       case wcPlay.NODE_TYPE.PROCESS: return 1;
       case wcPlay.NODE_TYPE.STORAGE: return 2;
+      case wcPlay.NODE_TYPE.COMPOSITE: return 3;
     }
   },
 
@@ -1156,6 +1158,8 @@ wcPlayEditor.prototype = {
             <li><span class="wcPlayEditorMenuOptionCopy wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-copy fa-lg"/>Copy<span>Ctrl+C</span></span></li>\
             <li><span class="wcPlayEditorMenuOptionPaste wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-paste fa-lg"/>Paste<span>Ctrl+P</span></span></li>\
             <li><span class="wcPlayEditorMenuOptionDelete wcPlayMenuItem"><i class="wcPlayEditorMenuIcon wcButton fa fa-trash-o fa-lg"/>Delete<span>Del</span></span></li>\
+            <li><hr class="wcPlayMenuSeparator"></li>\
+            <li><span class="wcPlayEditorMenuOptionComposite wcPlayMenuItem" title="Archive all selected nodes into a single \'Composite\' Node."><i class="wcPlayEditorMenuIcon wcButton fa fa-archive fa-lg"/>Create Composite<span></span></span></li>\
           </ul>\
         </li>\
         <li><span>Debugging</span>\
@@ -1191,6 +1195,8 @@ wcPlayEditor.prototype = {
         <div class="wcPlayEditorMenuOptionPaste disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-paste fa-lg" title="Paste"/></div>\
         <div class="wcPlayEditorMenuOptionDelete"><span class="wcPlayEditorMenuIcon wcButton fa fa-trash-o fa-lg" title="Delete"/></div>\
         <div class="ARPG_Separator"></div>\
+        <div class="wcPlayEditorMenuOptionComposite"><span class="wcPlayEditorMenuIcon wcButton fa fa-archive fa-lg" title="Archive all selected nodes into a single \'Composite\' Node."/></div>\
+        <div class="ARPG_Separator"></div>\
         <div class="wcPlayEditorMenuOptionDebugging"><span class="wcPlayEditorMenuIcon wcButton fa fa-dot-circle-o fa-lg" title="Toggle debugging mode for the entire script."/></div>\
         <div class="wcPlayEditorMenuOptionSilence"><span class="wcPlayEditorMenuIcon wcButton fa fa-volume-up fa-lg" title="Toggle silent mode for the entire script (Nodes with debug log enabled will not log when this is active)."/></div>\
         <div class="ARPG_Separator"></div>\
@@ -1217,16 +1223,20 @@ wcPlayEditor.prototype = {
     this.$typeButton.push($('<button class="wcPlayEditorButton wcToggled" title="Show Entry Nodes.">Entry</button>'));
     this.$typeButton.push($('<button class="wcPlayEditorButton" title="Show Process Nodes.">Process</button>'));
     this.$typeButton.push($('<button class="wcPlayEditorButton" title="Show Storage Nodes.">Storage</button>'));
+    this.$typeButton.push($('<button class="wcPlayEditorButton" title="Show Composite Nodes.">Composite</button>'));
     this.$palette.append(this.$typeButton[0]);
     this.$palette.append(this.$typeButton[1]);
     this.$palette.append(this.$typeButton[2]);
+    this.$palette.append(this.$typeButton[3]);
 
     this.$typeArea.push($('<div class="wcPlayTypeArea">'));
+    this.$typeArea.push($('<div class="wcPlayTypeArea wcPlayHidden">'));
     this.$typeArea.push($('<div class="wcPlayTypeArea wcPlayHidden">'));
     this.$typeArea.push($('<div class="wcPlayTypeArea wcPlayHidden">'));
     this.$paletteInner.append(this.$typeArea[0]);
     this.$paletteInner.append(this.$typeArea[1]);
     this.$paletteInner.append(this.$typeArea[2]);
+    this.$paletteInner.append(this.$typeArea[3]);
 
     // Initialize our node library.
     for (var i = 0; i < wcPlay.NODE_LIBRARY.length; ++i) {
@@ -1292,28 +1302,45 @@ wcPlayEditor.prototype = {
       self.$typeButton[0].addClass('wcToggled');
       self.$typeButton[1].removeClass('wcToggled');
       self.$typeButton[2].removeClass('wcToggled');
+      self.$typeButton[3].removeClass('wcToggled');
 
       self.$typeArea[0].removeClass('wcPlayHidden');
       self.$typeArea[1].addClass('wcPlayHidden');
       self.$typeArea[2].addClass('wcPlayHidden');
+      self.$typeArea[3].addClass('wcPlayHidden');
     });
     this.$typeButton[1].click(function() {
       self.$typeButton[0].removeClass('wcToggled');
       self.$typeButton[1].addClass('wcToggled');
       self.$typeButton[2].removeClass('wcToggled');
+      self.$typeButton[3].removeClass('wcToggled');
 
       self.$typeArea[0].addClass('wcPlayHidden');
       self.$typeArea[1].removeClass('wcPlayHidden');
       self.$typeArea[2].addClass('wcPlayHidden');
+      self.$typeArea[3].addClass('wcPlayHidden');
     });
     this.$typeButton[2].click(function() {
       self.$typeButton[0].removeClass('wcToggled');
       self.$typeButton[1].removeClass('wcToggled');
       self.$typeButton[2].addClass('wcToggled');
+      self.$typeButton[3].removeClass('wcToggled');
 
       self.$typeArea[0].addClass('wcPlayHidden');
       self.$typeArea[1].addClass('wcPlayHidden');
       self.$typeArea[2].removeClass('wcPlayHidden');
+      self.$typeArea[3].addClass('wcPlayHidden');
+    });
+    this.$typeButton[3].click(function() {
+      self.$typeButton[0].removeClass('wcToggled');
+      self.$typeButton[1].removeClass('wcToggled');
+      self.$typeButton[2].removeClass('wcToggled');
+      self.$typeButton[3].addClass('wcToggled');
+
+      self.$typeArea[0].addClass('wcPlayHidden');
+      self.$typeArea[1].addClass('wcPlayHidden');
+      self.$typeArea[2].addClass('wcPlayHidden');
+      self.$typeArea[3].removeClass('wcPlayHidden');
     });
   },
 
@@ -2837,6 +2864,13 @@ wcPlayEditor.prototype = {
         self._undoManager && self._undoManager.endGroup();
       }
     });
+
+    $body.on('click', '.wcPlayEditorMenuOptionComposite', function() {
+      if (self._selectedNodes.length) {
+        // TODO:
+      }
+    });
+
 
     // Debugger
     $body.on('click', '.wcPlayEditorMenuOptionDebugging', function() {
