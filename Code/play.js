@@ -106,10 +106,37 @@ wcPlay.prototype = {
    * @function wcPlay#start
    */
   start: function() {
-    var self = this;
-    this._updateID = setInterval(function() {
-      self.update();
-    }, this._options.updateRate);
+    this._isPaused = true;
+
+    for (var i = 0; i < this._properties.length; ++i) {
+      this._properties[i].value = this._properties[i].initialValue;
+    }
+
+    for (var i = 0; i < this._storageNodes.length; ++i) {
+      this._storageNodes[i].restart();
+    }
+    for (var i = 0; i < this._processNodes.length; ++i) {
+      this._processNodes[i].restart();
+    }
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      this._compositeNodes[i].restart();
+    }
+    for (var i = 0; i < this._entryNodes.length; ++i) {
+      this._entryNodes[i].restart();
+    }
+
+    this._queuedChain = [];
+    this._queuedProperties = [];
+
+    this._isPaused = false;
+    this._isStepping = false;
+
+    if (!this._updateId) {
+      var self = this;
+      this._updateID = setInterval(function() {
+        self.update();
+      }, this._options.updateRate);
+    }
 
     this.__notifyNodes('onStart', []);
   },
@@ -228,11 +255,11 @@ wcPlay.prototype = {
    * Creates a new global property.
    * @param {String} name - The name of the property.
    * @param {wcPlay.PROPERTY_TYPE} type - The type of property.
-   * @param {Object} [defaultValue] - A default value for this property.
+   * @param {Object} [initialValue] - A default value for this property.
    * @param {Object} [options] - Additional options for this property, see {@link wcPlay.PROPERTY_TYPE}.
    * @returns {Boolean} - Failes if the property does not exist.
    */
-  createProperty: function(name, type, defaultValue, options) {
+  createProperty: function(name, type, initialValue, options) {
     // Make sure this property doesn't already exist.
     for (var i = 0; i < this._properties.length; ++i) {
       if (this._properties[i].name === name) {
@@ -247,8 +274,8 @@ wcPlay.prototype = {
 
     this._properties.push({
       name: name,
-      value: defaultValue,
-      defaultValue: defaultValue,
+      value: initialValue,
+      initialValue: initialValue,
       type: type,
       options: options || {},
     });

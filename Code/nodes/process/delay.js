@@ -36,11 +36,10 @@ wcNodeProcess.extend('wcNodeProcessDelay', 'Delay', 'Core', {
     var delay = this.property('milliseconds');
 
     // Start a new thread that will keep the node alive until we are finished.
-    var thread = this.beginThread();
-    setTimeout(function() {
+    var thread = this.beginThread(setTimeout(function() {
       // Once the time has completed, fire the 'Finished' link and finish our thread.
       self.triggerExit('finished');
       self.finishThread(thread);
-    }, delay);
+    }, delay));
   },
 });

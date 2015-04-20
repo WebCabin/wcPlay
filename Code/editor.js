@@ -102,18 +102,23 @@ function wcPlayEditor(container, options) {
     this._options[prop] = options[prop];
   }
 
-  this.$palette = $('<div class="wcPlayPalette">');
+  this.$top = $('<div class="wcPlayEditorTop">');
+  this.$main = $('<div class="wcPlayEditorMain">');
+  this.$palette = $('<div class="wcPlayPalette wcPlayNoHighlights">');
   this.$paletteInner = $('<div class="wcPlayPaletteInner">');
   this.$viewport = $('<canvas class="wcPlayViewport">');
   this._viewportContext = this.$viewport[0].getContext('2d');
 
   this.$palette.append(this.$paletteInner);
 
-  this.$container.append(this.$palette);
-  this.$container.append(this.$viewport);
+  this.$main.append(this.$palette);
+  this.$main.append(this.$viewport);
+  this.$container.append(this.$top);
+  this.$container.append(this.$main);
 
   this.onResized();
 
+  this.__setupMenu();
   this.__setupPalette();
   this.__setupControls();
 
@@ -166,8 +171,8 @@ wcPlayEditor.prototype = {
    * @function wcPlayEditor#onResized
    */
   onResized: function() {
-    var width = this.$container.width();
-    var height= this.$container.height();
+    var width = this.$main.width();
+    var height= this.$main.height();
 
     if (this._size.x !== width || this._size.y !== height) {
       this._size.x = width;
@@ -369,6 +374,17 @@ wcPlayEditor.prototype = {
     var elapsed = (timestamp - this._lastUpdate) / 1000;
     this._lastUpdate = timestamp;
 
+    // Update undo/redo menu.
+    var self = this;
+    $('.wcPlayEditorMenuOptionUndo').each(function() {
+      $(this).toggleClass('disabled', !self._undoManager.canUndo()).find('.wcButton').toggleClass('disabled', !self._undoManager.canUndo());
+      $(this).attr('title', 'Undo ' + self._undoManager.undoInfo());
+    });
+    $('.wcPlayEditorMenuOptionRedo').each(function() {
+      $(this).toggleClass('disabled', !self._undoManager.canRedo()).find('.wcButton').toggleClass('disabled', !self._undoManager.canRedo());
+      $(this).attr('title', 'Redo ' + self._undoManager.redoInfo());
+    });
+
     this.onResized();
 
     if (this._engine) {
@@ -493,6 +509,52 @@ wcPlayEditor.prototype = {
   },
 
   /**
+   * Initializes the file menu and toolbar.
+   * @function wcPlayEditor#__setupMenu
+   * @private
+   */
+  __setupMenu: function() {
+    var $fileMenu = $('\
+      <ul class="wcPlayEditorMenu wcPlayNoHighlights">\
+        <span class="wcPlayVersionTag wcPlayNoHighlights"></span>\
+        <li><span>File</span>\
+          <ul>\
+            <li><span class="wcPlayEditorMenuOptionNew wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcPlayEditorMenuButton fa fa-file-o fa-lg"/>New Script...<span>Ctrl+N</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionOpen wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcPlayEditorMenuButton fa fa-folder-open-o fa-lg"/>Open Script...<span>Ctrl+O</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionSave wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcPlayEditorMenuButton fa fa-save fa-lg"/>Save Script<span>Ctrl+S</span></span></li>\
+          </ul>\
+        </li>\
+        <li><span>Edit</span>\
+          <ul>\
+            <li><span class="wcPlayEditorMenuOptionUndo wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcPlayEditorMenuButton fa fa-backward fa-lg"/>Undo<span>Ctrl+Z</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionRedo wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcPlayEditorMenuButton fa fa-forward fa-lg"/>Redo<span>Ctrl+Y</span></span></li>\
+            <li><hr class="wcPlayMenuSeparator"></li>\
+            <li><span class="wcPlayEditorMenuOptionCut wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcPlayEditorMenuButton fa fa-cut fa-lg"/>Cut<span>Ctrl+X</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionCopy wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcPlayEditorMenuButton fa fa-copy fa-lg"/>Copy<span>Ctrl+C</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionPaste wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcPlayEditorMenuButton fa fa-paste fa-lg"/>Paste<span>Ctrl+P</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionDelete wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcPlayEditorMenuButton fa fa-trash-o fa-lg"/>Delete<span>Del</span></span></li>\
+          </ul>\
+        </li>\
+        <li><span>Debugging</span>\
+          <ul>\
+            <li><span class="wcPlayEditorMenuOptionRestart wcPlayMenuItem" title="Reset all property values to their initial state and restart the execution of the script."><i class="wcPlayEditorMenuIcon wcPlayEditorMenuButton fa fa-eraser fa-lg"/>Restart Script<span></span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionPausePlay wcPlayMenuItem" title="Pause or Continue execution of the script."><i class="wcPlayEditorMenuIcon wcPlayEditorMenuButton fa fa-gear fa-lg"/>Pause/Continue Script<span>Return</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionStep wcPlayMenuItem" title="Steps execution of the script by a single update."><i class="wcPlayEditorMenuIcon wcPlayEditorMenuButton fa fa-gear fa-lg"/>Step Script<span>Spacebar</span></span></li>\
+          </ul>\
+        </li>\
+        <li><span>Help</span>\
+          <ul>\
+            <li><span class="wcPlayEditorMenuOptionDocs wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcPlayEditorMenuButton fa fa-file-pdf-o fa-lg"/>Documentation...<span></span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionAbout wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcPlayEditorMenuButton fa fa-question fa-lg"/>About...<span></span></span></li>\
+          </ul>\
+        </li>\
+      </ul>\
+    ');
+
+    this.$top.append($fileMenu);
+  },
+
+  /**
    * Initializes the palette view.
    * @function wcPlayEditor#__setupPalette
    * @private
@@ -526,7 +588,7 @@ wcPlayEditor.prototype = {
       if (!this._nodeLibrary[data.category].hasOwnProperty(data.type)) {
         var typeData = {
           $category: $('<div class="wcPlayTypeCategory">'),
-          $button: $('<button class="wcPlayCategoryButton">' + data.category + '</button>'),
+          $button: $('<button class="wcPlayCategoryButton wcToggled">' + data.category + '</button>'),
           $canvas: $('<canvas class="wcPlayTypeCategoryArea">'),
           context: null,
           nodes: [],
@@ -540,10 +602,10 @@ wcPlayEditor.prototype = {
           d.$button.click(function() {
             if (d.$button.hasClass('wcToggled')) {
               d.$button.removeClass('wcToggled');
-              d.$canvas.removeClass('wcPlayHidden');
+              d.$canvas.addClass('wcPlayHidden');
             } else {
               d.$button.addClass('wcToggled');
-              d.$canvas.addClass('wcPlayHidden');
+              d.$canvas.removeClass('wcPlayHidden');
             }
           });
         })(typeData);
@@ -618,7 +680,7 @@ wcPlayEditor.prototype = {
         var typeData = this._nodeLibrary[cat][type];
 
         // Ignore categories that are not visible.
-        if (typeData.$button.hasClass('wcToggled')) continue;
+        if (!typeData.$button.hasClass('wcToggled')) continue;
 
         var yPos = this._drawStyle.palette.spacing;
         var xPos = this.$paletteInner.width() / 2;
@@ -700,7 +762,8 @@ wcPlayEditor.prototype = {
     data.inner.left = data.rect.left;
     data.inner.width = data.rect.width;
     data.rect.left -= this._drawStyle.links.length;
-    data.rect.width += this._drawStyle.links.length * 2;
+    data.rect.width += this._drawStyle.links.length * 2 + 3;
+    data.rect.height += 3;
 
     if (node.chain.entry.length) {
       data.inner.top -= this._drawStyle.links.padding + this._font.links.size;
@@ -1654,12 +1717,12 @@ wcPlayEditor.prototype = {
       context.arcTo(endPos.x, endPos.y - radius, endPos.x, endPos.y, radius);
     }
     // If the start link is below the end link. Makes a loop around the nodes.
-    else if (startPos.y > endPos.y) {
+    else if (startPos.y > endPos.y && startPos.y > endRect.top + endRect.height) {
       var x = startPos.x;
       var bottom = Math.max(startRect.top + startRect.height + coreRadius, endRect.top + endRect.height + coreRadius);
       var midy = (startPos.y + endPos.y) / 2;
       // Choose left or right.
-      if (startPos.x > endPos.x) {
+      if (Math.abs(Math.min(startRect.left, endRect.left) - startPos.x) <= Math.abs(Math.max(startRect.left + startRect.width, endRect.left + endRect.width) - endPos.x)) {
         // Left
         x = Math.min(startRect.left - coreRadius, endRect.left - coreRadius);
         bottom -= 2;
@@ -1738,12 +1801,12 @@ wcPlayEditor.prototype = {
       context.arcTo(endPos.x - radius, endPos.y, endPos.x, endPos.y, radius);
     }
     // If the start link is to the right of the end link.
-    else if (startPos.x > endPos.x) {
+    else if (startPos.x > endPos.x && startPos.x > endRect.left + endRect.width) {
       var y = startPos.y;
       var right = Math.max(startRect.left + startRect.width + coreRadius, endRect.left + endRect.width + coreRadius);
       var midx = (startPos.x + endPos.x) / 2;
       // Choose top or bottom.
-      if (startPos.y > endPos.y) {
+      if (Math.abs(Math.min(startRect.top, endRect.top) - startPos.y) <= Math.abs(Math.max(startRect.top + startRect.height, endRect.top + endRect.height) - endPos.y)) {
         // Top
         y = Math.min(startRect.top - coreRadius, endRect.top - coreRadius);
         right -= 2;
@@ -1859,7 +1922,7 @@ wcPlayEditor.prototype = {
         left: this.$palette.width(),
       };
 
-      this.$container.append($control);
+      this.$main.append($control);
 
       $control.addClass('wcPlayEditorControl');
       $control.focus();
@@ -1899,6 +1962,14 @@ wcPlayEditor.prototype = {
    */
   __setupControls: function() {
     var self = this;
+
+    // Menu
+    // Setup events.
+    $('ul.wcPlayEditorMenu > li').on('mouseenter', this.__onMenuMouseEnter);
+    $('ul.wcPlayEditorMenu > li > ul').on('click', this.__onMenuClicked);
+    $('ul.wcPlayEditorMenu > li').on('mouseleave', this.__onMenuMouseLeave);
+    $('ul.wcPlayEditorMenu > li > ul').on('mouseleave', this.__onSubMenuMouseLeave);
+    this.__bindMenuHandlers();
 
     // Palette
     this.$palette.on('mousemove',  function(event){self.__onPaletteMouseMove(event, this);});
@@ -2005,7 +2076,138 @@ wcPlayEditor.prototype = {
           this._undoManager && this._undoManager.redo();
         }
         break;
+      case 32: // Space to step
+        $('.wcPlayEditorMenuOptionStep').click();
+        break;
+      case 13: // Enter to continue;
+        $('.wcPlayEditorMenuOptionPausePlay').click();
+        break;
     }
+  },
+
+  /**
+   * Mouse over an menu option on the top bar to open it.
+   * @function wcPlayEditor#__onMenuMouseEnter
+   * @private
+   * @param {Object} event - The mouse event.
+   */
+  __onMenuMouseEnter: function(event) {
+    var $self = $(this);
+    setTimeout(function() {
+      if ($self.is(':hover')) {
+        $self.addClass('wcPlayEditorMenuOpen').addClass('wcMenuItemHover');
+      }
+    }, 100);
+  },
+
+  /**
+   * Clicking a menu item will also hide that menu.
+   * @function wcPlayEditor#__onMenuClicked
+   * @private
+   * @param {Object} event - The mouse event.
+   */
+  __onMenuClicked: function() {
+    // Clicking a menu item will also hide that menu.
+    $('ul.wcPlayEditorMenu li ul').css('display', 'none');
+    setTimeout(function() {
+      $('ul.wcPlayEditorMenu li ul').css('display', '');
+    }, 200);
+  },
+
+  /**
+   * Leaving the popup menu will hide it.
+   * @function wcPlayEditor#__onMenuMouseLeave
+   * @private
+   * @param {Object} event - The mouse event.
+   */
+  __onMenuMouseLeave: function(event) {
+    if ($(this).find(event.toElement).length === 0) {
+      $(this).removeClass('wcPlayEditorMenuOpen').removeClass('wcMenuItemHover');
+    }
+  },
+
+  /**
+   * Moving your mouse cursor away from the drop down menu will also hide it.
+   * @function wcPlayEditor#__onSubMenuMouseLeave
+   * @private
+   * @param {Object} event - The mouse event.
+   */
+  __onSubMenuMouseLeave: function(event) {
+    // Make sure that we are actually leaving the menu
+    // and not just jumping to another item in the menu
+    $parent = $(this).parent();
+    if ($parent.find(event.toElement).length === 0) {
+      $parent.removeClass('wcPlayEditorMenuOpen').removeClass('wcMenuItemHover');
+    }
+  },
+
+  /**
+   * Binds click event handlers to each of the options in the menu and toolbar.
+   * @function wcPlayEditor#__bindMenuHandlers
+   * @private
+   */
+  __bindMenuHandlers: function() {
+    var self = this;
+
+    var $body = $('body');
+
+    // File menu
+    $body.on('click', '.wcPlayEditorMenuOptionNew', function() {
+      if ($(this).hasClass('disabled')) {return;}
+      if (this._engine) {
+        // TODO:
+      }
+    });
+    $body.on('click', '.wcPlayEditorMenuOptionOpen', function() {
+      if ($(this).hasClass('disabled')) {return;}
+      // TODO:
+    });
+    $body.on('click', '.wcPlayEditorMenuOptionSave', function() {
+      if ($(this).hasClass('disabled')) {return;}
+      // TODO:
+    });
+
+    // Edit menu
+    $body.on('click', '.wcPlayEditorMenuOptionUndo', function() {
+      if ($(this).hasClass('disabled')) {return;}
+      self._undoManager && self._undoManager.undo();
+    });
+    $body.on('click', '.wcPlayEditorMenuOptionRedo', function() {
+      if ($(this).hasClass('disabled')) {return;}
+      self._undoManager && self._undoManager.redo();
+    });
+
+    // Debugger
+    $body.on('click', '.wcPlayEditorMenuOptionRestart', function() {
+      if ($(this).hasClass('disabled')) {return;}
+      if (self._engine) {
+        self._engine.start();
+      }
+    });
+    $body.on('click', '.wcPlayEditorMenuOptionPausePlay', function() {
+      if ($(this).hasClass('disabled')) {return;}
+      if (self._engine) {
+        if (self._engine.paused() || self._engine.stepping()) {
+          self._engine.paused(false);
+          self._engine.stepping(false);
+        } else {
+          self._engine.stepping(true);
+        }
+      }
+    });
+    $body.on('click', '.wcPlayEditorMenuOptionStep', function() {
+      if ($(this).hasClass('disabled')) {return;}
+      if (self._engine) {
+        self._engine.paused(false);
+        self._engine.stepping(true);
+      }
+    });
+
+    // Help menu
+    $body.on('click', '.wcPlayEditorMenuOptionAbout', function() {
+      if ($(this).hasClass('disabled')) {return;}
+      // TODO:
+    });
   },
 
   /**
@@ -2074,7 +2276,7 @@ wcPlayEditor.prototype = {
           $canvas: $('<canvas class="wcPlayHoverCanvas">'),
           offset: {x: 0, y: 0}
         };
-        this.$container.append(this._draggingNodeData.$canvas);
+        this.$main.append(this._draggingNodeData.$canvas);
 
         this.$palette.addClass('wcMoving');
         this.$viewport.addClass('wcMoving');
@@ -3092,7 +3294,7 @@ wcPlayEditor.prototype = {
         var typeData = this._nodeLibrary[cat][type];
 
         // Ignore categories that are not visible.
-        if (typeData.$button.hasClass('wcToggled')) continue;
+        if (!typeData.$button.hasClass('wcToggled')) continue;
 
         var rect = typeData.$canvas.offset();
         rect.width = typeData.$canvas.width();

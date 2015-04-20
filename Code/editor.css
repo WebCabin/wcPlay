@@ -1,3 +1,20 @@
+.wcPlayEditorTop {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  height: 48px;
+  border-bottom: 2px solid black;
+}
+
+.wcPlayEditorMain {
+  position: absolute;
+  top: 50px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+}
+
 .wcPlayPalette {
   position: absolute;
   top: 0px;
@@ -6,6 +23,9 @@
   border-right:2px solid black;
   text-align: center;
   overflow: auto;
+}
+
+.wcPlayNoHighlights {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -70,4 +90,138 @@
 
 .wcPlayHidden {
   display: none;
+}
+
+/* Menu bar */
+ul.wcPlayEditorMenu {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  width: 100%;
+  height: 20px;
+  font-size: 13px;
+  z-index: 1000;
+  vertical-align: center;
+}
+
+/* Menu category */
+ul.wcPlayEditorMenu li {
+  position: relative;
+  font-size: 13px;
+  padding-right: 10px;
+  float: left;
+  cursor: pointer;
+  background-color: white;
+}
+
+/* Menu category list */
+ul.wcPlayEditorMenu li ul {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  display: none;
+  list-style: none;
+  margin: 0px;
+  padding: 0px;
+  border: 1px solid black;
+  z-index: 1001;
+}
+
+/* All menu items */
+ul.wcPlayEditorMenu span {
+  display: inline-block;
+  text-decoration: none;
+  /*color: black;*/
+  padding: 5px;
+  border-bottom: 0px;
+}
+
+/* Menu separator */
+ul.wcPlayEditorMenu li ul hr {
+  width: 286px;
+  height: 0px;
+  margin: 0px;
+}
+
+/* Sub menu item */
+ul.wcPlayEditorMenu li ul span {
+  width: 250px;
+  padding-left: 35px;
+}
+
+/* Hover over a menu category that contains a list */
+ul.wcPlayEditorMenu li.wcPlayEditorMenuOpen ul {
+  display: block;
+  position: absolute;
+  top: 20px;
+  float: none;
+  z-index: 1000;
+}
+
+ul.wcPlayEditorMenu li ul li {
+  padding: 0px;
+}
+
+/* Menu icons */
+ul.wcPlayEditorMenu li ul li span i {
+  position: absolute;
+  margin: 0px;
+  padding: 0px;
+  margin-right: 3px;
+  margin-left: 3px;
+  width: 18px;
+  height: 18px;
+  line-height: 18px;
+  left: 0px;
+  top: 2px;
+  background-size: contain;
+  vertical-align: center;
+  text-align: center;
+}
+
+ul.wcPlayEditorMenu li ul li span i div {
+  margin: 0px;
+  padding: 0px;
+  width: 18px;
+  height: 18px;
+  line-height: 18px;
+  background-size: contain;
+  vertical-align: center;
+  text-align: center;
+}
+
+/* Menu shortcuts */
+ul.wcPlayEditorMenu li ul li span span {
+  float: right;
+  margin: 0px;
+  padding: 0px;
+  margin-right: 10px;
+  width: 50px;
+  text-align: right;
+  background-color: transparent;
+}
+
+.wcPlayEditorMenuLongHotkey{
+  width: 100px !important;
+}
+
+.wcPlayVersionTag {
+  float: right;
+  font-size: 10px;
+  opacity: 0.5;
+  cursor: default;
+}
+
+.wcPlayEditorMenu .disabled {
+  color: gray !important;
+}
+
+.wcPlayEditorMenu .wcMenuItemHover,
+.wcPlayMenuItem:hover {
+  background-color: lightgray;
+}
+
+.wcPlayEditorToolbar span.wcMenuItemHover,
+.wcPlayEditorToolbar span.wcMenuItemHover:hover {
+  /*border: 2px inset lightgray;*/
 }

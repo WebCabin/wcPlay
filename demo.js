@@ -20,7 +20,7 @@ $(document).ready(function() {
   var logNode = new wcNodeProcessConsoleLog(myPlay, {x: 400, y: 200});
   var delayNode = new wcNodeProcessDelay(myPlay, {x: 400, y: 400});
   var operationNode = new wcNodeProcessOperation(myPlay, {x: 400, y: 600});
-  var numberNode = new wcNodeStorageNumber(myPlay, {x: 150, y: 650});
+  var numberNode = new wcNodeStorageNumber(myPlay, {x: 150, y: 600});
 
   // Assign them all debug log enabled, so they will console log various events.
   // startNode.debugLog(true);
@@ -30,8 +30,8 @@ $(document).ready(function() {
   // numberNode.debugLog(true);
 
   // Assign some property values.
-  numberNode.property('value', 0);
-  operationNode.property('valueB', 1);
+  numberNode.initialProperty('value', 0);
+  operationNode.initialProperty('valueB', 1);
 
   // Chain some nodes together.
   numberNode.connectOutput('value', operationNode, 'valueA');
@@ -50,29 +50,4 @@ $(document).ready(function() {
 
   // Start execution of the script.
   myPlay.start();
-
-  // setTimeout(function() {
-  //   operationNode.debugBreak(true);
-  // }, 500);
-
-  $('body').on('keyup', function(event) {
-    switch (event.keyCode) {
-      // Space to step
-      case 32:
-        myPlay.paused(false);
-        myPlay.stepping(true);
-        break;
-      // Enter to continue;
-      case 13:
-        myPlay.paused(false);
-        myPlay.stepping(false);
-        break;
-      // Esc disable pausing.
-      case 27:
-        myPlay.debugging(!myPlay.debugging());
-        myPlay.paused(false);
-        myPlay.stepping(false);
-        break;
-    };
-  });
 });
