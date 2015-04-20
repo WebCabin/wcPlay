@@ -94,14 +94,6 @@ wcPlay.registerNodeType = function(name, displayName, category, type) {
 
 wcPlay.prototype = {
   /**
-   * Gets whether the script is running in [silent mode]{@link wcPlay~Options}.
-   * @returns {Boolean}
-   */
-  isSilent: function() {
-    return this._options.silent;
-  },
-
-  /**
    * Initializes the script and begins the update process.
    * @function wcPlay#start
    */
@@ -113,16 +105,16 @@ wcPlay.prototype = {
     }
 
     for (var i = 0; i < this._storageNodes.length; ++i) {
-      this._storageNodes[i].restart();
+      this._storageNodes[i].reset();
     }
     for (var i = 0; i < this._processNodes.length; ++i) {
-      this._processNodes[i].restart();
+      this._processNodes[i].reset();
     }
     for (var i = 0; i < this._compositeNodes.length; ++i) {
-      this._compositeNodes[i].restart();
+      this._compositeNodes[i].reset();
     }
     for (var i = 0; i < this._entryNodes.length; ++i) {
-      this._entryNodes[i].restart();
+      this._entryNodes[i].reset();
     }
 
     this._queuedChain = [];
@@ -142,33 +134,27 @@ wcPlay.prototype = {
   },
 
   /**
-   * Retrieves a node from a given ID, if it exists in this script.
-   * @function wcPlay#nodeById
-   * @param {Number} id - The ID of the node.
-   * @returns {wcNode|null} - Either the found node, or null.
+   * Clears all nodes from the script.
+   * @function wcPlay#clear
    */
-  nodeById: function(id) {
-    for (var i = 0; i < this._storageNodes.length; ++i) {
-      if (this._storageNodes[i].id === id) {
-        return this._storageNodes[i];
-      }
+  clear: function() {
+    this._queuedChain = [];
+    this._queuedProperties = [];
+
+    this._properties = [];
+
+    while (this._storageNodes.length) {
+      this._storageNodes[0].destroy();
     }
-    for (var i = 0; i < this._processNodes.length; ++i) {
-      if (this._processNodes[i].id === id) {
-        return this._processNodes[i];
-      }
+    while (this._processNodes.length) {
+      this._processNodes[0].destroy();
     }
-    for (var i = 0; i < this._compositeNodes.length; ++i) {
-      if (this._compositeNodes[i].id === id) {
-        return this._compositeNodes[i];
-      }
+    while (this._compositeNodes.length) {
+      this._compositeNodes[0].destroy();
     }
-    for (var i = 0; i < this._entryNodes.length; ++i) {
-      if (this._entryNodes[i].id === id) {
-        return this._entryNodes[i];
-      }
+    while (this._entryNodes.length) {
+      this._entryNodes[0].destroy();
     }
-    return null;
   },
 
   /**
@@ -207,6 +193,50 @@ wcPlay.prototype = {
     if (this._isStepping) {
       this._isPaused = true;
     }
+  },
+
+  /**
+   * Retrieves a node from a given ID, if it exists in this script.
+   * @function wcPlay#nodeById
+   * @param {Number} id - The ID of the node.
+   * @returns {wcNode|null} - Either the found node, or null.
+   */
+  nodeById: function(id) {
+    for (var i = 0; i < this._storageNodes.length; ++i) {
+      if (this._storageNodes[i].id === id) {
+        return this._storageNodes[i];
+      }
+    }
+    for (var i = 0; i < this._processNodes.length; ++i) {
+      if (this._processNodes[i].id === id) {
+        return this._processNodes[i];
+      }
+    }
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      if (this._compositeNodes[i].id === id) {
+        return this._compositeNodes[i];
+      }
+    }
+    for (var i = 0; i < this._entryNodes.length; ++i) {
+      if (this._entryNodes[i].id === id) {
+        return this._entryNodes[i];
+      }
+    }
+    return null;
+  },
+
+  /**
+   * Gets, or Sets whether the script is running in [silent mode]{@link wcPlay~Options}.
+   * @function wcPlay#silent
+   * @param {Boolean} silent - If supplied, assigns a new silent state of the script.
+   * @returns {Boolean} - The current silent state of the script.
+   */
+  silent: function(silent) {
+    if (silent !== undefined) {
+      this._options.silent = silent? true: false;
+    }
+
+    return this._options.silent;
   },
 
   /**
@@ -333,6 +363,37 @@ wcPlay.prototype = {
       var oldValue = prop.value;
       prop.value = value;
       this.__notifyNodes('onSharedPropertyChanged', [prop.name, oldValue, prop.value]);
+    }
+  },
+
+  /**
+   * Gets, or Sets a global property initial value.
+   * @function wcPlay#initialProperty
+   * @param {String} name - The name of the property.
+   * @param {Object} [value] - If supplied, will assign a new value to the property.
+   * @returns {Object} - The current value of the property, or undefined if not found.
+   */
+  initialProperty: function(name, value) {
+    var prop = null;
+    for (var i = 0; i < this._properties.length; ++i) {
+      if (this._properties[i].name === name) {
+        prop = this._properties[i];
+        break;
+      }
+    }
+
+    if (!prop) {
+      return;
+    }
+
+    if (value !== undefined && value !== prop.initialValue) {
+      var oldValue = prop.initialValue;
+      prop.initialValue = value;
+
+      if (prop.value === oldValue) {
+        prop.value = value;
+        this.__notifyNodes('onSharedPropertyChanged', [prop.name, oldValue, prop.value]);
+      }
     }
   },
 

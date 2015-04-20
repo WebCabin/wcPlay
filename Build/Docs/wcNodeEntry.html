@@ -55,8 +55,7 @@
         wcNodeEntry
         </h2>
         
-            <div class="class-description"><p style="margin-left:20px;">The base class for all entry nodes. These are nodes that start script chains.<br>
-When inheriting, make sure to include 'this._super(parent, pos, type);' at the top of your init function.</p></div>
+            <div class="class-description"><p style="margin-left:20px;">The base class for all entry nodes. These are nodes that start script chains.<br>When inheriting, make sure to include 'this._super(parent, pos, type);' at the top of your init function.</p></div>
         
     
 </header>
@@ -328,197 +327,7 @@ When inheriting, make sure to include 'this._super(parent, pos, type);' at the t
     
     
     <div class="description">
-        <p style="margin-left: 20px;">Magic function that is called whenever any new class type is extended from this one.<br>
-Handles initializing of the class as well as registering the new node type.</p>
-    </div>
-    
-
-    
-
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-
-		<th>Type</th>
-
-		
-
-		
-
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-
-	<tbody>
-	
-
-        <tr>
-            
-                <td class="name"><code>className</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The name of the class constructor.</td>
-        </tr>
-
-	
-
-        <tr>
-            
-                <td class="name"><code>name</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">A display name for the node.</td>
-        </tr>
-
-	
-
-        <tr>
-            
-                <td class="name"><code>category</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">A category where this node will be grouped.</td>
-        </tr>
-
-	
-	</tbody>
-</table>
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
-    
-
-    
-<dl class="details">
-	
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="nodes_storage.js.html">nodes/storage.js</a>,
-     <a href="nodes_storage.js.html#sunlight-1-line-18">line 18</a>
-  </dt>
-<!-- 	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="nodes_storage.js.html">nodes/storage.js</a>,
-				 <a href="nodes_storage.js.html#sunlight-1-line-18">line 18</a>
-			</li>
-		</ul>
-	</dd> -->
-	
-
-	
-
-	
-
-	
-</dl>
-
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="classInit"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>classInit</b>(className, name, category)</toc>
-        
-    </h4>
-
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p style="margin-left: 20px;">Magic function that is called whenever any new class type is extended from this one.<br>
-Handles initializing of the class as well as registering the new node type.</p>
+        <p style="margin-left: 20px;">Magic function that is called whenever any new class type is extended from this one.<br>Handles initializing of the class as well as registering the new node type.</p>
     </div>
     
 
@@ -678,6 +487,194 @@ Handles initializing of the class as well as registering the new node type.</p>
 			<li>
 				<a href="nodes_entry.js.html">nodes/entry.js</a>,
 				 <a href="nodes_entry.js.html#sunlight-1-line-22">line 22</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="classInit"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>classInit</b>(className, name, category)</toc>
+        
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p style="margin-left: 20px;">Magic function that is called whenever any new class type is extended from this one.<br>Handles initializing of the class as well as registering the new node type.</p>
+    </div>
+    
+
+    
+
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>className</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The name of the class constructor.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">A display name for the node.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>category</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">A category where this node will be grouped.</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="nodes_storage.js.html">nodes/storage.js</a>,
+     <a href="nodes_storage.js.html#sunlight-1-line-18">line 18</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="nodes_storage.js.html">nodes/storage.js</a>,
+				 <a href="nodes_storage.js.html#sunlight-1-line-18">line 18</a>
 			</li>
 		</ul>
 	</dd> -->

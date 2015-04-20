@@ -1032,6 +1032,99 @@
             
 <hr>
 <dt>
+    <h4 class="name" id="clear"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>clear</b>()</toc>
+        
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p style="margin-left: 20px;">Clears all nodes from the script.</p>
+    </div>
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="play.js.html">play.js</a>,
+     <a href="play.js.html#sunlight-1-line-136">line 136</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="play.js.html">play.js</a>,
+				 <a href="play.js.html#sunlight-1-line-136">line 136</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+</dd>
+
+        
+            
+<hr>
+<dt>
     <h4 class="name" id="createProperty"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>createProperty</b>(name, type, <span class="optional">initialValue</span>, <span class="optional">options</span>)</toc>
         
         >
@@ -1275,13 +1368,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="play.js.html">play.js</a>,
-     <a href="play.js.html#sunlight-1-line-262">line 262</a>
+     <a href="play.js.html#sunlight-1-line-292">line 292</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="play.js.html">play.js</a>,
-				 <a href="play.js.html#sunlight-1-line-262">line 262</a>
+				 <a href="play.js.html#sunlight-1-line-292">line 292</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -1448,13 +1541,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="play.js.html">play.js</a>,
-     <a href="play.js.html#sunlight-1-line-212">line 212</a>
+     <a href="play.js.html#sunlight-1-line-242">line 242</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="play.js.html">play.js</a>,
-				 <a href="play.js.html#sunlight-1-line-212">line 212</a>
+				 <a href="play.js.html#sunlight-1-line-242">line 242</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -1473,12 +1566,12 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="isSilent"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>isSilent</b>()</toc>
+    <h4 class="name" id="initialProperty"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>initialProperty</b>(name, <span class="optional">value</span>)</toc>
         
         >
         
         <i><small>
-<span class="param-type">Boolean</span>
+<span class="param-type">Object</span>
 
 </small></i>
         
@@ -1490,7 +1583,7 @@
     
     
     <div class="description">
-        <p style="margin-left: 20px;">Gets whether the script is running in <a href="wcPlay.html#~Options">silent mode</a>.</p>
+        <p style="margin-left: 20px;">Gets, or Sets a global property initial value.</p>
     </div>
     
 
@@ -1500,15 +1593,110 @@
     
     
     
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The name of the property.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">If supplied, will assign a new value to the property.</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
     
     
     
 <h5>Returns: 
-<span class="param-type">Boolean</span>
+<span class="param-type">Object</span>
 
 </h5>
     
-            
+            <p class="param-desc" style="margin-left: 20px;">
+    
+		 The current value of the property, or undefined if not found.
+	</p>
 
         
 
@@ -1557,13 +1745,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="play.js.html">play.js</a>,
-     <a href="play.js.html#sunlight-1-line-100">line 100</a>
+     <a href="play.js.html#sunlight-1-line-369">line 369</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="play.js.html">play.js</a>,
-				 <a href="play.js.html#sunlight-1-line-100">line 100</a>
+				 <a href="play.js.html#sunlight-1-line-369">line 369</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -1724,13 +1912,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="play.js.html">play.js</a>,
-     <a href="play.js.html#sunlight-1-line-144">line 144</a>
+     <a href="play.js.html#sunlight-1-line-198">line 198</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="play.js.html">play.js</a>,
-				 <a href="play.js.html#sunlight-1-line-144">line 144</a>
+				 <a href="play.js.html#sunlight-1-line-198">line 198</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -1897,13 +2085,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="play.js.html">play.js</a>,
-     <a href="play.js.html#sunlight-1-line-226">line 226</a>
+     <a href="play.js.html#sunlight-1-line-256">line 256</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="play.js.html">play.js</a>,
-				 <a href="play.js.html#sunlight-1-line-226">line 226</a>
+				 <a href="play.js.html#sunlight-1-line-256">line 256</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -2101,13 +2289,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="play.js.html">play.js</a>,
-     <a href="play.js.html#sunlight-1-line-312">line 312</a>
+     <a href="play.js.html#sunlight-1-line-342">line 342</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="play.js.html">play.js</a>,
-				 <a href="play.js.html#sunlight-1-line-312">line 312</a>
+				 <a href="play.js.html#sunlight-1-line-342">line 342</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -2266,13 +2454,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="play.js.html">play.js</a>,
-     <a href="play.js.html#sunlight-1-line-353">line 353</a>
+     <a href="play.js.html#sunlight-1-line-414">line 414</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="play.js.html">play.js</a>,
-				 <a href="play.js.html#sunlight-1-line-353">line 353</a>
+				 <a href="play.js.html#sunlight-1-line-414">line 414</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -2454,13 +2642,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="play.js.html">play.js</a>,
-     <a href="play.js.html#sunlight-1-line-374">line 374</a>
+     <a href="play.js.html#sunlight-1-line-435">line 435</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="play.js.html">play.js</a>,
-				 <a href="play.js.html#sunlight-1-line-374">line 374</a>
+				 <a href="play.js.html#sunlight-1-line-435">line 435</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -2638,13 +2826,174 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="play.js.html">play.js</a>,
-     <a href="play.js.html#sunlight-1-line-285">line 285</a>
+     <a href="play.js.html#sunlight-1-line-315">line 315</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="play.js.html">play.js</a>,
-				 <a href="play.js.html#sunlight-1-line-285">line 285</a>
+				 <a href="play.js.html#sunlight-1-line-315">line 315</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="silent"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>silent</b>(silent)</toc>
+        
+        >
+        
+        <i><small>
+<span class="param-type">Boolean</span>
+
+</small></i>
+        
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p style="margin-left: 20px;">Gets, or Sets whether the script is running in <a href="wcPlay.html#~Options">silent mode</a>.</p>
+    </div>
+    
+
+    
+
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>silent</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">If supplied, assigns a new silent state of the script.</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+    
+<h5>Returns: 
+<span class="param-type">Boolean</span>
+
+</h5>
+    
+            <p class="param-desc" style="margin-left: 20px;">
+    
+		 The current silent state of the script.
+	</p>
+
+        
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="play.js.html">play.js</a>,
+     <a href="play.js.html#sunlight-1-line-228">line 228</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="play.js.html">play.js</a>,
+				 <a href="play.js.html#sunlight-1-line-228">line 228</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -2731,13 +3080,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="play.js.html">play.js</a>,
-     <a href="play.js.html#sunlight-1-line-104">line 104</a>
+     <a href="play.js.html#sunlight-1-line-96">line 96</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="play.js.html">play.js</a>,
-				 <a href="play.js.html#sunlight-1-line-104">line 104</a>
+				 <a href="play.js.html#sunlight-1-line-96">line 96</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -2904,13 +3253,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="play.js.html">play.js</a>,
-     <a href="play.js.html#sunlight-1-line-240">line 240</a>
+     <a href="play.js.html#sunlight-1-line-270">line 270</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="play.js.html">play.js</a>,
-				 <a href="play.js.html#sunlight-1-line-240">line 240</a>
+				 <a href="play.js.html#sunlight-1-line-270">line 270</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -3069,13 +3418,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="play.js.html">play.js</a>,
-     <a href="play.js.html#sunlight-1-line-339">line 339</a>
+     <a href="play.js.html#sunlight-1-line-400">line 400</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="play.js.html">play.js</a>,
-				 <a href="play.js.html#sunlight-1-line-339">line 339</a>
+				 <a href="play.js.html#sunlight-1-line-400">line 400</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -3162,13 +3511,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="play.js.html">play.js</a>,
-     <a href="play.js.html#sunlight-1-line-174">line 174</a>
+     <a href="play.js.html#sunlight-1-line-160">line 160</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="play.js.html">play.js</a>,
-				 <a href="play.js.html#sunlight-1-line-174">line 174</a>
+				 <a href="play.js.html#sunlight-1-line-160">line 160</a>
 			</li>
 		</ul>
 	</dd> -->

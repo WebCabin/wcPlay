@@ -55,8 +55,7 @@
         wcNode
         </h2>
         
-            <div class="class-description"><p style="margin-left:20px;">The foundation class for all nodes.<br>
-When inheriting, make sure to include 'this._super(parent, pos, type);' at the top of your init functions.</p></div>
+            <div class="class-description"><p style="margin-left:20px;">The foundation class for all nodes.<br>When inheriting, make sure to include 'this._super(parent, pos, type);' at the top of your init functions.</p></div>
         
     
 </header>
@@ -489,13 +488,13 @@ When inheriting, make sure to include 'this._super(parent, pos, type);' at the t
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1223">line 1223</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1228">line 1228</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1223">line 1223</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1228">line 1228</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -718,13 +717,13 @@ When inheriting, make sure to include 'this._super(parent, pos, type);' at the t
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1212">line 1212</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1217">line 1217</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1212">line 1212</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1217">line 1217</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -889,13 +888,13 @@ When inheriting, make sure to include 'this._super(parent, pos, type);' at the t
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1234">line 1234</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1239">line 1239</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1234">line 1234</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1239">line 1239</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -939,9 +938,7 @@ When inheriting, make sure to include 'this._super(parent, pos, type);' at the t
     
     
     <div class="description">
-        <p style="margin-left: 20px;">If your node takes time to process, call this to begin a thread that will keep the node 'active' until you close the thread with <a href="wcNode.html#finishThread">wcNode#finishThread</a>.<br>
-This ensures that, even if a node is executed more than once at the same time, each 'thread' is kept track of individually.<br>
-<b>Note:</b> This is not necessary if your node executes immediately without a timeout.</p>
+        <p style="margin-left: 20px;">If your node takes time to process, call this to begin a thread that will keep the node 'active' until you close the thread with <a href="wcNode.html#finishThread">wcNode#finishThread</a>.<br>This ensures that, even if a node is executed more than once at the same time, each 'thread' is kept track of individually.<br><b>Note:</b> This is not necessary if your node executes immediately without a timeout.</p>
     </div>
     
 
@@ -979,23 +976,7 @@ This ensures that, even if a node is executed more than once at the same time, e
     
         <h5>Example:</h5>
         
-    <pre class="sunlight-highlight-javascript">onTriggered: function(name) {
-   this._super(name);
-
-   // Always fire the &#x27;out&#x27; link immediately.
-   this.triggerExit(&#x27;out&#x27;);
-
-   // Now set a timeout to wait for &#x27;Milliseconds&#x27; amount of time.
-   var self = this;
-   var delay = this.property(&#x27;milliseconds&#x27;);
-
-   // Start a new thread that will keep the node alive until we are finished.
-   var thread = this.beginThread(setTimeout(function() {
-     // Once the time has completed, fire the &#x27;Finished&#x27; link and finish our thread.
-     self.triggerExit(&#x27;finished&#x27;);
-     self.finishThread(thread);
-   }, delay));
- },</pre>
+    <pre class="sunlight-highlight-javascript">onTriggered: function(name) {   this._super(name);   // Always fire the &#x27;out&#x27; link immediately.   this.triggerExit(&#x27;out&#x27;);   // Now set a timeout to wait for &#x27;Milliseconds&#x27; amount of time.   var self = this;   var delay = this.property(&#x27;milliseconds&#x27;);   // Start a new thread that will keep the node alive until we are finished.   var thread = this.beginThread(setTimeout(function() {     // Once the time has completed, fire the &#x27;Finished&#x27; link and finish our thread.     self.triggerExit(&#x27;finished&#x27;);     self.finishThread(thread);   }, delay)); },</pre>
 
 
     
@@ -1033,13 +1014,13 @@ This ensures that, even if a node is executed more than once at the same time, e
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-171">line 171</a>
+     <a href="nodes_node.js.html#sunlight-1-line-173">line 173</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-171">line 171</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-173">line 173</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -1206,13 +1187,13 @@ This ensures that, even if a node is executed more than once at the same time, e
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-157">line 157</a>
+     <a href="nodes_node.js.html#sunlight-1-line-159">line 159</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-157">line 157</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-159">line 159</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -1413,13 +1394,13 @@ This ensures that, even if a node is executed more than once at the same time, e
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-384">line 384</a>
+     <a href="nodes_node.js.html#sunlight-1-line-386">line 386</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-384">line 384</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-386">line 386</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -1620,13 +1601,13 @@ This ensures that, even if a node is executed more than once at the same time, e
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-450">line 450</a>
+     <a href="nodes_node.js.html#sunlight-1-line-452">line 452</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-450">line 450</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-452">line 452</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -1827,13 +1808,13 @@ This ensures that, even if a node is executed more than once at the same time, e
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-516">line 516</a>
+     <a href="nodes_node.js.html#sunlight-1-line-518">line 518</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-516">line 516</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-518">line 518</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -2034,13 +2015,13 @@ This ensures that, even if a node is executed more than once at the same time, e
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-582">line 582</a>
+     <a href="nodes_node.js.html#sunlight-1-line-584">line 584</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-582">line 582</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-584">line 584</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -2215,13 +2196,13 @@ This ensures that, even if a node is executed more than once at the same time, e
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-236">line 236</a>
+     <a href="nodes_node.js.html#sunlight-1-line-238">line 238</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-236">line 236</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-238">line 238</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -2376,13 +2357,13 @@ This ensures that, even if a node is executed more than once at the same time, e
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-262">line 262</a>
+     <a href="nodes_node.js.html#sunlight-1-line-264">line 264</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-262">line 262</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-264">line 264</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -2644,13 +2625,13 @@ This ensures that, even if a node is executed more than once at the same time, e
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-287">line 287</a>
+     <a href="nodes_node.js.html#sunlight-1-line-289">line 289</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-287">line 287</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-289">line 289</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -2817,13 +2798,13 @@ This ensures that, even if a node is executed more than once at the same time, e
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-142">line 142</a>
+     <a href="nodes_node.js.html#sunlight-1-line-144">line 144</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-142">line 142</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-144">line 144</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -2990,13 +2971,13 @@ This ensures that, even if a node is executed more than once at the same time, e
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-127">line 127</a>
+     <a href="nodes_node.js.html#sunlight-1-line-129">line 129</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-127">line 127</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-129">line 129</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -3317,13 +3298,13 @@ This ensures that, even if a node is executed more than once at the same time, e
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-648">line 648</a>
+     <a href="nodes_node.js.html#sunlight-1-line-650">line 650</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-648">line 648</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-650">line 650</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -3551,13 +3532,13 @@ This ensures that, even if a node is executed more than once at the same time, e
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-684">line 684</a>
+     <a href="nodes_node.js.html#sunlight-1-line-686">line 686</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-684">line 684</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-686">line 686</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -3785,13 +3766,13 @@ This ensures that, even if a node is executed more than once at the same time, e
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-720">line 720</a>
+     <a href="nodes_node.js.html#sunlight-1-line-722">line 722</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-720">line 720</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-722">line 722</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -4019,13 +4000,13 @@ This ensures that, even if a node is executed more than once at the same time, e
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-756">line 756</a>
+     <a href="nodes_node.js.html#sunlight-1-line-758">line 758</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-756">line 756</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-758">line 758</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -4192,13 +4173,13 @@ This ensures that, even if a node is executed more than once at the same time, e
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-113">line 113</a>
+     <a href="nodes_node.js.html#sunlight-1-line-115">line 115</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-113">line 113</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-115">line 115</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -4310,13 +4291,13 @@ This ensures that, even if a node is executed more than once at the same time, e
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-100">line 100</a>
+     <a href="nodes_node.js.html#sunlight-1-line-102">line 102</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-100">line 100</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-102">line 102</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -4345,8 +4326,7 @@ This ensures that, even if a node is executed more than once at the same time, e
     
     
     <div class="description">
-        <p style="margin-left: 20px;">Finishes a previously started thread from <a href="wcNode.html#beginThread">wcNode#beginThread</a>.<br>
-<b>Note:</b> If you do not properly finish a thread that was generated, your node will remain forever in its active state.</p>
+        <p style="margin-left: 20px;">Finishes a previously started thread from <a href="wcNode.html#beginThread">wcNode#beginThread</a>.<br><b>Note:</b> If you do not properly finish a thread that was generated, your node will remain forever in its active state.</p>
     </div>
     
 
@@ -4404,13 +4384,13 @@ This ensures that, even if a node is executed more than once at the same time, e
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-204">line 204</a>
+     <a href="nodes_node.js.html#sunlight-1-line-206">line 206</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-204">line 204</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-206">line 206</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -4614,13 +4594,13 @@ This ensures that, even if a node is executed more than once at the same time, e
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1014">line 1014</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1016">line 1016</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1014">line 1014</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1016">line 1016</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -4787,13 +4767,13 @@ This ensures that, even if a node is executed more than once at the same time, e
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-792">line 792</a>
+     <a href="nodes_node.js.html#sunlight-1-line-794">line 794</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-792">line 792</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-794">line 794</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -4960,13 +4940,13 @@ This ensures that, even if a node is executed more than once at the same time, e
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-817">line 817</a>
+     <a href="nodes_node.js.html#sunlight-1-line-819">line 819</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-817">line 817</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-819">line 819</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -5133,13 +5113,13 @@ This ensures that, even if a node is executed more than once at the same time, e
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-842">line 842</a>
+     <a href="nodes_node.js.html#sunlight-1-line-844">line 844</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-842">line 842</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-844">line 844</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -5306,13 +5286,13 @@ This ensures that, even if a node is executed more than once at the same time, e
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-867">line 867</a>
+     <a href="nodes_node.js.html#sunlight-1-line-869">line 869</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-867">line 867</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-869">line 869</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -5418,13 +5398,13 @@ This ensures that, even if a node is executed more than once at the same time, e
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-892">line 892</a>
+     <a href="nodes_node.js.html#sunlight-1-line-894">line 894</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-892">line 892</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-894">line 894</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -5453,8 +5433,7 @@ This ensures that, even if a node is executed more than once at the same time, e
     
     
     <div class="description">
-        <p style="margin-left: 20px;">Event that is called when a connection has been made.<br>
-Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
+        <p style="margin-left: 20px;">Event that is called when a connection has been made.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
     </div>
     
 
@@ -5676,13 +5655,13 @@ Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.<
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1090">line 1090</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1095">line 1095</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1090">line 1090</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1095">line 1095</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -5711,8 +5690,7 @@ Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.<
     
     
     <div class="description">
-        <p style="margin-left: 20px;">Event that is called when a property has changed.<br>
-Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
+        <p style="margin-left: 20px;">Event that is called when a property has changed.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
     </div>
     
 
@@ -5865,13 +5843,13 @@ Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.<
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1146">line 1146</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1151">line 1151</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1146">line 1146</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1151">line 1151</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -5907,8 +5885,7 @@ Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.<
     
     
     <div class="description">
-        <p style="margin-left: 20px;">Event that is called when a property is about to be changed.<br>
-Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
+        <p style="margin-left: 20px;">Event that is called when a property is about to be changed.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
     </div>
     
 
@@ -6073,13 +6050,13 @@ Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.<
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1131">line 1131</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1136">line 1136</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1131">line 1131</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1136">line 1136</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -6108,8 +6085,7 @@ Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.<
     
     
     <div class="description">
-        <p style="margin-left: 20px;">Event that is called when the property is being asked its value, before the value is actually retrieved.<br>
-Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
+        <p style="margin-left: 20px;">Event that is called when the property is being asked its value, before the value is actually retrieved.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
     </div>
     
 
@@ -6216,13 +6192,13 @@ Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.<
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1160">line 1160</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1165">line 1165</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1160">line 1160</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1165">line 1165</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -6251,8 +6227,7 @@ Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.<
     
     
     <div class="description">
-        <p style="margin-left: 20px;">Event that is called when the property has had its value retrieved.<br>
-Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
+        <p style="margin-left: 20px;">Event that is called when the property has had its value retrieved.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
     </div>
     
 
@@ -6359,13 +6334,13 @@ Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.<
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1172">line 1172</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1177">line 1177</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1172">line 1172</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1177">line 1177</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -6394,9 +6369,7 @@ Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.<
     
     
     <div class="description">
-        <p style="margin-left: 20px;">Event that is called when a global property value has changed.
-Overload this in inherited nodes.<br>
-<b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.</p>
+        <p style="margin-left: 20px;">Event that is called when a global property value has changed.Overload this in inherited nodes.<br><b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.</p>
     </div>
     
 
@@ -6549,13 +6522,13 @@ Overload this in inherited nodes.<br>
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1184">line 1184</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1189">line 1189</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1184">line 1184</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1189">line 1189</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -6584,9 +6557,7 @@ Overload this in inherited nodes.<br>
     
     
     <div class="description">
-        <p style="margin-left: 20px;">Event that is called when a global property has been renamed.
-Overload this in inherited nodes.<br>
-<b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.</p>
+        <p style="margin-left: 20px;">Event that is called when a global property has been renamed.Overload this in inherited nodes.<br><b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.</p>
     </div>
     
 
@@ -6716,13 +6687,13 @@ Overload this in inherited nodes.<br>
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1196">line 1196</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1201">line 1201</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1196">line 1196</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1201">line 1201</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -6751,8 +6722,7 @@ Overload this in inherited nodes.<br>
     
     
     <div class="description">
-        <p style="margin-left: 20px;">Event that is called as soon as the Play script has started.<br>
-Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
+        <p style="margin-left: 20px;">Event that is called as soon as the Play script has started.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
     </div>
     
 
@@ -6810,13 +6780,13 @@ Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.<
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1108">line 1108</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1113">line 1113</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1108">line 1108</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1113">line 1113</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -6845,8 +6815,7 @@ Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.<
     
     
     <div class="description">
-        <p style="margin-left: 20px;">Event that is called when an entry link has been triggered.<br>
-Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
+        <p style="margin-left: 20px;">Event that is called when an entry link has been triggered.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
     </div>
     
 
@@ -6953,13 +6922,13 @@ Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.<
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1119">line 1119</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1124">line 1124</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1119">line 1119</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1124">line 1124</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -6988,8 +6957,7 @@ Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.<
     
     
     <div class="description">
-        <p style="margin-left: 20px;">Event that is called when it is time to draw the contents of your custom viewport.<br>
-Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
+        <p style="margin-left: 20px;">Event that is called when it is time to draw the contents of your custom viewport.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
     </div>
     
 
@@ -7096,13 +7064,13 @@ Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.<
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1080">line 1080</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1085">line 1085</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1080">line 1080</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1085">line 1085</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -7276,13 +7244,13 @@ Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.<
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-221">line 221</a>
+     <a href="nodes_node.js.html#sunlight-1-line-223">line 223</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-221">line 221</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-223">line 223</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -7519,13 +7487,13 @@ Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.<
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-967">line 967</a>
+     <a href="nodes_node.js.html#sunlight-1-line-969">line 969</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-967">line 967</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-969">line 969</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -7680,13 +7648,13 @@ Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.<
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-330">line 330</a>
+     <a href="nodes_node.js.html#sunlight-1-line-332">line 332</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-330">line 330</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-332">line 332</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -7841,13 +7809,13 @@ Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.<
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-348">line 348</a>
+     <a href="nodes_node.js.html#sunlight-1-line-350">line 350</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-348">line 348</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-350">line 350</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -8002,13 +7970,13 @@ Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.<
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-366">line 366</a>
+     <a href="nodes_node.js.html#sunlight-1-line-368">line 368</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-366">line 366</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-368">line 368</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -8027,7 +7995,7 @@ Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.<
             
 <hr>
 <dt>
-    <h4 class="name" id="restart"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>restart</b>()</toc>
+    <h4 class="name" id="reset"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>reset</b>()</toc>
         
     </h4>
 
@@ -8095,13 +8063,13 @@ Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.<
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-82">line 82</a>
+     <a href="nodes_node.js.html#sunlight-1-line-84">line 84</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-82">line 82</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-84">line 84</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -8256,13 +8224,13 @@ Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.<
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-911">line 911</a>
+     <a href="nodes_node.js.html#sunlight-1-line-913">line 913</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-911">line 911</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-913">line 913</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -8417,13 +8385,13 @@ Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.<
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-934">line 934</a>
+     <a href="nodes_node.js.html#sunlight-1-line-936">line 936</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-934">line 934</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-936">line 936</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -8582,13 +8550,13 @@ Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.<
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1034">line 1034</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1039">line 1039</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1034">line 1034</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1039">line 1039</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -8624,8 +8592,7 @@ Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.<
     
     
     <div class="description">
-        <p style="margin-left: 20px;">Sets a size for the custom viewport.<br>
-The custom viewport is a rectangular area embedded into the node's visual display in which you can 'draw' whatever you wish. It appears below the title text and above properties.</p>
+        <p style="margin-left: 20px;">Sets a size for the custom viewport.<br>The custom viewport is a rectangular area embedded into the node's visual display in which you can 'draw' whatever you wish. It appears below the title text and above properties.</p>
     </div>
     
 
@@ -8789,13 +8756,13 @@ The custom viewport is a rectangular area embedded into the node's visual displa
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1057">line 1057</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1062">line 1062</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1057">line 1057</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1062">line 1062</a>
 			</li>
 		</ul>
 	</dd> -->

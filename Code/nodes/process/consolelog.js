@@ -30,7 +30,7 @@ wcNodeProcess.extend('wcNodeProcessConsoleLog', 'Console Log', 'Debugging', {
 
     // Cancel the log in silent mode.
     var engine = this.engine();
-    if (!engine || engine.isSilent()) {
+    if (!engine || engine.silent()) {
       return;
     }
 

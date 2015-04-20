@@ -74,6 +74,8 @@ Class.extend('wcNode', 'Node', '', {
       this.disconnectOutput(item.name);
     }
 
+    this.reset();
+
     // Remove the node from wcPlay
     var engine = this.engine();
     engine && engine.__removeNode(this);
@@ -81,9 +83,9 @@ Class.extend('wcNode', 'Node', '', {
 
   /**
    * Resets all properties to their initial values.
-   * @function wcNode#restart
+   * @function wcNode#reset
    */
-  restart: function() {
+  reset: function() {
     for (var i = 0; i < this.properties.length; ++i) {
       this.properties[i].value = this.properties[i].initialValue;
     }
@@ -136,7 +138,7 @@ Class.extend('wcNode', 'Node', '', {
     }
 
     var engine = this.engine();
-    return (!engine || engine.isSilent())? false: this.property(wcNode.PROPERTY.DEBUG_LOG);
+    return (!engine || engine.silent())? false: this.property(wcNode.PROPERTY.DEBUG_LOG);
   },
 
   /**
@@ -1023,6 +1025,9 @@ Class.extend('wcNode', 'Node', '', {
       var prop = this.properties[i];
       if (prop.name === name) {
         if (value !== undefined) {
+          if (prop.value === prop.initialValue) {
+            this.property(name, value);
+          }
           prop.initialValue = value;
         }
 

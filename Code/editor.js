@@ -384,6 +384,10 @@ wcPlayEditor.prototype = {
       $(this).toggleClass('disabled', !self._undoManager.canRedo()).find('.wcButton').toggleClass('disabled', !self._undoManager.canRedo());
       $(this).attr('title', 'Redo ' + self._undoManager.redoInfo());
     });
+    $('.wcPlayEditorMenuOptionDebugging').children('i:first-child, span:first-child').toggleClass('fa-dot-circle-o', this._engine.debugging()).toggleClass('fa-circle-o', !this._engine.debugging());
+    $('.wcPlayEditorMenuOptionSilence').children('i:first-child, span:first-child').toggleClass('fa-volume-off', this._engine.silent()).toggleClass('fa-volume-up', !this._engine.silent());
+    $('.wcPlayEditorMenuOptionPausePlay').children('i:first-child, span:first-child').toggleClass('fa-play', this._engine.paused()).toggleClass('fa-pause', !this._engine.paused());
+
 
     this.onResized();
 
@@ -519,39 +523,69 @@ wcPlayEditor.prototype = {
         <span class="wcPlayVersionTag wcPlayNoHighlights"></span>\
         <li><span>File</span>\
           <ul>\
-            <li><span class="wcPlayEditorMenuOptionNew wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcPlayEditorMenuButton fa fa-file-o fa-lg"/>New Script...<span>Ctrl+N</span></span></li>\
-            <li><span class="wcPlayEditorMenuOptionOpen wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcPlayEditorMenuButton fa fa-folder-open-o fa-lg"/>Open Script...<span>Ctrl+O</span></span></li>\
-            <li><span class="wcPlayEditorMenuOptionSave wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcPlayEditorMenuButton fa fa-save fa-lg"/>Save Script<span>Ctrl+S</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionNew wcPlayMenuItem"><i class="wcPlayEditorMenuIcon wcButton fa fa-file-o fa-lg"/>New Script...<span>Ctrl+N</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionOpen wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-folder-open-o fa-lg"/>Open Script...<span>Ctrl+O</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionSave wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-save fa-lg"/>Save Script<span>Ctrl+S</span></span></li>\
           </ul>\
         </li>\
         <li><span>Edit</span>\
           <ul>\
-            <li><span class="wcPlayEditorMenuOptionUndo wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcPlayEditorMenuButton fa fa-backward fa-lg"/>Undo<span>Ctrl+Z</span></span></li>\
-            <li><span class="wcPlayEditorMenuOptionRedo wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcPlayEditorMenuButton fa fa-forward fa-lg"/>Redo<span>Ctrl+Y</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionUndo wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-backward fa-lg"/>Undo<span>Ctrl+Z</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionRedo wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-forward fa-lg"/>Redo<span>Ctrl+Y</span></span></li>\
             <li><hr class="wcPlayMenuSeparator"></li>\
-            <li><span class="wcPlayEditorMenuOptionCut wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcPlayEditorMenuButton fa fa-cut fa-lg"/>Cut<span>Ctrl+X</span></span></li>\
-            <li><span class="wcPlayEditorMenuOptionCopy wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcPlayEditorMenuButton fa fa-copy fa-lg"/>Copy<span>Ctrl+C</span></span></li>\
-            <li><span class="wcPlayEditorMenuOptionPaste wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcPlayEditorMenuButton fa fa-paste fa-lg"/>Paste<span>Ctrl+P</span></span></li>\
-            <li><span class="wcPlayEditorMenuOptionDelete wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcPlayEditorMenuButton fa fa-trash-o fa-lg"/>Delete<span>Del</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionCut wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-cut fa-lg"/>Cut<span>Ctrl+X</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionCopy wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-copy fa-lg"/>Copy<span>Ctrl+C</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionPaste wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-paste fa-lg"/>Paste<span>Ctrl+P</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionDelete wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-trash-o fa-lg"/>Delete<span>Del</span></span></li>\
           </ul>\
         </li>\
         <li><span>Debugging</span>\
           <ul>\
-            <li><span class="wcPlayEditorMenuOptionRestart wcPlayMenuItem" title="Reset all property values to their initial state and restart the execution of the script."><i class="wcPlayEditorMenuIcon wcPlayEditorMenuButton fa fa-eraser fa-lg"/>Restart Script<span></span></span></li>\
-            <li><span class="wcPlayEditorMenuOptionPausePlay wcPlayMenuItem" title="Pause or Continue execution of the script."><i class="wcPlayEditorMenuIcon wcPlayEditorMenuButton fa fa-gear fa-lg"/>Pause/Continue Script<span>Return</span></span></li>\
-            <li><span class="wcPlayEditorMenuOptionStep wcPlayMenuItem" title="Steps execution of the script by a single update."><i class="wcPlayEditorMenuIcon wcPlayEditorMenuButton fa fa-gear fa-lg"/>Step Script<span>Spacebar</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionDebugging wcPlayMenuItem" title="Toggle debugging mode for the entire script."><i class="wcPlayEditorMenuIcon wcButton fa fa-dot-circle-o fa-lg"/>Toggle Debugger<span></span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionSilence wcPlayMenuItem" title="Toggle silent mode for the entire script (Nodes with debug log enabled will not log when this is active)."><i class="wcPlayEditorMenuIcon wcButton fa fa-volume-up fa-lg"/>Toggle Debugger<span></span></span></li>\
+            <li><hr class="wcPlayMenuSeparator"></li>\
+            <li><span class="wcPlayEditorMenuOptionRestart wcPlayMenuItem" title="Reset all property values to their initial state and restart the execution of the script."><i class="wcPlayEditorMenuIcon wcButton fa fa-refresh fa-lg"/>Restart Script<span></span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionPausePlay wcPlayMenuItem" title="Pause or Continue execution of the script."><i class="wcPlayEditorMenuIcon wcButton fa fa-pause fa-lg"/>Pause/Continue Script<span>Return</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionStep wcPlayMenuItem" title="Steps execution of the script by a single update."><i class="wcPlayEditorMenuIcon wcButton fa fa-forward fa-lg"/>Step Script<span>Spacebar</span></span></li>\
           </ul>\
         </li>\
         <li><span>Help</span>\
           <ul>\
-            <li><span class="wcPlayEditorMenuOptionDocs wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcPlayEditorMenuButton fa fa-file-pdf-o fa-lg"/>Documentation...<span></span></span></li>\
-            <li><span class="wcPlayEditorMenuOptionAbout wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcPlayEditorMenuButton fa fa-question fa-lg"/>About...<span></span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionDocs wcPlayMenuItem" title="Open the documentation for wcPlay in another window."><i class="wcPlayEditorMenuIcon wcButton fa fa-file-pdf-o fa-lg"/>Documentation...<span></span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionAbout wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-question fa-lg"/>About...<span></span></span></li>\
           </ul>\
         </li>\
       </ul>\
     ');
 
+    var $toolbar = $('\
+      <div class="wcPlayEditorToolbar">\
+        <div class="wcPlayEditorMenuOptionNew"><span class="wcPlayEditorMenuIcon wcButton fa fa-file-o fa-lg" title="New Project"/></div>\
+        <div class="wcPlayEditorMenuOptionOpen disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-folder-open-o fa-lg" title="Open Project"></div>\
+        <div class="wcPlayEditorMenuOptionSave disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-save fa-lg" title="Save Project"></div>\
+        <div class="ARPG_Separator"></div>\
+        <div class="wcPlayEditorMenuOptionUndo"><span class="wcPlayEditorMenuIcon wcButton fa fa-backward fa-lg"/></div>\
+        <div class="wcPlayEditorMenuOptionRedo"><span class="wcPlayEditorMenuIcon wcButton fa fa-forward fa-lg"/></div>\
+        <div class="ARPG_Separator"></div>\
+        <div class="wcPlayEditorMenuOptionCut disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-cut fa-lg" title="Cut"/></div>\
+        <div class="wcPlayEditorMenuOptionCopy disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-copy fa-lg" title="Copy"/></div>\
+        <div class="wcPlayEditorMenuOptionPaste disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-paste fa-lg" title="Paste"/></div>\
+        <div class="wcPlayEditorMenuOptionDelete disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-trash-o fa-lg" title="Delete"/></div>\
+        <div class="ARPG_Separator"></div>\
+        <div class="wcPlayEditorMenuOptionDebugging"><span class="wcPlayEditorMenuIcon wcButton fa fa-dot-circle-o fa-lg" title="Toggle debugging mode for the entire script."/></div>\
+        <div class="wcPlayEditorMenuOptionSilence"><span class="wcPlayEditorMenuIcon wcButton fa fa-volume-up fa-lg" title="Toggle silent mode for the entire script (Nodes with debug log enabled will not log when this is active)."/></div>\
+        <div class="ARPG_Separator"></div>\
+        <div class="wcPlayEditorMenuOptionRestart"><span class="wcPlayEditorMenuIcon wcButton fa fa-refresh fa-lg" title="Reset all property values to their initial state and restart the execution of the script."/></div>\
+        <div class="wcPlayEditorMenuOptionPausePlay"><span class="wcPlayEditorMenuIcon wcButton fa fa-pause fa-lg" title="Pause or Continue execution of the script."/></div>\
+        <div class="wcPlayEditorMenuOptionStep"><span class="wcPlayEditorMenuIcon wcButton fa fa-forward fa-lg" title="Steps execution of the script by a single update."/></div>\
+        <div class="ARPG_Separator"></div>\
+        <div class="wcPlayEditorMenuOptionDocs"><span class="wcPlayEditorMenuIcon wcButton fa fa-file-pdf-o fa-lg" title="Open the documentation for wcPlay in another window."/></div>\
+        <div class="wcPlayEditorMenuOptionAbout disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-question fa-lg"/></div>\
+      </div>\
+    ');
+
     this.$top.append($fileMenu);
+    this.$top.append($toolbar);
   },
 
   /**
@@ -821,17 +855,15 @@ wcPlayEditor.prototype = {
     };
 
     context.save();
-    var gradient = context.createRadialGradient(
-      data.breakpoint.left + data.breakpoint.width/2,
-      data.breakpoint.top + data.breakpoint.height/2,
-      0,
-      data.breakpoint.left + data.breakpoint.width/2,
-      data.breakpoint.top + data.breakpoint.height/2,
-      Math.min(data.breakpoint.width*0.5, data.breakpoint.height*0.5));
-    gradient.addColorStop(0, (node._break? "darkred": "gray"));
-    gradient.addColorStop(1, (this._highlightBreakpoint && this._highlightNode === node? "darkgray": "white"));
-    context.fillStyle = gradient;
+    context.fillStyle = (this._highlightBreakpoint && this._highlightNode === node? "darkgray": "white");
     context.fillRect(data.breakpoint.left, data.breakpoint.top, data.breakpoint.width, data.breakpoint.height);
+
+    if (node._break) {
+      context.fillStyle = "darkred";
+      context.beginPath();
+      context.arc(data.breakpoint.left + data.breakpoint.width/2, data.breakpoint.top + data.breakpoint.height/2, Math.min(data.breakpoint.width/2-1, data.breakpoint.height/2-1), 0, 2 * Math.PI);
+      context.fill();
+    }
 
     context.strokeStyle = "black";
     context.lineWidth = 1;
@@ -1685,7 +1717,7 @@ wcPlayEditor.prototype = {
     var coreRadius = 25;
 
     // If the exit link is above the entry link
-    if (startPos.y + coreRadius < endPos.y && startPos.x !== endPos.x) {
+    if (startPos.y < endPos.y) {
       var midx = (endPos.x + startPos.x) / 2;
       var midy = (endPos.y + startPos.y) / 2;
       var radius = Math.min(coreRadius, Math.abs(endPos.x - startPos.x)/2, Math.abs(endPos.y - startPos.y)/2);
@@ -1693,7 +1725,7 @@ wcPlayEditor.prototype = {
       context.arcTo(endPos.x, midy, endPos.x, endPos.y, radius);
     }
     // If the start rect is to the left side of the end rect.
-    else if (startRect.left + startRect.width + coreRadius < endRect.left) {
+    else if (startRect.left + startRect.width < endRect.left) {
       var midx = (endRect.left + startRect.left + startRect.width) / 2;
       var midy = (endPos.y + startPos.y) / 2;
       var leftx = (midx + startPos.x) / 2;
@@ -1705,7 +1737,7 @@ wcPlayEditor.prototype = {
       context.arcTo(endPos.x, endPos.y - radius, endPos.x, endPos.y, radius);
     }
     // If the start rect is to the right side of the end rect.
-    else if (startRect.left - coreRadius > endRect.left + endRect.width) {
+    else if (startRect.left > endRect.left + endRect.width) {
       var midx = (startRect.left + endRect.left + endRect.width) / 2;
       var midy = (endPos.y + startPos.y) / 2;
       var leftx = (midx + endPos.x) / 2;
@@ -1717,7 +1749,7 @@ wcPlayEditor.prototype = {
       context.arcTo(endPos.x, endPos.y - radius, endPos.x, endPos.y, radius);
     }
     // If the start link is below the end link. Makes a loop around the nodes.
-    else if (startPos.y > endPos.y && startPos.y > endRect.top + endRect.height) {
+    else if (startPos.y > endPos.y && startPos.y > endRect.top + endRect.height + 10) {
       var x = startPos.x;
       var bottom = Math.max(startRect.top + startRect.height + coreRadius, endRect.top + endRect.height + coreRadius);
       var midy = (startPos.y + endPos.y) / 2;
@@ -1732,7 +1764,7 @@ wcPlayEditor.prototype = {
         bottom += 2;
       }
       var midx = (startPos.x + x) / 2;
-      var radius = Math.min(coreRadius, Math.abs(x - endPos.x)/2);
+      var radius = Math.min(coreRadius, Math.abs(x - startPos.x)/2, Math.abs(x - endPos.x)/2);
 
       context.arcTo(startPos.x, bottom, midx, bottom, radius);
       context.arcTo(x, bottom, x, midy, radius);
@@ -1769,7 +1801,7 @@ wcPlayEditor.prototype = {
     var coreRadius = 25;
 
     // If the output link is to the right the input link
-    if (startPos.x + coreRadius < endPos.x && startPos.y !== endPos.y) {
+    if (startPos.x < endPos.x) {
       var midx = (endPos.x + startPos.x) / 2;
       var midy = (endPos.y + startPos.y) / 2;
       var radius = Math.min(coreRadius, Math.abs(endPos.x - startPos.x)/2, Math.abs(endPos.y - startPos.y)/2);
@@ -1777,7 +1809,7 @@ wcPlayEditor.prototype = {
       context.arcTo(midx, endPos.y, endPos.x, endPos.y, radius);
     }
     // If the start rect is below the end rect.
-    else if (startRect.top + startRect.height + coreRadius < endRect.top) {
+    else if (startRect.top + startRect.height < endRect.top) {
       var midx = (endPos.x + startPos.x) / 2;
       var midy = (endRect.top + startRect.top + startRect.height) / 2 - 2;
       var topy = (midy + startPos.y) / 2;
@@ -1789,7 +1821,7 @@ wcPlayEditor.prototype = {
       context.arcTo(endPos.x - radius, endPos.y, endPos.x, endPos.y, radius);
     }
     // If the start rect above the end rect.
-    else if (startRect.top - coreRadius > endRect.top + endRect.height) {
+    else if (startRect.top > endRect.top + endRect.height) {
       var midx = (endPos.x + startPos.x) / 2;
       var midy = (startRect.top + endRect.top + endRect.height) / 2 + 2;
       var topy = (midy + endPos.y) / 2;
@@ -1801,7 +1833,7 @@ wcPlayEditor.prototype = {
       context.arcTo(endPos.x - radius, endPos.y, endPos.x, endPos.y, radius);
     }
     // If the start link is to the right of the end link.
-    else if (startPos.x > endPos.x && startPos.x > endRect.left + endRect.width) {
+    else if (startPos.x > endPos.x && startPos.x > endRect.left + endRect.width + 10) {
       var y = startPos.y;
       var right = Math.max(startRect.left + startRect.width + coreRadius, endRect.left + endRect.width + coreRadius);
       var midx = (startPos.x + endPos.x) / 2;
@@ -1816,7 +1848,7 @@ wcPlayEditor.prototype = {
         right += 2;
       }
       var midy = (startPos.y + y) / 2;
-      var radius = Math.min(coreRadius, Math.abs(y - endPos.y)/2);
+      var radius = Math.min(coreRadius, Math.abs(y - startPos.y)/2, Math.abs(y - endPos.y)/2);
 
       context.arcTo(right, startPos.y, right, midy, radius);
       context.arcTo(right, y, midx, y, radius);
@@ -2151,41 +2183,52 @@ wcPlayEditor.prototype = {
 
     var $body = $('body');
 
+    // Catch any disabled menu clicks and stop them from executing.
+    $body.on('click', '.wcPlayMenuItem.disabled', function(event) {
+      event.stopPropagation();
+      event.preventDefault = true;
+      return false;
+    });
+
     // File menu
     $body.on('click', '.wcPlayEditorMenuOptionNew', function() {
-      if ($(this).hasClass('disabled')) {return;}
-      if (this._engine) {
-        // TODO:
+      if (self._engine) {
+        self._engine.clear();
       }
     });
     $body.on('click', '.wcPlayEditorMenuOptionOpen', function() {
-      if ($(this).hasClass('disabled')) {return;}
       // TODO:
     });
     $body.on('click', '.wcPlayEditorMenuOptionSave', function() {
-      if ($(this).hasClass('disabled')) {return;}
       // TODO:
     });
 
     // Edit menu
     $body.on('click', '.wcPlayEditorMenuOptionUndo', function() {
-      if ($(this).hasClass('disabled')) {return;}
       self._undoManager && self._undoManager.undo();
     });
     $body.on('click', '.wcPlayEditorMenuOptionRedo', function() {
-      if ($(this).hasClass('disabled')) {return;}
       self._undoManager && self._undoManager.redo();
     });
 
     // Debugger
+    $body.on('click', '.wcPlayEditorMenuOptionDebugging', function() {
+      if (self._engine) {
+        self._engine.debugging(!self._engine.debugging());
+        self._engine.paused(false);
+      }
+    });
+    $body.on('click', '.wcPlayEditorMenuOptionSilence', function() {
+      if (self._engine) {
+        self._engine.silent(!self._engine.silent());
+      }
+    });
     $body.on('click', '.wcPlayEditorMenuOptionRestart', function() {
-      if ($(this).hasClass('disabled')) {return;}
       if (self._engine) {
         self._engine.start();
       }
     });
     $body.on('click', '.wcPlayEditorMenuOptionPausePlay', function() {
-      if ($(this).hasClass('disabled')) {return;}
       if (self._engine) {
         if (self._engine.paused() || self._engine.stepping()) {
           self._engine.paused(false);
@@ -2196,7 +2239,6 @@ wcPlayEditor.prototype = {
       }
     });
     $body.on('click', '.wcPlayEditorMenuOptionStep', function() {
-      if ($(this).hasClass('disabled')) {return;}
       if (self._engine) {
         self._engine.paused(false);
         self._engine.stepping(true);
@@ -2204,8 +2246,10 @@ wcPlayEditor.prototype = {
     });
 
     // Help menu
+    $body.on('click', '.wcPlayEditorMenuOptionDocs', function() {
+      window.open('https://play.api.webcabin.org/', '_blank');
+    });
     $body.on('click', '.wcPlayEditorMenuOptionAbout', function() {
-      if ($(this).hasClass('disabled')) {return;}
       // TODO:
     });
   },
