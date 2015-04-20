@@ -56,8 +56,13 @@
   width: 100%;
 }
 
+.wcPlayEditorButton {
+  cursor: pointer;
+}
+
 .wcPlayCategoryButton {
   width: 100%;
+  cursor: pointer;
 }
 
 .wcPlayViewport {
@@ -243,6 +248,7 @@ ul.wcPlayEditorMenu li ul li span span {
   margin-right: 5px;
   padding: 0px;
   border: 0px;
+  cursor: pointer;
 }
 
 .wcPlayEditorToolbar .wcButton {
@@ -294,6 +300,7 @@ ul.wcPlayEditorMenu li ul li span span {
 /* Disabled menu item */
 .wcPlayEditorToolbar div.disabled span {
   border: 2px outset #888;
+  cursor: default;
   opacity: 0.5;
 }
 

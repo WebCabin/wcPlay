@@ -536,7 +536,7 @@ wcPlayEditor.prototype = {
             <li><span class="wcPlayEditorMenuOptionCut wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-cut fa-lg"/>Cut<span>Ctrl+X</span></span></li>\
             <li><span class="wcPlayEditorMenuOptionCopy wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-copy fa-lg"/>Copy<span>Ctrl+C</span></span></li>\
             <li><span class="wcPlayEditorMenuOptionPaste wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-paste fa-lg"/>Paste<span>Ctrl+P</span></span></li>\
-            <li><span class="wcPlayEditorMenuOptionDelete wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-trash-o fa-lg"/>Delete<span>Del</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionDelete wcPlayMenuItem"><i class="wcPlayEditorMenuIcon wcButton fa fa-trash-o fa-lg"/>Delete<span>Del</span></span></li>\
           </ul>\
         </li>\
         <li><span>Debugging</span>\
@@ -570,7 +570,7 @@ wcPlayEditor.prototype = {
         <div class="wcPlayEditorMenuOptionCut disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-cut fa-lg" title="Cut"/></div>\
         <div class="wcPlayEditorMenuOptionCopy disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-copy fa-lg" title="Copy"/></div>\
         <div class="wcPlayEditorMenuOptionPaste disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-paste fa-lg" title="Paste"/></div>\
-        <div class="wcPlayEditorMenuOptionDelete disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-trash-o fa-lg" title="Delete"/></div>\
+        <div class="wcPlayEditorMenuOptionDelete"><span class="wcPlayEditorMenuIcon wcButton fa fa-trash-o fa-lg" title="Delete"/></div>\
         <div class="ARPG_Separator"></div>\
         <div class="wcPlayEditorMenuOptionDebugging"><span class="wcPlayEditorMenuIcon wcButton fa fa-dot-circle-o fa-lg" title="Toggle debugging mode for the entire script."/></div>\
         <div class="wcPlayEditorMenuOptionSilence"><span class="wcPlayEditorMenuIcon wcButton fa fa-volume-up fa-lg" title="Toggle silent mode for the entire script (Nodes with debug log enabled will not log when this is active)."/></div>\
@@ -595,9 +595,9 @@ wcPlayEditor.prototype = {
    */
   __setupPalette: function() {
     // Create our top bar with buttons for each node type.
-    this.$typeButton.push($('<button class="wcToggled">Entry</button>'));
-    this.$typeButton.push($('<button>Process</button>'));
-    this.$typeButton.push($('<button>Storage</button>'));
+    this.$typeButton.push($('<button class="wcPlayEditorButton wcToggled" title="Show Entry Nodes.">Entry</button>'));
+    this.$typeButton.push($('<button class="wcPlayEditorButton" title="Show Process Nodes.">Process</button>'));
+    this.$typeButton.push($('<button class="wcPlayEditorButton" title="Show Storage Nodes.">Storage</button>'));
     this.$palette.append(this.$typeButton[0]);
     this.$palette.append(this.$typeButton[1]);
     this.$palette.append(this.$typeButton[2]);
@@ -622,7 +622,7 @@ wcPlayEditor.prototype = {
       if (!this._nodeLibrary[data.category].hasOwnProperty(data.type)) {
         var typeData = {
           $category: $('<div class="wcPlayTypeCategory">'),
-          $button: $('<button class="wcPlayCategoryButton wcToggled">' + data.category + '</button>'),
+          $button: $('<button class="wcPlayCategoryButton wcToggled" title="Toggle visibility of this category.">' + data.category + '</button>'),
           $canvas: $('<canvas class="wcPlayTypeCategoryArea">'),
           context: null,
           nodes: [],
@@ -2031,82 +2031,18 @@ wcPlayEditor.prototype = {
   __onKey: function(event, elem) {
     switch (event.keyCode) {
       case 46: // Delete key to delete selected nodes.
-        if (this._selectedNodes.length) {
-          this._undoManager && this._undoManager.beginGroup('Removed Nodes');
-          for (var i = 0; i < this._selectedNodes.length; ++i) {
-            var node = this._selectedNodes[i];
-
-            this._undoManager && this._undoManager.addEvent('',
-            {
-              id: node.id,
-              className: node.className,
-              pos: {
-                x: node.pos.x,
-                y: node.pos.y,
-              },
-              collapsed: node.collapsed(),
-              breakpoint: node._break,
-              properties: node.listProperties(),
-              entryChains: node.listEntryChains(),
-              exitChains: node.listExitChains(),
-              inputChains: node.listInputChains(),
-              outputChains: node.listOutputChains(),
-              editor: this,
-            },
-            // Undo
-            function() {
-              var myNode = new window[this.className](this.editor._engine, this.pos);
-              myNode.id = this.id;
-              myNode.collapsed(this.collapsed);
-              myNode.debugBreak(this.breakpoint);
-              // Restore property values.
-              for (var i = 0; i < this.properties.length; ++i) {
-                myNode.initialProperty(this.properties[i].name, this.properties[i].initialValue);
-                myNode.property(this.properties[i].name, this.properties[i].value);
-              }
-              // Re-connect all chains.
-              for (var i = 0; i < this.entryChains.length; ++i) {
-                var chain = this.entryChains[i];
-                var targetNode = this.editor._engine.nodeById(chain.outNodeId);
-                myNode.connectEntry(chain.inName, targetNode, chain.outName);
-              }
-              for (var i = 0; i < this.exitChains.length; ++i) {
-                var chain = this.exitChains[i];
-                var targetNode = this.editor._engine.nodeById(chain.inNodeId);
-                myNode.connectExit(chain.outName, targetNode, chain.inName);
-              }
-              for (var i = 0; i < this.inputChains.length; ++i) {
-                var chain = this.inputChains[i];
-                var targetNode = this.editor._engine.nodeById(chain.outNodeId);
-                myNode.connectInput(chain.inName, targetNode, chain.outName);
-              }
-              for (var i = 0; i < this.outputChains.length; ++i) {
-                var chain = this.outputChains[i];
-                var targetNode = this.editor._engine.nodeById(chain.outNodeId);
-                myNode.connectOutput(chain.inName, targetNode, chain.outName);
-              }
-            },
-            // Redo
-            function() {
-              var myNode = this.editor._engine.nodeById(this.id);
-              myNode.destroy();
-            });
-
-            node.destroy();
-            node = null;
-          }
-          this._undoManager && this._undoManager.endGroup();
-        }
+        $('.wcPlayEditorMenuOptionDelete').click();
+        break;
       case 'Z'.charCodeAt(0): // Ctrl+Z to undo last action.
         if (event.ctrlKey && !event.shiftKey) {
-          this._undoManager && this._undoManager.undo();
+          $('.wcPlayEditorMenuOptionUndo').click();
         }
         if (!event.shiftKey) {
           break;
         }
       case 'Y'.charCodeAt(0): // Ctrl+Shift+Z or Ctrl+Y to redo action.
         if (event.ctrlKey) {
-          this._undoManager && this._undoManager.redo();
+          $('.wcPlayEditorMenuOptionRedo').click();
         }
         break;
       case 32: // Space to step
@@ -2212,6 +2148,77 @@ wcPlayEditor.prototype = {
       self._undoManager && self._undoManager.redo();
     });
 
+    $body.on('click', '.wcPlayEditorMenuOptionDelete', function() {
+      if (self._selectedNodes.length) {
+        self._undoManager && self._undoManager.beginGroup('Removed Nodes');
+        for (var i = 0; i < self._selectedNodes.length; ++i) {
+          var node = self._selectedNodes[i];
+
+          self._undoManager && self._undoManager.addEvent('',
+          {
+            id: node.id,
+            className: node.className,
+            pos: {
+              x: node.pos.x,
+              y: node.pos.y,
+            },
+            collapsed: node.collapsed(),
+            breakpoint: node._break,
+            properties: node.listProperties(),
+            entryChains: node.listEntryChains(),
+            exitChains: node.listExitChains(),
+            inputChains: node.listInputChains(),
+            outputChains: node.listOutputChains(),
+            editor: self,
+          },
+          // Undo
+          function() {
+            var myNode = new window[this.className](this.editor._engine, this.pos);
+            myNode.id = this.id;
+            myNode.collapsed(this.collapsed);
+            myNode.debugBreak(this.breakpoint);
+            // Restore property values.
+            for (var i = 0; i < this.properties.length; ++i) {
+              myNode.initialProperty(this.properties[i].name, this.properties[i].initialValue);
+              myNode.property(this.properties[i].name, this.properties[i].value);
+            }
+            // Re-connect all chains.
+            for (var i = 0; i < this.entryChains.length; ++i) {
+              var chain = this.entryChains[i];
+              var targetNode = this.editor._engine.nodeById(chain.outNodeId);
+              myNode.connectEntry(chain.inName, targetNode, chain.outName);
+            }
+            for (var i = 0; i < this.exitChains.length; ++i) {
+              var chain = this.exitChains[i];
+              var targetNode = this.editor._engine.nodeById(chain.inNodeId);
+              myNode.connectExit(chain.outName, targetNode, chain.inName);
+            }
+            for (var i = 0; i < this.inputChains.length; ++i) {
+              var chain = this.inputChains[i];
+              var targetNode = this.editor._engine.nodeById(chain.outNodeId);
+              myNode.connectInput(chain.inName, targetNode, chain.outName);
+            }
+            for (var i = 0; i < this.outputChains.length; ++i) {
+              var chain = this.outputChains[i];
+              var targetNode = this.editor._engine.nodeById(chain.outNodeId);
+              myNode.connectOutput(chain.inName, targetNode, chain.outName);
+            }
+          },
+          // Redo
+          function() {
+            var myNode = this.editor._engine.nodeById(this.id);
+            myNode.destroy();
+          });
+
+          node.destroy();
+          node = null;
+        }
+        self._selectedNode = null;
+        self._selectedNodes = [];
+        self._undoManager && self._undoManager.endGroup();
+      }
+    });
+
     // Debugger
     $body.on('click', '.wcPlayEditorMenuOptionDebugging', function() {
       if (self._engine) {
@@ -2293,7 +2300,7 @@ wcPlayEditor.prototype = {
       if (node) {
         this._highlightNode = node;
         this.$palette.addClass('wcClickable');
-        this.$palette.attr('title', 'Click and drag to the script area to create a new node of this type.');
+        this.$palette.attr('title', 'Create a new instance of this node by dragging this into your script.');
       } else {
         this._highlightNode = null;
         this.$palette.removeClass('wcClickable');
