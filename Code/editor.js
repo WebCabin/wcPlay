@@ -384,9 +384,10 @@ wcPlayEditor.prototype = {
       $(this).toggleClass('disabled', !self._undoManager.canRedo()).find('.wcButton').toggleClass('disabled', !self._undoManager.canRedo());
       $(this).attr('title', 'Redo ' + self._undoManager.redoInfo());
     });
-    $('.wcPlayEditorMenuOptionDebugging').children('i:first-child, span:first-child').toggleClass('fa-dot-circle-o', this._engine.debugging()).toggleClass('fa-circle-o', !this._engine.debugging());
-    $('.wcPlayEditorMenuOptionSilence').children('i:first-child, span:first-child').toggleClass('fa-volume-off', this._engine.silent()).toggleClass('fa-volume-up', !this._engine.silent());
+    $('.wcPlayEditorMenuOptionDebugging').children('i:first-child, span:first-child').toggleClass('fa-dot-circle-o', this._engine.debugging()).toggleClass('fa-circle-o', !this._engine.debugging()).toggleClass('wcToggled', this._engine.debugging());
+    $('.wcPlayEditorMenuOptionSilence').children('i:first-child, span:first-child').toggleClass('fa-volume-off', this._engine.silent()).toggleClass('fa-volume-up', !this._engine.silent()).toggleClass('wcToggled', this._engine.silent());
     $('.wcPlayEditorMenuOptionPausePlay').children('i:first-child, span:first-child').toggleClass('fa-play', this._engine.paused()).toggleClass('fa-pause', !this._engine.paused());
+    $('.wcPlayEditorMenuOptionDelete').toggleClass('disabled', this._selectedNodes.length === 0);
 
 
     this.onResized();
@@ -2123,7 +2124,7 @@ wcPlayEditor.prototype = {
     // Catch any disabled menu clicks and stop them from executing.
     $body.on('click', '.wcPlayMenuItem.disabled', function(event) {
       event.stopPropagation();
-      event.preventDefault = true;
+      event.preventDefault();
       return false;
     });
 
@@ -2476,7 +2477,11 @@ wcPlayEditor.prototype = {
       if (!this._selectedEntryLink && !this._selectedExitLink && !this._selectedInputLink && !this._selectedOutputLink) {
         if (this.__inRect(mouse, node._meta.bounds.collapser, this._viewportCamera)) {
           this._highlightCollapser = true;
-          this.$viewport.attr('title', 'Collapse this node.');
+          if (node.collapsed()) {
+            this.$viewport.attr('title', 'Expand this node.');
+          } else {
+            this.$viewport.attr('title', 'Collapse this node.');
+          }
         }
 
         // Breakpoint button.

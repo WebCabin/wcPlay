@@ -89,10 +89,6 @@
   position: absolute;
 }
 
-.wcToggled {
-  border-style: inset;
-}
-
 .wcPlayHidden {
   display: none;
 }
@@ -249,6 +245,7 @@ ul.wcPlayEditorMenu li ul li span span {
   padding: 0px;
   border: 0px;
   cursor: pointer;
+  color: #444;
 }
 
 .wcPlayEditorToolbar .wcButton {
@@ -258,7 +255,7 @@ ul.wcPlayEditorMenu li ul li span span {
   line-height: 20px !important;
   margin: 0px;
   padding: 0px;
-  border: 2px outset #666;
+  border: 2px outset #888;
   background-size: contain;
   background-color: #EEE;
   vertical-align: center;
@@ -308,4 +305,8 @@ ul.wcPlayEditorMenu li ul li span span {
   border: 2px outset #888;
   background-color: #EEE;
   opacity: 0.5;
+}
+
+.wcToggled {
+  border-style: inset !important;
 }
