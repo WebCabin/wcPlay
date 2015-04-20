@@ -2368,7 +2368,7 @@ wcPlayEditor.prototype = {
       context.arcTo(endPos.x, endPos.y - radius, endPos.x, endPos.y, radius);
     }
     // If the start link is below the end link. Makes a loop around the nodes.
-    else if (startPos.y > endPos.y && startPos.y > endRect.top + endRect.height + 10) {
+    else if (startPos.y > endPos.y && startPos.y > endRect.top + endRect.height + this._drawStyle.links.length) {
       var x = startPos.x;
       var bottom = Math.max(startRect.top + startRect.height + coreRadius, endRect.top + endRect.height + coreRadius);
       var midy = (startPos.y + endPos.y) / 2;
@@ -2452,7 +2452,7 @@ wcPlayEditor.prototype = {
       context.arcTo(endPos.x - radius, endPos.y, endPos.x, endPos.y, radius);
     }
     // If the start link is to the right of the end link.
-    else if (startPos.x > endPos.x && startPos.x > endRect.left + endRect.width + 10) {
+    else if (startPos.x > endPos.x && startPos.x > endRect.left + endRect.width + this._drawStyle.links.length) {
       var y = startPos.y;
       var right = Math.max(startRect.left + startRect.width + coreRadius, endRect.left + endRect.width + coreRadius);
       var midx = (startPos.x + endPos.x) / 2;
@@ -2911,9 +2911,11 @@ wcPlayEditor.prototype = {
       if (node) {
         this._highlightNode = node;
         this.$palette.addClass('wcClickable');
+        this.$palette.attr('title', 'Click and drag to the script area to create a new node of this type.');
       } else {
         this._highlightNode = null;
         this.$palette.removeClass('wcClickable');
+        this.$palette.attr('title', '');
       }
     }
   },
@@ -3072,16 +3074,26 @@ wcPlayEditor.prototype = {
 
     var node = this.__findNodeAtPos(mouse, this._viewportCamera);
     if (node) {
+      // Check for main node collision.
+      if (this.__inRect(mouse, node._meta.bounds.inner, this._viewportCamera)) {
+        this._highlightNode = node;
+        this.$viewport.addClass('wcClickable');
+        this.$viewport.attr('title', 'Click and drag to move this node. Double click to collapse/expand this node.');
+      } else {
+        this.$viewport.removeClass('wcClickable');
+      }
 
       // Collapser button.
       if (!this._selectedEntryLink && !this._selectedExitLink && !this._selectedInputLink && !this._selectedOutputLink) {
         if (this.__inRect(mouse, node._meta.bounds.collapser, this._viewportCamera)) {
           this._highlightCollapser = true;
+          this.$viewport.attr('title', 'Collapse this node.');
         }
 
         // Breakpoint button.
         if (this.__inRect(mouse, node._meta.bounds.breakpoint, this._viewportCamera)) {
           this._highlightBreakpoint = true;
+          this.$viewport.attr('title', 'Toggle debug breakpoint on this node.');
         }
       }
 
@@ -3091,6 +3103,7 @@ wcPlayEditor.prototype = {
           if (this.__inRect(mouse, node._meta.bounds.entryBounds[i].rect, this._viewportCamera)) {
             this._highlightNode = node;
             this._highlightEntryLink = node._meta.bounds.entryBounds[i];
+            this.$viewport.attr('title', 'Click and drag to create a new flow chain to another node.');
             break;
           }
         }
@@ -3102,6 +3115,7 @@ wcPlayEditor.prototype = {
           if (this.__inRect(mouse, node._meta.bounds.exitBounds[i].rect, this._viewportCamera)) {
             this._highlightNode = node;
             this._highlightExitLink = node._meta.bounds.exitBounds[i];
+            this.$viewport.attr('title', 'Click and drag to create a new flow chain to another node. Double click to manually trigger chains attached to this link.');
             break;
           }
         }
@@ -3113,6 +3127,7 @@ wcPlayEditor.prototype = {
           if (this.__inRect(mouse, node._meta.bounds.inputBounds[i].rect, this._viewportCamera)) {
             this._highlightNode = node;
             this._highlightInputLink = node._meta.bounds.inputBounds[i];
+            this.$viewport.attr('title', 'Click and drag to chain this property to another.');
             break;
           }
         }
@@ -3124,6 +3139,7 @@ wcPlayEditor.prototype = {
           if (this.__inRect(mouse, node._meta.bounds.outputBounds[i].rect, this._viewportCamera)) {
             this._highlightNode = node;
             this._highlightOutputLink = node._meta.bounds.outputBounds[i];
+            this.$viewport.attr('title', 'Click and drag to chain this property to another. Double click to manually propagate this property through the chain.');
             break;
           }
         }
@@ -3144,6 +3160,7 @@ wcPlayEditor.prototype = {
             if (node.properties[i].name === propBounds.name) {
               this._highlightNode = node;
               this._highlightPropertyValue = propBounds;
+              this.$viewport.attr('title', 'Click to change the current value of this property.');
               break;
             }
           }
@@ -3162,21 +3179,15 @@ wcPlayEditor.prototype = {
             if (node.properties[i].name === propInitialBounds.name) {
               this._highlightNode = node;
               this._highlightPropertyInitialValue = propInitialBounds;
+              this.$viewport.attr('title', 'Click to change the initial value of this property.');
               break;
             }
           }
         }
       }
-
-      // Check for main node collision.
-      if (this.__inRect(mouse, node._meta.bounds.inner, this._viewportCamera)) {
-        this._highlightNode = node;
-        this.$viewport.addClass('wcClickable');
-      } else {
-        this.$viewport.removeClass('wcClickable');
-      }
     } else {
       this._highlightNode = null;
+      this.$viewport.attr('title', '');
       this.$viewport.removeClass('wcClickable');
     }
 
