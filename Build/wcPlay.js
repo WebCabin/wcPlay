@@ -3009,6 +3009,7 @@ wcPlayEditor.prototype = {
       };
 
       this._draggingNodeData.$canvas.css('left', pos.x).css('top', pos.y);
+      this._mouse = mouse;
       return;
     }
 
@@ -3042,6 +3043,7 @@ wcPlayEditor.prototype = {
       __nodesInRect(this._engine._compositeNodes);
       __nodesInRect(this._engine._processNodes);
       __nodesInRect(this._engine._entryNodes);
+      this._mouse = mouse;
       return;
     }
 
@@ -3052,7 +3054,7 @@ wcPlayEditor.prototype = {
       this._viewportCamera.x += moveX;
       this._viewportCamera.y += moveY;
       this._mouse = mouse;
-      if (!this._viewportMoved) {
+      if (!this._viewportMoved && this._mouseMoved) {
         this._viewportMoved = true;
         this.$viewport.addClass('wcMoving');
       }
