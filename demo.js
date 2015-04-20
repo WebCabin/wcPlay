@@ -30,7 +30,6 @@ $(document).ready(function() {
   // numberNode.debugLog(true);
 
   // Assign some property values.
-  numberNode.initialProperty('value', 0);
   operationNode.initialProperty('valueB', 1);
 
   // Chain some nodes together.
