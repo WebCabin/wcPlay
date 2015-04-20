@@ -559,7 +559,7 @@ wcPlayEditor.prototype = {
     ');
 
     var $toolbar = $('\
-      <div class="wcPlayEditorToolbar">\
+      <div class="wcPlayEditorToolbar wcPlayNoHighlights">\
         <div class="wcPlayEditorMenuOptionNew"><span class="wcPlayEditorMenuIcon wcButton fa fa-file-o fa-lg" title="New Project"/></div>\
         <div class="wcPlayEditorMenuOptionOpen disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-folder-open-o fa-lg" title="Open Project"></div>\
         <div class="wcPlayEditorMenuOptionSave disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-save fa-lg" title="Save Project"></div>\
