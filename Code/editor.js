@@ -857,8 +857,9 @@ wcPlayEditor.prototype = {
     var bounds = this.__expandRect([entryBounds, centerBounds, exitBounds]);
     bounds.top = centerBounds.top;
     bounds.height = centerBounds.height;
-    bounds.initialWidth = centerBounds.initialWidth;
+    bounds.propWidth = centerBounds.propWidth;
     bounds.valueWidth = centerBounds.valueWidth;
+    bounds.initialWidth = centerBounds.initialWidth;
 
     data.rect = this.__expandRect([entryBounds, centerBounds, exitBounds]);
     data.inner = this.__expandRect([centerBounds]);
@@ -886,6 +887,13 @@ wcPlayEditor.prototype = {
     if (this._selectedNodes.indexOf(node) > -1) {
       this.__drawRoundedRect(data.rect, "rgba(0, 255, 255, 0.25)", -1, 10, context);
       this.__drawRoundedRect(data.rect, "darkcyan", 2, 10, context);
+    }
+
+    var maxValueWidth = (data.inner.width - this._drawStyle.node.margin*2 - bounds.propWidth);
+    if (maxValueWidth > bounds.valueWidth + bounds.initialWidth) {
+      var extra = (maxValueWidth - (bounds.valueWidth + bounds.initialWidth)) / 2;
+      bounds.valueWidth += extra;
+      bounds.initialWidth += extra;
     }
 
     // Now use our measurements to draw our node.
@@ -1121,8 +1129,9 @@ wcPlayEditor.prototype = {
 
     bounds.width = Math.max(propWidth + valueWidth + initialWidth, bounds.width) + this._drawStyle.node.margin * 2;
     bounds.left -= bounds.width/2;
-    bounds.initialWidth = initialWidth;
+    bounds.propWidth = propWidth;
     bounds.valueWidth = valueWidth;
+    bounds.initialWidth = initialWidth;
     return bounds;
   },
 
