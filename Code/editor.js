@@ -55,8 +55,8 @@ function wcPlayEditor(container, options) {
       minLength: 30,      // The minimum length the property value can be.
       valueWrapL: ' ',    // The left string to wrap around a property value.
       valueWrapR: '  ',   // The right string to wrap around a property value.
-      initialWrapL: '(',  // The left string to wrap around a property initial value.
-      initialWrapR: ')',  // The right string to wrap around a property initial value.
+      initialWrapL: '[',  // The left string to wrap around a property initial value.
+      initialWrapR: ']',  // The right string to wrap around a property initial value.
     },
   };
 
@@ -824,6 +824,7 @@ wcPlayEditor.prototype = {
     bounds.top = centerBounds.top;
     bounds.height = centerBounds.height;
     bounds.initialWidth = centerBounds.initialWidth;
+    bounds.valueWidth = centerBounds.valueWidth;
 
     // Now use our measurements to draw our node.
     var propBounds  = this.__drawCenter(node, context, bounds, hideCollapsible);
@@ -1087,6 +1088,7 @@ wcPlayEditor.prototype = {
     bounds.width = Math.max(propWidth + valueWidth + initialWidth, bounds.width) + this._drawStyle.node.margin * 2;
     bounds.left -= bounds.width/2;
     bounds.initialWidth = initialWidth;
+    bounds.valueWidth = valueWidth;
     return bounds;
   },
 
@@ -1391,14 +1393,11 @@ wcPlayEditor.prototype = {
         result.initialBounds.push(initialBound);
 
         // Property value.
-        this.__setCanvasFont(this._font.value, context);
-        var w = Math.max(context.measureText(this._drawStyle.property.valueWrapL + this.__drawPropertyValue(node, props[i]) + this._drawStyle.property.valueWrapR).width, this._drawStyle.property.minLength);
-
         var valueBound = {
           rect: {
             top: rect.top + upper - this._font.property.size,
-            left: rect.left + rect.width - this._drawStyle.node.margin - w - rect.initialWidth,
-            width: w,
+            left: rect.left + rect.width - this._drawStyle.node.margin - rect.valueWidth - rect.initialWidth,
+            width: rect.valueWidth,
             height: this._font.property.size + this._drawStyle.property.spacing,
           },
           name: props[i].name,
@@ -1831,7 +1830,7 @@ wcPlayEditor.prototype = {
     }
     // If the start rect is to the left side of the end rect.
     else if (startRect.left + startRect.width < endRect.left) {
-      var midx = (endRect.left + startRect.left + startRect.width) / 2;
+      var midx = (endRect.left + startRect.left + startRect.width) / 2 - 2;
       var midy = (endPos.y + startPos.y) / 2;
       var leftx = (midx + startPos.x) / 2;
       var rightx = (endPos.x + midx) / 2;
@@ -1843,7 +1842,7 @@ wcPlayEditor.prototype = {
     }
     // If the start rect is to the right side of the end rect.
     else if (startRect.left > endRect.left + endRect.width) {
-      var midx = (startRect.left + endRect.left + endRect.width) / 2;
+      var midx = (startRect.left + endRect.left + endRect.width) / 2 + 2;
       var midy = (endPos.y + startPos.y) / 2;
       var leftx = (midx + endPos.x) / 2;
       var rightx = (startPos.x + midx) / 2;
@@ -1854,8 +1853,9 @@ wcPlayEditor.prototype = {
       context.arcTo(endPos.x, endPos.y - radius, endPos.x, endPos.y, radius);
     }
     // If the start link is below the end link. Makes a loop around the nodes.
-    else if (startPos.y > endPos.y && startPos.y > endRect.top + endRect.height + this._drawStyle.links.length) {
+    else if (startPos.y > endPos.y && Math.abs(startPos.y - endPos.y) > this._drawStyle.links.length) {
       var x = startPos.x;
+      var top = Math.min(startRect.top - coreRadius, endRect.top - coreRadius);
       var bottom = Math.max(startRect.top + startRect.height + coreRadius, endRect.top + endRect.height + coreRadius);
       var midy = (startPos.y + endPos.y) / 2;
       // Choose left or right.
@@ -1873,8 +1873,8 @@ wcPlayEditor.prototype = {
 
       context.arcTo(startPos.x, bottom, midx, bottom, radius);
       context.arcTo(x, bottom, x, midy, radius);
-      context.arcTo(x, endPos.y - radius, midx, endPos.y - radius, radius);
-      context.arcTo(endPos.x, endPos.y - radius, endPos.x, endPos.y, radius);
+      context.arcTo(x, top, midx, top, radius);
+      context.arcTo(endPos.x, top, endPos.x, endPos.y, radius);
     }
 
     // Finish our line to the end position.
@@ -1938,9 +1938,10 @@ wcPlayEditor.prototype = {
       context.arcTo(endPos.x - radius, endPos.y, endPos.x, endPos.y, radius);
     }
     // If the start link is to the right of the end link.
-    else if (startPos.x > endPos.x && startPos.x > endRect.left + endRect.width + this._drawStyle.links.length) {
+    else if (startPos.x > endPos.x && Math.abs(startPos.x - endPos.x) > this._drawStyle.links.length) {
       var y = startPos.y;
       var right = Math.max(startRect.left + startRect.width + coreRadius, endRect.left + endRect.width + coreRadius);
+      var left = Math.min(startRect.left - coreRadius, endRect.left - coreRadius);
       var midx = (startPos.x + endPos.x) / 2;
       // Choose top or bottom.
       if (Math.abs(Math.min(startRect.top, endRect.top) - startPos.y) <= Math.abs(Math.max(startRect.top + startRect.height, endRect.top + endRect.height) - endPos.y)) {
@@ -1957,8 +1958,8 @@ wcPlayEditor.prototype = {
 
       context.arcTo(right, startPos.y, right, midy, radius);
       context.arcTo(right, y, midx, y, radius);
-      context.arcTo(endPos.x - radius, y, endPos.x - radius, midy, radius);
-      context.arcTo(endPos.x - radius, endPos.y, endPos.x, endPos.y, radius);
+      context.arcTo(left, y, left, midy, radius);
+      context.arcTo(left, endPos.y, endPos.x, endPos.y, radius);
     }
 
     context.lineTo(endPos.x, endPos.y);
@@ -2216,6 +2217,7 @@ wcPlayEditor.prototype = {
           if (!cancelled) {
             undoChange(node, property.name, node[propFn](property.name), $control.val());
             node[propFn](property.name, $control.val());
+            $(this).blur();
           }
         });
         break;

@@ -383,6 +383,8 @@ wcPlay.prototype = {
       prop.value = value;
       this.__notifyNodes('onGlobalPropertyChanged', [prop.name, oldValue, prop.value]);
     }
+
+    return prop.value;
   },
 
   /**
@@ -411,9 +413,11 @@ wcPlay.prototype = {
 
       if (prop.value == oldValue) {
         prop.value = value;
-        this.__notifyNodes('onGlobalPropertyChanged', [prop.name, oldValue, prop.value]);
+        this.__notifyNodes('onGlobalInitialPropertyChanged', [prop.name, oldValue, prop.value]);
       }
     }
+
+    return prop.initialValue;
   },
 
   /**

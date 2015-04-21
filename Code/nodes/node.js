@@ -1079,7 +1079,7 @@ Class.extend('wcNode', 'Node', '', {
           }
         }
 
-        return prop.value;
+        return this.onPropertyGet(prop.name) || prop.value;
       }
     }
   },
@@ -1096,13 +1096,16 @@ Class.extend('wcNode', 'Node', '', {
       var prop = this.properties[i];
       if (prop.name === name) {
         if (value !== undefined) {
+          value = this.onInitialPropertyChanging(prop.name, prop.initialValue, value) || value;
           if (prop.value == prop.initialValue) {
             this.property(name, value);
           }
+          var oldValue = prop.initialValue;
           prop.initialValue = value;
+          this.onInitialPropertyChanged(prop.name, oldValue, value);
         }
 
-        return prop.initialValue;
+        return this.onInitialPropertyGet(prop.name) || prop.initialValue;
       }
     }
   },
@@ -1341,6 +1344,7 @@ Class.extend('wcNode', 'Node', '', {
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onPropertyGet
    * @param {String} name - The name of the property.
+   * @returns {Object|undefined} - If a value is returned, that value is what will be retrieved from the get.
    */
   onPropertyGet: function(name) {
     // this._super(name);
@@ -1350,16 +1354,48 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
-   * Event that is called when the property has had its value retrieved.<br>
+   * Event that is called when a property initial value is about to be changed.<br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNode#onPropertyGot
+   * @function wcNode#onInitialPropertyChanging
    * @param {String} name - The name of the property.
+   * @param {Object} oldValue - The current value of the property.
+   * @param {Object} newValue - The new, proposed, value of the property.
+   * @returns {Object} - Return the new value of the property (usually newValue unless you are proposing restrictions). If no value is returned, newValue is assumed.
    */
-  onPropertyGot: function(name) {
-    // this._super(name);
+  onInitialPropertyChanging: function(name, oldValue, newValue) {
+    // this._super(name, oldValue, newValue);
+    // if (this.debugLog()) {
+    //   console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Changing Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
+    // }
+  },
+
+  /**
+   * Event that is called when a property initial value has changed.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onInitialPropertyChanged
+   * @param {String} name - The name of the property.
+   * @param {Object} oldValue - The old value of the property.
+   * @param {Object} newValue - The new value of the property.
+   */
+  onInitialPropertyChanged: function(name, oldValue, newValue) {
+    // this._super(name, oldValue, newValue);
     if (this.debugLog()) {
-      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Got Property "' + name + '"');
+      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Changed Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
     }
+  },
+
+  /**
+   * Event that is called when the property initial value is being asked its value, before the value is actually retrieved.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onInitialPropertyGet
+   * @param {String} name - The name of the property.
+   * @returns {Object|undefined} - If a value is returned, that value is what will be retrieved from the get.
+   */
+  onInitialPropertyGet: function(name) {
+    // this._super(name);
+    // if (this.debugLog()) {
+    //   console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Requested Property "' + name + '"');
+    // }
   },
 
   /**
@@ -1393,6 +1429,18 @@ Class.extend('wcNode', 'Node', '', {
    * @param {String} newName - The new name of the global property.
    */
   // onGlobalPropertyRenamed: function(oldName, newName) {
+  // },
+
+  /**
+   * Event that is called when a global property initial value has changed.
+   * Overload this in inherited nodes.<br>
+   * <b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.
+   * @function wcNode#onGlobalInitialPropertyChanged
+   * @param {String} name - The name of the global property.
+   * @param {Object} oldValue - The old value of the global property.
+   * @param {Object} newValue - The new value of the global property.
+   */
+  // onGlobalInitialPropertyChanged: function(name, oldValue, newValue) {
   // },
 });
 

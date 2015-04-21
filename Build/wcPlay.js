@@ -456,6 +456,8 @@ wcPlay.prototype = {
       prop.value = value;
       this.__notifyNodes('onGlobalPropertyChanged', [prop.name, oldValue, prop.value]);
     }
+
+    return prop.value;
   },
 
   /**
@@ -484,9 +486,11 @@ wcPlay.prototype = {
 
       if (prop.value == oldValue) {
         prop.value = value;
-        this.__notifyNodes('onGlobalPropertyChanged', [prop.name, oldValue, prop.value]);
+        this.__notifyNodes('onGlobalInitialPropertyChanged', [prop.name, oldValue, prop.value]);
       }
     }
+
+    return prop.initialValue;
   },
 
   /**
@@ -711,8 +715,8 @@ function wcPlayEditor(container, options) {
       minLength: 30,      // The minimum length the property value can be.
       valueWrapL: ' ',    // The left string to wrap around a property value.
       valueWrapR: '  ',   // The right string to wrap around a property value.
-      initialWrapL: '(',  // The left string to wrap around a property initial value.
-      initialWrapR: ')',  // The right string to wrap around a property initial value.
+      initialWrapL: '[',  // The left string to wrap around a property initial value.
+      initialWrapR: ']',  // The right string to wrap around a property initial value.
     },
   };
 
@@ -1480,6 +1484,7 @@ wcPlayEditor.prototype = {
     bounds.top = centerBounds.top;
     bounds.height = centerBounds.height;
     bounds.initialWidth = centerBounds.initialWidth;
+    bounds.valueWidth = centerBounds.valueWidth;
 
     // Now use our measurements to draw our node.
     var propBounds  = this.__drawCenter(node, context, bounds, hideCollapsible);
@@ -1743,6 +1748,7 @@ wcPlayEditor.prototype = {
     bounds.width = Math.max(propWidth + valueWidth + initialWidth, bounds.width) + this._drawStyle.node.margin * 2;
     bounds.left -= bounds.width/2;
     bounds.initialWidth = initialWidth;
+    bounds.valueWidth = valueWidth;
     return bounds;
   },
 
@@ -2047,14 +2053,11 @@ wcPlayEditor.prototype = {
         result.initialBounds.push(initialBound);
 
         // Property value.
-        this.__setCanvasFont(this._font.value, context);
-        var w = Math.max(context.measureText(this._drawStyle.property.valueWrapL + this.__drawPropertyValue(node, props[i]) + this._drawStyle.property.valueWrapR).width, this._drawStyle.property.minLength);
-
         var valueBound = {
           rect: {
             top: rect.top + upper - this._font.property.size,
-            left: rect.left + rect.width - this._drawStyle.node.margin - w - rect.initialWidth,
-            width: w,
+            left: rect.left + rect.width - this._drawStyle.node.margin - rect.valueWidth - rect.initialWidth,
+            width: rect.valueWidth,
             height: this._font.property.size + this._drawStyle.property.spacing,
           },
           name: props[i].name,
@@ -2487,7 +2490,7 @@ wcPlayEditor.prototype = {
     }
     // If the start rect is to the left side of the end rect.
     else if (startRect.left + startRect.width < endRect.left) {
-      var midx = (endRect.left + startRect.left + startRect.width) / 2;
+      var midx = (endRect.left + startRect.left + startRect.width) / 2 - 2;
       var midy = (endPos.y + startPos.y) / 2;
       var leftx = (midx + startPos.x) / 2;
       var rightx = (endPos.x + midx) / 2;
@@ -2499,7 +2502,7 @@ wcPlayEditor.prototype = {
     }
     // If the start rect is to the right side of the end rect.
     else if (startRect.left > endRect.left + endRect.width) {
-      var midx = (startRect.left + endRect.left + endRect.width) / 2;
+      var midx = (startRect.left + endRect.left + endRect.width) / 2 + 2;
       var midy = (endPos.y + startPos.y) / 2;
       var leftx = (midx + endPos.x) / 2;
       var rightx = (startPos.x + midx) / 2;
@@ -2510,8 +2513,9 @@ wcPlayEditor.prototype = {
       context.arcTo(endPos.x, endPos.y - radius, endPos.x, endPos.y, radius);
     }
     // If the start link is below the end link. Makes a loop around the nodes.
-    else if (startPos.y > endPos.y && startPos.y > endRect.top + endRect.height + this._drawStyle.links.length) {
+    else if (startPos.y > endPos.y && Math.abs(startPos.y - endPos.y) > this._drawStyle.links.length) {
       var x = startPos.x;
+      var top = Math.min(startRect.top - coreRadius, endRect.top - coreRadius);
       var bottom = Math.max(startRect.top + startRect.height + coreRadius, endRect.top + endRect.height + coreRadius);
       var midy = (startPos.y + endPos.y) / 2;
       // Choose left or right.
@@ -2529,8 +2533,8 @@ wcPlayEditor.prototype = {
 
       context.arcTo(startPos.x, bottom, midx, bottom, radius);
       context.arcTo(x, bottom, x, midy, radius);
-      context.arcTo(x, endPos.y - radius, midx, endPos.y - radius, radius);
-      context.arcTo(endPos.x, endPos.y - radius, endPos.x, endPos.y, radius);
+      context.arcTo(x, top, midx, top, radius);
+      context.arcTo(endPos.x, top, endPos.x, endPos.y, radius);
     }
 
     // Finish our line to the end position.
@@ -2594,9 +2598,10 @@ wcPlayEditor.prototype = {
       context.arcTo(endPos.x - radius, endPos.y, endPos.x, endPos.y, radius);
     }
     // If the start link is to the right of the end link.
-    else if (startPos.x > endPos.x && startPos.x > endRect.left + endRect.width + this._drawStyle.links.length) {
+    else if (startPos.x > endPos.x && Math.abs(startPos.x - endPos.x) > this._drawStyle.links.length) {
       var y = startPos.y;
       var right = Math.max(startRect.left + startRect.width + coreRadius, endRect.left + endRect.width + coreRadius);
+      var left = Math.min(startRect.left - coreRadius, endRect.left - coreRadius);
       var midx = (startPos.x + endPos.x) / 2;
       // Choose top or bottom.
       if (Math.abs(Math.min(startRect.top, endRect.top) - startPos.y) <= Math.abs(Math.max(startRect.top + startRect.height, endRect.top + endRect.height) - endPos.y)) {
@@ -2613,8 +2618,8 @@ wcPlayEditor.prototype = {
 
       context.arcTo(right, startPos.y, right, midy, radius);
       context.arcTo(right, y, midx, y, radius);
-      context.arcTo(endPos.x - radius, y, endPos.x - radius, midy, radius);
-      context.arcTo(endPos.x - radius, endPos.y, endPos.x, endPos.y, radius);
+      context.arcTo(left, y, left, midy, radius);
+      context.arcTo(left, endPos.y, endPos.x, endPos.y, radius);
     }
 
     context.lineTo(endPos.x, endPos.y);
@@ -2872,6 +2877,7 @@ wcPlayEditor.prototype = {
           if (!cancelled) {
             undoChange(node, property.name, node[propFn](property.name), $control.val());
             node[propFn](property.name, $control.val());
+            $(this).blur();
           }
         });
         break;
@@ -5544,7 +5550,7 @@ Class.extend('wcNode', 'Node', '', {
           }
         }
 
-        return prop.value;
+        return this.onPropertyGet(prop.name) || prop.value;
       }
     }
   },
@@ -5561,13 +5567,16 @@ Class.extend('wcNode', 'Node', '', {
       var prop = this.properties[i];
       if (prop.name === name) {
         if (value !== undefined) {
+          value = this.onInitialPropertyChanging(prop.name, prop.initialValue, value) || value;
           if (prop.value == prop.initialValue) {
             this.property(name, value);
           }
+          var oldValue = prop.initialValue;
           prop.initialValue = value;
+          this.onInitialPropertyChanged(prop.name, oldValue, value);
         }
 
-        return prop.initialValue;
+        return this.onInitialPropertyGet(prop.name) || prop.initialValue;
       }
     }
   },
@@ -5806,6 +5815,7 @@ Class.extend('wcNode', 'Node', '', {
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onPropertyGet
    * @param {String} name - The name of the property.
+   * @returns {Object|undefined} - If a value is returned, that value is what will be retrieved from the get.
    */
   onPropertyGet: function(name) {
     // this._super(name);
@@ -5815,16 +5825,48 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
-   * Event that is called when the property has had its value retrieved.<br>
+   * Event that is called when a property initial value is about to be changed.<br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNode#onPropertyGot
+   * @function wcNode#onInitialPropertyChanging
    * @param {String} name - The name of the property.
+   * @param {Object} oldValue - The current value of the property.
+   * @param {Object} newValue - The new, proposed, value of the property.
+   * @returns {Object} - Return the new value of the property (usually newValue unless you are proposing restrictions). If no value is returned, newValue is assumed.
    */
-  onPropertyGot: function(name) {
-    // this._super(name);
+  onInitialPropertyChanging: function(name, oldValue, newValue) {
+    // this._super(name, oldValue, newValue);
+    // if (this.debugLog()) {
+    //   console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Changing Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
+    // }
+  },
+
+  /**
+   * Event that is called when a property initial value has changed.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onInitialPropertyChanged
+   * @param {String} name - The name of the property.
+   * @param {Object} oldValue - The old value of the property.
+   * @param {Object} newValue - The new value of the property.
+   */
+  onInitialPropertyChanged: function(name, oldValue, newValue) {
+    // this._super(name, oldValue, newValue);
     if (this.debugLog()) {
-      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Got Property "' + name + '"');
+      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Changed Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
     }
+  },
+
+  /**
+   * Event that is called when the property initial value is being asked its value, before the value is actually retrieved.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onInitialPropertyGet
+   * @param {String} name - The name of the property.
+   * @returns {Object|undefined} - If a value is returned, that value is what will be retrieved from the get.
+   */
+  onInitialPropertyGet: function(name) {
+    // this._super(name);
+    // if (this.debugLog()) {
+    //   console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Requested Property "' + name + '"');
+    // }
   },
 
   /**
@@ -5858,6 +5900,18 @@ Class.extend('wcNode', 'Node', '', {
    * @param {String} newName - The new name of the global property.
    */
   // onGlobalPropertyRenamed: function(oldName, newName) {
+  // },
+
+  /**
+   * Event that is called when a global property initial value has changed.
+   * Overload this in inherited nodes.<br>
+   * <b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.
+   * @function wcNode#onGlobalInitialPropertyChanged
+   * @param {String} name - The name of the global property.
+   * @param {Object} oldValue - The old value of the global property.
+   * @param {Object} newValue - The new value of the global property.
+   */
+  // onGlobalInitialPropertyChanged: function(name, oldValue, newValue) {
   // },
 });
 
@@ -6330,6 +6384,141 @@ wcNodeStorage.extend('wcNodeStorageGlobal', 'Global Property', 'Core', {
     }
 
     return result;
+  },
+
+  /**
+   * Any changes to the 'value' property will also change the global property.<br>
+   * Event that is called when a property has changed.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onPropertyChanged
+   * @param {String} name - The name of the property.
+   * @param {Object} oldValue - The old value of the property.
+   * @param {Object} newValue - The new value of the property.
+   */
+  onPropertyChanged: function(name, oldValue, newValue) {
+    this._super(name, oldValue, newValue);
+
+    if (name === 'value') {
+      var propVal = this.property('property');
+      if (propVal) {
+        var engine = this.engine();
+        engine && engine.property(propVal, newValue);
+      }
+    } else if (name === 'property') {
+      if (newValue) {
+        this.property('value', this.property('value'));
+      } else {
+        this.property('value', '');
+      }
+    }
+  },
+
+  /**
+   * Always redirect property gets on 'value' to the referenced global property.<br>
+   * Event that is called when the property is being asked its value, before the value is actually retrieved.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeStorageGlobal#onPropertyGet
+   * @param {String} name - The name of the property.
+   * @returns {Object|undefined} - If a value is returned, that value is what will be retrieved from the get.
+   */
+  onPropertyGet: function(name) {
+    this._super(name);
+
+    if (name === 'value') {
+      var propVal = this.property('property');
+      if (propVal) {
+        var engine = this.engine();
+        return (engine && engine.property(propVal)) || 0;
+      }
+    }
+  },
+
+  /**
+   * Any changes to the 'value' property will also change the global property.<br>
+   * Event that is called when a property initial value is about to be changed.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeStorageGlobal#onInitialPropertyChanging
+   * @param {String} name - The name of the property.
+   * @param {Object} oldValue - The current value of the property.
+   * @param {Object} newValue - The new, proposed, value of the property.
+   * @returns {Object} - Return the new value of the property (usually newValue unless you are proposing restrictions). If no value is returned, newValue is assumed.
+   */
+  onInitialPropertyChanging: function(name, oldValue, newValue) {
+    this._super(name, oldValue, newValue);
+
+    if (name === 'value') {
+      var propVal = this.property('property');
+      if (propVal) {
+        var engine = this.engine();
+        engine && engine.initialProperty(propVal, newValue);
+      }
+    } else if (name === 'property') {
+      var engine = this.engine();
+      engine && this.property('value', engine.property(newValue));
+    }
+  },
+
+  /**
+   * Always redirect property gets on 'value' to the referenced global property.<br>
+   * Event that is called when the property initial value is being asked its value, before the value is actually retrieved.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeStorageGlobal#onInitialPropertyGet
+   * @param {String} name - The name of the property.
+   * @returns {Object|undefined} - If a value is returned, that value is what will be retrieved from the get.
+   */
+  onInitialPropertyGet: function(name) {
+    this._super(name);
+
+    if (name === 'value') {
+      var propVal = this.property('property');
+      if (propVal) {
+        var engine = this.engine();
+        return (engine && engine.initialProperty(propVal)) || 0;
+      }
+    }
+  },
+
+
+  /**
+   * Event that is called when a global property value has changed.
+   * Overload this in inherited nodes.<br>
+   * <b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.
+   * @function wcNodeStorageGlobal#onGlobalPropertyChanged
+   * @param {String} name - The name of the global property.
+   * @param {Object} oldValue - The old value of the global property.
+   * @param {Object} newValue - The new value of the global property.
+   */
+  onGlobalPropertyChanged: function(name, oldValue, newValue) {
+    if (this.property('property') == name) {
+      this.property('value', this.property('value'), true);
+    };
+  },
+
+  /**
+   * Event that is called when a global property has been removed.
+   * Overload this in inherited nodes.<br>
+   * <b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.
+   * @function wcNodeStorageGlobal#onGlobalPropertyRemoved
+   * @param {String} name - The name of the global property.
+   */
+  onGlobalPropertyRemoved: function(name) {
+    if (this.property('property') == name) {
+      this.property('property', '');
+    }
+  },
+
+  /**
+   * Event that is called when a global property has been renamed.
+   * Overload this in inherited nodes.<br>
+   * <b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.
+   * @function wcNodeStorageGlobal#onGlobalPropertyRenamed
+   * @param {String} oldName - The old name of the global property.
+   * @param {String} newName - The new name of the global property.
+   */
+  onGlobalPropertyRenamed: function(oldName, newName) {
+    if (this.property('property') == oldName) {
+      this.property('property', newName);
+    }
   },
 });
 
