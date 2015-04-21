@@ -2,6 +2,14 @@
  * Custom options available when constructing a new {@link wcPlay} instance.
  * @typedef {Object} wcPlayEditor~Options
  * @property {Boolean} [readOnly=false] - If true, the script will not be editable.
+ * @property {wcPlayEditor~CategoryOptions} [category] - Options that determine what categories appear in the palette. By default, all categories are visible.
+ */
+
+/**
+ * Category display options.
+ * @typedef {Object} wcPlayEditor~CategoryOptions
+ * @property {String[]} items - A list of categories to show in the palette.
+ * @property {Boolean} isBlacklist - If true, the items list will be treated as a blacklist of categories to hide.
  */
 
 /**

@@ -54,9 +54,9 @@ function wcPlayEditor(container, options) {
       strLen: 10,         // The maximum character length a property value can display.
       minLength: 30,      // The minimum length the property value can be.
       valueWrapL: ' ',    // The left string to wrap around a property value.
-      valueWrapR: '  ',   // The right string to wrap around a property value.
-      initialWrapL: '[',  // The left string to wrap around a property initial value.
-      initialWrapR: ']',  // The right string to wrap around a property initial value.
+      valueWrapR: ' ',    // The right string to wrap around a property value.
+      initialWrapL: ' [', // The left string to wrap around a property initial value.
+      initialWrapR: '] ', // The right string to wrap around a property initial value.
     },
   };
 
@@ -103,6 +103,10 @@ function wcPlayEditor(container, options) {
   // Setup our options.
   this._options = {
     readOnly: false,
+    category: {
+      items: [],
+      isBlacklist: true,
+    },
   };
   for (var prop in options) {
     this._options[prop] = options[prop];
@@ -501,7 +505,7 @@ wcPlayEditor.prototype = {
 
     var color = node.color;
     if (this._highlightNode === node) {
-      color = this.__blendColors(node.color, "#00FFFF", 0.5);
+      color = this.__blendColors(node.color, "#FFFFFF", 0.25);
     }
     __updateFlash(node._meta, color, "#FFFFFF", "#FFFFFF", true, 0.5);
 
@@ -622,28 +626,54 @@ wcPlayEditor.prototype = {
    * @private
    */
   __setupPalette: function() {
-    // Create our top bar with buttons for each node type.
-    this.$typeButton.push($('<button class="wcPlayEditorButton" title="Show Entry Nodes.">Entry</button>'));
-    this.$typeButton.push($('<button class="wcPlayEditorButton wcToggled" title="Show Process Nodes.">Process</button>'));
-    this.$typeButton.push($('<button class="wcPlayEditorButton" title="Show Storage Nodes.">Storage</button>'));
-    this.$typeButton.push($('<button class="wcPlayEditorButton" title="Show Composite Nodes.">Composite</button>'));
-    this.$palette.append(this.$typeButton[0]);
-    this.$palette.append(this.$typeButton[1]);
-    this.$palette.append(this.$typeButton[2]);
-    this.$palette.append(this.$typeButton[3]);
+    if (this.$typeButton.length == 0) {
+      // Create our top bar with buttons for each node type.
+      this.$typeButton.push($('<button class="wcPlayEditorButton" title="Show Entry Nodes.">Entry</button>'));
+      this.$typeButton.push($('<button class="wcPlayEditorButton wcToggled" title="Show Process Nodes.">Process</button>'));
+      this.$typeButton.push($('<button class="wcPlayEditorButton" title="Show Storage Nodes.">Storage</button>'));
+      this.$typeButton.push($('<button class="wcPlayEditorButton" title="Show Composite Nodes.">Composite</button>'));
+      this.$palette.append(this.$typeButton[0]);
+      this.$palette.append(this.$typeButton[1]);
+      this.$palette.append(this.$typeButton[2]);
+      this.$palette.append(this.$typeButton[3]);
 
-    this.$typeArea.push($('<div class="wcPlayTypeArea wcPlayHidden">'));
-    this.$typeArea.push($('<div class="wcPlayTypeArea">'));
-    this.$typeArea.push($('<div class="wcPlayTypeArea wcPlayHidden">'));
-    this.$typeArea.push($('<div class="wcPlayTypeArea wcPlayHidden">'));
-    this.$paletteInner.append(this.$typeArea[0]);
-    this.$paletteInner.append(this.$typeArea[1]);
-    this.$paletteInner.append(this.$typeArea[2]);
-    this.$paletteInner.append(this.$typeArea[3]);
+      this.$typeArea.push($('<div class="wcPlayTypeArea wcPlayHidden">'));
+      this.$typeArea.push($('<div class="wcPlayTypeArea">'));
+      this.$typeArea.push($('<div class="wcPlayTypeArea wcPlayHidden">'));
+      this.$typeArea.push($('<div class="wcPlayTypeArea wcPlayHidden">'));
+      this.$paletteInner.append(this.$typeArea[0]);
+      this.$paletteInner.append(this.$typeArea[1]);
+      this.$paletteInner.append(this.$typeArea[2]);
+      this.$paletteInner.append(this.$typeArea[3]);
+    }
+
+    // Empty out our current node library.
+    if (this._nodeLibrary) {
+      for (var cat in this._nodeLibrary) {
+        for (var type in this._nodeLibrary[cat]) {
+          var typeData = this._nodeLibrary[cat][type];
+          typeData.$button.remove();
+          typeData.$canvas.remove();
+          typeData.$category.remove();
+          for (var i = 0; i < typeData.nodes.length; ++i) {
+            typeData.nodes[i].destroy();
+          }
+        }
+      }
+
+      this._nodeLibrary = {};
+    }
 
     // Initialize our node library.
     for (var i = 0; i < wcPlay.NODE_LIBRARY.length; ++i) {
       var data = wcPlay.NODE_LIBRARY[i];
+
+      // Skip categories we are not showing.
+      var catIndex = this._options.category.items.indexOf(data.category);
+      if ((!this._options.category.isBlacklist && catIndex === -1) ||
+          (this._options.category.isBlacklist && catIndex > -1)) {
+        continue;
+      }
 
       // Initialize the node category if it is new.
       if (!this._nodeLibrary.hasOwnProperty(data.category)) {
@@ -852,6 +882,12 @@ wcPlayEditor.prototype = {
       data.rect.height += this._drawStyle.links.length;
     }
 
+    // Show an additional bounding rect around selected nodes.
+    if (this._selectedNodes.indexOf(node) > -1) {
+      this.__drawRoundedRect(data.rect, "rgba(0, 255, 255, 0.25)", -1, 10, context);
+      this.__drawRoundedRect(data.rect, "darkcyan", 2, 10, context);
+    }
+
     // Now use our measurements to draw our node.
     var propBounds  = this.__drawCenter(node, context, bounds, hideCollapsible);
     var entryLinkBounds = this.__drawEntryLinks(node, context, pos, entryBounds.width);
@@ -883,13 +919,13 @@ wcPlayEditor.prototype = {
     };
 
     context.save();
-    context.fillStyle = (this._highlightCollapser && this._highlightNode === node? "cyan": "white");
+    context.fillStyle = (this._highlightCollapser && this._highlightNode === node? "black": "white");
     context.strokeStyle = "black";
     context.lineWidth = 1;
     context.fillRect(data.collapser.left, data.collapser.top, data.collapser.width, data.collapser.height);
     context.strokeRect(data.collapser.left, data.collapser.top, data.collapser.width, data.collapser.height);
 
-    context.strokeStyle = "black";
+    context.strokeStyle = (this._highlightCollapser && this._highlightNode === node? "white": "black");
     context.lineWidth = 2;
     context.beginPath();
     context.moveTo(data.collapser.left + 1, data.collapser.top + data.collapser.height/2);
@@ -910,10 +946,10 @@ wcPlayEditor.prototype = {
     };
 
     context.save();
-    context.fillStyle = (this._highlightBreakpoint && this._highlightNode === node? "cyan": "white");
+    context.fillStyle = (this._highlightBreakpoint && this._highlightNode === node? "black": "white");
     context.fillRect(data.breakpoint.left, data.breakpoint.top, data.breakpoint.width, data.breakpoint.height);
 
-    context.strokeStyle = (node._break? "darkred": "black");
+    context.strokeStyle = (node._break? "darkred": (this._highlightBreakpoint && this._highlightNode === node? "white": "black"));
     context.fillStyle = "darkred";
     context.lineWidth = 2;
     context.beginPath();
@@ -950,12 +986,6 @@ wcPlayEditor.prototype = {
       } else {
         this.__drawRoundedRect(data.inner, "yellow", 2, 10, context);
       }
-    }
-
-    // Show an additional bounding rect around selected nodes.
-    if (this._selectedNodes.indexOf(node) > -1) {
-      this.__drawRoundedRect(data.rect, "rgba(0, 255, 255, 0.25)", -1, 10, context);
-      this.__drawRoundedRect(data.rect, "darkcyan", 2, 10, context);
     }
 
     node._meta.bounds = data;
@@ -1296,10 +1326,7 @@ wcPlayEditor.prototype = {
 
     // Highlight title text.
     if (this._highlightTitle && this._highlightNode === node) {
-      context.save();
-      context.fillStyle = 'cyan';
-      context.fillRect(result.titleBounds.left, result.titleBounds.top, result.titleBounds.width, result.titleBounds.height);
-      context.restore();
+      this.__drawRoundedRect(result.titleBounds, 'rgba(255, 255, 255, 0.5)', -1, this._font.title.size/2, context);
     }
 
     // Measure the title bar area.
@@ -1409,12 +1436,11 @@ wcPlayEditor.prototype = {
         result.valueBounds.push(valueBound);
 
         // Highlight hovered values.
-        context.fillStyle = "cyan";
         if (this._highlightNode === node && this._highlightPropertyValue && this._highlightPropertyValue.name === props[i].name) {
-          context.fillRect(valueBound.rect.left, valueBound.rect.top, valueBound.rect.width, valueBound.rect.height);
+          this.__drawRoundedRect(valueBound.rect, 'rgba(255, 255, 255, 0.5)', -1, this._font.property.size/2, context);
         }
         if (this._highlightNode === node && this._highlightPropertyInitialValue && this._highlightPropertyInitialValue.name === props[i].name) {
-          context.fillRect(initialBound.rect.left, initialBound.rect.top, initialBound.rect.width, initialBound.rect.height);
+          this.__drawRoundedRect(initialBound.rect, 'rgba(255, 255, 255, 0.5)', -1, this._font.property.size/2, context);
         }
 
         context.fillStyle = "black";

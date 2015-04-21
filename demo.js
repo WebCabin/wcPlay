@@ -7,6 +7,17 @@ $(document).ready(function() {
     debugging: true,
   });
 
+  var col = "#FF0000";
+
+  wcNodeComposite.extend('wcNodeCompositeTest', 'Test', 'Core', {
+    init: function(parent, pos) {
+      this._super(parent, pos);
+      this.color = this.myCol;
+    },
+    myCol: col,
+  });
+  // var testComposite = new wcNodeComposite(null, {x: 0, y: 0});
+
   // Create an instance of our script editor.
   var myPlayEditor = new wcPlayEditor('.playContainer', {
     readOnly: false,
