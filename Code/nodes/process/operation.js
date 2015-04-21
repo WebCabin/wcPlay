@@ -2,29 +2,30 @@ wcNodeProcess.extend('wcNodeProcessOperation', 'Operation', 'Core', {
   /**
    * @class
    * Performs a simple math operation on two values.
-   * When inheriting, make sure to include 'this._super(parent, pos, type);' at the top of your init function.
+   * When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.
    *
    * @constructor wcNodeProcessOperation
    * @param {String} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
-   * @param {String} [type="Operation"] - The type name of the node, as displayed on the title bar.
    */
-  init: function(parent, pos, type) {
-    this._super(parent, pos, type);
+  init: function(parent, pos) {
+    this._super(parent, pos);
+
+    this.description("Performs a simple math operation on two values.");
 
     // Remove our default entry.
     this.removeEntry('in');
 
     // Create an input link per operation type.
-    this.createEntry('add');
-    this.createEntry('sub');
-    this.createEntry('mul');
-    this.createEntry('div');
+    this.createEntry('add', "valueA + valueB = result");
+    this.createEntry('sub', "valueA - valueB = result");
+    this.createEntry('mul', "valueA * valueB = result");
+    this.createEntry('div', "valueA / valueB = result");
 
     // Create our two operator values.
-    this.createProperty('valueA', wcPlay.PROPERTY_TYPE.NUMBER, 0);
-    this.createProperty('valueB', wcPlay.PROPERTY_TYPE.NUMBER, 0);
-    this.createProperty('result', wcPlay.PROPERTY_TYPE.NUMBER, 0);
+    this.createProperty('valueA', wcPlay.PROPERTY_TYPE.NUMBER, 0, {description: "Left hand value for the operation."});
+    this.createProperty('valueB', wcPlay.PROPERTY_TYPE.NUMBER, 0, {description: "Right hand value for the operation."});
+    this.createProperty('result', wcPlay.PROPERTY_TYPE.NUMBER, 0, {description: "The result of the operation."});
   },
 
   /**

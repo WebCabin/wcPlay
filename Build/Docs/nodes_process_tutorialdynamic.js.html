@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>wcPlay Source: play.jsdoc</title>
+	<title>wcPlay Source: nodes/process/tutorialdynamic.js</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -46,26 +46,85 @@
 		<div id="main">
     		
 
-		<h1 class="page-title">Source: play.jsdoc</h1>
+		<h1 class="page-title">Source: nodes/process/tutorialdynamic.js</h1>
     
 <section>
 	<article>
 		<pre
-			class="sunlight-highlight-javascript linenums">/**
- * Custom options available when constructing a new {@link wcPlay} instance.
- * @typedef {Object} wcPlay~Options
- * @property {Boolean} [silent=false] - If true, will disable debug logging on all nodes.
- * @property {Number} [updateRate=25] - The time, in milliseconds, between node updates.
- * @property {Number} [updateLimit=100] - The maximum number of nodes allowed to be updated in a single update. This minimizes the potential for script lock.
- * @property {Boolean} [debugging=true] - If true, debug break toggles on individual nodes will trigger the script to pause. Turn this off during production.
- */
+			class="sunlight-highlight-javascript linenums">wcNodeProcess.extend('wcNodeProcessTutorialDynamic', 'Example Dynamic', 'Tutorial', {
+  /**
+   * @class
+   * This node demonstrates an example of a number of possible dynamic behaviors.
+   * When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.
+   *
+   * @constructor wcNodeProcessTutorialDynamic
+   * @param {String} parent - The parent object of this node.
+   * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
+   */
+  init: function(parent, pos) {
+    this._super(parent, pos);
 
-/**
- * A 2D positional coordinate.
- * @typedef {Object} wcPlay~Coordinates
- * @property {Number} x - The horizontal coordinate.
- * @property {Number} y - The vertical coordinate.
- */
+    this.description("This node demonstrates an example of using different flow links to determine how this node behaves.");
+
+    // Remove the default 'in' entry link.
+    this.removeEntry('in');
+
+    this.createEntry('change color', "Change the color of this node!");
+
+    this._propCount = 0;
+    this.createProperty('count', wcPlay.PROPERTY_TYPE.NUMBER, 0, {min: 0, max: 10, description: "Dynamically create a property for each count."});
+  },
+
+  /**
+   * Event that is called when an entry link has been triggered.&lt;br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeProcessTutorialDynamic#onTriggered
+   * @param {String} name - The name of the entry link triggered.
+   */
+  onTriggered: function(name) {
+    this._super(name);
+
+    switch (name) {
+      case 'change color':
+        if (this.color == '#007ACC') {
+          this.color = '#00CC7A';
+        } else {
+          this.color = '#007ACC';
+        }
+        break;
+    }
+
+    this.triggerExit('out');
+  },
+
+  /**
+   * Event that is called when a property has changed.&lt;br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeProcessTutorialDynamic#onPropertyChanged
+   * @param {String} name - The name of the property.
+   * @param {Object} oldValue - The old value of the property.
+   * @param {Object} newValue - The new value of the property.
+   */
+  onPropertyChanged: function(name, oldValue, newValue) {
+    this._super(name, oldValue, newValue);
+
+    if (name === 'count') {
+      var count = parseInt(newValue);
+
+      if (count &lt; this._propCount) {
+        while (this._propCount > count) {
+          this.removeProperty('Prop ' + this._propCount);
+          this._propCount--;
+        }
+      } else if (count > this._propCount) {
+        while (this._propCount &lt; count) {
+          this._propCount++;
+          this.createProperty('Prop ' + this._propCount, wcPlay.PROPERTY_TYPE.STRING, 'val ' + this._propCount, {description: "Dynamically created property!"});
+        }
+      }
+    }
+  },
+});
 </pre>
 	</article>
 </section>

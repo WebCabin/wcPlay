@@ -1,16 +1,17 @@
 wcNodeProcess.extend('wcNodeProcessTutorialViewport', 'Example Viewport', 'Tutorial', {
   /**
    * @class
-   * This node demonstrates an example of using the custom viewport to display custom graphics into the node, as well as handling mouse events within that viewport.
-   * When inheriting, make sure to include 'this._super(parent, pos, type);' at the top of your init function.
+   * This node demonstrates an example of using the node's viewport for displaying graphics directly on your node. It can also receive mouse events for interactivity.
+   * When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.
    *
    * @constructor wcNodeProcessTutorialViewport
    * @param {String} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
-   * @param {String} [type="Toggle"] - The type name of the node, as displayed on the title bar.
    */
-  init: function(parent, pos, type) {
-    this._super(parent, pos, type);
+  init: function(parent, pos) {
+    this._super(parent, pos);
+
+    this.description("This node demonstrates an example of using the node's viewport for displaying graphics directly on your node. It can also receive mouse events for interactivity.");
 
     this.viewportSize(100, 100);
     this.hoverPos = null;
@@ -108,6 +109,31 @@ wcNodeProcess.extend('wcNodeProcessTutorialViewport', 'Example Viewport', 'Tutor
   },
 
   /**
+   * Event that is called when the mouse has moved over your viewport area.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeProcessTutorialViewport~onViewportMouseMove
+   * @param {Object} event - The original jquery mouse event.
+   * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   */
+  onViewportMouseMove: function(event, pos) {
+    this._super(event, pos);
+    this.hoverPos = pos;
+  },
+
+  /**
+   * Event that is called when the mouse wheel is used over your viewport area.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeProcessTutorialViewport~onViewportMouseWheel
+   * @param {Object} event - The original jquery mouse event.
+   * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   * @param {Number} scroll - The scroll amount and direction.
+   */
+  onViewportMouseWheel: function(event, pos, scroll) {
+    this._super(event, pos, scroll);
+    return this.property('lock viewport');
+  },
+
+  /**
    * Event that is called when the mouse button is pressed and released in the same spot over your viewport area.<br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNodeProcessTutorialViewport~onViewportMouseClick
@@ -131,17 +157,5 @@ wcNodeProcess.extend('wcNodeProcessTutorialViewport', 'Example Viewport', 'Tutor
     this._super(event, pos);
     this.mouseDoubleClicked = !this.mouseDoubleClicked;
     return true;
-  },
-
-  /**
-   * Event that is called when the mouse has moved over your viewport area.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNodeProcessTutorialViewport~onViewportMouseMove
-   * @param {Object} event - The original jquery mouse event.
-   * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
-   */
-  onViewportMouseMove: function(event, pos) {
-    this._super(event, pos);
-    this.hoverPos = pos;
   },
 });

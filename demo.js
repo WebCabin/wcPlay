@@ -40,7 +40,7 @@ $(document).ready(function() {
   operationNode.connectOutput('result', numberNode, 'value');
   startNode.connectExit('out', logNode, 'in');
   logNode.connectExit('out', delayNode, 'in');
-  delayNode.connectExit('finished', operationNode, 'add');
+  delayNode.connectExit('out', operationNode, 'add');
   operationNode.connectExit('out', logNode, 'in');
 
   // Lets collapse all the nodes so they take up less space.

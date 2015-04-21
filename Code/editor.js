@@ -22,6 +22,7 @@ function wcPlayEditor(container, options) {
 
   this._font = {
     title: {size: 15, family: 'Arial', weight: 'bold'},
+    titleDesc: {size: 15, family: 'Arial', weight: 'italic'},
     links: {size: 10, family: 'Arial'},
     property: {size: 10, family: 'Arial', weight: 'italic'},
     value: {size: 10, family: 'Arial', weight: 'bold'},
@@ -38,6 +39,8 @@ function wcPlayEditor(container, options) {
     },
     title: {
       spacing: 5,         // The pixel space between the title text and the bar that separates the properties.
+      wrapL: '  ',        // The left string to wrap around the title text.
+      wrapR: '  ',        // The right string to wrap around the title text.
     },
     links: {
       length: 12,         // Length of each link 'nub'
@@ -49,8 +52,9 @@ function wcPlayEditor(container, options) {
     property: {
       spacing: 5,         // The pixel space between adjacent properties.
       strLen: 10,         // The maximum character length a property value can display.
-      valueWrapL: '',    // The left string to wrap around a property value.
-      valueWrapR: '  ',    // The right string to wrap around a property value.
+      minLength: 30,      // The minimum length the property value can be.
+      valueWrapL: ' ',    // The left string to wrap around a property value.
+      valueWrapR: '  ',   // The right string to wrap around a property value.
       initialWrapL: '(',  // The left string to wrap around a property initial value.
       initialWrapR: ')',  // The right string to wrap around a property initial value.
     },
@@ -74,6 +78,7 @@ function wcPlayEditor(container, options) {
   this._expandedNode = null;
   this._expandedNodeWasCollapsed = false;
 
+  this._highlightTitle = false;
   this._highlightCollapser = false;
   this._highlightBreakpoint = false;
   this._highlightEntryLink = false;
@@ -815,19 +820,22 @@ wcPlayEditor.prototype = {
 
     data.entryBounds = entryLinkBounds;
     data.exitBounds = exitLinkBounds;
+    data.titleBounds = propBounds.titleBounds;
+    data.viewportBounds = propBounds.viewportBounds;
     data.inputBounds = propBounds.inputBounds;
     data.outputBounds = propBounds.outputBounds;
+    data.propertyBounds = propBounds.propertyBounds;
     data.valueBounds = propBounds.valueBounds;
     data.initialBounds = propBounds.initialBounds;
-    data.viewportBounds = propBounds.viewportBounds;
 
     data.inner = this.__expandRect([centerBounds]);
     data.rect = this.__expandRect([entryBounds, centerBounds, exitBounds]);
     data.inner.left = data.rect.left;
     data.inner.width = data.rect.width;
-    data.rect.left -= this._drawStyle.links.length;
-    data.rect.width += this._drawStyle.links.length * 2 + 3;
-    data.rect.height += 3;
+    data.rect.top -= 3;
+    data.rect.left -= this._drawStyle.links.length + 3;
+    data.rect.width += this._drawStyle.links.length * 2 + 6;
+    data.rect.height += 6;
 
     if (node.chain.entry.length) {
       data.inner.top -= this._drawStyle.links.padding + this._font.links.size;
@@ -858,7 +866,7 @@ wcPlayEditor.prototype = {
     };
 
     context.save();
-    context.fillStyle = (this._highlightCollapser && this._highlightNode === node? "darkgray": "white");
+    context.fillStyle = (this._highlightCollapser && this._highlightNode === node? "cyan": "white");
     context.strokeStyle = "black";
     context.lineWidth = 1;
     context.fillRect(data.collapser.left, data.collapser.top, data.collapser.width, data.collapser.height);
@@ -885,7 +893,7 @@ wcPlayEditor.prototype = {
     };
 
     context.save();
-    context.fillStyle = (this._highlightBreakpoint && this._highlightNode === node? "darkgray": "white");
+    context.fillStyle = (this._highlightBreakpoint && this._highlightNode === node? "cyan": "white");
     context.fillRect(data.breakpoint.left, data.breakpoint.top, data.breakpoint.width, data.breakpoint.height);
 
     context.strokeStyle = (node._break? "darkred": "black");
@@ -1026,7 +1034,11 @@ wcPlayEditor.prototype = {
 
     // Measure the title bar area.
     this.__setCanvasFont(this._font.title, context);
-    bounds.width = context.measureText(node.type + (node.name? ': ' + node.name: '')).width;
+    bounds.width = context.measureText(this._drawStyle.title.wrapL + node.type + (node.name? ': ': '') + this._drawStyle.title.wrapR).width;
+    if (node.name) {
+      this.__setCanvasFont(this._font.titleDesc, context);
+      bounds.width += context.measureText(node.name).width;
+    }
 
     // Measure the node's viewport.
     if (node._viewportSize) {
@@ -1048,11 +1060,11 @@ wcPlayEditor.prototype = {
 
         // Property value.
         this.__setCanvasFont(this._font.value, context);
-        w += context.measureText(this._drawStyle.property.valueWrapL + this.__drawPropertyValue(node, props[i]) + this._drawStyle.property.valueWrapR).width;
+        w += Math.max(context.measureText(this._drawStyle.property.valueWrapL + this.__drawPropertyValue(node, props[i]) + this._drawStyle.property.valueWrapR).width, this._drawStyle.property.minLength);
 
         // Property initial value.
         this.__setCanvasFont(this._font.initialValue, context);
-        w += context.measureText(this._drawStyle.property.initialWrapL + this.__drawPropertyValue(node, props[i], true) + this._drawStyle.property.initialWrapR).width;
+        w += Math.max(context.measureText(this._drawStyle.property.initialWrapL + this.__drawPropertyValue(node, props[i], true) + this._drawStyle.property.initialWrapR).width, this._drawStyle.property.minLength);
         bounds.width = Math.max(w, bounds.width);
       }
     }
@@ -1212,11 +1224,13 @@ wcPlayEditor.prototype = {
 
     // Properties
     var result = {
+      titleBounds:    null,
       viewportBounds: null,
-      valueBounds:  [],
-      initialBounds:[],
-      inputBounds:  [],
-      outputBounds: [],
+      propertyBounds: [],
+      valueBounds:    [],
+      initialBounds:  [],
+      inputBounds:    [],
+      outputBounds:   [],
     };
     var linkRect;
 
@@ -1251,14 +1265,48 @@ wcPlayEditor.prototype = {
       context.stroke();
     }
 
+    result.titleBounds = {
+      top: rect.top + upper,
+      left: rect.left + this._drawStyle.node.margin,
+      width: rect.width - this._drawStyle.node.margin * 2,
+      height: this._font.title.size + this._drawStyle.title.spacing - 1,
+    };
+
+    // Highlight title text.
+    if (this._highlightTitle && this._highlightNode === node) {
+      context.save();
+      context.fillStyle = 'cyan';
+      context.fillRect(result.titleBounds.left, result.titleBounds.top, result.titleBounds.width, result.titleBounds.height);
+      context.restore();
+    }
+
+    // Measure the title bar area.
+    this.__setCanvasFont(this._font.title, context);
+    var titleTypeWidth = context.measureText(this._drawStyle.title.wrapL + node.type + (node.name? ': ': '')).width;
+    var titleWrapRWidth = context.measureText(this._drawStyle.title.wrapR).width;
+    var titleTextWidth = 0;
+    if (node.name) {
+      this.__setCanvasFont(this._font.titleDesc, context);
+      titleTextWidth = context.measureText(node.name).width;
+    }
+
     // Title Text
     context.save();
     upper += this._font.title.size;
     context.fillStyle = "black";
     context.strokeStyle = "black";
-    context.textAlign = "center";
+    context.textAlign = "left";
     this.__setCanvasFont(this._font.title, context);
-    context.fillText(node.type + (node.name? ': ' + node.name: ''), rect.left + rect.width/2, rect.top + upper);
+    context.fillText(this._drawStyle.title.wrapL + node.type + (node.name? ': ': ''), rect.left + (rect.width - (titleTypeWidth + titleWrapRWidth + titleTextWidth)) / 2, rect.top + upper);
+
+    if (node.name) {
+      this.__setCanvasFont(this._font.titleDesc, context);
+      context.fillText(node.name, rect.left + titleTypeWidth + (rect.width - (titleTypeWidth + titleWrapRWidth + titleTextWidth))/2, rect.top + upper);
+    }
+
+    context.textAlign = "right";
+    this.__setCanvasFont(this._font.title, context);
+    context.fillText(this._drawStyle.title.wrapR, rect.left + rect.width - (rect.width - (titleTypeWidth + titleWrapRWidth + titleTextWidth)) / 2, rect.top + upper);
     context.restore();
 
     // Title Lower Bar
@@ -1273,8 +1321,8 @@ wcPlayEditor.prototype = {
     if (node._viewportSize) {
       // Calculate the translation to make the viewport 0,0.
       result.viewportBounds = {
-        left: -this._viewportCamera.x + rect.left + (rect.width/2 - node._viewportSize.x/2),
-        top: -this._viewportCamera.y + rect.top + upper,
+        top: rect.top + upper,
+        left: rect.left + (rect.width/2 - node._viewportSize.x/2),
         width: node._viewportSize.x,
         height: node._viewportSize.y,
       };
@@ -1303,15 +1351,20 @@ wcPlayEditor.prototype = {
         upper += this._font.property.size;
 
         // Property name.
-        context.fillStyle = "black";
-        context.textAlign = "left";
-        this.__setCanvasFont(this._font.property, context);
-        context.fillText(props[i].name + ': ', rect.left + this._drawStyle.node.margin, rect.top + upper);
+        var propertyBound = {
+          rect: {
+            top: rect.top + upper - this._font.property.size,
+            left: rect.left + this._drawStyle.node.margin,
+            width: rect.width - this._drawStyle.node.margin * 2,
+            height: this._font.property.size + this._drawStyle.property.spacing,
+          },
+          name: props[i].name,
+        };
+        result.propertyBounds.push(propertyBound);
 
         // Initial property value.
-        context.textAlign = "right";
         this.__setCanvasFont(this._font.initialValue, context);
-        var w = context.measureText(this._drawStyle.property.initialWrapL + this.__drawPropertyValue(node, props[i], true) + this._drawStyle.property.initialWrapR).width;
+        var w = Math.max(context.measureText(this._drawStyle.property.initialWrapL + this.__drawPropertyValue(node, props[i], true) + this._drawStyle.property.initialWrapR).width, this._drawStyle.property.minLength);
 
         var initialBound = {
           rect: {
@@ -1326,7 +1379,7 @@ wcPlayEditor.prototype = {
 
         // Property value.
         this.__setCanvasFont(this._font.value, context);
-        var vw = context.measureText(this._drawStyle.property.valueWrapL + this.__drawPropertyValue(node, props[i]) + this._drawStyle.property.valueWrapR).width;
+        var vw = Math.max(context.measureText(this._drawStyle.property.valueWrapL + this.__drawPropertyValue(node, props[i]) + this._drawStyle.property.valueWrapR).width, this._drawStyle.property.minLength);
 
         var valueBound = {
           rect: {
@@ -1340,15 +1393,20 @@ wcPlayEditor.prototype = {
         result.valueBounds.push(valueBound);
 
         // Highlight hovered values.
+        context.fillStyle = "cyan";
         if (this._highlightNode === node && this._highlightPropertyValue && this._highlightPropertyValue.name === props[i].name) {
-          context.fillStyle = "darkgray";
           context.fillRect(valueBound.rect.left, valueBound.rect.top, valueBound.rect.width, valueBound.rect.height);
         }
         if (this._highlightNode === node && this._highlightPropertyInitialValue && this._highlightPropertyInitialValue.name === props[i].name) {
-          context.fillStyle = "darkgray";
           context.fillRect(initialBound.rect.left, initialBound.rect.top, initialBound.rect.width, initialBound.rect.height);
         }
 
+        context.fillStyle = "black";
+        context.textAlign = "left";
+        this.__setCanvasFont(this._font.property, context);
+        context.fillText(props[i].name + ': ', rect.left + this._drawStyle.node.margin, rect.top + upper);
+
+        context.textAlign = "right";
         this.__setCanvasFont(this._font.initialValue, context);
         context.fillStyle = "#444444";
         context.fillText(this._drawStyle.property.initialWrapL + this.__drawPropertyValue(node, props[i], true) + this._drawStyle.property.initialWrapR, rect.left + rect.width - this._drawStyle.node.margin, rect.top + upper);
@@ -1961,6 +2019,77 @@ wcPlayEditor.prototype = {
   },
 
   /**
+   * Draws the editor control for the title of the node.
+   * @function wcPlayEditor#__drawTitleEditor
+   * @private
+   * @param {wcNode} node - The node to draw for.
+   * @param {wcPlayEditor~BoundingData} bounds - The bounding data for the title.
+   */
+  __drawTitleEditor: function(node, bounds) {
+    var self = this;
+    var cancelled = false;
+
+    var $control = $('<input type="text">');
+    $control.val(node.name);
+    $control.change(function() {
+      if (!cancelled) {
+        self._undoManager && self._undoManager.addEvent('Title changed for Node "' + node.category + '.' + node.type + '"',
+        {
+          id: node.id,
+          oldValue: node.name,
+          newValue: $control.val(),
+          editor: self,
+        },
+        // Undo
+        function() {
+          var myNode = this.editor._engine.nodeById(this.id);
+          myNode.name = this.oldValue;
+        },
+        // Redo
+        function() {
+          var myNode = this.editor._engine.nodeById(this.id);
+          myNode.name = this.newValue;
+        });
+        node.name = $control.val();
+      }
+    });
+
+    var offset = {
+      top: 0,
+      left: this.$palette.width(),
+    };
+
+    this.$main.append($control);
+
+    $control.addClass('wcPlayEditorControl');
+    $control.focus();
+    $control.select();
+
+    // Clicking away will close the editor control.
+    $control.blur(function() {
+      $(this).remove();
+    });
+
+    $control.keyup(function(event) {
+      switch (event.keyCode) {
+        case 13: // Enter to confirm.
+          $control.blur();
+          break;
+        case 27: // Escape to cancel.
+          cancelled = true;
+          $control.blur();
+          break;
+      }
+      return false;
+    });
+
+    $control.css('top', offset.top + bounds.top * this._viewportCamera.z + this._viewportCamera.y)
+      .css('left', offset.left + bounds.left * this._viewportCamera.z + this._viewportCamera.x)
+      .css('width', 200)
+      .css('height', Math.max(bounds.height * this._viewportCamera.z, 15));
+  },
+
+  /**
    * Draws the editor control for a property.
    * @function wcPlayEditor#__drawPropertyEditor
    * @private
@@ -1976,16 +2105,16 @@ wcPlayEditor.prototype = {
     var propFn = (initial? 'initialProperty': 'property');
 
     var type = property.type;
-    if (type === wcPlay.PROPERTY_TYPE.DYNAMIC) {
-      var value = node.property(property.name);
-      if (typeof value === 'string') {
-        type = wcPlay.PROPERTY_TYPE.STRING;
-      } else if (typeof value === 'bool') {
-        type = wcPlay.PROPERTY_TYPE.TOGGLE;
-      } else if (typeof value === 'number') {
-        type = wcPlay.PROPERTY_TYPE.NUMBER;
-      }
-    }
+    // if (type === wcPlay.PROPERTY_TYPE.DYNAMIC) {
+    //   var value = node.property(property.name);
+    //   if (typeof value === 'string') {
+    //     type = wcPlay.PROPERTY_TYPE.STRING;
+    //   } else if (typeof value === 'bool') {
+    //     type = wcPlay.PROPERTY_TYPE.TOGGLE;
+    //   } else if (typeof value === 'number') {
+    //     type = wcPlay.PROPERTY_TYPE.NUMBER;
+    //   }
+    // }
 
     var self = this;
     function undoChange(node, name, oldValue, newValue) {
@@ -2023,12 +2152,16 @@ wcPlayEditor.prototype = {
         $control.val(parseFloat(node[propFn](property.name)));
         $control.change(function() {
           if (!cancelled) {
-            undoChange(node, property.name, node[propFn](property.name), $control.val());
-            node[propFn](property.name, $control.val());
+            var min = $(this).attr('min') !== undefined? parseInt($(this).attr('min')): -Infinity;
+            var max = $(this).attr('max') !== undefined? parseInt($(this).attr('max')):  Infinity;
+            value = Math.min(max, Math.max(min, parseInt($control.val())));
+            undoChange(node, property.name, node[propFn](property.name), value);
+            node[propFn](property.name, value);
           }
         });
         break;
       case wcPlay.PROPERTY_TYPE.STRING:
+      case wcPlay.PROPERTY_TYPE.DYNAMIC:
         if (property.options.multiline) {
           $control = $('<textarea' + (property.options.maxlength? ' maxlength="' + property.options.maxlength + '"': '') + '>');
           enterConfirms = false;
@@ -2157,25 +2290,25 @@ wcPlayEditor.prototype = {
   __onKey: function(event, elem) {
     switch (event.keyCode) {
       case 46: // Delete key to delete selected nodes.
-        $('.wcPlayEditorMenuOptionDelete').click();
+        $('.wcPlayEditorMenuOptionDelete').first().click();
         break;
       case 'Z'.charCodeAt(0): // Ctrl+Z to undo last action.
         if (event.ctrlKey && !event.shiftKey) {
-          $('.wcPlayEditorMenuOptionUndo').click();
+          $('.wcPlayEditorMenuOptionUndo').first().click();
         }
         if (!event.shiftKey) {
           break;
         }
       case 'Y'.charCodeAt(0): // Ctrl+Shift+Z or Ctrl+Y to redo action.
         if (event.ctrlKey) {
-          $('.wcPlayEditorMenuOptionRedo').click();
+          $('.wcPlayEditorMenuOptionRedo').first().click();
         }
         break;
       case 32: // Space to step
-        $('.wcPlayEditorMenuOptionStep').click();
+        $('.wcPlayEditorMenuOptionStep').first().click();
         break;
       case 13: // Enter to continue;
-        $('.wcPlayEditorMenuOptionPausePlay').click();
+        $('.wcPlayEditorMenuOptionPausePlay').first().click();
         break;
     }
   },
@@ -2405,6 +2538,7 @@ wcPlayEditor.prototype = {
   __onPaletteMouseMove: function(event, elem) {
     var mouse = this.__mouse(event);
 
+    this._highlightTitle = false;
     this._highlightCollapser = false;
     this._highlightBreakpoint = false;
     this._highlightEntryLink = false;
@@ -2481,7 +2615,7 @@ wcPlayEditor.prototype = {
           yPos += this._drawStyle.links.length;
         }
 
-        this.__drawNode(this._highlightNode, {x: rect.width/2, y: yPos}, this._draggingNodeData.$canvas[0].getContext('2d'), true);
+        this.__drawNode(this._highlightNode, {x: rect.width/2, y: yPos+3}, this._draggingNodeData.$canvas[0].getContext('2d'), true);
       }
     }
   },
@@ -2588,6 +2722,7 @@ wcPlayEditor.prototype = {
     }
 
     this._mouse = mouse;
+    this._highlightTitle = false;
     this._highlightCollapser = false;
     this._highlightBreakpoint = false;
     this._highlightEntryLink = false;
@@ -2606,7 +2741,7 @@ wcPlayEditor.prototype = {
       if (this.__inRect(mouse, node._meta.bounds.inner, this._viewportCamera)) {
         this._highlightNode = node;
         this.$viewport.addClass('wcClickable');
-        this.$viewport.attr('title', 'Click and drag to move this node. Double click to collapse/expand this node.');
+        this.$viewport.attr('title', (node._meta.description? node._meta.description + '\n': '') + 'Click and drag to move this node. Double click to collapse/expand this node.');
       } else {
         this.$viewport.removeClass('wcClickable');
       }
@@ -2635,7 +2770,16 @@ wcPlayEditor.prototype = {
           if (this.__inRect(mouse, node._meta.bounds.entryBounds[i].rect, this._viewportCamera)) {
             this._highlightNode = node;
             this._highlightEntryLink = node._meta.bounds.entryBounds[i];
-            this.$viewport.attr('title', 'Click and drag to create a new flow chain to another node.');
+
+            var link;
+            for (var a = 0; a < node.chain.entry.length; ++a) {
+              if (node.chain.entry[a].name == this._highlightEntryLink.name) {
+                link = node.chain.entry[a];
+                break;
+              }
+            }
+
+            this.$viewport.attr('title', (link.meta.description? link.meta.description + '\n': '') + 'Click and drag to create a new flow chain from another node. Double click to manually fire this entry link.');
             break;
           }
         }
@@ -2647,7 +2791,16 @@ wcPlayEditor.prototype = {
           if (this.__inRect(mouse, node._meta.bounds.exitBounds[i].rect, this._viewportCamera)) {
             this._highlightNode = node;
             this._highlightExitLink = node._meta.bounds.exitBounds[i];
-            this.$viewport.attr('title', 'Click and drag to create a new flow chain to another node. Double click to manually trigger chains attached to this link.');
+
+            var link;
+            for (var a = 0; a < node.chain.exit.length; ++a) {
+              if (node.chain.exit[a].name == this._highlightExitLink.name) {
+                link = node.chain.exit[a];
+                break;
+              }
+            }
+
+            this.$viewport.attr('title', (link.meta.description? link.meta.description + '\n': '') + 'Click and drag to create a new flow chain to another node. Double click to manually fire this exit link.');
             break;
           }
         }
@@ -2659,7 +2812,7 @@ wcPlayEditor.prototype = {
           if (this.__inRect(mouse, node._meta.bounds.inputBounds[i].rect, this._viewportCamera)) {
             this._highlightNode = node;
             this._highlightInputLink = node._meta.bounds.inputBounds[i];
-            this.$viewport.attr('title', 'Click and drag to chain this property to another.');
+            this.$viewport.attr('title', 'Click and drag to chain this property to the output of another.');
             break;
           }
         }
@@ -2671,18 +2824,24 @@ wcPlayEditor.prototype = {
           if (this.__inRect(mouse, node._meta.bounds.outputBounds[i].rect, this._viewportCamera)) {
             this._highlightNode = node;
             this._highlightOutputLink = node._meta.bounds.outputBounds[i];
-            this.$viewport.attr('title', 'Click and drag to chain this property to another. Double click to manually propagate this property through the chain.');
+            this.$viewport.attr('title', 'Click and drag to chain this property to the input of another. Double click to manually propagate this property through the chain.');
             break;
           }
         }
       }
 
-      // Property values.
       if (!this._selectedEntryLink && !this._selectedExitLink && !this._selectedInputLink && !this._selectedOutputLink) {
+        // Title label.
+        if (this.__inRect(this._mouse, node._meta.bounds.titleBounds, this._viewportCamera)) {
+          this._highlightNode = node;
+          this._highlightTitle = true;
+        }
+
+        // Property labels.
         var propBounds;
-        for (var i = 0; i < node._meta.bounds.valueBounds.length; ++i) {
-          if (this.__inRect(this._mouse, node._meta.bounds.valueBounds[i].rect, this._viewportCamera)) {
-            propBounds = node._meta.bounds.valueBounds[i];
+        for (var i = 0; i < node._meta.bounds.propertyBounds.length; ++i) {
+          if (this.__inRect(this._mouse, node._meta.bounds.propertyBounds[i].rect, this._viewportCamera)) {
+            propBounds = node._meta.bounds.propertyBounds[i];
             break;
           }
         }
@@ -2690,28 +2849,47 @@ wcPlayEditor.prototype = {
         if (propBounds) {
           for (var i = 0; i < node.properties.length; ++i) {
             if (node.properties[i].name === propBounds.name) {
-              this._highlightNode = node;
-              this._highlightPropertyValue = propBounds;
-              this.$viewport.attr('title', 'Click to change the current value of this property.\n' + node.properties[i].value);
+              this.$viewport.attr('title', (node.properties[i].options.description? node.properties[i].options.description + '\n': ''));
               break;
             }
           }
         }
 
-        var propInitialBounds;
-        for (var i = 0; i < node._meta.bounds.initialBounds.length; ++i) {
-          if (this.__inRect(this._mouse, node._meta.bounds.initialBounds[i].rect, this._viewportCamera)) {
-            propInitialBounds = node._meta.bounds.initialBounds[i];
+        // Property values.
+        var valueBounds;
+        for (var i = 0; i < node._meta.bounds.valueBounds.length; ++i) {
+          if (this.__inRect(this._mouse, node._meta.bounds.valueBounds[i].rect, this._viewportCamera)) {
+            valueBounds = node._meta.bounds.valueBounds[i];
             break;
           }
         }
 
-        if (propInitialBounds) {
+        if (valueBounds) {
           for (var i = 0; i < node.properties.length; ++i) {
-            if (node.properties[i].name === propInitialBounds.name) {
+            if (node.properties[i].name === valueBounds.name) {
               this._highlightNode = node;
-              this._highlightPropertyInitialValue = propInitialBounds;
-              this.$viewport.attr('title', 'Click to change the initial value of this property.\n' + node.properties[i].initialValue);
+              this._highlightPropertyValue = valueBounds;
+              this.$viewport.attr('title', (node.properties[i].options.description? node.properties[i].options.description + '\n': '') + 'Click to change the current value of this property.');
+              break;
+            }
+          }
+        }
+
+        // Property initial values.
+        var initialBounds;
+        for (var i = 0; i < node._meta.bounds.initialBounds.length; ++i) {
+          if (this.__inRect(this._mouse, node._meta.bounds.initialBounds[i].rect, this._viewportCamera)) {
+            initialBounds = node._meta.bounds.initialBounds[i];
+            break;
+          }
+        }
+
+        if (initialBounds) {
+          for (var i = 0; i < node.properties.length; ++i) {
+            if (node.properties[i].name === initialBounds.name) {
+              this._highlightNode = node;
+              this._highlightPropertyInitialValue = initialBounds;
+              this.$viewport.attr('title', (node.properties[i].options.description? node.properties[i].options.description + '\n': '') + 'Click to change the initial value of this property.');
               break;
             }
           }
@@ -2720,8 +2898,8 @@ wcPlayEditor.prototype = {
         // Custom viewport area.
         if (node._meta.bounds.viewportBounds) {
           var pos = {
-            x: this._mouse.x - node._meta.bounds.viewportBounds.left,
-            y: this._mouse.y - node._meta.bounds.viewportBounds.top,
+            x: (mouse.x - this._viewportCamera.x) / this._viewportCamera.z - node._meta.bounds.viewportBounds.left,
+            y: (mouse.y - this._viewportCamera.y) / this._viewportCamera.z - node._meta.bounds.viewportBounds.top,
           };
 
           if (this.__inRect(this._mouse, node._meta.bounds.viewportBounds, this._viewportCamera)) {
@@ -2974,8 +3152,8 @@ wcPlayEditor.prototype = {
       // Custom viewport area.
       if (!hasTarget && node._meta.bounds.viewportBounds) {
         var pos = {
-          x: this._mouse.x - node._meta.bounds.viewportBounds.left,
-          y: this._mouse.y - node._meta.bounds.viewportBounds.top,
+          x: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z - node._meta.bounds.viewportBounds.left,
+          y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z - node._meta.bounds.viewportBounds.top,
         };
 
         if (this.__inRect(this._mouse, node._meta.bounds.viewportBounds, this._viewportCamera)) {
@@ -3011,189 +3189,6 @@ wcPlayEditor.prototype = {
     if (!hasTarget) {
       this._viewportMoving = true;
       this._viewportMoved = false;
-    }
-  },
-
-  /**
-   * Handle mouse click events over the viewport canvas.
-   * @function wcPlayEditor#__onViewportMouseDown
-   * @private
-   * @param {Object} event - The mouse event.
-   * @param {Object} elem - The target element.
-   */
-  __onViewportMouseClick: function(event, elem) {
-    if (!this._mouseMoved) {
-      this._mouse = this.__mouse(event, this.$viewport.offset());
-
-      var hasTarget = false;
-      var node = this.__findNodeAtPos(this._mouse, this._viewportCamera);
-      if (node) {
-        // Collapser button.
-        if (this.__inRect(this._mouse, node._meta.bounds.collapser, this._viewportCamera)) {
-          var state = !node.collapsed();
-          node.collapsed(state);
-          this._undoManager && this._undoManager.addEvent((state? 'Collapsed': 'Expanded') + ' Node "' + node.category + '.' + node.type + '"',
-          {
-            id: node.id,
-            state: state,
-            editor: this,
-          },
-          // Undo
-          function() {
-            var myNode = this.editor._engine.nodeById(this.id);
-            myNode.collapsed(!this.state);
-          },
-          // Redo
-          function() {
-            var myNode = this.editor._engine.nodeById(this.id);
-            myNode.collapsed(this.state);
-          });
-        }
-
-        // Breakpoint button.
-        if (this.__inRect(this._mouse, node._meta.bounds.breakpoint, this._viewportCamera)) {
-          var state = !node._break;
-          node.debugBreak(state);
-          this._undoManager && this._undoManager.addEvent((state? 'Enabled': 'Disabled') + ' Breakpoint on Node "' + node.category + '.' + node.type + '"',
-          {
-            id: node.id,
-            state: state,
-            editor: this,
-          },
-          // Undo
-          function() {
-            var myNode = this.editor._engine.nodeById(this.id);
-            myNode.debugBreak(!this.state);
-          },
-          // Redo
-          function() {
-            var myNode = this.editor._engine.nodeById(this.id);
-            myNode.debugBreak(this.state);
-          });
-        }
-
-        // Property values.
-        var propBounds;
-        for (var i = 0; i < node._meta.bounds.valueBounds.length; ++i) {
-          if (this.__inRect(this._mouse, node._meta.bounds.valueBounds[i].rect, this._viewportCamera)) {
-            propBounds = node._meta.bounds.valueBounds[i];
-            break;
-          }
-        }
-
-        if (propBounds) {
-          for (var i = 0; i < node.properties.length; ++i) {
-            if (node.properties[i].name === propBounds.name) {
-              this.__drawPropertyEditor(node, node.properties[i], propBounds);
-              break;
-            }
-          }
-        }
-
-        var propInitialBounds;
-        for (var i = 0; i < node._meta.bounds.initialBounds.length; ++i) {
-          if (this.__inRect(this._mouse, node._meta.bounds.initialBounds[i].rect, this._viewportCamera)) {
-            propInitialBounds = node._meta.bounds.initialBounds[i];
-            break;
-          }
-        }
-
-        if (propInitialBounds) {
-          for (var i = 0; i < node.properties.length; ++i) {
-            if (node.properties[i].name === propInitialBounds.name) {
-              this.__drawPropertyEditor(node, node.properties[i], propInitialBounds, true);
-              break;
-            }
-          }
-        }
-
-        // Custom viewport area.
-        if (node._meta.bounds.viewportBounds) {
-          var pos = {
-            x: this._mouse.x - node._meta.bounds.viewportBounds.left,
-            y: this._mouse.y - node._meta.bounds.viewportBounds.top,
-          };
-
-          if (this.__inRect(this._mouse, node._meta.bounds.viewportBounds, this._viewportCamera)) {
-            node.onViewportMouseClick(event, pos);
-          }
-        }
-      }
-    }
-  },
-
-  /**
-   * Handle mouse double click events over the viewport canvas.
-   * @function wcPlayEditor#__onViewportMouseDoubleClick
-   * @private
-   * @param {Object} event - The mouse event.
-   * @param {Object} elem - The target element.
-   */
-  __onViewportMouseDoubleClick: function(event, elem) {
-    this._mouse = this.__mouse(event, this.$viewport.offset());
-
-    var hasTarget = false;
-    var node = this.__findNodeAtPos(this._mouse, this._viewportCamera);
-    if (node) {
-      // Collapser button.
-      if (this.__inRect(this._mouse, node._meta.bounds.collapser, this._viewportCamera)) {
-        hasTarget = true;
-      }
-
-      // Breakpoint button.
-      if (this.__inRect(this._mouse, node._meta.bounds.breakpoint, this._viewportCamera)) {
-        hasTarget = true;
-      }
-
-      // Property values.
-      for (var i = 0; i < node._meta.bounds.valueBounds.length; ++i) {
-        if (this.__inRect(this._mouse, node._meta.bounds.valueBounds[i].rect, this._viewportCamera)) {
-          hasTarget = true;
-          break;
-        }
-      }
-
-      // Exit links.
-      if (!hasTarget) {
-        for (var i = 0; i < node._meta.bounds.exitBounds.length; ++i) {
-          if (this.__inRect(this._mouse, node._meta.bounds.exitBounds[i].rect, this._viewportCamera)) {
-            hasTarget = true;
-            // Double click to manually fire this exit chain.
-            node.triggerExit(node._meta.bounds.exitBounds[i].name);
-            break;
-          }
-        }
-      }
-
-      // Output links.
-      if (!hasTarget) {
-        for (var i = 0; i < node._meta.bounds.outputBounds.length; ++i) {
-          if (this.__inRect(this._mouse, node._meta.bounds.outputBounds[i].rect, this._viewportCamera)) {
-            hasTarget = true;
-            // Double click to manually fire this output chain.
-            node.property(node._meta.bounds.outputBounds[i].name, node.property(node._meta.bounds.outputBounds[i].name), true);
-            break;
-          }
-        }
-      }
-
-      // Custom viewport area.
-      if (!hasTarget && node._meta.bounds.viewportBounds) {
-        var pos = {
-          x: this._mouse.x - node._meta.bounds.viewportBounds.left,
-          y: this._mouse.y - node._meta.bounds.viewportBounds.top,
-        };
-
-        if (this.__inRect(this._mouse, node._meta.bounds.viewportBounds, this._viewportCamera)) {
-          hasTarget = node.onViewportMouseDoubleClick(event, pos);
-        }
-      }
-
-      // Center area.
-      if (!hasTarget && this.__inRect(this._mouse, node._meta.bounds.inner, this._viewportCamera)) {
-        hasTarget = true;
-        node.collapsed(!node.collapsed());
-      }
     }
   },
 
@@ -3474,8 +3469,8 @@ wcPlayEditor.prototype = {
     if (this._selectedNode && this._highlightViewport) {
       var mouse = this.__mouse(event, this.$viewport.offset());
       var pos = {
-        x: mouse.x - this._selectedNode._meta.bounds.viewportBounds.left,
-        y: mouse.y - this._selectedNode._meta.bounds.viewportBounds.top,
+        x: (mouse.x - this._viewportCamera.x) / this._viewportCamera.z - this._selectedNode._meta.bounds.viewportBounds.left,
+        y: (mouse.y - this._viewportCamera.y) / this._viewportCamera.z - this._selectedNode._meta.bounds.viewportBounds.top,
       };
 
       this._selectedNode.onViewportMouseUp(event, pos);
@@ -3506,9 +3501,222 @@ wcPlayEditor.prototype = {
     }
   },
 
+  /**
+   * Handle mouse click events over the viewport canvas.
+   * @function wcPlayEditor#__onViewportMouseDown
+   * @private
+   * @param {Object} event - The mouse event.
+   * @param {Object} elem - The target element.
+   */
+  __onViewportMouseClick: function(event, elem) {
+    if (!this._mouseMoved) {
+      this._mouse = this.__mouse(event, this.$viewport.offset());
+
+      var hasTarget = false;
+      var node = this.__findNodeAtPos(this._mouse, this._viewportCamera);
+      if (node) {
+        // Collapser button.
+        if (this.__inRect(this._mouse, node._meta.bounds.collapser, this._viewportCamera)) {
+          var state = !node.collapsed();
+          node.collapsed(state);
+          this._undoManager && this._undoManager.addEvent((state? 'Collapsed': 'Expanded') + ' Node "' + node.category + '.' + node.type + '"',
+          {
+            id: node.id,
+            state: state,
+            editor: this,
+          },
+          // Undo
+          function() {
+            var myNode = this.editor._engine.nodeById(this.id);
+            myNode.collapsed(!this.state);
+          },
+          // Redo
+          function() {
+            var myNode = this.editor._engine.nodeById(this.id);
+            myNode.collapsed(this.state);
+          });
+        }
+
+        // Breakpoint button.
+        if (this.__inRect(this._mouse, node._meta.bounds.breakpoint, this._viewportCamera)) {
+          var state = !node._break;
+          node.debugBreak(state);
+          this._undoManager && this._undoManager.addEvent((state? 'Enabled': 'Disabled') + ' Breakpoint on Node "' + node.category + '.' + node.type + '"',
+          {
+            id: node.id,
+            state: state,
+            editor: this,
+          },
+          // Undo
+          function() {
+            var myNode = this.editor._engine.nodeById(this.id);
+            myNode.debugBreak(!this.state);
+          },
+          // Redo
+          function() {
+            var myNode = this.editor._engine.nodeById(this.id);
+            myNode.debugBreak(this.state);
+          });
+        }
+
+        // Title label.
+        if (this.__inRect(this._mouse, node._meta.bounds.titleBounds, this._viewportCamera)) {
+          this.__drawTitleEditor(node, node._meta.bounds.titleBounds);
+        }
+
+        // Property values.
+        var propBounds;
+        for (var i = 0; i < node._meta.bounds.valueBounds.length; ++i) {
+          if (this.__inRect(this._mouse, node._meta.bounds.valueBounds[i].rect, this._viewportCamera)) {
+            propBounds = node._meta.bounds.valueBounds[i];
+            break;
+          }
+        }
+
+        if (propBounds) {
+          for (var i = 0; i < node.properties.length; ++i) {
+            if (node.properties[i].name === propBounds.name) {
+              this.__drawPropertyEditor(node, node.properties[i], propBounds);
+              break;
+            }
+          }
+        }
+
+        var propInitialBounds;
+        for (var i = 0; i < node._meta.bounds.initialBounds.length; ++i) {
+          if (this.__inRect(this._mouse, node._meta.bounds.initialBounds[i].rect, this._viewportCamera)) {
+            propInitialBounds = node._meta.bounds.initialBounds[i];
+            break;
+          }
+        }
+
+        if (propInitialBounds) {
+          for (var i = 0; i < node.properties.length; ++i) {
+            if (node.properties[i].name === propInitialBounds.name) {
+              this.__drawPropertyEditor(node, node.properties[i], propInitialBounds, true);
+              break;
+            }
+          }
+        }
+
+        // Custom viewport area.
+        if (node._meta.bounds.viewportBounds) {
+          var pos = {
+            x: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z - node._meta.bounds.viewportBounds.left,
+            y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z - node._meta.bounds.viewportBounds.top,
+          };
+
+          if (this.__inRect(this._mouse, node._meta.bounds.viewportBounds, this._viewportCamera)) {
+            node.onViewportMouseClick(event, pos);
+          }
+        }
+      }
+    }
+  },
+
+  /**
+   * Handle mouse double click events over the viewport canvas.
+   * @function wcPlayEditor#__onViewportMouseDoubleClick
+   * @private
+   * @param {Object} event - The mouse event.
+   * @param {Object} elem - The target element.
+   */
+  __onViewportMouseDoubleClick: function(event, elem) {
+    this._mouse = this.__mouse(event, this.$viewport.offset());
+
+    var hasTarget = false;
+    var node = this.__findNodeAtPos(this._mouse, this._viewportCamera);
+    if (node) {
+      // Collapser button.
+      if (this.__inRect(this._mouse, node._meta.bounds.collapser, this._viewportCamera)) {
+        hasTarget = true;
+      }
+
+      // Breakpoint button.
+      if (this.__inRect(this._mouse, node._meta.bounds.breakpoint, this._viewportCamera)) {
+        hasTarget = true;
+      }
+
+      // Property values.
+      for (var i = 0; i < node._meta.bounds.valueBounds.length; ++i) {
+        if (this.__inRect(this._mouse, node._meta.bounds.valueBounds[i].rect, this._viewportCamera)) {
+          hasTarget = true;
+          break;
+        }
+      }
+
+      // Entry links.
+      if (!hasTarget) {
+        for (var i = 0; i < node._meta.bounds.entryBounds.length; ++i) {
+          if (this.__inRect(this._mouse, node._meta.bounds.entryBounds[i].rect, this._viewportCamera)) {
+            hasTarget = true;
+            // Double click to manually fire this entry chain.
+            node.triggerEntry(node._meta.bounds.entryBounds[i].name);
+            break;
+          }
+        }
+      }
+
+      // Exit links.
+      if (!hasTarget) {
+        for (var i = 0; i < node._meta.bounds.exitBounds.length; ++i) {
+          if (this.__inRect(this._mouse, node._meta.bounds.exitBounds[i].rect, this._viewportCamera)) {
+            hasTarget = true;
+            // Double click to manually fire this exit chain.
+            node.triggerExit(node._meta.bounds.exitBounds[i].name);
+            break;
+          }
+        }
+      }
+
+      // Output links.
+      if (!hasTarget) {
+        for (var i = 0; i < node._meta.bounds.outputBounds.length; ++i) {
+          if (this.__inRect(this._mouse, node._meta.bounds.outputBounds[i].rect, this._viewportCamera)) {
+            hasTarget = true;
+            // Double click to manually fire this output chain.
+            node.property(node._meta.bounds.outputBounds[i].name, node.property(node._meta.bounds.outputBounds[i].name), true);
+            break;
+          }
+        }
+      }
+
+      // Custom viewport area.
+      if (!hasTarget && node._meta.bounds.viewportBounds) {
+        var pos = {
+          x: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z - node._meta.bounds.viewportBounds.left,
+          y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z - node._meta.bounds.viewportBounds.top,
+        };
+
+        if (this.__inRect(this._mouse, node._meta.bounds.viewportBounds, this._viewportCamera)) {
+          hasTarget = node.onViewportMouseDoubleClick(event, pos);
+        }
+      }
+
+      // Center area.
+      if (!hasTarget && this.__inRect(this._mouse, node._meta.bounds.inner, this._viewportCamera)) {
+        hasTarget = true;
+        node.collapsed(!node.collapsed());
+      }
+    }
+  },
+
   __onViewportMouseWheel: function(event, elem) {
     var oldZoom = this._viewportCamera.z;
     var mouse = this.__mouse(event, this.$viewport.offset());
+
+    // Custom viewport area.
+    if (this._highlightNode && this._highlightNode._meta.bounds.viewportBounds) {
+      var pos = {
+        x: (mouse.x - this._viewportCamera.x) / this._viewportCamera.z - this._highlightNode._meta.bounds.viewportBounds.left,
+        y: (mouse.y - this._viewportCamera.y) / this._viewportCamera.z - this._highlightNode._meta.bounds.viewportBounds.top,
+      };
+
+      if (this.__inRect(mouse, this._highlightNode._meta.bounds.viewportBounds, this._viewportCamera) &&
+          this._highlightNode.onViewportMouseWheel(event, pos, (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0))) {
+        return;
+      }
+    }
 
     if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) {
       // scroll up to zoom in.

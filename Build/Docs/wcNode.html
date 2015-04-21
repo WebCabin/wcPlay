@@ -27,7 +27,7 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeProcessTutorialViewport.html">wcNodeProcessTutorialViewport</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageGlobal.html">wcNodeStorageGlobal</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
+					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeProcessTutorialDynamic.html">wcNodeProcessTutorialDynamic</a></li><li><a href="wcNodeProcessTutorialProperties.html">wcNodeProcessTutorialProperties</a></li><li><a href="wcNodeProcessTutorialViewport.html">wcNodeProcessTutorialViewport</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageGlobal.html">wcNodeStorageGlobal</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
 				</ul>
 			</li>
 			
@@ -55,7 +55,7 @@
         wcNode
         </h2>
         
-            <div class="class-description"><p style="margin-left:20px;">The foundation class for all nodes.<br>When inheriting, make sure to include 'this._super(parent, pos, type);' at the top of your init functions.</p></div>
+            <div class="class-description"><p style="margin-left:20px;">The foundation class for all nodes.<br>When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init functions.</p></div>
         
     
 </header>
@@ -67,7 +67,7 @@
         
 <hr>
 <dt>
-    <h4 class="name" id="wcNode"><toc class="small"><i></i></toc><toc> </toc><toc>new </toc><toc><b>wcNode</b>(parent, pos, <span class="optional">type</span>)</toc>
+    <h4 class="name" id="wcNode"><toc class="small"><i></i></toc><toc> </toc><toc>new </toc><toc><b>wcNode</b>(parent, pos)</toc>
         
     </h4>
 
@@ -100,11 +100,7 @@
 		<th>Type</th>
 
 		
-		<th>Argument</th>
-		
 
-		
-		<th>Default</th>
 		
 
 		<th class="last">Description</th>
@@ -129,19 +125,7 @@
             </td>
 
             
-                <td class="attributes">
-                
 
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
             
 
             <td class="description last">The parent object of this node.</td>
@@ -164,61 +148,10 @@
             </td>
 
             
-                <td class="attributes">
-                
 
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
             
 
             <td class="description last">The position of this node in the visual editor.</td>
-        </tr>
-
-	
-
-        <tr>
-            
-                <td class="name"><code>type</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    "Node"
-                
-                </td>
-            
-
-            <td class="description last">The type name of the node, as displayed on the title bar.</td>
         </tr>
 
 	
@@ -488,13 +421,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1309">line 1309</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1411">line 1411</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1309">line 1309</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1411">line 1411</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -717,13 +650,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1298">line 1298</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1400">line 1400</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1298">line 1298</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1400">line 1400</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -888,13 +821,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1320">line 1320</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1422">line 1422</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1320">line 1320</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1422">line 1422</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -1014,13 +947,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-176">line 176</a>
+     <a href="nodes_node.js.html#sunlight-1-line-189">line 189</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-176">line 176</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-189">line 189</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -1187,13 +1120,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-162">line 162</a>
+     <a href="nodes_node.js.html#sunlight-1-line-161">line 161</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-162">line 162</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-161">line 161</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -1394,13 +1327,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-389">line 389</a>
+     <a href="nodes_node.js.html#sunlight-1-line-407">line 407</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-389">line 389</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-407">line 407</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -1601,13 +1534,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-455">line 455</a>
+     <a href="nodes_node.js.html#sunlight-1-line-473">line 473</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-455">line 455</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-473">line 473</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -1808,13 +1741,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-521">line 521</a>
+     <a href="nodes_node.js.html#sunlight-1-line-539">line 539</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-521">line 521</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-539">line 539</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -2015,13 +1948,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-587">line 587</a>
+     <a href="nodes_node.js.html#sunlight-1-line-605">line 605</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-587">line 587</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-605">line 605</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -2040,7 +1973,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="createEntry"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>createEntry</b>(<span class="optional">name</span>)</toc>
+    <h4 class="name" id="createEntry"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>createEntry</b>(name, <span class="optional">description</span>)</toc>
         
         >
         
@@ -2084,8 +2017,6 @@
 		
 
 		
-		<th>Default</th>
-		
 
 		<th class="last">Description</th>
 	</tr>
@@ -2111,6 +2042,37 @@
             
                 <td class="attributes">
                 
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The name of the entry link.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>description</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
                     &lt;optional><br>
                 
 
@@ -2121,14 +2083,8 @@
             
 
             
-                <td class="default">
-                
-                    "In"
-                
-                </td>
-            
 
-            <td class="description last">The name of the entry link.</td>
+            <td class="description last">An optional description to display as a tooltip for this link.</td>
         </tr>
 
 	
@@ -2196,13 +2152,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-241">line 241</a>
+     <a href="nodes_node.js.html#sunlight-1-line-254">line 254</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-241">line 241</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-254">line 254</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -2221,7 +2177,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="createExit"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>createExit</b>(name)</toc>
+    <h4 class="name" id="createExit"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>createExit</b>(name, <span class="optional">description</span>)</toc>
         
         >
         
@@ -2261,6 +2217,8 @@
 		<th>Type</th>
 
 		
+		<th>Argument</th>
+		
 
 		
 
@@ -2286,10 +2244,51 @@
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
 
             <td class="description last">The name of the exit link.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>description</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">An optional description to display as a tooltip for this link.</td>
         </tr>
 
 	
@@ -2357,13 +2356,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-267">line 267</a>
+     <a href="nodes_node.js.html#sunlight-1-line-282">line 282</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-267">line 267</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-282">line 282</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -2575,7 +2574,7 @@
     
             <p class="param-desc" style="margin-left: 20px;">
     
-		 Failes if the property does not exist.
+		 Fails if the property does not exist.
 	</p>
 
         
@@ -2625,13 +2624,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-292">line 292</a>
+     <a href="nodes_node.js.html#sunlight-1-line-309">line 309</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-292">line 292</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-309">line 309</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -2798,13 +2797,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-147">line 147</a>
+     <a href="nodes_node.js.html#sunlight-1-line-146">line 146</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-147">line 147</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-146">line 146</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -2971,13 +2970,186 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-132">line 132</a>
+     <a href="nodes_node.js.html#sunlight-1-line-131">line 131</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-132">line 132</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-131">line 131</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="description"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>description</b>(<span class="optional">description</span>)</toc>
+        
+        >
+        
+        <i><small>
+<span class="param-type">String</span>
+
+</small></i>
+        
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p style="margin-left: 20px;">Gets, or Sets the description for this node.</p>
+    </div>
+    
+
+    
+
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>description</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">If supplied, will assign a new description for this node.</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+    
+<h5>Returns: 
+<span class="param-type">String</span>
+
+</h5>
+    
+            <p class="param-desc" style="margin-left: 20px;">
+    
+		 The current description of this node.
+	</p>
+
+        
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="nodes_node.js.html">nodes/node.js</a>,
+     <a href="nodes_node.js.html#sunlight-1-line-175">line 175</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="nodes_node.js.html">nodes/node.js</a>,
+				 <a href="nodes_node.js.html#sunlight-1-line-175">line 175</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -3064,13 +3236,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-55">line 55</a>
+     <a href="nodes_node.js.html#sunlight-1-line-54">line 54</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-55">line 55</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-54">line 54</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -3298,13 +3470,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-653">line 653</a>
+     <a href="nodes_node.js.html#sunlight-1-line-671">line 671</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-653">line 653</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-671">line 671</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -3532,13 +3704,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-689">line 689</a>
+     <a href="nodes_node.js.html#sunlight-1-line-707">line 707</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-689">line 689</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-707">line 707</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -3766,13 +3938,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-725">line 725</a>
+     <a href="nodes_node.js.html#sunlight-1-line-743">line 743</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-725">line 725</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-743">line 743</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -4000,13 +4172,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-761">line 761</a>
+     <a href="nodes_node.js.html#sunlight-1-line-779">line 779</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-761">line 761</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-779">line 779</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -4173,13 +4345,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-118">line 118</a>
+     <a href="nodes_node.js.html#sunlight-1-line-117">line 117</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-118">line 118</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-117">line 117</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -4291,13 +4463,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-105">line 105</a>
+     <a href="nodes_node.js.html#sunlight-1-line-104">line 104</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-105">line 105</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-104">line 104</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -4384,13 +4556,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-209">line 209</a>
+     <a href="nodes_node.js.html#sunlight-1-line-222">line 222</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-209">line 209</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-222">line 222</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -4594,13 +4766,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1019">line 1019</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1084">line 1084</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1019">line 1019</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1084">line 1084</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -4767,13 +4939,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-797">line 797</a>
+     <a href="nodes_node.js.html#sunlight-1-line-815">line 815</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-797">line 797</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-815">line 815</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -4940,13 +5112,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-822">line 822</a>
+     <a href="nodes_node.js.html#sunlight-1-line-840">line 840</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-822">line 822</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-840">line 840</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -5113,13 +5285,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-847">line 847</a>
+     <a href="nodes_node.js.html#sunlight-1-line-865">line 865</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-847">line 847</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-865">line 865</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -5286,13 +5458,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-872">line 872</a>
+     <a href="nodes_node.js.html#sunlight-1-line-890">line 890</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-872">line 872</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-890">line 890</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -5398,13 +5570,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-897">line 897</a>
+     <a href="nodes_node.js.html#sunlight-1-line-915">line 915</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-897">line 897</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-915">line 915</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -5655,13 +5827,508 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1176">line 1176</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1261">line 1261</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1176">line 1176</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1261">line 1261</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="onGlobalPropertyChanged"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onGlobalPropertyChanged</b>(name, oldValue, newValue)</toc>
+        
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p style="margin-left: 20px;">Event that is called when a global property value has changed.Overload this in inherited nodes.<br><b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.</p>
+    </div>
+    
+
+    
+
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The name of the global property.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>oldValue</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The old value of the global property.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>newValue</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The new value of the global property.</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="nodes_node.js.html">nodes/node.js</a>,
+     <a href="nodes_node.js.html#sunlight-1-line-1362">line 1362</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="nodes_node.js.html">nodes/node.js</a>,
+				 <a href="nodes_node.js.html#sunlight-1-line-1362">line 1362</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="onGlobalPropertyRemoved"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onGlobalPropertyRemoved</b>(name)</toc>
+        
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p style="margin-left: 20px;">Event that is called when a global property has been removed.Overload this in inherited nodes.<br><b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.</p>
+    </div>
+    
+
+    
+
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The name of the global property.</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="nodes_node.js.html">nodes/node.js</a>,
+     <a href="nodes_node.js.html#sunlight-1-line-1374">line 1374</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="nodes_node.js.html">nodes/node.js</a>,
+				 <a href="nodes_node.js.html#sunlight-1-line-1374">line 1374</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="onGlobalPropertyRenamed"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onGlobalPropertyRenamed</b>(oldName, newName)</toc>
+        
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p style="margin-left: 20px;">Event that is called when a global property has been renamed.Overload this in inherited nodes.<br><b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.</p>
+    </div>
+    
+
+    
+
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>oldName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The old name of the global property.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>newName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The new name of the global property.</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="nodes_node.js.html">nodes/node.js</a>,
+     <a href="nodes_node.js.html#sunlight-1-line-1384">line 1384</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="nodes_node.js.html">nodes/node.js</a>,
+				 <a href="nodes_node.js.html#sunlight-1-line-1384">line 1384</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -5843,13 +6510,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1232">line 1232</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1321">line 1321</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1232">line 1232</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1321">line 1321</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -6050,13 +6717,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1217">line 1217</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1305">line 1305</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1217">line 1217</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1305">line 1305</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -6192,13 +6859,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1246">line 1246</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1336">line 1336</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1246">line 1246</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1336">line 1336</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -6334,366 +7001,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1258">line 1258</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1349">line 1349</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1258">line 1258</a>
-			</li>
-		</ul>
-	</dd> -->
-	
-
-	
-
-	
-
-	
-</dl>
-
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="onSharedPropertyChanged"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onSharedPropertyChanged</b>(name, oldValue, newValue)</toc>
-        
-    </h4>
-
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p style="margin-left: 20px;">Event that is called when a global property value has changed.Overload this in inherited nodes.<br><b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.</p>
-    </div>
-    
-
-    
-
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-
-		<th>Type</th>
-
-		
-
-		
-
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-
-	<tbody>
-	
-
-        <tr>
-            
-                <td class="name"><code>name</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The name of the global property.</td>
-        </tr>
-
-	
-
-        <tr>
-            
-                <td class="name"><code>oldValue</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The old value of the global property.</td>
-        </tr>
-
-	
-
-        <tr>
-            
-                <td class="name"><code>newValue</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The new value of the global property.</td>
-        </tr>
-
-	
-	</tbody>
-</table>
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
-    
-
-    
-<dl class="details">
-	
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1270">line 1270</a>
-  </dt>
-<!-- 	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1270">line 1270</a>
-			</li>
-		</ul>
-	</dd> -->
-	
-
-	
-
-	
-
-	
-</dl>
-
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="onSharedPropertyRenamed"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onSharedPropertyRenamed</b>(oldName, newName)</toc>
-        
-    </h4>
-
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p style="margin-left: 20px;">Event that is called when a global property has been renamed.Overload this in inherited nodes.<br><b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.</p>
-    </div>
-    
-
-    
-
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-
-		<th>Type</th>
-
-		
-
-		
-
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-
-	<tbody>
-	
-
-        <tr>
-            
-                <td class="name"><code>oldName</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The old name of the global property.</td>
-        </tr>
-
-	
-
-        <tr>
-            
-                <td class="name"><code>newName</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The new name of the global property.</td>
-        </tr>
-
-	
-	</tbody>
-</table>
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
-    
-
-    
-<dl class="details">
-	
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1282">line 1282</a>
-  </dt>
-<!-- 	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1282">line 1282</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1349">line 1349</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -6780,13 +7094,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1194">line 1194</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1280">line 1280</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1194">line 1194</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1280">line 1280</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -6922,13 +7236,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1205">line 1205</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1292">line 1292</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1205">line 1205</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1292">line 1292</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -7064,13 +7378,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1089">line 1089</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1154">line 1154</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1089">line 1089</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1154">line 1154</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -7244,13 +7558,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-226">line 226</a>
+     <a href="nodes_node.js.html#sunlight-1-line-239">line 239</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-226">line 226</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-239">line 239</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -7487,13 +7801,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-972">line 972</a>
+     <a href="nodes_node.js.html#sunlight-1-line-990">line 990</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-972">line 972</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-990">line 990</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -7648,13 +7962,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-335">line 335</a>
+     <a href="nodes_node.js.html#sunlight-1-line-352">line 352</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-335">line 335</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-352">line 352</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -7809,13 +8123,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-353">line 353</a>
+     <a href="nodes_node.js.html#sunlight-1-line-370">line 370</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-353">line 353</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-370">line 370</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -7970,13 +8284,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-371">line 371</a>
+     <a href="nodes_node.js.html#sunlight-1-line-388">line 388</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-371">line 371</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-388">line 388</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -8063,13 +8377,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-84">line 84</a>
+     <a href="nodes_node.js.html#sunlight-1-line-83">line 83</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-84">line 84</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-83">line 83</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -8224,13 +8538,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-916">line 916</a>
+     <a href="nodes_node.js.html#sunlight-1-line-934">line 934</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-916">line 916</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-934">line 934</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -8385,13 +8699,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-939">line 939</a>
+     <a href="nodes_node.js.html#sunlight-1-line-957">line 957</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-939">line 939</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-957">line 957</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -8550,13 +8864,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1042">line 1042</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1107">line 1107</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1042">line 1042</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1107">line 1107</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -8756,13 +9070,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1065">line 1065</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1130">line 1130</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1065">line 1065</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1130">line 1130</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -8777,6 +9091,171 @@
 			<li><a href="wcNode.html#onViewportDraw">wcNode#onViewportDraw</a></li>
 			</ul>
 	</dd>
+	
+
+	
+</dl>
+
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="~onViewportMouseClick"><toc class="small"><i>inner</i></toc><toc> </toc>function <toc><b>onViewportMouseClick</b>(event, pos)</toc>
+        
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p style="margin-left: 20px;">Event that is called when the mouse button is pressed and released in the same spot over your viewport area.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
+    </div>
+    
+
+    
+
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>event</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The original jquery mouse event.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>pos</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="wcPlay.html#~Coordinates">wcPlay~Coordinates</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The position of the mouse relative to the viewport area (top left corner is 0,0).</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="nodes_node.js.html">nodes/node.js</a>,
+     <a href="nodes_node.js.html#sunlight-1-line-1238">line 1238</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="nodes_node.js.html">nodes/node.js</a>,
+				 <a href="nodes_node.js.html#sunlight-1-line-1238">line 1238</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
 	
 
 	
@@ -8953,178 +9432,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1155">line 1155</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1249">line 1249</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1155">line 1155</a>
-			</li>
-		</ul>
-	</dd> -->
-	
-
-	
-
-	
-
-	
-</dl>
-
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="~onViewportMouseClick"><toc class="small"><i>inner</i></toc><toc> </toc>function <toc><b>onViewportMouseClick</b>(event, pos)</toc>
-        
-    </h4>
-
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p style="margin-left: 20px;">Event that is called when the mouse button is pressed and released in the same spot over your viewport area.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
-    </div>
-    
-
-    
-
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-
-		<th>Type</th>
-
-		
-
-		
-
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-
-	<tbody>
-	
-
-        <tr>
-            
-                <td class="name"><code>event</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The original jquery mouse event.</td>
-        </tr>
-
-	
-
-        <tr>
-            
-                <td class="name"><code>pos</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="wcPlay.html#~Coordinates">wcPlay~Coordinates</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The position of the mouse relative to the viewport area (top left corner is 0,0).</td>
-        </tr>
-
-	
-	</tbody>
-</table>
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
-    
-
-    
-<dl class="details">
-	
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1145">line 1145</a>
-  </dt>
-<!-- 	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1145">line 1145</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1249">line 1249</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -9308,13 +9622,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1124">line 1124</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1192">line 1192</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1124">line 1124</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1192">line 1192</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -9473,13 +9787,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1099">line 1099</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1165">line 1165</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1099">line 1099</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1165">line 1165</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -9615,13 +9929,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1112">line 1112</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1179">line 1179</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1112">line 1112</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1179">line 1179</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -9780,13 +10094,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1166">line 1166</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1215">line 1215</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1166">line 1166</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1215">line 1215</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -9945,13 +10259,201 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1135">line 1135</a>
+     <a href="nodes_node.js.html#sunlight-1-line-1204">line 1204</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1135">line 1135</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1204">line 1204</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="~onViewportMouseWheel"><toc class="small"><i>inner</i></toc><toc> </toc>function <toc><b>onViewportMouseWheel</b>(event, pos, scrollDelta)</toc>
+        
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p style="margin-left: 20px;">Event that is called when the mouse wheel is used over your viewport area.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
+    </div>
+    
+
+    
+
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>event</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The original jquery mouse event.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>pos</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="wcPlay.html#~Coordinates">wcPlay~Coordinates</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The position of the mouse relative to the viewport area (top left corner is 0,0).</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>scrollDelta</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The scroll amount and direction.</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="nodes_node.js.html">nodes/node.js</a>,
+     <a href="nodes_node.js.html#sunlight-1-line-1226">line 1226</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="nodes_node.js.html">nodes/node.js</a>,
+				 <a href="nodes_node.js.html#sunlight-1-line-1226">line 1226</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -11614,7 +12116,7 @@
 		
 		<span class="jsdoc-message">
 			Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta3</a>
-			on 2015-04-20 using the <a
+			on 2015-04-21 using the <a
 			href="https://github.com/WebCabin/docstrap">Web Cabin DocStrap template</a>.
 		</span>
 		</footer>

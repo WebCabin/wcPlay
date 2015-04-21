@@ -2,18 +2,19 @@ wcNodeStorage.extend('wcNodeStorageGlobal', 'Global Property', 'Core', {
   /**
    * @class
    * References a global property on the script.
-   * When inheriting, make sure to include 'this._super(parent, pos, type);' at the top of your init function.
+   * When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.
    *
    * @constructor wcNodeStorageGlobal
    * @param {String} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
-   * @param {String} [type="Toggle"] - The type name of the node, as displayed on the title bar.
    */
-  init: function(parent, pos, type) {
-    this._super(parent, pos, type);
+  init: function(parent, pos) {
+    this._super(parent, pos);
 
-    this.createProperty('property', wcPlay.PROPERTY_TYPE.SELECT, '', {items: this.propertyList});
-    this.createProperty('value', wcPlay.PROPERTY_TYPE.STRING, '');
+    this.description("References a global property on the script.");
+
+    this.createProperty('property', wcPlay.PROPERTY_TYPE.SELECT, '', {items: this.propertyList, description: "The global script property to reference."});
+    this.createProperty('value', wcPlay.PROPERTY_TYPE.STRING, '', {description: "The current value of the global property chosen above."});
   },
 
   /**

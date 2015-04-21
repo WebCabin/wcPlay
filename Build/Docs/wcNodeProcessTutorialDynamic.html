@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>wcPlay Class: wcNodeProcess</title>
+	<title>wcPlay Class: wcNodeProcessTutorialDynamic</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -46,16 +46,16 @@
 		<div id="main">
     		
 
-	<h1 class="page-title">Class: wcNodeProcess</h1>
+	<h1 class="page-title">Class: wcNodeProcessTutorialDynamic</h1>
 <section>
 
 <header>
     
         <h2>
-        wcNodeProcess
+        wcNodeProcessTutorialDynamic
         </h2>
         
-            <div class="class-description"><p style="margin-left:20px;">The base class for all process nodes. These are nodes that make up the bulk of script chains.<br>When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.</p></div>
+            <div class="class-description"><p style="margin-left:20px;">This node demonstrates an example of a number of possible dynamic behaviors.When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.</p></div>
         
     
 </header>
@@ -67,7 +67,7 @@
         
 <hr>
 <dt>
-    <h4 class="name" id="wcNodeProcess"><toc class="small"><i></i></toc><toc> </toc><toc>new </toc><toc><b>wcNodeProcess</b>(parent, pos)</toc>
+    <h4 class="name" id="wcNodeProcessTutorialDynamic"><toc class="small"><i></i></toc><toc> </toc><toc>new </toc><toc><b>wcNodeProcessTutorialDynamic</b>(parent, pos)</toc>
         
     </h4>
 
@@ -75,10 +75,6 @@
 </dt>
 <dd>
     
-    
-    <div class="description">
-        <p style="margin-left: 20px;"><b>Should be inherited and never constructed directly.</b></p>
-    </div>
     
 
     
@@ -206,14 +202,14 @@
 
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="nodes_process.js.html">nodes/process.js</a>,
-     <a href="nodes_process.js.html#sunlight-1-line-2">line 2</a>
+    <a href="nodes_process_tutorialdynamic.js.html">nodes/process/tutorialdynamic.js</a>,
+     <a href="nodes_process_tutorialdynamic.js.html#sunlight-1-line-2">line 2</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="nodes_process.js.html">nodes/process.js</a>,
-				 <a href="nodes_process.js.html#sunlight-1-line-2">line 2</a>
+				<a href="nodes_process_tutorialdynamic.js.html">nodes/process/tutorialdynamic.js</a>,
+				 <a href="nodes_process_tutorialdynamic.js.html#sunlight-1-line-2">line 2</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -250,7 +246,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="classInit"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>classInit</b>(className, type, category)</toc>
+    <h4 class="name" id="onPropertyChanged"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onPropertyChanged</b>(name, oldValue, newValue)</toc>
         
     </h4>
 
@@ -260,7 +256,7 @@
     
     
     <div class="description">
-        <p style="margin-left: 20px;">Magic function that is called whenever any new class type is extended from this one.<br>Handles initializing of the class as well as registering the new node type.</p>
+        <p style="margin-left: 20px;">Event that is called when a property has changed.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
     </div>
     
 
@@ -295,7 +291,7 @@
 
         <tr>
             
-                <td class="name"><code>className</code></td>
+                <td class="name"><code>name</code></td>
             
 
             <td class="type">
@@ -311,20 +307,20 @@
 
             
 
-            <td class="description last">The name of the class constructor.</td>
+            <td class="description last">The name of the property.</td>
         </tr>
 
 	
 
         <tr>
             
-                <td class="name"><code>type</code></td>
+                <td class="name"><code>oldValue</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">String</span>
+<span class="param-type">Object</span>
 
 
             
@@ -334,20 +330,20 @@
 
             
 
-            <td class="description last">The type name for the node.</td>
+            <td class="description last">The old value of the property.</td>
         </tr>
 
 	
 
         <tr>
             
-                <td class="name"><code>category</code></td>
+                <td class="name"><code>newValue</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">String</span>
+<span class="param-type">Object</span>
 
 
             
@@ -357,7 +353,7 @@
 
             
 
-            <td class="description last">A category where this node will be grouped.</td>
+            <td class="description last">The new value of the property.</td>
         </tr>
 
 	
@@ -412,14 +408,156 @@
 
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="nodes_process.js.html">nodes/process.js</a>,
-     <a href="nodes_process.js.html#sunlight-1-line-22">line 22</a>
+    <a href="nodes_process_tutorialdynamic.js.html">nodes/process/tutorialdynamic.js</a>,
+     <a href="nodes_process_tutorialdynamic.js.html#sunlight-1-line-47">line 47</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="nodes_process.js.html">nodes/process.js</a>,
-				 <a href="nodes_process.js.html#sunlight-1-line-22">line 22</a>
+				<a href="nodes_process_tutorialdynamic.js.html">nodes/process/tutorialdynamic.js</a>,
+				 <a href="nodes_process_tutorialdynamic.js.html#sunlight-1-line-47">line 47</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="onTriggered"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onTriggered</b>(name)</toc>
+        
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p style="margin-left: 20px;">Event that is called when an entry link has been triggered.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
+    </div>
+    
+
+    
+
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The name of the entry link triggered.</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="nodes_process_tutorialdynamic.js.html">nodes/process/tutorialdynamic.js</a>,
+     <a href="nodes_process_tutorialdynamic.js.html#sunlight-1-line-25">line 25</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="nodes_process_tutorialdynamic.js.html">nodes/process/tutorialdynamic.js</a>,
+				 <a href="nodes_process_tutorialdynamic.js.html#sunlight-1-line-25">line 25</a>
 			</li>
 		</ul>
 	</dd> -->

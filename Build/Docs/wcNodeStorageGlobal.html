@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>wcPlay Class: wcNodeProcess</title>
+	<title>wcPlay Class: wcNodeStorageGlobal</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -46,16 +46,16 @@
 		<div id="main">
     		
 
-	<h1 class="page-title">Class: wcNodeProcess</h1>
+	<h1 class="page-title">Class: wcNodeStorageGlobal</h1>
 <section>
 
 <header>
     
         <h2>
-        wcNodeProcess
+        wcNodeStorageGlobal
         </h2>
         
-            <div class="class-description"><p style="margin-left:20px;">The base class for all process nodes. These are nodes that make up the bulk of script chains.<br>When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.</p></div>
+            <div class="class-description"><p style="margin-left:20px;">References a global property on the script.When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.</p></div>
         
     
 </header>
@@ -67,7 +67,7 @@
         
 <hr>
 <dt>
-    <h4 class="name" id="wcNodeProcess"><toc class="small"><i></i></toc><toc> </toc><toc>new </toc><toc><b>wcNodeProcess</b>(parent, pos)</toc>
+    <h4 class="name" id="wcNodeStorageGlobal"><toc class="small"><i></i></toc><toc> </toc><toc>new </toc><toc><b>wcNodeStorageGlobal</b>(parent, pos)</toc>
         
     </h4>
 
@@ -75,10 +75,6 @@
 </dt>
 <dd>
     
-    
-    <div class="description">
-        <p style="margin-left: 20px;"><b>Should be inherited and never constructed directly.</b></p>
-    </div>
     
 
     
@@ -206,14 +202,14 @@
 
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="nodes_process.js.html">nodes/process.js</a>,
-     <a href="nodes_process.js.html#sunlight-1-line-2">line 2</a>
+    <a href="nodes_storage_global.js.html">nodes/storage/global.js</a>,
+     <a href="nodes_storage_global.js.html#sunlight-1-line-2">line 2</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="nodes_process.js.html">nodes/process.js</a>,
-				 <a href="nodes_process.js.html#sunlight-1-line-2">line 2</a>
+				<a href="nodes_storage_global.js.html">nodes/storage/global.js</a>,
+				 <a href="nodes_storage_global.js.html#sunlight-1-line-2">line 2</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -250,7 +246,14 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="classInit"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>classInit</b>(className, type, category)</toc>
+    <h4 class="name" id="propertyList"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>propertyList</b>()</toc>
+        
+        >
+        
+        <i><small>
+<span class="param-type">Array.&lt;String></span>
+
+</small></i>
         
     </h4>
 
@@ -260,7 +263,7 @@
     
     
     <div class="description">
-        <p style="margin-left: 20px;">Magic function that is called whenever any new class type is extended from this one.<br>Handles initializing of the class as well as registering the new node type.</p>
+        <p style="margin-left: 20px;">Callback to retrieve a list of properties to display in the combo box.</p>
     </div>
     
 
@@ -270,103 +273,20 @@
     
     
     
-        <h5>Parameters:</h5>
+    
+    
+    
+<h5>Returns: 
+<span class="param-type">Array.&lt;String></span>
+
+</h5>
+    
+            <p class="param-desc" style="margin-left: 20px;">
+    
+		 A list of property names.
+	</p>
+
         
-
-<table class="params table table-striped">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-
-		<th>Type</th>
-
-		
-
-		
-
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-
-	<tbody>
-	
-
-        <tr>
-            
-                <td class="name"><code>className</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The name of the class constructor.</td>
-        </tr>
-
-	
-
-        <tr>
-            
-                <td class="name"><code>type</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The type name for the node.</td>
-        </tr>
-
-	
-
-        <tr>
-            
-                <td class="name"><code>category</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">A category where this node will be grouped.</td>
-        </tr>
-
-	
-	</tbody>
-</table>
-
-    
-    
-    
 
     
 
@@ -412,14 +332,14 @@
 
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="nodes_process.js.html">nodes/process.js</a>,
-     <a href="nodes_process.js.html#sunlight-1-line-22">line 22</a>
+    <a href="nodes_storage_global.js.html">nodes/storage/global.js</a>,
+     <a href="nodes_storage_global.js.html#sunlight-1-line-20">line 20</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="nodes_process.js.html">nodes/process.js</a>,
-				 <a href="nodes_process.js.html#sunlight-1-line-22">line 22</a>
+				<a href="nodes_storage_global.js.html">nodes/storage/global.js</a>,
+				 <a href="nodes_storage_global.js.html#sunlight-1-line-20">line 20</a>
 			</li>
 		</ul>
 	</dd> -->

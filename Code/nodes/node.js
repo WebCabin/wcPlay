@@ -3,18 +3,16 @@ Class.extend('wcNode', 'Node', '', {
   /**
    * @class
    * The foundation class for all nodes.<br>
-   * When inheriting, make sure to include 'this._super(parent, pos, type);' at the top of your init functions.
+   * When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init functions.
    *
    * @constructor wcNode
    * @description
    * <b>Should be inherited and never constructed directly.</b>
    * @param {String} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
-   * @param {String} [type="Node"] - The type name of the node, as displayed on the title bar.
    */
-  init: function(parent, pos, type) {
+  init: function(parent, pos) {
     this.id = ++wcNodeNextID;
-    this.type = type || this.name;
     this.name = '';
     this.color = '#FFFFFF';
 
@@ -38,6 +36,7 @@ Class.extend('wcNode', 'Node', '', {
       paused: false,
       awake: false,
       threads: [],
+      description: '',
     };
     this._collapsed = false;
     this._break = false;
@@ -45,7 +44,7 @@ Class.extend('wcNode', 'Node', '', {
     this._parent = parent;
 
     // Give the node its default properties.
-    this.createProperty(wcNode.PROPERTY.ENABLED, wcPlay.PROPERTY_TYPE.TOGGLE, true, {collapsible: true, description: "Disabled nodes will not trigger."});
+    this.createProperty(wcNode.PROPERTY.ENABLED, wcPlay.PROPERTY_TYPE.TOGGLE, true, {collapsible: true, description: "Disabled nodes will be treated as if they were not there, all connections will be ignored."});
     this.createProperty(wcNode.PROPERTY.DEBUG_LOG, wcPlay.PROPERTY_TYPE.TOGGLE, false, {collapsible: true, description: "Output various debugging information about this node."});
 
     var engine = this.engine();
@@ -174,6 +173,20 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
+   * Gets, or Sets the description for this node.
+   * @function wcNode#description
+   * @param {String} [description] - If supplied, will assign a new description for this node.
+   * @returns {String} - The current description of this node.
+   */
+  description: function(description) {
+    if (description !== undefined) {
+      this._meta.description = description;
+    }
+
+    return this._meta.description;
+  },
+
+  /**
    * If your node takes time to process, call this to begin a thread that will keep the node 'active' until you close the thread with {@link wcNode#finishThread}.<br>
    * This ensures that, even if a node is executed more than once at the same time, each 'thread' is kept track of individually.<br>
    * <b>Note:</b> This is not necessary if your node executes immediately without a timeout.
@@ -241,10 +254,11 @@ Class.extend('wcNode', 'Node', '', {
   /**
    * Creates a new entry link on the node.
    * @function wcNode#createEntry
-   * @param {String} [name="In"] - The name of the entry link.
+   * @param {String} name - The name of the entry link.
+   * @param {String} [description] - An optional description to display as a tooltip for this link.
    * @returns {Boolean} - Fails if the entry link name already exists.
    */
-  createEntry: function(name) {
+  createEntry: function(name, description) {
     for (var i = 0; i < this.chain.entry.length; ++i) {
       if (this.chain.entry[i].name === name) {
         return false;
@@ -259,6 +273,7 @@ Class.extend('wcNode', 'Node', '', {
         flash: false,
         flashDelta: 0,
         color: "#000000",
+        description: description,
       },
     });
     return true;
@@ -268,9 +283,10 @@ Class.extend('wcNode', 'Node', '', {
    * Creates a new exit link on the node.
    * @function wcNode#createExit
    * @param {String} name - The name of the exit link.
+   * @param {String} [description] - An optional description to display as a tooltip for this link.
    * @returns {Boolean} - Fails if the exit link name already exists.
    */
-  createExit: function(name) {
+  createExit: function(name, description) {
     for (var i = 0; i < this.chain.exit.length; ++i) {
       if (this.chain.exit[i].name === name) {
         return false;
@@ -284,6 +300,7 @@ Class.extend('wcNode', 'Node', '', {
         flash: false,
         flashDelta: 0,
         color: "#000000",
+        description: description,
       },
     });
     return true;
@@ -296,7 +313,7 @@ Class.extend('wcNode', 'Node', '', {
    * @param {wcPlay.PROPERTY_TYPE} type - The type of property.
    * @param {Object} [initialValue] - A initial value for this property when the script starts.
    * @param {Object} [options] - Additional options for this property, see {@link wcPlay.PROPERTY_TYPE}.
-   * @returns {Boolean} - Failes if the property does not exist.
+   * @returns {Boolean} - Fails if the property does not exist.
    */
   createProperty: function(name, type, initialValue, options) {
     // Make sure this property doesn't already exist.
@@ -377,7 +394,8 @@ Class.extend('wcNode', 'Node', '', {
   removeProperty: function(name) {
     for (var i = 0; i < this.properties.length; ++i) {
       if (this.properties[i].name === name) {
-        if (this.disconnectInput(name) === this.disconnectOutput(name) === wcNode.CONNECT_RESULT.SUCCESS) {
+        if (this.disconnectInput(name) === wcNode.CONNECT_RESULT.SUCCESS &&
+            this.disconnectOutput(name) === wcNode.CONNECT_RESULT.SUCCESS) {
           this.properties.splice(i, 1);
           return true;
         }
@@ -985,6 +1003,53 @@ Class.extend('wcNode', 'Node', '', {
           // Retrieve the current value of the property
           var oldValue = prop.value;
 
+          // Apply restrictions to the property based on its type and options supplied.
+          switch (prop.type) {
+            case wcPlay.PROPERTY_TYPE.TOGGLE:
+              value = value? true: false;
+              break;
+            case wcPlay.PROPERTY_TYPE.NUMBER:
+              var min = (prop.options.min !== undefined? prop.options.min: -Infinity);
+              var max = (prop.options.max !== undefined? prop.options.max:  Infinity);
+              var num = Math.min(max, Math.max(min, parseInt(value)));
+              if (isNaN(num)) {
+                value = Math.min(max, Math.max(min, 0));
+              }
+              break;
+            case wcPlay.PROPERTY_TYPE.STRING:
+              var len = prop.options.maxlength;
+              if (len) {
+                value = value.toString().substring(0, len);
+              }
+              break;
+            case wcPlay.PROPERTY_TYPE.SELECT:
+              var items = prop.options.items;
+              if (typeof items === 'function') {
+                items = items.call(this);
+              }
+              var found = false;
+              if ($.isArray(items)) {
+                for (var i = 0; i < items.length; ++i) {
+                  if (typeof items[i] === 'object') {
+                    if (items[i].value == value) {
+                      found = true;
+                      break;
+                    }
+                  } else {
+                    if (items[i] == value) {
+                      found = true;
+                      break;
+                    }
+                  }
+                }
+              }
+
+              if (!found) {
+                value = '';
+              }
+              break;
+          }
+
           var engine = this.engine();
           prop.outputMeta.flash = true;
           if (this.debugBreak() || (engine && engine.stepping())) {
@@ -1094,6 +1159,7 @@ Class.extend('wcNode', 'Node', '', {
    * @see wcNode#viewportSize
    */
   onViewportDraw: function(context) {
+    // this._super(context);
   },
 
   /**
@@ -1104,6 +1170,7 @@ Class.extend('wcNode', 'Node', '', {
    * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
    */
   onViewportMouseEnter: function(event, pos) {
+    // this._super(event, pos);
     if (this.debugLog()) {
       console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" mouse entered custom viewport!');
     }
@@ -1116,6 +1183,7 @@ Class.extend('wcNode', 'Node', '', {
    * @param {Object} event - The original jquery mouse event.
    */
   onViewportMouseLeave: function(event) {
+    // this._super(event);
     if (this.debugLog()) {
       console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" mouse left custom viewport!');
     }
@@ -1130,6 +1198,7 @@ Class.extend('wcNode', 'Node', '', {
    * @returns {Boolean|undefined} - Return true if you want to disable node dragging during mouse down within your viewport.
    */
   onViewportMouseDown: function(event, pos) {
+    // this._super(event, pos);
   },
 
   /**
@@ -1140,6 +1209,30 @@ Class.extend('wcNode', 'Node', '', {
    * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
    */
   onViewportMouseUp: function(event, pos) {
+    // this._super(event, pos);
+  },
+
+  /**
+   * Event that is called when the mouse has moved over your viewport area.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode~onViewportMouseMove
+   * @param {Object} event - The original jquery mouse event.
+   * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   */
+  onViewportMouseMove: function(event, pos) {
+    // this._super(event, pos);
+  },
+
+  /**
+   * Event that is called when the mouse wheel is used over your viewport area.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode~onViewportMouseWheel
+   * @param {Object} event - The original jquery mouse event.
+   * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   * @param {Number} scrollDelta - The scroll amount and direction.
+   */
+  onViewportMouseWheel: function(event, pos, scrollDelta) {
+    // this._super(event, pos, scrollDelta);
   },
 
   /**
@@ -1150,6 +1243,7 @@ Class.extend('wcNode', 'Node', '', {
    * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
    */
   onViewportMouseClick: function(event, pos) {
+    // this._super(event, pos);
   },
 
   /**
@@ -1161,16 +1255,7 @@ Class.extend('wcNode', 'Node', '', {
    * @returns {Boolean|undefined} - Return true if you want to disable node auto-collapse when double clicking.
    */
   onViewportMouseDoubleClick: function(event, pos) {
-  },
-
-  /**
-   * Event that is called when the mouse has moved over your viewport area.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNode~onViewportMouseMove
-   * @param {Object} event - The original jquery mouse event.
-   * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
-   */
-  onViewportMouseMove: function(event, pos) {
+    // this._super(event, pos);
   },
 
   /**
@@ -1185,6 +1270,7 @@ Class.extend('wcNode', 'Node', '', {
    * @param {wcNode.LINK_TYPE} targetType - The target link's type.
    */
   onConnect: function(isConnecting, name, type, targetNode, targetName, targetType) {
+    // this._super(isConnecting, name, type, targetNode, targetName, targetType);
     // If we are connecting one of our property outputs to another property, alert them and send your value to them.
     if (isConnecting && type === wcNode.LINK_TYPE.OUTPUT) {
       targetNode.triggerProperty(targetName, this.property(name));
@@ -1197,6 +1283,7 @@ Class.extend('wcNode', 'Node', '', {
    * @function wcNode#onStart
    */
   onStart: function() {
+    // this._super();
     if (this.debugLog()) {
       console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" started!');
     }
@@ -1209,6 +1296,7 @@ Class.extend('wcNode', 'Node', '', {
    * @param {String} name - The name of the entry link triggered.
    */
   onTriggered: function(name) {
+    // this._super(name);
     if (this.debugLog()) {
       console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Triggered Entry link "' + name + '"');
     }
@@ -1224,6 +1312,7 @@ Class.extend('wcNode', 'Node', '', {
    * @returns {Object} - Return the new value of the property (usually newValue unless you are proposing restrictions). If no value is returned, newValue is assumed.
    */
   onPropertyChanging: function(name, oldValue, newValue) {
+    // this._super(name, oldValue, newValue);
     // if (this.debugLog()) {
     //   console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Changing Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
     // }
@@ -1238,6 +1327,7 @@ Class.extend('wcNode', 'Node', '', {
    * @param {Object} newValue - The new value of the property.
    */
   onPropertyChanged: function(name, oldValue, newValue) {
+    // this._super(name, oldValue, newValue);
     if (this.debugLog()) {
       console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Changed Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
     }
@@ -1250,6 +1340,7 @@ Class.extend('wcNode', 'Node', '', {
    * @param {String} name - The name of the property.
    */
   onPropertyGet: function(name) {
+    // this._super(name);
     // if (this.debugLog()) {
     //   console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Requested Property "' + name + '"');
     // }
@@ -1262,6 +1353,7 @@ Class.extend('wcNode', 'Node', '', {
    * @param {String} name - The name of the property.
    */
   onPropertyGot: function(name) {
+    // this._super(name);
     if (this.debugLog()) {
       console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Got Property "' + name + '"');
     }
@@ -1271,23 +1363,33 @@ Class.extend('wcNode', 'Node', '', {
    * Event that is called when a global property value has changed.
    * Overload this in inherited nodes.<br>
    * <b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.
-   * @function wcNode#onSharedPropertyChanged
+   * @function wcNode#onGlobalPropertyChanged
    * @param {String} name - The name of the global property.
    * @param {Object} oldValue - The old value of the global property.
    * @param {Object} newValue - The new value of the global property.
    */
-  // onSharedPropertyChanged: function(name, oldValue, newValue) {
+  // onGlobalPropertyChanged: function(name, oldValue, newValue) {
+  // },
+
+  /**
+   * Event that is called when a global property has been removed.
+   * Overload this in inherited nodes.<br>
+   * <b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.
+   * @function wcNode#onGlobalPropertyRemoved
+   * @param {String} name - The name of the global property.
+   */
+  // onGlobalPropertyRemoved: function(name) {
   // },
 
   /**
    * Event that is called when a global property has been renamed.
    * Overload this in inherited nodes.<br>
    * <b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.
-   * @function wcNode#onSharedPropertyRenamed
+   * @function wcNode#onGlobalPropertyRenamed
    * @param {String} oldName - The old name of the global property.
    * @param {String} newName - The new name of the global property.
    */
-  // onSharedPropertyRenamed: function(oldName, newName) {
+  // onGlobalPropertyRenamed: function(oldName, newName) {
   // },
 });
 

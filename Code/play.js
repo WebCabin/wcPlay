@@ -39,9 +39,9 @@ function wcPlay(options) {
  * @enum {String}
  */
 wcPlay.PROPERTY_TYPE = {
-  /** Displays the property based on the type of data it holds. Options depend on the property type it holds, you can include properties from all the types together as they do not share option values. */
+  /** Displays the property as a string, but does not enforce or convert its type. [Default options]{@link wcNode~PropertyOptions} are used. */
   DYNAMIC: 'dynamic',
-  /** Displays the property as a checkbox. No options are used. */
+  /** Displays the property as a checkbox. [Default options]{@link wcNode~PropertyOptions} are used. */
   TOGGLE: 'toggle',
   /** Displays the property as a number control. [Number options]{@link wcNode~NumberOptions} are used. */
   NUMBER: 'number',
@@ -56,10 +56,14 @@ wcPlay.PROPERTY_TYPE = {
  * @enum {String}
  */
 wcPlay.NODE_TYPE = {
+  /** Entry nodes mark the beginning of an execution flow chain and are usually triggered by some type of event that happens outside of the script. */
   ENTRY: 'entry',
+  /** Process nodes perform a process, often very simple, and make up the bulk of a flow chain within the script. */
   PROCESS: 'process',
-  COMPOSITE: 'composite',
+  /** Storage nodes are designed with a single purpose of storing data for use within the script. */
   STORAGE: 'storage',
+  /** Composite nodes are a group of nodes combined into a single visible node. They appear in the composite section of the node palette for easy duplication within your script. */
+  COMPOSITE: 'composite',
 };
 
 /**
@@ -282,12 +286,12 @@ wcPlay.prototype = {
   },
 
   /**
-   * Creates a new global property.
+   * Creates a new global property (can be used with the global storage node).
    * @param {String} name - The name of the property.
    * @param {wcPlay.PROPERTY_TYPE} type - The type of property.
    * @param {Object} [initialValue] - A default value for this property.
    * @param {Object} [options] - Additional options for this property, see {@link wcPlay.PROPERTY_TYPE}.
-   * @returns {Boolean} - Failes if the property does not exist.
+   * @returns {Boolean} - Fails if the property does not exist.
    */
   createProperty: function(name, type, initialValue, options) {
     // Make sure this property doesn't already exist.
@@ -297,9 +301,8 @@ wcPlay.prototype = {
       }
     }
 
-    // Make sure the type is valid.
-    if (!wcPlay.PROPERTY_TYPE.hasOwnProperty(type)) {
-      type = wcPlay.PROPERTY_TYPE.STRING;
+    if (initialValue === undefined) {
+      initialValue = 0;
     }
 
     this._properties.push({
@@ -336,7 +339,23 @@ wcPlay.prototype = {
     }
 
     prop.name = newName;
-    this.__notifyNodes('onSharedPropertyRenamed', [name, newName]);
+    this.__notifyNodes('onGlobalPropertyRenamed', [name, newName]);
+  },
+
+  /**
+   * Removes a global property.
+   * @param {String} name - The name of the property to remove.
+   * @returns {Boolean} - Fails if the property does not exist.
+   */
+  removeProperty: function(name) {
+    for (var i = 0; i < this._properties.length; ++i) {
+      if (this._properties[i].name === name) {
+        this.__notifyNodes('onGlobalPropertyRemoved', [name]);
+        this._properties.splice(i, 1);
+        return true;
+      }
+    }
+    return false;
   },
 
   /**
@@ -362,7 +381,7 @@ wcPlay.prototype = {
     if (value !== undefined && value !== prop.value) {
       var oldValue = prop.value;
       prop.value = value;
-      this.__notifyNodes('onSharedPropertyChanged', [prop.name, oldValue, prop.value]);
+      this.__notifyNodes('onGlobalPropertyChanged', [prop.name, oldValue, prop.value]);
     }
   },
 
@@ -392,7 +411,7 @@ wcPlay.prototype = {
 
       if (prop.value == oldValue) {
         prop.value = value;
-        this.__notifyNodes('onSharedPropertyChanged', [prop.name, oldValue, prop.value]);
+        this.__notifyNodes('onGlobalPropertyChanged', [prop.name, oldValue, prop.value]);
       }
     }
   },

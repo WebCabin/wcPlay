@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>wcPlay Source: play.jsdoc</title>
+	<title>wcPlay Source: nodes/storage/global.js</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -46,26 +46,48 @@
 		<div id="main">
     		
 
-		<h1 class="page-title">Source: play.jsdoc</h1>
+		<h1 class="page-title">Source: nodes/storage/global.js</h1>
     
 <section>
 	<article>
 		<pre
-			class="sunlight-highlight-javascript linenums">/**
- * Custom options available when constructing a new {@link wcPlay} instance.
- * @typedef {Object} wcPlay~Options
- * @property {Boolean} [silent=false] - If true, will disable debug logging on all nodes.
- * @property {Number} [updateRate=25] - The time, in milliseconds, between node updates.
- * @property {Number} [updateLimit=100] - The maximum number of nodes allowed to be updated in a single update. This minimizes the potential for script lock.
- * @property {Boolean} [debugging=true] - If true, debug break toggles on individual nodes will trigger the script to pause. Turn this off during production.
- */
+			class="sunlight-highlight-javascript linenums">wcNodeStorage.extend('wcNodeStorageGlobal', 'Global Property', 'Core', {
+  /**
+   * @class
+   * References a global property on the script.
+   * When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.
+   *
+   * @constructor wcNodeStorageGlobal
+   * @param {String} parent - The parent object of this node.
+   * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
+   */
+  init: function(parent, pos) {
+    this._super(parent, pos);
 
-/**
- * A 2D positional coordinate.
- * @typedef {Object} wcPlay~Coordinates
- * @property {Number} x - The horizontal coordinate.
- * @property {Number} y - The vertical coordinate.
- */
+    this.description("References a global property on the script.");
+
+    this.createProperty('property', wcPlay.PROPERTY_TYPE.SELECT, '', {items: this.propertyList, description: "The global script property to reference."});
+    this.createProperty('value', wcPlay.PROPERTY_TYPE.STRING, '', {description: "The current value of the global property chosen above."});
+  },
+
+  /**
+   * Callback to retrieve a list of properties to display in the combo box.
+   * @function wcNodeStorageGlobal#propertyList
+   * @returns {String[]} - A list of property names.
+   */
+  propertyList: function() {
+    var result = [];
+    var engine = this.engine();
+    if (engine) {
+      var props = engine.listProperties();
+      for (var i = 0; i &lt; props.length; ++i) {
+        result.push(props[i].name);
+      }
+    }
+
+    return result;
+  },
+});
 </pre>
 	</article>
 </section>
