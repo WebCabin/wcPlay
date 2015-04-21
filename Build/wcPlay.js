@@ -1895,7 +1895,7 @@ wcPlayEditor.prototype = {
       var left = rect.left + rect.width/2;
       var top = rect.top + (rect.height)/2;
       var gradient = context.createRadialGradient(left, top, 10, left, top, Math.max(rect.width, rect.height));
-      gradient.addColorStop(0, node._meta.color);
+      gradient.addColorStop(0, (node.enabled()? node._meta.color: '#555'));
       gradient.addColorStop(1, "white");
       context.fillStyle = context.strokeStyle = gradient;
       context.lineJoin = "round";
@@ -5413,6 +5413,9 @@ Class.extend('wcNode', 'Node', '', {
    * @returns {Boolean} - Fails if the exit link does not exist.
    */
   triggerExit: function(name) {
+    if (!this.enabled()) {
+      return false;
+    }
     if (this.debugLog()) {
       console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Triggered Exit link "' + name + '"');
     }

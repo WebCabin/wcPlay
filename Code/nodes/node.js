@@ -961,6 +961,9 @@ Class.extend('wcNode', 'Node', '', {
    * @returns {Boolean} - Fails if the exit link does not exist.
    */
   triggerExit: function(name) {
+    if (!this.enabled()) {
+      return false;
+    }
     if (this.debugLog()) {
       console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Triggered Exit link "' + name + '"');
     }
