@@ -13,6 +13,10 @@ wcNodeProcess.extend('wcNodeProcessTutorialViewport', 'Example Viewport', 'Tutor
 
     this.description("This node demonstrates an example of using the node's viewport for displaying graphics directly on your node. It can also receive mouse events for interactivity.");
 
+    // Get rid of the flow links, as they do not function.
+    this.removeEntry('in');
+    this.removeExit('out');
+
     this.viewportSize(100, 100);
     this.hoverPos = null;
     this.mousePressed = false;

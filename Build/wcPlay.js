@@ -1009,6 +1009,16 @@ wcPlayEditor.prototype = {
     context.strokeRect(rect.left, rect.top, rect.width, rect.height);
   },
 
+  /**
+   * Draws a rounded rectangle.
+   * @function wcPlayEditor#__drawRoundedRect
+   * @private
+   * @param {wcPlayEditor~Rect} rect - The rectangle bounds to draw.
+   * @param {String} color - The color of the line.
+   * @param {Number} lineWidth - The thickness of the line.
+   * @param {Number} radius - The radius of the rounded corners.
+   * @param {external:Canvas~Context} context - The canvas context to render on.
+   */
   __drawRoundedRect: function(rect, color, lineWidth, radius, context) {
     context.save();
     context.strokeStyle = color;
@@ -1050,7 +1060,8 @@ wcPlayEditor.prototype = {
     $('.wcPlayEditorMenuOptionSilence').children(':first-child, span:first-child').toggleClass('fa-volume-off', this._engine.silent()).toggleClass('fa-volume-up', !this._engine.silent());
     $('.wcPlayEditorMenuOptionPausePlay').children('i:first-child, span:first-child').toggleClass('fa-play', this._engine.paused()).toggleClass('fa-pause', !this._engine.paused());
     $('.wcPlayEditorMenuOptionDelete').toggleClass('disabled', this._selectedNodes.length === 0);
-    $('.wcPlayEditorMenuOptionComposite').toggleClass('disabled', this._selectedNodes.length === 0);
+    // $('.wcPlayEditorMenuOptionComposite').toggleClass('disabled', this._selectedNodes.length === 0);
+    $('.wcPlayEditorMenuOptionComposite').toggleClass('disabled', true);
 
 
     this.onResized();
@@ -1087,8 +1098,9 @@ wcPlayEditor.prototype = {
       this.__drawChains(this._engine._storageNodes, this._viewportContext);
 
       if (this._highlightRect) {
-        this._viewportContext.strokeStyle = 'cyan';
-        this._viewportContext.strokeRect(this._highlightRect.left, this._highlightRect.top, this._highlightRect.width, this._highlightRect.height);
+        var radius = Math.min(10, this._highlightRect.width/2, this._highlightRect.height/2);
+        this.__drawRoundedRect(this._highlightRect, "darkcyan", 5, radius, this._viewportContext);
+        this.__drawRoundedRect(this._highlightRect, "cyan", 2, radius, this._viewportContext);
       }
       this._viewportContext.restore();
     }
@@ -1203,7 +1215,7 @@ wcPlayEditor.prototype = {
             <li><span class="wcPlayEditorMenuOptionPaste wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-paste fa-lg"/>Paste<span>Ctrl+P</span></span></li>\
             <li><span class="wcPlayEditorMenuOptionDelete wcPlayMenuItem"><i class="wcPlayEditorMenuIcon wcButton fa fa-trash-o fa-lg"/>Delete<span>Del</span></span></li>\
             <li><hr class="wcPlayMenuSeparator"></li>\
-            <li><span class="wcPlayEditorMenuOptionComposite wcPlayMenuItem" title="Archive all selected nodes into a single \'Composite\' Node."><i class="wcPlayEditorMenuIcon wcButton fa fa-archive fa-lg"/>Create Composite<span></span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionComposite wcPlayMenuItem" title="Combine all selected nodes into a new \'Composite\' Node."><i class="wcPlayEditorMenuIcon wcButton fa fa-share-alt-square fa-lg"/>Create Composite<span></span></span></li>\
           </ul>\
         </li>\
         <li><span>Debugging</span>\
@@ -1239,7 +1251,7 @@ wcPlayEditor.prototype = {
         <div class="wcPlayEditorMenuOptionPaste disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-paste fa-lg" title="Paste"/></div>\
         <div class="wcPlayEditorMenuOptionDelete"><span class="wcPlayEditorMenuIcon wcButton fa fa-trash-o fa-lg" title="Delete"/></div>\
         <div class="ARPG_Separator"></div>\
-        <div class="wcPlayEditorMenuOptionComposite"><span class="wcPlayEditorMenuIcon wcButton fa fa-archive fa-lg" title="Archive all selected nodes into a single \'Composite\' Node."/></div>\
+        <div class="wcPlayEditorMenuOptionComposite"><span class="wcPlayEditorMenuIcon wcButton fa fa-share-alt-square fa-lg" title="Combine all selected nodes into a new \'Composite\' Node."/></div>\
         <div class="ARPG_Separator"></div>\
         <div class="wcPlayEditorMenuOptionDebugging"><span class="wcPlayEditorMenuIcon wcButton fa fa-dot-circle-o fa-lg" title="Toggle debugging mode for the entire script."/></div>\
         <div class="wcPlayEditorMenuOptionSilence"><span class="wcPlayEditorMenuIcon wcButton fa fa-volume-up fa-lg" title="Toggle silent mode for the entire script (Nodes with debug log enabled will not log when this is active)."/></div>\
@@ -1593,6 +1605,7 @@ wcPlayEditor.prototype = {
 
     // Show an additional bounding rect around selected nodes.
     if (this._selectedNodes.indexOf(node) > -1) {
+      this.__drawRoundedRect(data.rect, "darkcyan", 5, 10, context);
       this.__drawRoundedRect(data.rect, "cyan", 2, 10, context);
     }
 
@@ -6044,6 +6057,38 @@ wcNode.extend('wcNodeStorage', 'Storage', '', {
   },
 });
 
+wcNode.extend('wcNodeComposite', 'Composite', '', {
+  /**
+   * @class
+   * The base class for all composite nodes. These are nodes that contain additional nodes inside.<br>
+   *
+   * @constructor wcNodeComposite
+   * @param {String} parent - The parent object of this node.
+   * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
+   */
+  init: function(parent, pos) {
+    this._super(parent, pos);
+    this.color = '#009999';
+  },
+
+  /**
+   * Magic function that is called whenever any new class type is extended from this one.<br>
+   * Handles initializing of the class as well as registering the new node type.
+   * @function wcNodeComposite#classInit
+   * @param {String} className - The name of the class constructor.
+   * @param {String} type - The type name for the node.
+   * @param {String} category - A category where this node will be grouped.
+   */
+  classInit: function(className, type, category) {
+    if (category) {
+      this.className = className;
+      this.type = type;
+      this.category = category;
+      wcPlay.registerNodeType(className, type, category, wcPlay.NODE_TYPE.COMPOSITE);
+    }
+  },
+});
+
 wcNodeEntry.extend('wcNodeEntryStart', 'Start', 'Core', {
   /**
    * @class
@@ -6250,6 +6295,44 @@ wcNodeProcess.extend('wcNodeProcessOperation', 'Operation', 'Core', {
   },
 });
 
+wcNodeStorage.extend('wcNodeStorageGlobal', 'Global Property', 'Core', {
+  /**
+   * @class
+   * References a global property on the script.
+   * When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.
+   *
+   * @constructor wcNodeStorageGlobal
+   * @param {String} parent - The parent object of this node.
+   * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
+   */
+  init: function(parent, pos) {
+    this._super(parent, pos);
+
+    this.description("References a global property on the script.");
+
+    this.createProperty('property', wcPlay.PROPERTY_TYPE.SELECT, '', {items: this.propertyList, description: "The global script property to reference."});
+    this.createProperty('value', wcPlay.PROPERTY_TYPE.STRING, '', {description: "The current value of the global property chosen above."});
+  },
+
+  /**
+   * Callback to retrieve a list of properties to display in the combo box.
+   * @function wcNodeStorageGlobal#propertyList
+   * @returns {String[]} - A list of property names.
+   */
+  propertyList: function() {
+    var result = [];
+    var engine = this.engine();
+    if (engine) {
+      var props = engine.listProperties();
+      for (var i = 0; i < props.length; ++i) {
+        result.push(props[i].name);
+      }
+    }
+
+    return result;
+  },
+});
+
 wcNodeStorage.extend('wcNodeStorageToggle', 'Toggle', 'Core', {
   /**
    * @class
@@ -6304,5 +6387,291 @@ wcNodeStorage.extend('wcNodeStorageString', 'String', 'Core', {
     this.description("Stores a string value.");
 
     this.createProperty('value', wcPlay.PROPERTY_TYPE.STRING, '', {multiline: true});
+  },
+});
+
+wcNodeProcess.extend('wcNodeProcessTutorialViewport', 'Example Viewport', 'Tutorial', {
+  /**
+   * @class
+   * This node demonstrates an example of using the node's viewport for displaying graphics directly on your node. It can also receive mouse events for interactivity.
+   * When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.
+   *
+   * @constructor wcNodeProcessTutorialViewport
+   * @param {String} parent - The parent object of this node.
+   * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
+   */
+  init: function(parent, pos) {
+    this._super(parent, pos);
+
+    this.description("This node demonstrates an example of using the node's viewport for displaying graphics directly on your node. It can also receive mouse events for interactivity.");
+
+    // Get rid of the flow links, as they do not function.
+    this.removeEntry('in');
+    this.removeExit('out');
+
+    this.viewportSize(100, 100);
+    this.hoverPos = null;
+    this.mousePressed = false;
+    this.mouseClicked = false;
+    this.mouseDoubleClicked = false;
+
+    this.createProperty('lock viewport', wcPlay.PROPERTY_TYPE.TOGGLE, true, {description: "If true, dragging in the viewport will not move the node."});
+  },
+
+  /**
+   * Event that is called when it is time to draw the contents of your custom viewport. It is up to you to stay within the [wcNode.viewportSize]{@link wcNode~viewportSize} you've specified.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeProcessTutorialViewport#onViewportDraw
+   * @param {external:Canvas~Context} context - The canvas context to draw on, coordinates 0,0 will be the top left corner of your viewport. It is up to you to stay within the [viewport bounds]{@link wcNode#viewportSize} you have assigned.
+   * @see wcNode#viewportSize
+   */
+  onViewportDraw: function(context) {
+    this._super(context);
+
+    if (this.mouseClicked) {
+      context.fillStyle = "green";
+      context.fillRect(0, 0, 100, 50);
+    }
+    if (this.mouseDoubleClicked) {
+      context.fillStyle = "darkgreen";
+      context.fillRect(0, 50, 100, 50);
+    }
+
+    context.strokeStyle = "red";
+    context.strokeRect(0, 0, 100, 100);
+    context.beginPath();
+    context.moveTo(0,0);
+    context.lineTo(100, 100);
+    context.stroke();
+    context.beginPath();
+    context.moveTo(100,0);
+    context.lineTo(0, 100);
+    context.stroke();
+
+    if (this.hoverPos) {
+      context.fillStyle = this.mousePressed? "red": "blue";
+      context.fillRect(this.hoverPos.x - 5, this.hoverPos.y - 5, 10, 10);
+    }
+  },
+
+  /**
+   * Event that is called when the mouse has entered the viewport area.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeProcessTutorialViewport~onViewportMouseEnter
+   * @param {Object} event - The original jquery mouse event.
+   * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   */
+  onViewportMouseEnter: function(event, pos) {
+    this._super(event, pos);
+    this.hoverPos = pos;
+  },
+
+  /**
+   * Event that is called when the mouse has left the viewport area.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeProcessTutorialViewport~onViewportMouseLeave
+   * @param {Object} event - The original jquery mouse event.
+   */
+  onViewportMouseLeave: function(event) {
+    this._super(event);
+    this.hoverPos = null;
+    this.mousePressed = false;
+  },
+
+  /**
+   * Event that is called when the mouse button is pressed over your viewport area.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeProcessTutorialViewport~onViewportMouseDown
+   * @param {Object} event - The original jquery mouse event.
+   * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   * @returns {Boolean|undefined} - Return true if you want to disable node dragging during mouse down within your viewport.
+   */
+  onViewportMouseDown: function(event, pos) {
+    this._super(event, pos);
+    this.mousePressed = true;
+    return this.property('lock viewport');
+  },
+
+  /**
+   * Event that is called when the mouse button is released over your viewport area.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeProcessTutorialViewport~onViewportMouseUp
+   * @param {Object} event - The original jquery mouse event.
+   * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   */
+  onViewportMouseUp: function(event, pos) {
+    this._super(event, pos);
+    this.mousePressed = false;
+  },
+
+  /**
+   * Event that is called when the mouse has moved over your viewport area.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeProcessTutorialViewport~onViewportMouseMove
+   * @param {Object} event - The original jquery mouse event.
+   * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   */
+  onViewportMouseMove: function(event, pos) {
+    this._super(event, pos);
+    this.hoverPos = pos;
+  },
+
+  /**
+   * Event that is called when the mouse wheel is used over your viewport area.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeProcessTutorialViewport~onViewportMouseWheel
+   * @param {Object} event - The original jquery mouse event.
+   * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   * @param {Number} scroll - The scroll amount and direction.
+   */
+  onViewportMouseWheel: function(event, pos, scroll) {
+    this._super(event, pos, scroll);
+    return this.property('lock viewport');
+  },
+
+  /**
+   * Event that is called when the mouse button is pressed and released in the same spot over your viewport area.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeProcessTutorialViewport~onViewportMouseClick
+   * @param {Object} event - The original jquery mouse event.
+   * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   */
+  onViewportMouseClick: function(event, pos) {
+    this._super(event, pos);
+    this.mouseClicked = !this.mouseClicked;
+  },
+
+  /**
+   * Event that is called when the mouse button is double clicked in the same spot over your viewport area.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeProcessTutorialViewport~onViewportMouseClick
+   * @param {Object} event - The original jquery mouse event.
+   * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   * @returns {Boolean|undefined} - Return true if you want to disable node auto-collapse when double clicking.
+   */
+  onViewportMouseDoubleClick: function(event, pos) {
+    this._super(event, pos);
+    this.mouseDoubleClicked = !this.mouseDoubleClicked;
+    return true;
+  },
+});
+
+wcNodeProcess.extend('wcNodeProcessTutorialProperties', 'Example Properties', 'Tutorial', {
+  /**
+   * @class
+   * This node demonstrates an example of the different property types and how their values can be limited.
+   * When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.
+   *
+   * @constructor wcNodeProcessTutorialProperties
+   * @param {String} parent - The parent object of this node.
+   * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
+   */
+  init: function(parent, pos) {
+    this._super(parent, pos);
+
+    this.description("This node demonstrates an example of the different property types and how their values can be limited.");
+
+    // Get rid of the flow links, as they do not function.
+    this.removeEntry('in');
+    this.removeExit('out');
+
+    this.createProperty('toggle', wcPlay.PROPERTY_TYPE.TOGGLE, true, {description: "Demonstration of the toggle property type."});
+    this.createProperty('number', wcPlay.PROPERTY_TYPE.NUMBER, 3, {description: "Demonstration of the number property type with a clamped range of 1-5.", min: 1, max: 5});
+    this.createProperty('string', wcPlay.PROPERTY_TYPE.STRING, 'Text', {description: "Demonstration of the string property with a max character length of 10.", maxlength: 10});
+    this.createProperty('select', wcPlay.PROPERTY_TYPE.SELECT, 3, {description: "Demonstration of the select property with a dynamic number of options based on the 'number' property.", items: this.selectItems});
+  },
+
+  /**
+   * This function is used in the 'select' property to list a dynamic number of items that appear in edit combo box.
+   * @function wcNodeProcessTutorialProperties#selectItems
+   * @returns {wcNode~SelectItem[]} - A list of items to populate in the combo box.
+   */
+  selectItems: function() {
+    var result = [];
+
+    var count = parseInt(this.property('number'));
+    for (var i = 0; i < count; ++i) {
+      result.push({
+        name: 'Option ' + (i+1),
+        value: i+1,
+      });
+    }
+
+    return result;
+  },
+});
+
+wcNodeProcess.extend('wcNodeProcessTutorialDynamic', 'Example Dynamic', 'Tutorial', {
+  /**
+   * @class
+   * This node demonstrates an example of a number of possible dynamic behaviors.
+   * When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.
+   *
+   * @constructor wcNodeProcessTutorialDynamic
+   * @param {String} parent - The parent object of this node.
+   * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
+   */
+  init: function(parent, pos) {
+    this._super(parent, pos);
+
+    this.description("This node demonstrates an example of using different flow links to determine how this node behaves.");
+
+    // Remove the default 'in' entry link.
+    this.removeEntry('in');
+
+    this.createEntry('change color', "Change the color of this node!");
+
+    this._propCount = 0;
+    this.createProperty('count', wcPlay.PROPERTY_TYPE.NUMBER, 0, {min: 0, max: 10, description: "Dynamically create a property for each count."});
+  },
+
+  /**
+   * Event that is called when an entry link has been triggered.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeProcessTutorialDynamic#onTriggered
+   * @param {String} name - The name of the entry link triggered.
+   */
+  onTriggered: function(name) {
+    this._super(name);
+
+    switch (name) {
+      case 'change color':
+        if (this.color == '#007ACC') {
+          this.color = '#00CC7A';
+        } else {
+          this.color = '#007ACC';
+        }
+        break;
+    }
+
+    this.triggerExit('out');
+  },
+
+  /**
+   * Event that is called when a property has changed.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeProcessTutorialDynamic#onPropertyChanged
+   * @param {String} name - The name of the property.
+   * @param {Object} oldValue - The old value of the property.
+   * @param {Object} newValue - The new value of the property.
+   */
+  onPropertyChanged: function(name, oldValue, newValue) {
+    this._super(name, oldValue, newValue);
+
+    if (name === 'count') {
+      var count = parseInt(newValue);
+
+      if (count < this._propCount) {
+        while (this._propCount > count) {
+          this.removeProperty('Prop ' + this._propCount);
+          this._propCount--;
+        }
+      } else if (count > this._propCount) {
+        while (this._propCount < count) {
+          this._propCount++;
+          this.createProperty('Prop ' + this._propCount, wcPlay.PROPERTY_TYPE.STRING, 'val ' + this._propCount, {description: "Dynamically created property!"});
+        }
+      }
+    }
   },
 });

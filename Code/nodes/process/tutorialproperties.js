@@ -13,6 +13,10 @@ wcNodeProcess.extend('wcNodeProcessTutorialProperties', 'Example Properties', 'T
 
     this.description("This node demonstrates an example of the different property types and how their values can be limited.");
 
+    // Get rid of the flow links, as they do not function.
+    this.removeEntry('in');
+    this.removeExit('out');
+
     this.createProperty('toggle', wcPlay.PROPERTY_TYPE.TOGGLE, true, {description: "Demonstration of the toggle property type."});
     this.createProperty('number', wcPlay.PROPERTY_TYPE.NUMBER, 3, {description: "Demonstration of the number property type with a clamped range of 1-5.", min: 1, max: 5});
     this.createProperty('string', wcPlay.PROPERTY_TYPE.STRING, 'Text', {description: "Demonstration of the string property with a max character length of 10.", maxlength: 10});

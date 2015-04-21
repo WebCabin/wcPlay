@@ -353,6 +353,16 @@ wcPlayEditor.prototype = {
     context.strokeRect(rect.left, rect.top, rect.width, rect.height);
   },
 
+  /**
+   * Draws a rounded rectangle.
+   * @function wcPlayEditor#__drawRoundedRect
+   * @private
+   * @param {wcPlayEditor~Rect} rect - The rectangle bounds to draw.
+   * @param {String} color - The color of the line.
+   * @param {Number} lineWidth - The thickness of the line.
+   * @param {Number} radius - The radius of the rounded corners.
+   * @param {external:Canvas~Context} context - The canvas context to render on.
+   */
   __drawRoundedRect: function(rect, color, lineWidth, radius, context) {
     context.save();
     context.strokeStyle = color;
@@ -394,7 +404,8 @@ wcPlayEditor.prototype = {
     $('.wcPlayEditorMenuOptionSilence').children(':first-child, span:first-child').toggleClass('fa-volume-off', this._engine.silent()).toggleClass('fa-volume-up', !this._engine.silent());
     $('.wcPlayEditorMenuOptionPausePlay').children('i:first-child, span:first-child').toggleClass('fa-play', this._engine.paused()).toggleClass('fa-pause', !this._engine.paused());
     $('.wcPlayEditorMenuOptionDelete').toggleClass('disabled', this._selectedNodes.length === 0);
-    $('.wcPlayEditorMenuOptionComposite').toggleClass('disabled', this._selectedNodes.length === 0);
+    // $('.wcPlayEditorMenuOptionComposite').toggleClass('disabled', this._selectedNodes.length === 0);
+    $('.wcPlayEditorMenuOptionComposite').toggleClass('disabled', true);
 
 
     this.onResized();
@@ -431,8 +442,9 @@ wcPlayEditor.prototype = {
       this.__drawChains(this._engine._storageNodes, this._viewportContext);
 
       if (this._highlightRect) {
-        this._viewportContext.strokeStyle = 'cyan';
-        this._viewportContext.strokeRect(this._highlightRect.left, this._highlightRect.top, this._highlightRect.width, this._highlightRect.height);
+        var radius = Math.min(10, this._highlightRect.width/2, this._highlightRect.height/2);
+        this.__drawRoundedRect(this._highlightRect, "darkcyan", 5, radius, this._viewportContext);
+        this.__drawRoundedRect(this._highlightRect, "cyan", 2, radius, this._viewportContext);
       }
       this._viewportContext.restore();
     }
@@ -547,7 +559,7 @@ wcPlayEditor.prototype = {
             <li><span class="wcPlayEditorMenuOptionPaste wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-paste fa-lg"/>Paste<span>Ctrl+P</span></span></li>\
             <li><span class="wcPlayEditorMenuOptionDelete wcPlayMenuItem"><i class="wcPlayEditorMenuIcon wcButton fa fa-trash-o fa-lg"/>Delete<span>Del</span></span></li>\
             <li><hr class="wcPlayMenuSeparator"></li>\
-            <li><span class="wcPlayEditorMenuOptionComposite wcPlayMenuItem" title="Archive all selected nodes into a single \'Composite\' Node."><i class="wcPlayEditorMenuIcon wcButton fa fa-archive fa-lg"/>Create Composite<span></span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionComposite wcPlayMenuItem" title="Combine all selected nodes into a new \'Composite\' Node."><i class="wcPlayEditorMenuIcon wcButton fa fa-share-alt-square fa-lg"/>Create Composite<span></span></span></li>\
           </ul>\
         </li>\
         <li><span>Debugging</span>\
@@ -583,7 +595,7 @@ wcPlayEditor.prototype = {
         <div class="wcPlayEditorMenuOptionPaste disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-paste fa-lg" title="Paste"/></div>\
         <div class="wcPlayEditorMenuOptionDelete"><span class="wcPlayEditorMenuIcon wcButton fa fa-trash-o fa-lg" title="Delete"/></div>\
         <div class="ARPG_Separator"></div>\
-        <div class="wcPlayEditorMenuOptionComposite"><span class="wcPlayEditorMenuIcon wcButton fa fa-archive fa-lg" title="Archive all selected nodes into a single \'Composite\' Node."/></div>\
+        <div class="wcPlayEditorMenuOptionComposite"><span class="wcPlayEditorMenuIcon wcButton fa fa-share-alt-square fa-lg" title="Combine all selected nodes into a new \'Composite\' Node."/></div>\
         <div class="ARPG_Separator"></div>\
         <div class="wcPlayEditorMenuOptionDebugging"><span class="wcPlayEditorMenuIcon wcButton fa fa-dot-circle-o fa-lg" title="Toggle debugging mode for the entire script."/></div>\
         <div class="wcPlayEditorMenuOptionSilence"><span class="wcPlayEditorMenuIcon wcButton fa fa-volume-up fa-lg" title="Toggle silent mode for the entire script (Nodes with debug log enabled will not log when this is active)."/></div>\
@@ -937,6 +949,7 @@ wcPlayEditor.prototype = {
 
     // Show an additional bounding rect around selected nodes.
     if (this._selectedNodes.indexOf(node) > -1) {
+      this.__drawRoundedRect(data.rect, "darkcyan", 5, 10, context);
       this.__drawRoundedRect(data.rect, "cyan", 2, 10, context);
     }
 

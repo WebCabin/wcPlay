@@ -24,6 +24,8 @@ $(document).ready(function() {
 
   // Tutorial nodes.
   var tutViewportNode = new wcNodeProcessTutorialViewport(myPlay, {x: 800, y: 200});
+  var tutPropertyNode = new wcNodeProcessTutorialProperties(myPlay, {x: 800, y: 400});
+  var tutDynamicNode = new wcNodeProcessTutorialDynamic(myPlay, {x: 800, y: 600});
 
   // Assign them all debug log enabled, so they will console log various events.
   // startNode.debugLog(true);
@@ -42,6 +44,7 @@ $(document).ready(function() {
   logNode.connectExit('out', delayNode, 'in');
   delayNode.connectExit('out', operationNode, 'add');
   operationNode.connectExit('out', logNode, 'in');
+  delayNode.connectExit('out', tutDynamicNode, 'change color');
 
   // Lets collapse all the nodes so they take up less space.
   startNode.collapsed(true);
