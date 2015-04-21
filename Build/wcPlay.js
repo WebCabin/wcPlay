@@ -1060,8 +1060,7 @@ wcPlayEditor.prototype = {
     $('.wcPlayEditorMenuOptionSilence').children(':first-child, span:first-child').toggleClass('fa-volume-off', this._engine.silent()).toggleClass('fa-volume-up', !this._engine.silent());
     $('.wcPlayEditorMenuOptionPausePlay').children('i:first-child, span:first-child').toggleClass('fa-play', this._engine.paused()).toggleClass('fa-pause', !this._engine.paused());
     $('.wcPlayEditorMenuOptionDelete').toggleClass('disabled', this._selectedNodes.length === 0);
-    // $('.wcPlayEditorMenuOptionComposite').toggleClass('disabled', this._selectedNodes.length === 0);
-    $('.wcPlayEditorMenuOptionComposite').toggleClass('disabled', true);
+    $('.wcPlayEditorMenuOptionComposite').toggleClass('disabled', this._selectedNodes.length === 0);
 
 
     this.onResized();
@@ -1480,6 +1479,7 @@ wcPlayEditor.prototype = {
     var bounds = this.__expandRect([entryBounds, centerBounds, exitBounds]);
     bounds.top = centerBounds.top;
     bounds.height = centerBounds.height;
+    bounds.initialWidth = centerBounds.initialWidth;
 
     // Now use our measurements to draw our node.
     var propBounds  = this.__drawCenter(node, context, bounds, hideCollapsible);
@@ -1716,6 +1716,9 @@ wcPlayEditor.prototype = {
     }
 
     // Measure properties.
+    var propWidth = 0;
+    var valueWidth = 0;
+    var initialWidth = 0;
     var collapsed = node.collapsed();
     var props = node.properties;
     for (var i = 0; i < props.length; ++i) {
@@ -1725,21 +1728,21 @@ wcPlayEditor.prototype = {
 
         // Property name.
         this.__setCanvasFont(this._font.property, context);
-        var w = context.measureText(props[i].name + ': ').width;
+        propWidth = Math.max(context.measureText(props[i].name + ': ').width, propWidth);
 
         // Property value.
         this.__setCanvasFont(this._font.value, context);
-        w += Math.max(context.measureText(this._drawStyle.property.valueWrapL + this.__drawPropertyValue(node, props[i]) + this._drawStyle.property.valueWrapR).width, this._drawStyle.property.minLength);
+        valueWidth = Math.max(context.measureText(this._drawStyle.property.valueWrapL + this.__drawPropertyValue(node, props[i]) + this._drawStyle.property.valueWrapR).width, this._drawStyle.property.minLength, valueWidth);
 
         // Property initial value.
         this.__setCanvasFont(this._font.initialValue, context);
-        w += Math.max(context.measureText(this._drawStyle.property.initialWrapL + this.__drawPropertyValue(node, props[i], true) + this._drawStyle.property.initialWrapR).width, this._drawStyle.property.minLength);
-        bounds.width = Math.max(w, bounds.width);
+        initialWidth = Math.max(context.measureText(this._drawStyle.property.initialWrapL + this.__drawPropertyValue(node, props[i], true) + this._drawStyle.property.initialWrapR).width, this._drawStyle.property.minLength, initialWidth);
       }
     }
 
-    bounds.left -= bounds.width/2 + this._drawStyle.node.margin;
-    bounds.width += this._drawStyle.node.margin * 2;
+    bounds.width = Math.max(propWidth + valueWidth + initialWidth, bounds.width) + this._drawStyle.node.margin * 2;
+    bounds.left -= bounds.width/2;
+    bounds.initialWidth = initialWidth;
     return bounds;
   },
 
@@ -2032,14 +2035,11 @@ wcPlayEditor.prototype = {
         result.propertyBounds.push(propertyBound);
 
         // Initial property value.
-        this.__setCanvasFont(this._font.initialValue, context);
-        var w = Math.max(context.measureText(this._drawStyle.property.initialWrapL + this.__drawPropertyValue(node, props[i], true) + this._drawStyle.property.initialWrapR).width, this._drawStyle.property.minLength);
-
         var initialBound = {
           rect: {
             top: rect.top + upper - this._font.property.size,
-            left: rect.left + rect.width - this._drawStyle.node.margin - w,
-            width: w,
+            left: rect.left + rect.width - this._drawStyle.node.margin - rect.initialWidth,
+            width: rect.initialWidth,
             height: this._font.property.size + this._drawStyle.property.spacing,
           },
           name: props[i].name,
@@ -2048,13 +2048,13 @@ wcPlayEditor.prototype = {
 
         // Property value.
         this.__setCanvasFont(this._font.value, context);
-        var vw = Math.max(context.measureText(this._drawStyle.property.valueWrapL + this.__drawPropertyValue(node, props[i]) + this._drawStyle.property.valueWrapR).width, this._drawStyle.property.minLength);
+        var w = Math.max(context.measureText(this._drawStyle.property.valueWrapL + this.__drawPropertyValue(node, props[i]) + this._drawStyle.property.valueWrapR).width, this._drawStyle.property.minLength);
 
         var valueBound = {
           rect: {
             top: rect.top + upper - this._font.property.size,
-            left: rect.left + rect.width - this._drawStyle.node.margin - vw - w,
-            width: vw,
+            left: rect.left + rect.width - this._drawStyle.node.margin - w - rect.initialWidth,
+            width: w,
             height: this._font.property.size + this._drawStyle.property.spacing,
           },
           name: props[i].name,
@@ -2082,7 +2082,7 @@ wcPlayEditor.prototype = {
 
         this.__setCanvasFont(this._font.value, context);
         context.fillStyle = "black";
-        context.fillText(this._drawStyle.property.valueWrapL + this.__drawPropertyValue(node, props[i]) + this._drawStyle.property.valueWrapR, rect.left + rect.width - this._drawStyle.node.margin - w, rect.top + upper);
+        context.fillText(this._drawStyle.property.valueWrapL + this.__drawPropertyValue(node, props[i]) + this._drawStyle.property.valueWrapR, rect.left + rect.width - this._drawStyle.node.margin - rect.initialWidth, rect.top + upper);
 
         // Property input.
         if (!collapsed || props[i].inputs.length) {
