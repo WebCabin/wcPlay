@@ -22,7 +22,7 @@
   height: 100%;
   border-right:2px solid black;
   text-align: center;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .wcPlayNoHighlights {
@@ -34,6 +34,16 @@
   user-select: none;
 }
 
+.wcPlayPaletteScroller {
+  position: absolute;
+  top: 25px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  overflow: auto;
+  border-top: 2px solid black;
+}
+
 .wcPlayPaletteInner {
   width: 100%;
   height: auto;
@@ -41,7 +51,7 @@
 
 .wcPlayTypeArea {
   position: absolute;
-  top: 25px;
+  top: 0px;
   left: 0px;
   right: 0px;
   height: auto;

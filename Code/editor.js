@@ -111,11 +111,13 @@ function wcPlayEditor(container, options) {
   this.$top = $('<div class="wcPlayEditorTop">');
   this.$main = $('<div class="wcPlayEditorMain">');
   this.$palette = $('<div class="wcPlayPalette wcPlayNoHighlights">');
+  this.$paletteScroller = $('<div class="wcPlayPaletteScroller">');
   this.$paletteInner = $('<div class="wcPlayPaletteInner">');
   this.$viewport = $('<canvas class="wcPlayViewport">');
   this._viewportContext = this.$viewport[0].getContext('2d');
 
-  this.$palette.append(this.$paletteInner);
+  this.$palette.append(this.$paletteScroller);
+  this.$paletteScroller.append(this.$paletteInner);
 
   this.$main.append(this.$palette);
   this.$main.append(this.$viewport);
@@ -359,14 +361,15 @@ wcPlayEditor.prototype = {
    * @private
    * @param {wcPlayEditor~Rect} rect - The rectangle bounds to draw.
    * @param {String} color - The color of the line.
-   * @param {Number} lineWidth - The thickness of the line.
+   * @param {Number} lineWidth - The thickness of the line, -1 will fill the shape.
    * @param {Number} radius - The radius of the rounded corners.
    * @param {external:Canvas~Context} context - The canvas context to render on.
    */
   __drawRoundedRect: function(rect, color, lineWidth, radius, context) {
     context.save();
     context.strokeStyle = color;
-    context.lineWidth = lineWidth;
+    context.fillStyle = color;
+    context.lineWidth = (lineWidth > 0)? lineWidth: 1;
     context.beginPath();
     context.moveTo(rect.left + radius, rect.top);
     context.arcTo(rect.left + rect.width, rect.top, rect.left + rect.width, rect.top + radius, radius);
@@ -374,7 +377,7 @@ wcPlayEditor.prototype = {
     context.arcTo(rect.left, rect.top + rect.height, rect.left, rect.top + rect.height - radius, radius);
     context.arcTo(rect.left, rect.top, rect.left + radius, rect.top, radius);
     context.closePath();
-    context.stroke();
+    lineWidth == -1? context.fill(): context.stroke();
     context.restore();
   },
 
@@ -442,9 +445,10 @@ wcPlayEditor.prototype = {
 
       if (this._highlightRect) {
         var radius = Math.min(10, this._highlightRect.width/2, this._highlightRect.height/2);
-        this.__drawRoundedRect(this._highlightRect, "darkcyan", 5, radius, this._viewportContext);
-        this.__drawRoundedRect(this._highlightRect, "cyan", 2, radius, this._viewportContext);
+        this.__drawRoundedRect(this._highlightRect, "rgba(0, 255, 255, 0.25)", -1, radius, this._viewportContext);
+        this.__drawRoundedRect(this._highlightRect, "darkcyan", 2, radius, this._viewportContext);
       }
+
       this._viewportContext.restore();
     }
 
@@ -826,23 +830,8 @@ wcPlayEditor.prototype = {
     bounds.initialWidth = centerBounds.initialWidth;
     bounds.valueWidth = centerBounds.valueWidth;
 
-    // Now use our measurements to draw our node.
-    var propBounds  = this.__drawCenter(node, context, bounds, hideCollapsible);
-    var entryLinkBounds = this.__drawEntryLinks(node, context, pos, entryBounds.width);
-    var exitLinkBounds = this.__drawExitLinks(node, context, {x: pos.x, y: pos.y + entryBounds.height + centerBounds.height}, exitBounds.width);
-
-    data.entryBounds = entryLinkBounds;
-    data.exitBounds = exitLinkBounds;
-    data.titleBounds = propBounds.titleBounds;
-    data.viewportBounds = propBounds.viewportBounds;
-    data.inputBounds = propBounds.inputBounds;
-    data.outputBounds = propBounds.outputBounds;
-    data.propertyBounds = propBounds.propertyBounds;
-    data.valueBounds = propBounds.valueBounds;
-    data.initialBounds = propBounds.initialBounds;
-
-    data.inner = this.__expandRect([centerBounds]);
     data.rect = this.__expandRect([entryBounds, centerBounds, exitBounds]);
+    data.inner = this.__expandRect([centerBounds]);
     data.inner.left = data.rect.left;
     data.inner.width = data.rect.width;
     data.rect.top -= 3;
@@ -862,6 +851,21 @@ wcPlayEditor.prototype = {
     } else {
       data.rect.height += this._drawStyle.links.length;
     }
+
+    // Now use our measurements to draw our node.
+    var propBounds  = this.__drawCenter(node, context, bounds, hideCollapsible);
+    var entryLinkBounds = this.__drawEntryLinks(node, context, pos, entryBounds.width);
+    var exitLinkBounds = this.__drawExitLinks(node, context, {x: pos.x, y: pos.y + entryBounds.height + centerBounds.height}, exitBounds.width);
+
+    data.entryBounds = entryLinkBounds;
+    data.exitBounds = exitLinkBounds;
+    data.titleBounds = propBounds.titleBounds;
+    data.viewportBounds = propBounds.viewportBounds;
+    data.inputBounds = propBounds.inputBounds;
+    data.outputBounds = propBounds.outputBounds;
+    data.propertyBounds = propBounds.propertyBounds;
+    data.valueBounds = propBounds.valueBounds;
+    data.initialBounds = propBounds.initialBounds;
 
     data.farRect = {
       top: data.inner.top - data.inner.height/4,
@@ -950,8 +954,8 @@ wcPlayEditor.prototype = {
 
     // Show an additional bounding rect around selected nodes.
     if (this._selectedNodes.indexOf(node) > -1) {
-      this.__drawRoundedRect(data.rect, "darkcyan", 5, 10, context);
-      this.__drawRoundedRect(data.rect, "cyan", 2, 10, context);
+      this.__drawRoundedRect(data.rect, "rgba(0, 255, 255, 0.25)", -1, 10, context);
+      this.__drawRoundedRect(data.rect, "darkcyan", 2, 10, context);
     }
 
     node._meta.bounds = data;
