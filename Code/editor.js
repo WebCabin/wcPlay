@@ -175,7 +175,44 @@ wcPlayEditor.prototype = {
    * @function wcPlayEditor#center
    */
   center: function() {
-    // TODO:
+    if (this._engine) {
+      this.focus(this._engine._entryNodes.concat(this._engine._entryNodes, this._engine._processNodes, this._engine._storageNodes, this._engine._compositeNodes));
+    }
+  },
+
+  /**
+   * Scrolls the canvas view until a given set of nodes are within view.
+   * @function wcPlayEditor#focus
+   * @param {wcNode} nodes - A list of nodes to focus the view on.
+   */
+  focus: function(nodes) {
+    if (nodes.length) {
+      this.__updateNodes(nodes, 0);
+      this.__drawNodes(nodes, this._viewportContext);
+      var boundList = [];
+      for (var i = 1; i < nodes.length; ++i) {
+        boundList.push(nodes[i]._meta.bounds.farRect);
+      }
+      this.focusRect(this.__expandRect(boundList));
+    }
+  },
+
+  /**
+   * Scrolls the canvas view and centers on a given bounding rectangle.
+   * @function wcPlayEditor#focusRect
+   * @param {wcPlayEditor~Rect} rect - The rectangle to focus on.
+   */
+  focusRect: function(rect) {
+    var scaleX = (this.$viewport.width() / rect.width);
+    var scaleY = (this.$viewport.height() / rect.height);
+    this._viewportCamera.z = Math.min(scaleX, scaleY);
+    if (scaleX > scaleY) {
+      rect.left -= ((this.$viewport.width() / scaleY - rect.width)) / 2;
+    } else {
+      rect.top -= ((this.$viewport.height() / scaleX - rect.height)) / 2;
+    }
+    this._viewportCamera.x = -rect.left * this._viewportCamera.z;
+    this._viewportCamera.y = -rect.top * this._viewportCamera.z;
   },
 
   /**
@@ -276,7 +313,7 @@ wcPlayEditor.prototype = {
    * @function wcPlayEditor#__expandRect
    * @private
    * @param {wcPlayEditor~Rect[]} rects - A list of rectangles to expand from.
-   * @param {wcPlayEditor~Rect} - A bounding rectangle that encloses all given rectangles.
+   * @returns {wcPlayEditor~Rect} - A bounding rectangle that encloses all given rectangles.
    */
   __expandRect: function(rects) {
     var bounds = {
@@ -293,6 +330,8 @@ wcPlayEditor.prototype = {
       if (rects[i].left < bounds.left) {
         bounds.left = rects[i].left;
       }
+    }
+    for (var i = 1; i < rects.length; ++i) {
       if (rects[i].top + rects[i].height > bounds.top + bounds.height) {
         bounds.height = (rects[i].top + rects[i].height) - bounds.top;
       }
@@ -427,7 +466,6 @@ wcPlayEditor.prototype = {
       this._viewportContext.save();
       this._viewportContext.translate(this._viewportCamera.x, this._viewportCamera.y);
       this._viewportContext.scale(this._viewportCamera.z, this._viewportCamera.z);
-      // this._viewportContext.translate(this._viewportCamera.x / this._viewportCamera.z, this._viewportCamera.y / this._viewportCamera.z);
 
       // Update nodes.
       this.__updateNodes(this._engine._entryNodes, elapsed);
@@ -912,10 +950,10 @@ wcPlayEditor.prototype = {
     data.initialBounds = propBounds.initialBounds;
 
     data.farRect = {
-      top: data.inner.top - data.inner.height/4,
-      left: data.inner.left - data.inner.width/4,
-      width: data.inner.width * 1.5,
-      height: data.inner.height * 1.5,
+      top: data.inner.top - 30,
+      left: data.inner.left - 30,
+      width: data.inner.width + 60,
+      height: data.inner.height + 60,
     };
 
     // Add a collapse button to the node in the left margin of the title.
@@ -995,6 +1033,8 @@ wcPlayEditor.prototype = {
         this.__drawRoundedRect(data.inner, "yellow", 2, 10, context);
       }
     }
+
+    // this.__drawRoundedRect(data.farRect, "#000", 2, 10, context);
 
     node._meta.bounds = data;
     return data;
@@ -2138,7 +2178,7 @@ wcPlayEditor.prototype = {
 
     $control.css('top', offset.top + bounds.top * this._viewportCamera.z + this._viewportCamera.y)
       .css('left', offset.left + bounds.left * this._viewportCamera.z + this._viewportCamera.x)
-      .css('width', 200)
+      .css('width', Math.max(bounds.width * this._viewportCamera.z, 200))
       .css('height', Math.max(bounds.height * this._viewportCamera.z, 15));
   },
 
@@ -2296,7 +2336,7 @@ wcPlayEditor.prototype = {
 
       $control.css('top', offset.top + bounds.rect.top * this._viewportCamera.z + this._viewportCamera.y)
         .css('left', offset.left + bounds.rect.left * this._viewportCamera.z + this._viewportCamera.x)
-        .css('width', 200)
+        .css('width', Math.max(bounds.rect.width * this._viewportCamera.z, 200))
         .css('height', Math.max(bounds.rect.height * this._viewportCamera.z, 15));
     }
   },

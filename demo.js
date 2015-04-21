@@ -7,14 +7,20 @@ $(document).ready(function() {
     debugging: true,
   });
 
-  var col = "#FF0000";
-
   wcNodeComposite.extend('wcNodeCompositeTest', 'Test', 'Core', {
     init: function(parent, pos) {
       this._super(parent, pos);
       this.color = this.myCol;
     },
-    myCol: col,
+    myCol: "#FF0000",
+  });
+
+  wcNodeComposite.extend('wcNodeCompositeTest2', 'Test2', 'Core', {
+    init: function(parent, pos) {
+      this._super(parent, pos);
+      this.color = this.myCol;
+    },
+    myCol: "#0000FF",
   });
   // var testComposite = new wcNodeComposite(null, {x: 0, y: 0});
 
@@ -37,6 +43,7 @@ $(document).ready(function() {
   var tutViewportNode = new wcNodeProcessTutorialViewport(myPlay, {x: 800, y: 200});
   var tutPropertyNode = new wcNodeProcessTutorialProperties(myPlay, {x: 800, y: 400});
   var tutDynamicNode = new wcNodeProcessTutorialDynamic(myPlay, {x: 800, y: 600});
+  myPlayEditor.center();
 
   // Assign them all debug log enabled, so they will console log various events.
   // startNode.debugLog(true);
@@ -69,4 +76,10 @@ $(document).ready(function() {
 
   // Start execution of the script.
   myPlay.start();
+
+  $('body').keyup(function(event) {
+    if (event.keyCode === 'F'.charCodeAt(0)) {
+      myPlayEditor.center();
+    }
+  })
 });
