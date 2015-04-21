@@ -471,6 +471,25 @@ wcPlay.prototype = {
   },
 
   /**
+   * Retrieves a list of all global properties and their values for this script.
+   * @function wcPlay#listProperties
+   * @returns {wcNode~PropertyData[]} - A list of all property data.
+   */
+  listProperties: function() {
+    var result = [];
+    for (var i = 0; i < this._properties.length; ++i) {
+      var myProp = this._properties[i];
+      result.push({
+        name: myProp.name,
+        value: myProp.value,
+        initialValue: myProp.initialValue,
+      });
+    }
+
+    return result;
+  },
+
+  /**
    * Triggers an event into the Play script.
    * @function wcPlay#triggerEvent
    * @param {String} name - The event name to trigger (more specifically, the name of the wcNodeEntry).
@@ -700,6 +719,7 @@ function wcPlayEditor(container, options) {
   this._highlightOutputLink = false;
   this._highlightPropertyValue = false;
   this._highlightPropertyInitialValue = false;
+  this._highlightViewport = false;
 
   this._selectedEntryLink = false;
   this._selectedExitLink = false;
@@ -1220,8 +1240,8 @@ wcPlayEditor.prototype = {
    */
   __setupPalette: function() {
     // Create our top bar with buttons for each node type.
-    this.$typeButton.push($('<button class="wcPlayEditorButton wcToggled" title="Show Entry Nodes.">Entry</button>'));
-    this.$typeButton.push($('<button class="wcPlayEditorButton" title="Show Process Nodes.">Process</button>'));
+    this.$typeButton.push($('<button class="wcPlayEditorButton" title="Show Entry Nodes.">Entry</button>'));
+    this.$typeButton.push($('<button class="wcPlayEditorButton wcToggled" title="Show Process Nodes.">Process</button>'));
     this.$typeButton.push($('<button class="wcPlayEditorButton" title="Show Storage Nodes.">Storage</button>'));
     this.$typeButton.push($('<button class="wcPlayEditorButton" title="Show Composite Nodes.">Composite</button>'));
     this.$palette.append(this.$typeButton[0]);
@@ -1229,8 +1249,8 @@ wcPlayEditor.prototype = {
     this.$palette.append(this.$typeButton[2]);
     this.$palette.append(this.$typeButton[3]);
 
-    this.$typeArea.push($('<div class="wcPlayTypeArea">'));
     this.$typeArea.push($('<div class="wcPlayTypeArea wcPlayHidden">'));
+    this.$typeArea.push($('<div class="wcPlayTypeArea">'));
     this.$typeArea.push($('<div class="wcPlayTypeArea wcPlayHidden">'));
     this.$typeArea.push($('<div class="wcPlayTypeArea wcPlayHidden">'));
     this.$paletteInner.append(this.$typeArea[0]);
@@ -1436,6 +1456,7 @@ wcPlayEditor.prototype = {
     data.outputBounds = propBounds.outputBounds;
     data.valueBounds = propBounds.valueBounds;
     data.initialBounds = propBounds.initialBounds;
+    data.viewportBounds = propBounds.viewportBounds;
 
     data.inner = this.__expandRect([centerBounds]);
     data.rect = this.__expandRect([entryBounds, centerBounds, exitBounds]);
@@ -1664,11 +1685,11 @@ wcPlayEditor.prototype = {
 
         // Property value.
         this.__setCanvasFont(this._font.value, context);
-        w += context.measureText(this._drawStyle.property.valueWrapL + this.__clampString(node.property(props[i].name).toString(), this._drawStyle.property.strLen) + this._drawStyle.property.valueWrapR).width;
+        w += context.measureText(this._drawStyle.property.valueWrapL + this.__drawPropertyValue(node, props[i]) + this._drawStyle.property.valueWrapR).width;
 
         // Property initial value.
         this.__setCanvasFont(this._font.initialValue, context);
-        w += context.measureText(this._drawStyle.property.initialWrapL + this.__clampString(node.initialProperty(props[i].name).toString(), this._drawStyle.property.strLen) + this._drawStyle.property.initialWrapR).width;
+        w += context.measureText(this._drawStyle.property.initialWrapL + this.__drawPropertyValue(node, props[i], true) + this._drawStyle.property.initialWrapR).width;
         bounds.width = Math.max(w, bounds.width);
       }
     }
@@ -1826,6 +1847,16 @@ wcPlayEditor.prototype = {
     var upper = node.chain.entry.length? this._font.links.size + this._drawStyle.links.padding: 0;
     var lower = node.chain.exit.length? this._font.links.size + this._drawStyle.links.padding: 0;
 
+    // Properties
+    var result = {
+      viewportBounds: null,
+      valueBounds:  [],
+      initialBounds:[],
+      inputBounds:  [],
+      outputBounds: [],
+    };
+    var linkRect;
+
     // Node background
     context.save();
       var left = rect.left + rect.width/2;
@@ -1878,33 +1909,26 @@ wcPlayEditor.prototype = {
     // Draw the node's viewport.
     if (node._viewportSize) {
       // Calculate the translation to make the viewport 0,0.
-      var corner = {
-        x: -this._viewportCamera.x + rect.left + (rect.width/2 - node._viewportSize.x/2),
-        y: -this._viewportCamera.y + rect.top + upper,
+      result.viewportBounds = {
+        left: -this._viewportCamera.x + rect.left + (rect.width/2 - node._viewportSize.x/2),
+        top: -this._viewportCamera.y + rect.top + upper,
+        width: node._viewportSize.x,
+        height: node._viewportSize.y,
       };
 
       context.save();
       // Translate the canvas so 0,0 is the beginning of the viewport.
-      context.translate(corner.x, corner.y);
+      context.translate(result.viewportBounds.left, result.viewportBounds.top);
 
       // Draw the viewport.
-      node.onViewport(context);
+      node.onViewportDraw(context);
 
       // Now revert the translation.
-      context.translate(-corner.x, -corner.y);
+      context.translate(-result.viewportBounds.left, -result.viewportBounds.top);
       context.restore();
 
       upper += node._viewportSize.y + this._drawStyle.property.spacing;
     }
-
-    // Properties
-    var result = {
-      valueBounds:  [],
-      initialBounds:[],
-      inputBounds:  [],
-      outputBounds: [],
-    };
-    var linkRect;
 
     context.save();
     var collapsed = node.collapsed();
@@ -1924,7 +1948,7 @@ wcPlayEditor.prototype = {
         // Initial property value.
         context.textAlign = "right";
         this.__setCanvasFont(this._font.initialValue, context);
-        var w = context.measureText(this._drawStyle.property.initialWrapL + this.__clampString(node.initialProperty(props[i].name).toString(), this._drawStyle.property.strLen) + this._drawStyle.property.initialWrapR).width;
+        var w = context.measureText(this._drawStyle.property.initialWrapL + this.__drawPropertyValue(node, props[i], true) + this._drawStyle.property.initialWrapR).width;
 
         var initialBound = {
           rect: {
@@ -1939,7 +1963,7 @@ wcPlayEditor.prototype = {
 
         // Property value.
         this.__setCanvasFont(this._font.value, context);
-        var vw = context.measureText(this._drawStyle.property.valueWrapL + this.__clampString(node.property(props[i].name).toString(), this._drawStyle.property.strLen) + this._drawStyle.property.valueWrapR).width;
+        var vw = context.measureText(this._drawStyle.property.valueWrapL + this.__drawPropertyValue(node, props[i]) + this._drawStyle.property.valueWrapR).width;
 
         var valueBound = {
           rect: {
@@ -1964,11 +1988,11 @@ wcPlayEditor.prototype = {
 
         this.__setCanvasFont(this._font.initialValue, context);
         context.fillStyle = "#444444";
-        context.fillText(this._drawStyle.property.initialWrapL + this.__clampString(node.initialProperty(props[i].name).toString(), this._drawStyle.property.strLen) + this._drawStyle.property.initialWrapR, rect.left + rect.width - this._drawStyle.node.margin, rect.top + upper);
+        context.fillText(this._drawStyle.property.initialWrapL + this.__drawPropertyValue(node, props[i], true) + this._drawStyle.property.initialWrapR, rect.left + rect.width - this._drawStyle.node.margin, rect.top + upper);
 
         this.__setCanvasFont(this._font.value, context);
         context.fillStyle = "black";
-        context.fillText(this._drawStyle.property.valueWrapL + this.__clampString(node.property(props[i].name).toString(), this._drawStyle.property.strLen) + this._drawStyle.property.valueWrapR, rect.left + rect.width - this._drawStyle.node.margin - w, rect.top + upper);
+        context.fillText(this._drawStyle.property.valueWrapL + this.__drawPropertyValue(node, props[i]) + this._drawStyle.property.valueWrapR, rect.left + rect.width - this._drawStyle.node.margin - w, rect.top + upper);
 
         // Property input.
         if (!collapsed || props[i].inputs.length) {
@@ -2509,6 +2533,71 @@ wcPlayEditor.prototype = {
   },
 
   /**
+   * Draws the value of a property embedded on the node.
+   * @function wcPlayEditor#__drawPropertyValue
+   * @private
+   * @param {wcNode} node - The node that owns this property.
+   * @param {Object} property - The property data.
+   * @param {Boolean} [initial] - Set true if the property being viewed is the initial value.
+   * @returns {String} - A string value to print as the value.
+   *
+   * @see {wcNode~wcNode~PropertyOptions}
+   * @see {wcNode~PropertyDisplay}
+   */
+  __drawPropertyValue: function(node, property, initial) {
+    var value;
+    if (initial) {
+      value = node.initialProperty(property.name);
+    } else {
+      value = node.property(property.name);
+    }
+
+    if (typeof property.options.display === 'function') {
+      value = property.options.display(value);
+    } else {
+      // Handle custom display of certain property types.
+      switch (property.type) {
+        case wcPlay.PROPERTY_TYPE.TOGGLE:
+          // Display toggle buttons as 'yes', 'no'
+          return (value? 'yes': 'no');
+        case wcPlay.PROPERTY_TYPE.SELECT:
+          if (value == '') {
+            return '<none>';
+          }
+          var items = property.options.items;
+          if ($.isFunction(items)) {
+            items = items.call(node);
+          }
+
+          if ($.isArray(items)) {
+            var found = false;
+            for (var i = 0; i < items.length; ++i) {
+              if (typeof items[i] === 'object') {
+                if (items[i].value == value) {
+                  value = items[i].name;
+                  found = true;
+                  break;
+                }
+              } else if (typeof items[i] === 'string') {
+                if (items[i] == value) {
+                  found = true;
+                  break;
+                }
+              }
+            }
+
+            if (!found) {
+              value = 'Unknown';
+            }
+          }
+          break;
+      }
+    }
+
+    return this.__clampString(value.toString(), this._drawStyle.property.strLen)
+  },
+
+  /**
    * Draws the editor control for a property.
    * @function wcPlayEditor#__drawPropertyEditor
    * @private
@@ -2592,6 +2681,34 @@ wcPlayEditor.prototype = {
         });
         break;
       case wcPlay.PROPERTY_TYPE.SELECT:
+        var value = node[propFn](property.name);
+        $control = $('<select>');
+
+        var items = property.options.items;
+        if ($.isFunction(items)) {
+          items = items.call(node);
+        }
+
+        if ($.isArray(items)) {
+          $control.append($('<option value=""' + ('' == value? ' selected': '') + '>&lt;none&gt;</option>'));
+          for (var i = 0; i < items.length; ++i) {
+            if (typeof items[i] === 'object') {
+              $control.append($('<option value="' + items[i].value + '"' + (items[i].value == value? ' selected': '') + '>' + items[i].name + '</option>'));
+            } else {
+              $control.append($('<option value="' + items[i] + '"' + (items[i] == value? ' selected': '') + '>' + items[i] + '</option>'));
+            }
+          }
+        } else {
+          console.log("ERROR: Tried to display a Select type property when no selection list was provided.");
+          return;
+        }
+
+        $control.change(function() {
+          if (!cancelled) {
+            undoChange(node, property.name, node[propFn](property.name), $control.val());
+            node[propFn](property.name, $control.val());
+          }
+        });
         break;
     }
 
@@ -2630,7 +2747,7 @@ wcPlayEditor.prototype = {
       $control.css('top', offset.top + bounds.rect.top * this._viewportCamera.z + this._viewportCamera.y)
         .css('left', offset.left + bounds.rect.left * this._viewportCamera.z + this._viewportCamera.x)
         .css('width', 200)
-        .css('height', Math.max(bounds.rect.height * this._viewportCamera.z * 0.9, 15));
+        .css('height', Math.max(bounds.rect.height * this._viewportCamera.z, 15));
     }
   },
 
@@ -2933,6 +3050,7 @@ wcPlayEditor.prototype = {
     this._highlightOutputLink = false;
     this._highlightPropertyValue = false;
     this._highlightPropertyInitialValue = false;
+    this._highlightViewport = false;
 
     // Dragging a node from the palette view.
     if (this._draggingNodeData) {
@@ -3116,6 +3234,9 @@ wcPlayEditor.prototype = {
     this._highlightPropertyValue = false;
     this._highlightPropertyInitialValue = false;
 
+    var wasOverViewport = this._highlightViewport;
+    this._highlightViewport = false;
+
     var node = this.__findNodeAtPos(mouse, this._viewportCamera);
     if (node) {
       // Check for main node collision.
@@ -3230,6 +3351,27 @@ wcPlayEditor.prototype = {
               this.$viewport.attr('title', 'Click to change the initial value of this property.\n' + node.properties[i].initialValue);
               break;
             }
+          }
+        }
+
+        // Custom viewport area.
+        if (node._meta.bounds.viewportBounds) {
+          var pos = {
+            x: this._mouse.x - node._meta.bounds.viewportBounds.left,
+            y: this._mouse.y - node._meta.bounds.viewportBounds.top,
+          };
+
+          if (this.__inRect(this._mouse, node._meta.bounds.viewportBounds, this._viewportCamera)) {
+            this._highlightNode = node;
+            this._highlightViewport = true;
+
+            if (!wasOverViewport) {
+              node.onViewportMouseEnter(event, pos);
+            }
+
+            node.onViewportMouseMove(event, pos);
+          } else if (wasOverViewport) {
+            node.onViewportMouseLeave(event, pos);
           }
         }
       }
@@ -3466,6 +3608,23 @@ wcPlayEditor.prototype = {
         }
       }
 
+      // Custom viewport area.
+      if (!hasTarget && node._meta.bounds.viewportBounds) {
+        var pos = {
+          x: this._mouse.x - node._meta.bounds.viewportBounds.left,
+          y: this._mouse.y - node._meta.bounds.viewportBounds.top,
+        };
+
+        if (this.__inRect(this._mouse, node._meta.bounds.viewportBounds, this._viewportCamera)) {
+          this._selectedNode = node;
+          this._selectedNodes = [node];
+
+          if (node.onViewportMouseDown(event, pos)) {
+            hasTarget = true;
+          }
+        }
+      }
+
       // Center area.
       if (!hasTarget && this.__inRect(this._mouse, node._meta.bounds.inner, this._viewportCamera)) {
         hasTarget = true;
@@ -3584,6 +3743,18 @@ wcPlayEditor.prototype = {
             }
           }
         }
+
+        // Custom viewport area.
+        if (node._meta.bounds.viewportBounds) {
+          var pos = {
+            x: this._mouse.x - node._meta.bounds.viewportBounds.left,
+            y: this._mouse.y - node._meta.bounds.viewportBounds.top,
+          };
+
+          if (this.__inRect(this._mouse, node._meta.bounds.viewportBounds, this._viewportCamera)) {
+            node.onViewportMouseClick(event, pos);
+          }
+        }
       }
     }
   },
@@ -3640,6 +3811,18 @@ wcPlayEditor.prototype = {
             node.property(node._meta.bounds.outputBounds[i].name, node.property(node._meta.bounds.outputBounds[i].name), true);
             break;
           }
+        }
+      }
+
+      // Custom viewport area.
+      if (!hasTarget && node._meta.bounds.viewportBounds) {
+        var pos = {
+          x: this._mouse.x - node._meta.bounds.viewportBounds.left,
+          y: this._mouse.y - node._meta.bounds.viewportBounds.top,
+        };
+
+        if (this.__inRect(this._mouse, node._meta.bounds.viewportBounds, this._viewportCamera)) {
+          hasTarget = node.onViewportMouseDoubleClick(event, pos);
         }
       }
 
@@ -3924,6 +4107,17 @@ wcPlayEditor.prototype = {
       }
     }
 
+    // Custom viewport area.
+    if (this._selectedNode && this._highlightViewport) {
+      var mouse = this.__mouse(event, this.$viewport.offset());
+      var pos = {
+        x: mouse.x - this._selectedNode._meta.bounds.viewportBounds.left,
+        y: mouse.y - this._selectedNode._meta.bounds.viewportBounds.top,
+      };
+
+      this._selectedNode.onViewportMouseUp(event, pos);
+    }
+
     // Re-collapse the node, if necessary.
     if (this._expandedNode && this._expandedNodeWasCollapsed) {
       this._expandedNode.collapsed(true);
@@ -4076,8 +4270,8 @@ Class.extend('wcNode', 'Node', '', {
     this._parent = parent;
 
     // Give the node its default properties.
-    this.createProperty(wcNode.PROPERTY.ENABLED, wcPlay.PROPERTY_TYPE.TOGGLE, true, {collapsible: true});
-    this.createProperty(wcNode.PROPERTY.DEBUG_LOG, wcPlay.PROPERTY_TYPE.TOGGLE, false, {collapsible: true});
+    this.createProperty(wcNode.PROPERTY.ENABLED, wcPlay.PROPERTY_TYPE.TOGGLE, true, {collapsible: true, description: "Disabled nodes will not trigger."});
+    this.createProperty(wcNode.PROPERTY.DEBUG_LOG, wcPlay.PROPERTY_TYPE.TOGGLE, false, {collapsible: true, description: "Output various debugging information about this node."});
 
     var engine = this.engine();
     engine && engine.__addNode(this);
@@ -5100,6 +5294,7 @@ Class.extend('wcNode', 'Node', '', {
    * @param {Number} [width] - If supplied, assigns the width of the viewport desired. Use 0 or null to disable the viewport.
    * @param {Number} [height] - If supplied, assigns the height of the viewport desired. Use 0 or null to disable the viewport.
    * @returns {wcPlay~Coordinates} - The current size of the viewport.
+   * @see wcNode#onViewportDraw
    */
   viewportSize: function(width, height) {
     if (width !== undefined && height !== undefined) {
@@ -5117,13 +5312,90 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
-   * Event that is called when it is time to draw the contents of your custom viewport.<br>
+   * Event that is called when it is time to draw the contents of your custom viewport. It is up to you to stay within the [wcNode.viewportSize]{@link wcNode~viewportSize} you've specified.<br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNode#onViewport
+   * @function wcNode#onViewportDraw
    * @param {external:Canvas~Context} context - The canvas context to draw on, coordinates 0,0 will be the top left corner of your viewport. It is up to you to stay within the [viewport bounds]{@link wcNode#viewportSize} you have assigned.
    * @see wcNode#viewportSize
    */
-  onViewport: function(context) {
+  onViewportDraw: function(context) {
+  },
+
+  /**
+   * Event that is called when the mouse has entered the viewport area.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode~onViewportMouseEnter
+   * @param {Object} event - The original jquery mouse event.
+   * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   */
+  onViewportMouseEnter: function(event, pos) {
+    if (this.debugLog()) {
+      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" mouse entered custom viewport!');
+    }
+  },
+
+  /**
+   * Event that is called when the mouse has left the viewport area.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode~onViewportMouseLeave
+   * @param {Object} event - The original jquery mouse event.
+   */
+  onViewportMouseLeave: function(event) {
+    if (this.debugLog()) {
+      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" mouse left custom viewport!');
+    }
+  },
+
+  /**
+   * Event that is called when the mouse button is pressed over your viewport area.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode~onViewportMouseDown
+   * @param {Object} event - The original jquery mouse event.
+   * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   * @returns {Boolean|undefined} - Return true if you want to disable node dragging during mouse down within your viewport.
+   */
+  onViewportMouseDown: function(event, pos) {
+  },
+
+  /**
+   * Event that is called when the mouse button is released over your viewport area.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode~onViewportMouseUp
+   * @param {Object} event - The original jquery mouse event.
+   * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   */
+  onViewportMouseUp: function(event, pos) {
+  },
+
+  /**
+   * Event that is called when the mouse button is pressed and released in the same spot over your viewport area.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode~onViewportMouseClick
+   * @param {Object} event - The original jquery mouse event.
+   * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   */
+  onViewportMouseClick: function(event, pos) {
+  },
+
+  /**
+   * Event that is called when the mouse button is double clicked in the same spot over your viewport area.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode~onViewportMouseClick
+   * @param {Object} event - The original jquery mouse event.
+   * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   * @returns {Boolean|undefined} - Return true if you want to disable node auto-collapse when double clicking.
+   */
+  onViewportMouseDoubleClick: function(event, pos) {
+  },
+
+  /**
+   * Event that is called when the mouse has moved over your viewport area.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode~onViewportMouseMove
+   * @param {Object} event - The original jquery mouse event.
+   * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   */
+  onViewportMouseMove: function(event, pos) {
   },
 
   /**
@@ -5529,7 +5801,7 @@ wcNodeProcess.extend('wcNodeProcessConsoleLog', 'Console Log', 'Debugging', {
     this._super(parent, pos, type);
 
     // Create the message property so we know what to output in the log.
-    this.createProperty('message', wcPlay.PROPERTY_TYPE.STRING, 'Log message.', {multiline: true});
+    this.createProperty('message', wcPlay.PROPERTY_TYPE.STRING, 'Log message.');
   },
 
   /**

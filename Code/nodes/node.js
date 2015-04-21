@@ -45,8 +45,8 @@ Class.extend('wcNode', 'Node', '', {
     this._parent = parent;
 
     // Give the node its default properties.
-    this.createProperty(wcNode.PROPERTY.ENABLED, wcPlay.PROPERTY_TYPE.TOGGLE, true, {collapsible: true});
-    this.createProperty(wcNode.PROPERTY.DEBUG_LOG, wcPlay.PROPERTY_TYPE.TOGGLE, false, {collapsible: true});
+    this.createProperty(wcNode.PROPERTY.ENABLED, wcPlay.PROPERTY_TYPE.TOGGLE, true, {collapsible: true, description: "Disabled nodes will not trigger."});
+    this.createProperty(wcNode.PROPERTY.DEBUG_LOG, wcPlay.PROPERTY_TYPE.TOGGLE, false, {collapsible: true, description: "Output various debugging information about this node."});
 
     var engine = this.engine();
     engine && engine.__addNode(this);
@@ -1069,6 +1069,7 @@ Class.extend('wcNode', 'Node', '', {
    * @param {Number} [width] - If supplied, assigns the width of the viewport desired. Use 0 or null to disable the viewport.
    * @param {Number} [height] - If supplied, assigns the height of the viewport desired. Use 0 or null to disable the viewport.
    * @returns {wcPlay~Coordinates} - The current size of the viewport.
+   * @see wcNode#onViewportDraw
    */
   viewportSize: function(width, height) {
     if (width !== undefined && height !== undefined) {
@@ -1086,13 +1087,90 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
-   * Event that is called when it is time to draw the contents of your custom viewport.<br>
+   * Event that is called when it is time to draw the contents of your custom viewport. It is up to you to stay within the [wcNode.viewportSize]{@link wcNode~viewportSize} you've specified.<br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNode#onViewport
+   * @function wcNode#onViewportDraw
    * @param {external:Canvas~Context} context - The canvas context to draw on, coordinates 0,0 will be the top left corner of your viewport. It is up to you to stay within the [viewport bounds]{@link wcNode#viewportSize} you have assigned.
    * @see wcNode#viewportSize
    */
-  onViewport: function(context) {
+  onViewportDraw: function(context) {
+  },
+
+  /**
+   * Event that is called when the mouse has entered the viewport area.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode~onViewportMouseEnter
+   * @param {Object} event - The original jquery mouse event.
+   * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   */
+  onViewportMouseEnter: function(event, pos) {
+    if (this.debugLog()) {
+      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" mouse entered custom viewport!');
+    }
+  },
+
+  /**
+   * Event that is called when the mouse has left the viewport area.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode~onViewportMouseLeave
+   * @param {Object} event - The original jquery mouse event.
+   */
+  onViewportMouseLeave: function(event) {
+    if (this.debugLog()) {
+      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" mouse left custom viewport!');
+    }
+  },
+
+  /**
+   * Event that is called when the mouse button is pressed over your viewport area.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode~onViewportMouseDown
+   * @param {Object} event - The original jquery mouse event.
+   * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   * @returns {Boolean|undefined} - Return true if you want to disable node dragging during mouse down within your viewport.
+   */
+  onViewportMouseDown: function(event, pos) {
+  },
+
+  /**
+   * Event that is called when the mouse button is released over your viewport area.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode~onViewportMouseUp
+   * @param {Object} event - The original jquery mouse event.
+   * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   */
+  onViewportMouseUp: function(event, pos) {
+  },
+
+  /**
+   * Event that is called when the mouse button is pressed and released in the same spot over your viewport area.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode~onViewportMouseClick
+   * @param {Object} event - The original jquery mouse event.
+   * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   */
+  onViewportMouseClick: function(event, pos) {
+  },
+
+  /**
+   * Event that is called when the mouse button is double clicked in the same spot over your viewport area.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode~onViewportMouseClick
+   * @param {Object} event - The original jquery mouse event.
+   * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   * @returns {Boolean|undefined} - Return true if you want to disable node auto-collapse when double clicking.
+   */
+  onViewportMouseDoubleClick: function(event, pos) {
+  },
+
+  /**
+   * Event that is called when the mouse has moved over your viewport area.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode~onViewportMouseMove
+   * @param {Object} event - The original jquery mouse event.
+   * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   */
+  onViewportMouseMove: function(event, pos) {
   },
 
   /**

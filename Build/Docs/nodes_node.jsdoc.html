@@ -27,7 +27,7 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
+					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeProcessTutorialViewport.html">wcNodeProcessTutorialViewport</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageGlobal.html">wcNodeStorageGlobal</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
 				</ul>
 			</li>
 			
@@ -52,9 +52,17 @@
 	<article>
 		<pre
 			class="sunlight-highlight-javascript linenums">/**
+ * Allows for overriding the display string for a property value as displayed on the node.
+ * @callback wcNode~PropertyDisplay
+ * @param {Object} - The value or initial value of the property to display.
+ * @returns {String} - A string value to display on the node.
+ */
+
+/**
  * @typedef {Object} wcNode~PropertyOptions
  * @property {String} [description] - An optional description to display as a tooltip for this property.
  * @property {Boolean} [collapsible] - If true, this property will be hidden on a collapsed node (unless links are connected to it).
+ * @property {wcNode~PropertyDisplay} [display] - An optional function that will be called to retrieve the display string for the value/initial value for this property.
  */
 
 /**
@@ -75,8 +83,20 @@
 /**
  * Options for a [SELECT]{@link wcPlay.PROPERTY_TYPE} value.
  * @typedef {Object} wcNode~SelectOptions
- * @property {String[]} items - A list of items to display in the combo box.
- * @property {Boolean} isIndex - When an item is selected, does it record the item index number, or the item text itself?
+ * @property {wcNode~SelectItem[]|String[]|wcNode~SelectItemFunc} items - A list of items to display in the combo box, or a callback function that can dynamically retrieve a list.
+ */
+
+/**
+ * A callback that dynamically retrieves a list of items to display in a Select property.
+ * @callback wcNode~SelectItemFunc
+ * @property {wcNode~SelectItem[]|String[]} items - A list of items to display in the combo box.
+ */
+
+/**
+ * A select property item.
+ * @typedef {Object} wcNode~SelectItem
+ * @property {String} name - The display text to display for this item.
+ * @property {String|Number} value - The value to assign to the property when this property is selected.
  */
 
 /**

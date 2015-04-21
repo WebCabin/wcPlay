@@ -82,6 +82,7 @@ function wcPlayEditor(container, options) {
   this._highlightOutputLink = false;
   this._highlightPropertyValue = false;
   this._highlightPropertyInitialValue = false;
+  this._highlightViewport = false;
 
   this._selectedEntryLink = false;
   this._selectedExitLink = false;
@@ -602,8 +603,8 @@ wcPlayEditor.prototype = {
    */
   __setupPalette: function() {
     // Create our top bar with buttons for each node type.
-    this.$typeButton.push($('<button class="wcPlayEditorButton wcToggled" title="Show Entry Nodes.">Entry</button>'));
-    this.$typeButton.push($('<button class="wcPlayEditorButton" title="Show Process Nodes.">Process</button>'));
+    this.$typeButton.push($('<button class="wcPlayEditorButton" title="Show Entry Nodes.">Entry</button>'));
+    this.$typeButton.push($('<button class="wcPlayEditorButton wcToggled" title="Show Process Nodes.">Process</button>'));
     this.$typeButton.push($('<button class="wcPlayEditorButton" title="Show Storage Nodes.">Storage</button>'));
     this.$typeButton.push($('<button class="wcPlayEditorButton" title="Show Composite Nodes.">Composite</button>'));
     this.$palette.append(this.$typeButton[0]);
@@ -611,8 +612,8 @@ wcPlayEditor.prototype = {
     this.$palette.append(this.$typeButton[2]);
     this.$palette.append(this.$typeButton[3]);
 
-    this.$typeArea.push($('<div class="wcPlayTypeArea">'));
     this.$typeArea.push($('<div class="wcPlayTypeArea wcPlayHidden">'));
+    this.$typeArea.push($('<div class="wcPlayTypeArea">'));
     this.$typeArea.push($('<div class="wcPlayTypeArea wcPlayHidden">'));
     this.$typeArea.push($('<div class="wcPlayTypeArea wcPlayHidden">'));
     this.$paletteInner.append(this.$typeArea[0]);
@@ -818,6 +819,7 @@ wcPlayEditor.prototype = {
     data.outputBounds = propBounds.outputBounds;
     data.valueBounds = propBounds.valueBounds;
     data.initialBounds = propBounds.initialBounds;
+    data.viewportBounds = propBounds.viewportBounds;
 
     data.inner = this.__expandRect([centerBounds]);
     data.rect = this.__expandRect([entryBounds, centerBounds, exitBounds]);
@@ -1208,6 +1210,16 @@ wcPlayEditor.prototype = {
     var upper = node.chain.entry.length? this._font.links.size + this._drawStyle.links.padding: 0;
     var lower = node.chain.exit.length? this._font.links.size + this._drawStyle.links.padding: 0;
 
+    // Properties
+    var result = {
+      viewportBounds: null,
+      valueBounds:  [],
+      initialBounds:[],
+      inputBounds:  [],
+      outputBounds: [],
+    };
+    var linkRect;
+
     // Node background
     context.save();
       var left = rect.left + rect.width/2;
@@ -1260,33 +1272,26 @@ wcPlayEditor.prototype = {
     // Draw the node's viewport.
     if (node._viewportSize) {
       // Calculate the translation to make the viewport 0,0.
-      var corner = {
-        x: -this._viewportCamera.x + rect.left + (rect.width/2 - node._viewportSize.x/2),
-        y: -this._viewportCamera.y + rect.top + upper,
+      result.viewportBounds = {
+        left: -this._viewportCamera.x + rect.left + (rect.width/2 - node._viewportSize.x/2),
+        top: -this._viewportCamera.y + rect.top + upper,
+        width: node._viewportSize.x,
+        height: node._viewportSize.y,
       };
 
       context.save();
       // Translate the canvas so 0,0 is the beginning of the viewport.
-      context.translate(corner.x, corner.y);
+      context.translate(result.viewportBounds.left, result.viewportBounds.top);
 
       // Draw the viewport.
-      node.onViewport(context);
+      node.onViewportDraw(context);
 
       // Now revert the translation.
-      context.translate(-corner.x, -corner.y);
+      context.translate(-result.viewportBounds.left, -result.viewportBounds.top);
       context.restore();
 
       upper += node._viewportSize.y + this._drawStyle.property.spacing;
     }
-
-    // Properties
-    var result = {
-      valueBounds:  [],
-      initialBounds:[],
-      inputBounds:  [],
-      outputBounds: [],
-    };
-    var linkRect;
 
     context.save();
     var collapsed = node.collapsed();
@@ -2408,6 +2413,7 @@ wcPlayEditor.prototype = {
     this._highlightOutputLink = false;
     this._highlightPropertyValue = false;
     this._highlightPropertyInitialValue = false;
+    this._highlightViewport = false;
 
     // Dragging a node from the palette view.
     if (this._draggingNodeData) {
@@ -2591,6 +2597,9 @@ wcPlayEditor.prototype = {
     this._highlightPropertyValue = false;
     this._highlightPropertyInitialValue = false;
 
+    var wasOverViewport = this._highlightViewport;
+    this._highlightViewport = false;
+
     var node = this.__findNodeAtPos(mouse, this._viewportCamera);
     if (node) {
       // Check for main node collision.
@@ -2705,6 +2714,27 @@ wcPlayEditor.prototype = {
               this.$viewport.attr('title', 'Click to change the initial value of this property.\n' + node.properties[i].initialValue);
               break;
             }
+          }
+        }
+
+        // Custom viewport area.
+        if (node._meta.bounds.viewportBounds) {
+          var pos = {
+            x: this._mouse.x - node._meta.bounds.viewportBounds.left,
+            y: this._mouse.y - node._meta.bounds.viewportBounds.top,
+          };
+
+          if (this.__inRect(this._mouse, node._meta.bounds.viewportBounds, this._viewportCamera)) {
+            this._highlightNode = node;
+            this._highlightViewport = true;
+
+            if (!wasOverViewport) {
+              node.onViewportMouseEnter(event, pos);
+            }
+
+            node.onViewportMouseMove(event, pos);
+          } else if (wasOverViewport) {
+            node.onViewportMouseLeave(event, pos);
           }
         }
       }
@@ -2941,6 +2971,23 @@ wcPlayEditor.prototype = {
         }
       }
 
+      // Custom viewport area.
+      if (!hasTarget && node._meta.bounds.viewportBounds) {
+        var pos = {
+          x: this._mouse.x - node._meta.bounds.viewportBounds.left,
+          y: this._mouse.y - node._meta.bounds.viewportBounds.top,
+        };
+
+        if (this.__inRect(this._mouse, node._meta.bounds.viewportBounds, this._viewportCamera)) {
+          this._selectedNode = node;
+          this._selectedNodes = [node];
+
+          if (node.onViewportMouseDown(event, pos)) {
+            hasTarget = true;
+          }
+        }
+      }
+
       // Center area.
       if (!hasTarget && this.__inRect(this._mouse, node._meta.bounds.inner, this._viewportCamera)) {
         hasTarget = true;
@@ -3059,6 +3106,18 @@ wcPlayEditor.prototype = {
             }
           }
         }
+
+        // Custom viewport area.
+        if (node._meta.bounds.viewportBounds) {
+          var pos = {
+            x: this._mouse.x - node._meta.bounds.viewportBounds.left,
+            y: this._mouse.y - node._meta.bounds.viewportBounds.top,
+          };
+
+          if (this.__inRect(this._mouse, node._meta.bounds.viewportBounds, this._viewportCamera)) {
+            node.onViewportMouseClick(event, pos);
+          }
+        }
       }
     }
   },
@@ -3115,6 +3174,18 @@ wcPlayEditor.prototype = {
             node.property(node._meta.bounds.outputBounds[i].name, node.property(node._meta.bounds.outputBounds[i].name), true);
             break;
           }
+        }
+      }
+
+      // Custom viewport area.
+      if (!hasTarget && node._meta.bounds.viewportBounds) {
+        var pos = {
+          x: this._mouse.x - node._meta.bounds.viewportBounds.left,
+          y: this._mouse.y - node._meta.bounds.viewportBounds.top,
+        };
+
+        if (this.__inRect(this._mouse, node._meta.bounds.viewportBounds, this._viewportCamera)) {
+          hasTarget = node.onViewportMouseDoubleClick(event, pos);
         }
       }
 
@@ -3397,6 +3468,17 @@ wcPlayEditor.prototype = {
           myNode.connectOutput(this.name, targetNode, this.targetName);
         });
       }
+    }
+
+    // Custom viewport area.
+    if (this._selectedNode && this._highlightViewport) {
+      var mouse = this.__mouse(event, this.$viewport.offset());
+      var pos = {
+        x: mouse.x - this._selectedNode._meta.bounds.viewportBounds.left,
+        y: mouse.y - this._selectedNode._meta.bounds.viewportBounds.top,
+      };
+
+      this._selectedNode.onViewportMouseUp(event, pos);
     }
 
     // Re-collapse the node, if necessary.

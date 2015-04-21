@@ -22,6 +22,9 @@ $(document).ready(function() {
   var operationNode = new wcNodeProcessOperation(myPlay, {x: 400, y: 600});
   var numberNode = new wcNodeStorageNumber(myPlay, {x: 150, y: 600});
 
+  // Tutorial nodes.
+  var tutViewportNode = new wcNodeProcessTutorialViewport(myPlay, {x: 800, y: 200});
+
   // Assign them all debug log enabled, so they will console log various events.
   // startNode.debugLog(true);
   // logNode.debugLog(true);

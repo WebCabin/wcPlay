@@ -27,7 +27,7 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
+					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeProcessTutorialViewport.html">wcNodeProcessTutorialViewport</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageGlobal.html">wcNodeStorageGlobal</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
 				</ul>
 			</li>
 			
@@ -135,6 +135,7 @@ function wcPlayEditor(container, options) {
   this._highlightOutputLink = false;
   this._highlightPropertyValue = false;
   this._highlightPropertyInitialValue = false;
+  this._highlightViewport = false;
 
   this._selectedEntryLink = false;
   this._selectedExitLink = false;
@@ -441,6 +442,7 @@ wcPlayEditor.prototype = {
     $('.wcPlayEditorMenuOptionSilence').children(':first-child, span:first-child').toggleClass('fa-volume-off', this._engine.silent()).toggleClass('fa-volume-up', !this._engine.silent());
     $('.wcPlayEditorMenuOptionPausePlay').children('i:first-child, span:first-child').toggleClass('fa-play', this._engine.paused()).toggleClass('fa-pause', !this._engine.paused());
     $('.wcPlayEditorMenuOptionDelete').toggleClass('disabled', this._selectedNodes.length === 0);
+    $('.wcPlayEditorMenuOptionComposite').toggleClass('disabled', this._selectedNodes.length === 0);
 
 
     this.onResized();
@@ -563,6 +565,7 @@ wcPlayEditor.prototype = {
       case wcPlay.NODE_TYPE.ENTRY: return 0;
       case wcPlay.NODE_TYPE.PROCESS: return 1;
       case wcPlay.NODE_TYPE.STORAGE: return 2;
+      case wcPlay.NODE_TYPE.COMPOSITE: return 3;
     }
   },
 
@@ -591,6 +594,8 @@ wcPlayEditor.prototype = {
             &lt;li>&lt;span class="wcPlayEditorMenuOptionCopy wcPlayMenuItem disabled">&lt;i class="wcPlayEditorMenuIcon wcButton fa fa-copy fa-lg"/>Copy&lt;span>Ctrl+C&lt;/span>&lt;/span>&lt;/li>\
             &lt;li>&lt;span class="wcPlayEditorMenuOptionPaste wcPlayMenuItem disabled">&lt;i class="wcPlayEditorMenuIcon wcButton fa fa-paste fa-lg"/>Paste&lt;span>Ctrl+P&lt;/span>&lt;/span>&lt;/li>\
             &lt;li>&lt;span class="wcPlayEditorMenuOptionDelete wcPlayMenuItem">&lt;i class="wcPlayEditorMenuIcon wcButton fa fa-trash-o fa-lg"/>Delete&lt;span>Del&lt;/span>&lt;/span>&lt;/li>\
+            &lt;li>&lt;hr class="wcPlayMenuSeparator">&lt;/li>\
+            &lt;li>&lt;span class="wcPlayEditorMenuOptionComposite wcPlayMenuItem" title="Archive all selected nodes into a single \'Composite\' Node.">&lt;i class="wcPlayEditorMenuIcon wcButton fa fa-archive fa-lg"/>Create Composite&lt;span>&lt;/span>&lt;/span>&lt;/li>\
           &lt;/ul>\
         &lt;/li>\
         &lt;li>&lt;span>Debugging&lt;/span>\
@@ -626,6 +631,8 @@ wcPlayEditor.prototype = {
         &lt;div class="wcPlayEditorMenuOptionPaste disabled">&lt;span class="wcPlayEditorMenuIcon wcButton fa fa-paste fa-lg" title="Paste"/>&lt;/div>\
         &lt;div class="wcPlayEditorMenuOptionDelete">&lt;span class="wcPlayEditorMenuIcon wcButton fa fa-trash-o fa-lg" title="Delete"/>&lt;/div>\
         &lt;div class="ARPG_Separator">&lt;/div>\
+        &lt;div class="wcPlayEditorMenuOptionComposite">&lt;span class="wcPlayEditorMenuIcon wcButton fa fa-archive fa-lg" title="Archive all selected nodes into a single \'Composite\' Node."/>&lt;/div>\
+        &lt;div class="ARPG_Separator">&lt;/div>\
         &lt;div class="wcPlayEditorMenuOptionDebugging">&lt;span class="wcPlayEditorMenuIcon wcButton fa fa-dot-circle-o fa-lg" title="Toggle debugging mode for the entire script."/>&lt;/div>\
         &lt;div class="wcPlayEditorMenuOptionSilence">&lt;span class="wcPlayEditorMenuIcon wcButton fa fa-volume-up fa-lg" title="Toggle silent mode for the entire script (Nodes with debug log enabled will not log when this is active)."/>&lt;/div>\
         &lt;div class="ARPG_Separator">&lt;/div>\
@@ -649,19 +656,23 @@ wcPlayEditor.prototype = {
    */
   __setupPalette: function() {
     // Create our top bar with buttons for each node type.
-    this.$typeButton.push($('&lt;button class="wcPlayEditorButton wcToggled" title="Show Entry Nodes.">Entry&lt;/button>'));
-    this.$typeButton.push($('&lt;button class="wcPlayEditorButton" title="Show Process Nodes.">Process&lt;/button>'));
+    this.$typeButton.push($('&lt;button class="wcPlayEditorButton" title="Show Entry Nodes.">Entry&lt;/button>'));
+    this.$typeButton.push($('&lt;button class="wcPlayEditorButton wcToggled" title="Show Process Nodes.">Process&lt;/button>'));
     this.$typeButton.push($('&lt;button class="wcPlayEditorButton" title="Show Storage Nodes.">Storage&lt;/button>'));
+    this.$typeButton.push($('&lt;button class="wcPlayEditorButton" title="Show Composite Nodes.">Composite&lt;/button>'));
     this.$palette.append(this.$typeButton[0]);
     this.$palette.append(this.$typeButton[1]);
     this.$palette.append(this.$typeButton[2]);
+    this.$palette.append(this.$typeButton[3]);
 
+    this.$typeArea.push($('&lt;div class="wcPlayTypeArea wcPlayHidden">'));
     this.$typeArea.push($('&lt;div class="wcPlayTypeArea">'));
     this.$typeArea.push($('&lt;div class="wcPlayTypeArea wcPlayHidden">'));
     this.$typeArea.push($('&lt;div class="wcPlayTypeArea wcPlayHidden">'));
     this.$paletteInner.append(this.$typeArea[0]);
     this.$paletteInner.append(this.$typeArea[1]);
     this.$paletteInner.append(this.$typeArea[2]);
+    this.$paletteInner.append(this.$typeArea[3]);
 
     // Initialize our node library.
     for (var i = 0; i &lt; wcPlay.NODE_LIBRARY.length; ++i) {
@@ -727,28 +738,45 @@ wcPlayEditor.prototype = {
       self.$typeButton[0].addClass('wcToggled');
       self.$typeButton[1].removeClass('wcToggled');
       self.$typeButton[2].removeClass('wcToggled');
+      self.$typeButton[3].removeClass('wcToggled');
 
       self.$typeArea[0].removeClass('wcPlayHidden');
       self.$typeArea[1].addClass('wcPlayHidden');
       self.$typeArea[2].addClass('wcPlayHidden');
+      self.$typeArea[3].addClass('wcPlayHidden');
     });
     this.$typeButton[1].click(function() {
       self.$typeButton[0].removeClass('wcToggled');
       self.$typeButton[1].addClass('wcToggled');
       self.$typeButton[2].removeClass('wcToggled');
+      self.$typeButton[3].removeClass('wcToggled');
 
       self.$typeArea[0].addClass('wcPlayHidden');
       self.$typeArea[1].removeClass('wcPlayHidden');
       self.$typeArea[2].addClass('wcPlayHidden');
+      self.$typeArea[3].addClass('wcPlayHidden');
     });
     this.$typeButton[2].click(function() {
       self.$typeButton[0].removeClass('wcToggled');
       self.$typeButton[1].removeClass('wcToggled');
       self.$typeButton[2].addClass('wcToggled');
+      self.$typeButton[3].removeClass('wcToggled');
 
       self.$typeArea[0].addClass('wcPlayHidden');
       self.$typeArea[1].addClass('wcPlayHidden');
       self.$typeArea[2].removeClass('wcPlayHidden');
+      self.$typeArea[3].addClass('wcPlayHidden');
+    });
+    this.$typeButton[3].click(function() {
+      self.$typeButton[0].removeClass('wcToggled');
+      self.$typeButton[1].removeClass('wcToggled');
+      self.$typeButton[2].removeClass('wcToggled');
+      self.$typeButton[3].addClass('wcToggled');
+
+      self.$typeArea[0].addClass('wcPlayHidden');
+      self.$typeArea[1].addClass('wcPlayHidden');
+      self.$typeArea[2].addClass('wcPlayHidden');
+      self.$typeArea[3].removeClass('wcPlayHidden');
     });
   },
 
@@ -844,6 +872,7 @@ wcPlayEditor.prototype = {
     data.outputBounds = propBounds.outputBounds;
     data.valueBounds = propBounds.valueBounds;
     data.initialBounds = propBounds.initialBounds;
+    data.viewportBounds = propBounds.viewportBounds;
 
     data.inner = this.__expandRect([centerBounds]);
     data.rect = this.__expandRect([entryBounds, centerBounds, exitBounds]);
@@ -1072,11 +1101,11 @@ wcPlayEditor.prototype = {
 
         // Property value.
         this.__setCanvasFont(this._font.value, context);
-        w += context.measureText(this._drawStyle.property.valueWrapL + this.__clampString(node.property(props[i].name).toString(), this._drawStyle.property.strLen) + this._drawStyle.property.valueWrapR).width;
+        w += context.measureText(this._drawStyle.property.valueWrapL + this.__drawPropertyValue(node, props[i]) + this._drawStyle.property.valueWrapR).width;
 
         // Property initial value.
         this.__setCanvasFont(this._font.initialValue, context);
-        w += context.measureText(this._drawStyle.property.initialWrapL + this.__clampString(node.initialProperty(props[i].name).toString(), this._drawStyle.property.strLen) + this._drawStyle.property.initialWrapR).width;
+        w += context.measureText(this._drawStyle.property.initialWrapL + this.__drawPropertyValue(node, props[i], true) + this._drawStyle.property.initialWrapR).width;
         bounds.width = Math.max(w, bounds.width);
       }
     }
@@ -1234,6 +1263,16 @@ wcPlayEditor.prototype = {
     var upper = node.chain.entry.length? this._font.links.size + this._drawStyle.links.padding: 0;
     var lower = node.chain.exit.length? this._font.links.size + this._drawStyle.links.padding: 0;
 
+    // Properties
+    var result = {
+      viewportBounds: null,
+      valueBounds:  [],
+      initialBounds:[],
+      inputBounds:  [],
+      outputBounds: [],
+    };
+    var linkRect;
+
     // Node background
     context.save();
       var left = rect.left + rect.width/2;
@@ -1286,33 +1325,26 @@ wcPlayEditor.prototype = {
     // Draw the node's viewport.
     if (node._viewportSize) {
       // Calculate the translation to make the viewport 0,0.
-      var corner = {
-        x: -this._viewportCamera.x + rect.left + (rect.width/2 - node._viewportSize.x/2),
-        y: -this._viewportCamera.y + rect.top + upper,
+      result.viewportBounds = {
+        left: -this._viewportCamera.x + rect.left + (rect.width/2 - node._viewportSize.x/2),
+        top: -this._viewportCamera.y + rect.top + upper,
+        width: node._viewportSize.x,
+        height: node._viewportSize.y,
       };
 
       context.save();
       // Translate the canvas so 0,0 is the beginning of the viewport.
-      context.translate(corner.x, corner.y);
+      context.translate(result.viewportBounds.left, result.viewportBounds.top);
 
       // Draw the viewport.
-      node.onViewport(context);
+      node.onViewportDraw(context);
 
       // Now revert the translation.
-      context.translate(-corner.x, -corner.y);
+      context.translate(-result.viewportBounds.left, -result.viewportBounds.top);
       context.restore();
 
       upper += node._viewportSize.y + this._drawStyle.property.spacing;
     }
-
-    // Properties
-    var result = {
-      valueBounds:  [],
-      initialBounds:[],
-      inputBounds:  [],
-      outputBounds: [],
-    };
-    var linkRect;
 
     context.save();
     var collapsed = node.collapsed();
@@ -1332,7 +1364,7 @@ wcPlayEditor.prototype = {
         // Initial property value.
         context.textAlign = "right";
         this.__setCanvasFont(this._font.initialValue, context);
-        var w = context.measureText(this._drawStyle.property.initialWrapL + this.__clampString(node.initialProperty(props[i].name).toString(), this._drawStyle.property.strLen) + this._drawStyle.property.initialWrapR).width;
+        var w = context.measureText(this._drawStyle.property.initialWrapL + this.__drawPropertyValue(node, props[i], true) + this._drawStyle.property.initialWrapR).width;
 
         var initialBound = {
           rect: {
@@ -1347,7 +1379,7 @@ wcPlayEditor.prototype = {
 
         // Property value.
         this.__setCanvasFont(this._font.value, context);
-        var vw = context.measureText(this._drawStyle.property.valueWrapL + this.__clampString(node.property(props[i].name).toString(), this._drawStyle.property.strLen) + this._drawStyle.property.valueWrapR).width;
+        var vw = context.measureText(this._drawStyle.property.valueWrapL + this.__drawPropertyValue(node, props[i]) + this._drawStyle.property.valueWrapR).width;
 
         var valueBound = {
           rect: {
@@ -1372,11 +1404,11 @@ wcPlayEditor.prototype = {
 
         this.__setCanvasFont(this._font.initialValue, context);
         context.fillStyle = "#444444";
-        context.fillText(this._drawStyle.property.initialWrapL + this.__clampString(node.initialProperty(props[i].name).toString(), this._drawStyle.property.strLen) + this._drawStyle.property.initialWrapR, rect.left + rect.width - this._drawStyle.node.margin, rect.top + upper);
+        context.fillText(this._drawStyle.property.initialWrapL + this.__drawPropertyValue(node, props[i], true) + this._drawStyle.property.initialWrapR, rect.left + rect.width - this._drawStyle.node.margin, rect.top + upper);
 
         this.__setCanvasFont(this._font.value, context);
         context.fillStyle = "black";
-        context.fillText(this._drawStyle.property.valueWrapL + this.__clampString(node.property(props[i].name).toString(), this._drawStyle.property.strLen) + this._drawStyle.property.valueWrapR, rect.left + rect.width - this._drawStyle.node.margin - w, rect.top + upper);
+        context.fillText(this._drawStyle.property.valueWrapL + this.__drawPropertyValue(node, props[i]) + this._drawStyle.property.valueWrapR, rect.left + rect.width - this._drawStyle.node.margin - w, rect.top + upper);
 
         // Property input.
         if (!collapsed || props[i].inputs.length) {
@@ -1917,6 +1949,71 @@ wcPlayEditor.prototype = {
   },
 
   /**
+   * Draws the value of a property embedded on the node.
+   * @function wcPlayEditor#__drawPropertyValue
+   * @private
+   * @param {wcNode} node - The node that owns this property.
+   * @param {Object} property - The property data.
+   * @param {Boolean} [initial] - Set true if the property being viewed is the initial value.
+   * @returns {String} - A string value to print as the value.
+   *
+   * @see {wcNode~wcNode~PropertyOptions}
+   * @see {wcNode~PropertyDisplay}
+   */
+  __drawPropertyValue: function(node, property, initial) {
+    var value;
+    if (initial) {
+      value = node.initialProperty(property.name);
+    } else {
+      value = node.property(property.name);
+    }
+
+    if (typeof property.options.display === 'function') {
+      value = property.options.display(value);
+    } else {
+      // Handle custom display of certain property types.
+      switch (property.type) {
+        case wcPlay.PROPERTY_TYPE.TOGGLE:
+          // Display toggle buttons as 'yes', 'no'
+          return (value? 'yes': 'no');
+        case wcPlay.PROPERTY_TYPE.SELECT:
+          if (value == '') {
+            return '&lt;none>';
+          }
+          var items = property.options.items;
+          if ($.isFunction(items)) {
+            items = items.call(node);
+          }
+
+          if ($.isArray(items)) {
+            var found = false;
+            for (var i = 0; i &lt; items.length; ++i) {
+              if (typeof items[i] === 'object') {
+                if (items[i].value == value) {
+                  value = items[i].name;
+                  found = true;
+                  break;
+                }
+              } else if (typeof items[i] === 'string') {
+                if (items[i] == value) {
+                  found = true;
+                  break;
+                }
+              }
+            }
+
+            if (!found) {
+              value = 'Unknown';
+            }
+          }
+          break;
+      }
+    }
+
+    return this.__clampString(value.toString(), this._drawStyle.property.strLen)
+  },
+
+  /**
    * Draws the editor control for a property.
    * @function wcPlayEditor#__drawPropertyEditor
    * @private
@@ -2000,6 +2097,34 @@ wcPlayEditor.prototype = {
         });
         break;
       case wcPlay.PROPERTY_TYPE.SELECT:
+        var value = node[propFn](property.name);
+        $control = $('&lt;select>');
+
+        var items = property.options.items;
+        if ($.isFunction(items)) {
+          items = items.call(node);
+        }
+
+        if ($.isArray(items)) {
+          $control.append($('&lt;option value=""' + ('' == value? ' selected': '') + '>&amp;lt;none&amp;gt;&lt;/option>'));
+          for (var i = 0; i &lt; items.length; ++i) {
+            if (typeof items[i] === 'object') {
+              $control.append($('&lt;option value="' + items[i].value + '"' + (items[i].value == value? ' selected': '') + '>' + items[i].name + '&lt;/option>'));
+            } else {
+              $control.append($('&lt;option value="' + items[i] + '"' + (items[i] == value? ' selected': '') + '>' + items[i] + '&lt;/option>'));
+            }
+          }
+        } else {
+          console.log("ERROR: Tried to display a Select type property when no selection list was provided.");
+          return;
+        }
+
+        $control.change(function() {
+          if (!cancelled) {
+            undoChange(node, property.name, node[propFn](property.name), $control.val());
+            node[propFn](property.name, $control.val());
+          }
+        });
         break;
     }
 
@@ -2038,7 +2163,7 @@ wcPlayEditor.prototype = {
       $control.css('top', offset.top + bounds.rect.top * this._viewportCamera.z + this._viewportCamera.y)
         .css('left', offset.left + bounds.rect.left * this._viewportCamera.z + this._viewportCamera.x)
         .css('width', 200)
-        .css('height', Math.max(bounds.rect.height * this._viewportCamera.z * 0.9, 15));
+        .css('height', Math.max(bounds.rect.height * this._viewportCamera.z, 15));
     }
   },
 
@@ -2273,6 +2398,13 @@ wcPlayEditor.prototype = {
       }
     });
 
+    $body.on('click', '.wcPlayEditorMenuOptionComposite', function() {
+      if (self._selectedNodes.length) {
+        // TODO:
+      }
+    });
+
+
     // Debugger
     $body.on('click', '.wcPlayEditorMenuOptionDebugging', function() {
       if (self._engine) {
@@ -2334,6 +2466,7 @@ wcPlayEditor.prototype = {
     this._highlightOutputLink = false;
     this._highlightPropertyValue = false;
     this._highlightPropertyInitialValue = false;
+    this._highlightViewport = false;
 
     // Dragging a node from the palette view.
     if (this._draggingNodeData) {
@@ -2517,6 +2650,9 @@ wcPlayEditor.prototype = {
     this._highlightPropertyValue = false;
     this._highlightPropertyInitialValue = false;
 
+    var wasOverViewport = this._highlightViewport;
+    this._highlightViewport = false;
+
     var node = this.__findNodeAtPos(mouse, this._viewportCamera);
     if (node) {
       // Check for main node collision.
@@ -2631,6 +2767,27 @@ wcPlayEditor.prototype = {
               this.$viewport.attr('title', 'Click to change the initial value of this property.\n' + node.properties[i].initialValue);
               break;
             }
+          }
+        }
+
+        // Custom viewport area.
+        if (node._meta.bounds.viewportBounds) {
+          var pos = {
+            x: this._mouse.x - node._meta.bounds.viewportBounds.left,
+            y: this._mouse.y - node._meta.bounds.viewportBounds.top,
+          };
+
+          if (this.__inRect(this._mouse, node._meta.bounds.viewportBounds, this._viewportCamera)) {
+            this._highlightNode = node;
+            this._highlightViewport = true;
+
+            if (!wasOverViewport) {
+              node.onViewportMouseEnter(event, pos);
+            }
+
+            node.onViewportMouseMove(event, pos);
+          } else if (wasOverViewport) {
+            node.onViewportMouseLeave(event, pos);
           }
         }
       }
@@ -2867,6 +3024,23 @@ wcPlayEditor.prototype = {
         }
       }
 
+      // Custom viewport area.
+      if (!hasTarget &amp;&amp; node._meta.bounds.viewportBounds) {
+        var pos = {
+          x: this._mouse.x - node._meta.bounds.viewportBounds.left,
+          y: this._mouse.y - node._meta.bounds.viewportBounds.top,
+        };
+
+        if (this.__inRect(this._mouse, node._meta.bounds.viewportBounds, this._viewportCamera)) {
+          this._selectedNode = node;
+          this._selectedNodes = [node];
+
+          if (node.onViewportMouseDown(event, pos)) {
+            hasTarget = true;
+          }
+        }
+      }
+
       // Center area.
       if (!hasTarget &amp;&amp; this.__inRect(this._mouse, node._meta.bounds.inner, this._viewportCamera)) {
         hasTarget = true;
@@ -2985,6 +3159,18 @@ wcPlayEditor.prototype = {
             }
           }
         }
+
+        // Custom viewport area.
+        if (node._meta.bounds.viewportBounds) {
+          var pos = {
+            x: this._mouse.x - node._meta.bounds.viewportBounds.left,
+            y: this._mouse.y - node._meta.bounds.viewportBounds.top,
+          };
+
+          if (this.__inRect(this._mouse, node._meta.bounds.viewportBounds, this._viewportCamera)) {
+            node.onViewportMouseClick(event, pos);
+          }
+        }
       }
     }
   },
@@ -3041,6 +3227,18 @@ wcPlayEditor.prototype = {
             node.property(node._meta.bounds.outputBounds[i].name, node.property(node._meta.bounds.outputBounds[i].name), true);
             break;
           }
+        }
+      }
+
+      // Custom viewport area.
+      if (!hasTarget &amp;&amp; node._meta.bounds.viewportBounds) {
+        var pos = {
+          x: this._mouse.x - node._meta.bounds.viewportBounds.left,
+          y: this._mouse.y - node._meta.bounds.viewportBounds.top,
+        };
+
+        if (this.__inRect(this._mouse, node._meta.bounds.viewportBounds, this._viewportCamera)) {
+          hasTarget = node.onViewportMouseDoubleClick(event, pos);
         }
       }
 
@@ -3323,6 +3521,17 @@ wcPlayEditor.prototype = {
           myNode.connectOutput(this.name, targetNode, this.targetName);
         });
       }
+    }
+
+    // Custom viewport area.
+    if (this._selectedNode &amp;&amp; this._highlightViewport) {
+      var mouse = this.__mouse(event, this.$viewport.offset());
+      var pos = {
+        x: mouse.x - this._selectedNode._meta.bounds.viewportBounds.left,
+        y: mouse.y - this._selectedNode._meta.bounds.viewportBounds.top,
+      };
+
+      this._selectedNode.onViewportMouseUp(event, pos);
     }
 
     // Re-collapse the node, if necessary.
