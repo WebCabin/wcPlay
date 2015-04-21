@@ -2050,7 +2050,7 @@ wcPlayEditor.prototype = {
         if ($.isArray(items)) {
           $control.append($('<option value=""' + ('' == value? ' selected': '') + '>&lt;none&gt;</option>'));
           for (var i = 0; i < items.length; ++i) {
-            if (typeof items[0] === 'object') {
+            if (typeof items[i] === 'object') {
               $control.append($('<option value="' + items[i].value + '"' + (items[i].value == value? ' selected': '') + '>' + items[i].name + '</option>'));
             } else {
               $control.append($('<option value="' + items[i] + '"' + (items[i] == value? ' selected': '') + '>' + items[i] + '</option>'));
