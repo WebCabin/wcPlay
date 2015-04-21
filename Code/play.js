@@ -398,6 +398,25 @@ wcPlay.prototype = {
   },
 
   /**
+   * Retrieves a list of all global properties and their values for this script.
+   * @function wcPlay#listProperties
+   * @returns {wcNode~PropertyData[]} - A list of all property data.
+   */
+  listProperties: function() {
+    var result = [];
+    for (var i = 0; i < this._properties.length; ++i) {
+      var myProp = this._properties[i];
+      result.push({
+        name: myProp.name,
+        value: myProp.value,
+        initialValue: myProp.initialValue,
+      });
+    }
+
+    return result;
+  },
+
+  /**
    * Triggers an event into the Play script.
    * @function wcPlay#triggerEvent
    * @param {String} name - The event name to trigger (more specifically, the name of the wcNodeEntry).

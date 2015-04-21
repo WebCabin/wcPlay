@@ -13,7 +13,7 @@ wcNodeProcess.extend('wcNodeProcessConsoleLog', 'Console Log', 'Debugging', {
     this._super(parent, pos, type);
 
     // Create the message property so we know what to output in the log.
-    this.createProperty('message', wcPlay.PROPERTY_TYPE.STRING, 'Log message.', {multiline: true});
+    this.createProperty('message', wcPlay.PROPERTY_TYPE.STRING, 'Log message.');
   },
 
   /**

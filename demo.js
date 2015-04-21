@@ -47,6 +47,8 @@ $(document).ready(function() {
   operationNode.collapsed(true);
   numberNode.collapsed(true);
 
+  myPlay.createProperty('Test property', wcPlay.PROPERTY_TYPE.STRING, 'Foo');
+
   // Start execution of the script.
   myPlay.start();
 });
