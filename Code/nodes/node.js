@@ -13,8 +13,10 @@ Class.extend('wcNode', 'Node', '', {
    */
   init: function(parent, pos) {
     this.id = ++wcNodeNextID;
-    this.name = '';
     this.color = '#FFFFFF';
+    if (!this.name) {
+      this.name = '';
+    }
 
     this._viewportSize = null;
 
@@ -47,8 +49,8 @@ Class.extend('wcNode', 'Node', '', {
     this.createProperty(wcNode.PROPERTY.ENABLED, wcPlay.PROPERTY_TYPE.TOGGLE, true, {collapsible: true, description: "Disabled nodes will be treated as if they were not there, all connections will be ignored."});
     this.createProperty(wcNode.PROPERTY.DEBUG_LOG, wcPlay.PROPERTY_TYPE.TOGGLE, false, {collapsible: true, description: "Output various debugging information about this node."});
 
-    var engine = this.engine();
-    engine && engine.__addNode(this);
+    // Add this node to its parent.
+    this._parent && this._parent.__addNode(this);
   },
 
   /**
@@ -56,6 +58,8 @@ Class.extend('wcNode', 'Node', '', {
    * @function wcNode#destroy
    */
   destroy: function() {
+    this.onDestroy();
+
     // Remove all links.
     for (var i = 0; i < this.chain.entry.length; ++i) {
       var item = this.chain.entry[i];
@@ -75,9 +79,14 @@ Class.extend('wcNode', 'Node', '', {
 
     this.reset();
 
-    // Remove the node from wcPlay
-    var engine = this.engine();
-    engine && engine.__removeNode(this);
+    var instanceIndex = window.wcNodeInstances[this.className].indexOf(this);
+    if (instanceIndex === -1) {
+      console.log("ERROR: Could not remove instance of node.");
+    }
+    window.wcNodeInstances[this.className].splice(instanceIndex, 1);
+
+    // Remove the node from its parent.
+    this._parent && this._parent.__removeNode(this);
   },
 
   /**
@@ -85,6 +94,8 @@ Class.extend('wcNode', 'Node', '', {
    * @function wcNode#reset
    */
   reset: function() {
+    this.onReset();
+
     for (var i = 0; i < this.properties.length; ++i) {
       this.properties[i].value = this.properties[i].initialValue;
     }
@@ -428,6 +439,107 @@ Class.extend('wcNode', 'Node', '', {
       }
     }
     return false;
+  },
+
+  /**
+   * Renames an entry link on this node while preserving all connected chains.
+   * @function wcNode#renameEntry
+   * @param {String} oldName - The old (current) name of the link.
+   * @param {String} newName - The new name of the link.
+   * @returns {Boolean} - Fails if the new name already exists, or the old name does not.
+   */
+  renameEntry: function(oldName, newName) {
+    if (!this.createEntry(newName)) {
+      return false;
+    }
+
+    if (this.createEntry(oldName)) {
+      this.removeEntry(oldName);
+      this.removeEntry(newName);
+      return false;
+    }
+
+    var chains = this.listEntryChains(oldName);
+    this.removeEntry(oldName);
+
+    var engine = this.engine();
+    if (engine) {
+      for (var i = 0; i < chains.length; ++i) {
+        this.connectEntry(newName, engine.nodeById(chains[i].outNodeId), chains[i].outName);
+      }
+    }
+    return true;
+  },
+
+  /**
+   * Renames an exit link on this node while preserving all connected chains.
+   * @function wcNode#renameExit
+   * @param {String} oldName - The old (current) name of the link.
+   * @param {String} newName - The new name of the link.
+   * @returns {Boolean} - Fails if the new name already exists, or the old name does not.
+   */
+  renameExit: function(oldName, newName) {
+    if (!this.createExit(newName)) {
+      return false;
+    }
+
+    if (this.createExit(oldName)) {
+      this.removeExit(oldName);
+      this.removeExit(newName);
+      return false;
+    }
+
+    var chains = this.listExitChains(oldName);
+    this.removeExit(oldName);
+
+    var engine = this.engine();
+    if (engine) {
+      for (var i = 0; i < chains.length; ++i) {
+        this.connectEntry(newName, engine.nodeById(chains[i].inNodeId), chains[i].inName);
+      }
+    }
+    return true;
+  },
+
+  /**
+   * Renames a property on this node while preserving all connected chains.
+   * @function wcNode#renameProperty
+   * @param {String} oldName - The old (current) name of the link.
+   * @param {String} newName - The new name of the link.
+   * @returns {Boolean} - Fails if the new name already exists, or the old name does not.
+   */
+  renameProperty: function(oldName, newName) {
+    var prop;
+    for (var i = 0; i < this.properties.length; ++i) {
+      if (this.properties[i].name === oldName) {
+        prop = this.properties[i];
+      }
+      if (this.properties[i].name === newName) {
+        return false;
+      }
+    }
+
+    if (!prop) {
+      return false;
+    }
+
+    this.createProperty(newName, prop.type, prop.initialValue, prop.options);
+    this.property(newName, prop.value, false);
+
+    var inputChains = this.listInputChains(oldName);
+    var outputChains= this.listOutputChains(oldName);
+    this.removeProperty(oldName);
+
+    var engine = this.engine();
+    if (engine) {
+      for (var i = 0; i < inputChains.length; ++i) {
+        this.connectInput(newName, engine.nodeById(inputChains[i].outNodeId), inputChains[i].outName);
+      }
+      for (var i = 0; i < outputChains.length; ++i) {
+        this.connectOutput(newName, engine.nodeById(outputChains[i].inNodeId), outputChains[i].inName);
+      }
+    }
+    return true;
   },
 
   /**
@@ -839,125 +951,6 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
-   * Retrieves a list of all chains connected to an entry link on this node.
-   * @function wcNode#listEntryChains
-   * @param {String} [name] - The entry link, if omitted, all link chains are retrieved.
-   * @returns {wcNode~ChainData[]} - A list of all chains connected to this link, if the link was not found, an empty list is returned.
-   */
-  listEntryChains: function(name) {
-    var result = [];
-    for (var i = 0; i < this.chain.entry.length; ++i) {
-      if (!name || this.chain.entry[i].name === name) {
-        var myLink = this.chain.entry[i];
-        for (var a = 0; a < myLink.links.length; ++a) {
-          result.push({
-            inName: myLink.name,
-            inNodeId: this.id,
-            outName: myLink.links[a].name,
-            outNodeId: myLink.links[a].node.id,
-          });
-        }
-      }
-    }
-
-    return result;
-  },
-
-  /**
-   * Retrieves a list of all chains connected to an exit link on this node.
-   * @function wcNode#listExitChains
-   * @param {String} [name] - The exit link, if omitted, all link chains are retrieved.
-   * @returns {wcNode~ChainData[]} - A list of all chains connected to this link, if the link was not found, an empty list is returned.
-   */
-  listExitChains: function(name) {
-    var result = [];
-    for (var i = 0; i < this.chain.exit.length; ++i) {
-      if (!name || this.chain.exit[i].name === name) {
-        var myLink = this.chain.exit[i];
-        for (var a = 0; a < myLink.links.length; ++a) {
-          result.push({
-            inName: myLink.links[a].name,
-            inNodeId: myLink.links[a].node.id,
-            outName: myLink.name,
-            outNodeId: this.id,
-          });
-        }
-      }
-    }
-
-    return result;
-  },
-
-  /**
-   * Retrieves a list of all chains connected to a property input link on this node.
-   * @function wcNode#listInputChains
-   * @param {String} [name] - The property input link, if omitted, all link chains are retrieved.
-   * @returns {wcNode~ChainData[]} - A list of all chains connected to this link, if the link was not found, an empty list is returned.
-   */
-  listInputChains: function(name) {
-    var result = [];
-    for (var i = 0; i < this.properties.length; ++i) {
-      if (!name || this.properties[i].name === name) {
-        var myProp = this.properties[i];
-        for (var a = 0; a < myProp.inputs.length; ++a) {
-          result.push({
-            inName: myProp.name,
-            inNodeId: this.id,
-            outName: myProp.inputs[a].name,
-            outNodeId: myProp.inputs[a].node.id,
-          });
-        }
-      }
-    }
-
-    return result;
-  },
-
-  /**
-   * Retrieves a list of all chains connected to a property output link on this node.
-   * @function wcNode#listOutputChains
-   * @param {String} [name] - The property output link, if omitted, all link chains are retrieved.
-   * @returns {wcNode~ChainData[]} - A list of all chains connected to this link, if the link was not found, an empty list is returned.
-   */
-  listOutputChains: function(name) {
-    var result = [];
-    for (var i = 0; i < this.properties.length; ++i) {
-      if (!name || this.properties[i].name === name) {
-        var myProp = this.properties[i];
-        for (var a = 0; a < myProp.outputs.length; ++a) {
-          result.push({
-            inName: myProp.outputs[a].name,
-            inNodeId: myProp.outputs[a].node.id,
-            outName: myProp.name,
-            outNodeId: this.id,
-          });
-        }
-      }
-    }
-
-    return result;
-  },
-
-  /**
-   * Retrieves a list of all properties and their values for this node.
-   * @function wcNode#listProperties
-   * @returns {wcNode~PropertyData[]} - A list of all property data.
-   */
-  listProperties: function() {
-    var result = [];
-    for (var i = 0; i < this.properties.length; ++i) {
-      var myProp = this.properties[i];
-      result.push({
-        name: myProp.name,
-        value: myProp.value,
-        initialValue: myProp.initialValue,
-      });
-    }
-
-    return result;
-  },
-
-  /**
    * Triggers an entry link and activates this node.
    * @function wcNode#triggerEntry
    * @param {String} name - The name of the entry link to trigger.
@@ -1160,6 +1153,137 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
+   * Retrieves a list of all chains connected to an entry link on this node.
+   * @function wcNode#listEntryChains
+   * @param {String} [name] - The entry link, if omitted, all link chains are retrieved.
+   * @param {wcNode[]} [ignoreNodes] - If supplied, will ignore all chains connected to a node in this list.
+   * @returns {wcNode~ChainData[]} - A list of all chains connected to this link, if the link was not found, an empty list is returned.
+   */
+  listEntryChains: function(name, ignoreNodes) {
+    var result = [];
+    for (var i = 0; i < this.chain.entry.length; ++i) {
+      if (!name || this.chain.entry[i].name === name) {
+        var myLink = this.chain.entry[i];
+        for (var a = 0; a < myLink.links.length; ++a) {
+          if (!ignoreNodes || ignoreNodes.indexOf(myLink.links[a].node) === -1) {
+            result.push({
+              inName: myLink.name,
+              inNodeId: this.id,
+              outName: myLink.links[a].name,
+              outNodeId: myLink.links[a].node.id,
+            });
+          }
+        }
+      }
+    }
+
+    return result;
+  },
+
+  /**
+   * Retrieves a list of all chains connected to an exit link on this node.
+   * @function wcNode#listExitChains
+   * @param {String} [name] - The exit link, if omitted, all link chains are retrieved.
+   * @param {wcNode[]} [ignoreNodes] - If supplied, will ignore all chains connected to a node in this list.
+   * @returns {wcNode~ChainData[]} - A list of all chains connected to this link, if the link was not found, an empty list is returned.
+   */
+  listExitChains: function(name, ignoreNodes) {
+    var result = [];
+    for (var i = 0; i < this.chain.exit.length; ++i) {
+      if (!name || this.chain.exit[i].name === name) {
+        var myLink = this.chain.exit[i];
+        for (var a = 0; a < myLink.links.length; ++a) {
+          if (!ignoreNodes || ignoreNodes.indexOf(myLink.links[a].node) === -1) {
+            result.push({
+              inName: myLink.links[a].name,
+              inNodeId: myLink.links[a].node.id,
+              outName: myLink.name,
+              outNodeId: this.id,
+            });
+          }
+        }
+      }
+    }
+
+    return result;
+  },
+
+  /**
+   * Retrieves a list of all chains connected to a property input link on this node.
+   * @function wcNode#listInputChains
+   * @param {String} [name] - The property input link, if omitted, all link chains are retrieved.
+   * @param {wcNode[]} [ignoreNodes] - If supplied, will ignore all chains connected to a node in this list.
+   * @returns {wcNode~ChainData[]} - A list of all chains connected to this link, if the link was not found, an empty list is returned.
+   */
+  listInputChains: function(name, ignoreNodes) {
+    var result = [];
+    for (var i = 0; i < this.properties.length; ++i) {
+      if (!name || this.properties[i].name === name) {
+        var myProp = this.properties[i];
+        for (var a = 0; a < myProp.inputs.length; ++a) {
+          if (!ignoreNodes || ignoreNodes.indexOf(myProp.inputs[a].node) === -1) {
+            result.push({
+              inName: myProp.name,
+              inNodeId: this.id,
+              outName: myProp.inputs[a].name,
+              outNodeId: myProp.inputs[a].node.id,
+            });
+          }
+        }
+      }
+    }
+
+    return result;
+  },
+
+  /**
+   * Retrieves a list of all chains connected to a property output link on this node.
+   * @function wcNode#listOutputChains
+   * @param {String} [name] - The property output link, if omitted, all link chains are retrieved.
+   * @param {wcNode[]} [ignoreNodes] - If supplied, will ignore all chains connected to a node in this list.
+   * @returns {wcNode~ChainData[]} - A list of all chains connected to this link, if the link was not found, an empty list is returned.
+   */
+  listOutputChains: function(name, ignoreNodes) {
+    var result = [];
+    for (var i = 0; i < this.properties.length; ++i) {
+      if (!name || this.properties[i].name === name) {
+        var myProp = this.properties[i];
+        for (var a = 0; a < myProp.outputs.length; ++a) {
+          if (!ignoreNodes || ignoreNodes.indexOf(myProp.outputs[a].node) === -1) {
+            result.push({
+              inName: myProp.outputs[a].name,
+              inNodeId: myProp.outputs[a].node.id,
+              outName: myProp.name,
+              outNodeId: this.id,
+            });
+          }
+        }
+      }
+    }
+
+    return result;
+  },
+
+  /**
+   * Retrieves a list of all properties and their values for this node.
+   * @function wcNode#listProperties
+   * @returns {wcNode~PropertyData[]} - A list of all property data.
+   */
+  listProperties: function() {
+    var result = [];
+    for (var i = 0; i < this.properties.length; ++i) {
+      var myProp = this.properties[i];
+      result.push({
+        name: myProp.name,
+        value: myProp.value,
+        initialValue: myProp.initialValue,
+      });
+    }
+
+    return result;
+  },
+
+  /**
    * Sets a size for the custom viewport.<br>
    * The custom viewport is a rectangular area embedded into the node's visual display in which you can 'draw' whatever you wish. It appears below the title text and above properties.
    * @function wcNode#viewportSize
@@ -1322,6 +1446,15 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
+   * Event that is called when this node is about to be drawn.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onDraw
+   */
+  onDraw: function() {
+    // this._super();
+  },
+
+  /**
    * Event that is called when an entry link has been triggered.<br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onTriggered
@@ -1332,6 +1465,17 @@ Class.extend('wcNode', 'Node', '', {
     if (this.debugLog()) {
       console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Triggered Entry link "' + name + '"');
     }
+  },
+
+  /**
+   * Event that is called when the name of this node has changed.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onNameChanged
+   * @param {String} oldName - The current name.
+   * @param {String} newName - The new name.
+   */
+  onNameChanged: function(oldName, newName) {
+    // this._super(oldName, newName);
   },
 
   /**
@@ -1422,6 +1566,24 @@ Class.extend('wcNode', 'Node', '', {
     // if (this.debugLog()) {
     //   console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Requested Property "' + name + '"');
     // }
+  },
+
+  /**
+   * Event that is called when the node is about to be destroyed.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onDestroy
+   */
+  onDestroy: function() {
+    // this._super();
+  },
+
+  /**
+   * Event that is called when the node is about to be reset.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onReset
+   */
+  onReset: function() {
+    // this._super();
   },
 
   /**

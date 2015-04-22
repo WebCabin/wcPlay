@@ -7,22 +7,6 @@ $(document).ready(function() {
     debugging: true,
   });
 
-  // wcNodeComposite.extend('wcNodeCompositeTest', 'Test', 'Core', {
-  //   init: function(parent, pos) {
-  //     this._super(parent, pos);
-  //     this.color = this.myCol;
-  //   },
-  //   myCol: "#FF0000",
-  // });
-
-  // wcNodeComposite.extend('wcNodeCompositeTest2', 'Test2', 'Core', {
-  //   init: function(parent, pos) {
-  //     this._super(parent, pos);
-  //     this.color = this.myCol;
-  //   },
-  //   myCol: "#0000FF",
-  // });
-
   // Create an instance of our script editor.
   var myPlayEditor = new wcPlayEditor('.playContainer', {
     readOnly: false,
@@ -43,13 +27,6 @@ $(document).ready(function() {
   var tutPropertyNode = new wcNodeProcessTutorialProperties(myPlay, {x: 800, y: 400});
   var tutDynamicNode = new wcNodeProcessTutorialDynamic(myPlay, {x: 800, y: 600});
   myPlayEditor.center();
-
-  // Assign them all debug log enabled, so they will console log various events.
-  // startNode.debugLog(true);
-  // logNode.debugLog(true);
-  // delayNode.debugLog(true);
-  // operationNode.debugLog(true);
-  // numberNode.debugLog(true);
 
   // Assign some property values.
   operationNode.initialProperty('valueB', 1);

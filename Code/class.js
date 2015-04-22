@@ -5,7 +5,8 @@
  */
 (function(){
   var initializing = false, fnTest = /xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/;
- 
+  window.wcNodeInstances = {};
+
   // The base Class implementation (does nothing)
   this.Class = function(){};
  
@@ -53,6 +54,7 @@
     function Class() {
       // All construction is actually done in the init method
       if (!initializing) {
+        window.wcNodeInstances[this.className].push(this);
         this.init && this.init.apply(this, arguments);
       } else {
         this.classInit && this.classInit.apply(this, arguments[0]);
@@ -69,5 +71,6 @@
     Class.extend = arguments.callee;
    
     window[className] = Class;
+    window.wcNodeInstances[className] = [];
   };
 })();

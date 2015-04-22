@@ -5,7 +5,8 @@
  */
 (function(){
   var initializing = false, fnTest = /xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/;
- 
+  window.wcNodeInstances = {};
+
   // The base Class implementation (does nothing)
   this.Class = function(){};
  
@@ -53,6 +54,7 @@
     function Class() {
       // All construction is actually done in the init method
       if (!initializing) {
+        window.wcNodeInstances[this.className].push(this);
         this.init && this.init.apply(this, arguments);
       } else {
         this.classInit && this.classInit.apply(this, arguments[0]);
@@ -69,6 +71,7 @@
     Class.extend = arguments.callee;
    
     window[className] = Class;
+    window.wcNodeInstances[className] = [];
   };
 })();
 /**
@@ -279,9 +282,9 @@ wcPlay.prototype = {
    * @returns {wcNode|null} - Either the found node, or null.
    */
   nodeById: function(id) {
-    for (var i = 0; i < this._storageNodes.length; ++i) {
-      if (this._storageNodes[i].id === id) {
-        return this._storageNodes[i];
+    for (var i = 0; i < this._entryNodes.length; ++i) {
+      if (this._entryNodes[i].id === id) {
+        return this._entryNodes[i];
       }
     }
     for (var i = 0; i < this._processNodes.length; ++i) {
@@ -289,14 +292,21 @@ wcPlay.prototype = {
         return this._processNodes[i];
       }
     }
+    for (var i = 0; i < this._storageNodes.length; ++i) {
+      if (this._storageNodes[i].id === id) {
+        return this._storageNodes[i];
+      }
+    }
     for (var i = 0; i < this._compositeNodes.length; ++i) {
       if (this._compositeNodes[i].id === id) {
         return this._compositeNodes[i];
       }
     }
-    for (var i = 0; i < this._entryNodes.length; ++i) {
-      if (this._entryNodes[i].id === id) {
-        return this._entryNodes[i];
+
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      var found = this._compositeNodes[i].nodeById(id);
+      if (found) {
+        return found;
       }
     }
     return null;
@@ -703,6 +713,7 @@ function wcPlayEditor(container, options) {
   this._size = {x: 0, y: 0};
 
   this._engine = null;
+  this._parent = null;
   this._nodeLibrary = {};
 
   this._font = {
@@ -841,6 +852,7 @@ wcPlayEditor.prototype = {
       }
 
       this._engine = engine;
+      this._parent = engine;
 
       if (this._engine) {
         this._engine._editors.push(this);
@@ -860,8 +872,8 @@ wcPlayEditor.prototype = {
    * @function wcPlayEditor#center
    */
   center: function() {
-    if (this._engine) {
-      this.focus(this._engine._entryNodes.concat(this._engine._entryNodes, this._engine._processNodes, this._engine._storageNodes, this._engine._compositeNodes));
+    if (this._parent) {
+      this.focus(this._parent._entryNodes.concat(this._parent._processNodes, this._parent._storageNodes, this._parent._compositeNodes));
     }
   },
 
@@ -1140,7 +1152,7 @@ wcPlayEditor.prototype = {
 
     this.onResized();
 
-    if (this._engine) {
+    if (this._parent) {
 
       // Render the palette.
       this.__drawPalette(elapsed);
@@ -1153,22 +1165,22 @@ wcPlayEditor.prototype = {
       this._viewportContext.scale(this._viewportCamera.z, this._viewportCamera.z);
 
       // Update nodes.
-      this.__updateNodes(this._engine._entryNodes, elapsed);
-      this.__updateNodes(this._engine._processNodes, elapsed);
-      this.__updateNodes(this._engine._compositeNodes, elapsed);
-      this.__updateNodes(this._engine._storageNodes, elapsed);
+      this.__updateNodes(this._parent._entryNodes, elapsed);
+      this.__updateNodes(this._parent._processNodes, elapsed);
+      this.__updateNodes(this._parent._compositeNodes, elapsed);
+      this.__updateNodes(this._parent._storageNodes, elapsed);
 
       // Render the nodes in the main script.
-      this.__drawNodes(this._engine._entryNodes, this._viewportContext);
-      this.__drawNodes(this._engine._processNodes, this._viewportContext);
-      this.__drawNodes(this._engine._compositeNodes, this._viewportContext);
-      this.__drawNodes(this._engine._storageNodes, this._viewportContext);
+      this.__drawNodes(this._parent._entryNodes, this._viewportContext);
+      this.__drawNodes(this._parent._processNodes, this._viewportContext);
+      this.__drawNodes(this._parent._compositeNodes, this._viewportContext);
+      this.__drawNodes(this._parent._storageNodes, this._viewportContext);
 
       // Render chains between nodes.
-      this.__drawChains(this._engine._entryNodes, this._viewportContext);
-      this.__drawChains(this._engine._processNodes, this._viewportContext);
-      this.__drawChains(this._engine._compositeNodes, this._viewportContext);
-      this.__drawChains(this._engine._storageNodes, this._viewportContext);
+      this.__drawChains(this._parent._entryNodes, this._viewportContext);
+      this.__drawChains(this._parent._processNodes, this._viewportContext);
+      this.__drawChains(this._parent._compositeNodes, this._viewportContext);
+      this.__drawChains(this._parent._storageNodes, this._viewportContext);
 
       if (this._highlightRect) {
         var radius = Math.min(10, this._highlightRect.width/2, this._highlightRect.height/2);
@@ -1203,6 +1215,8 @@ wcPlayEditor.prototype = {
    * @param {Number} elapsed - Elapsed time since last update.
    */
   __updateNode: function(node, elapsed) {
+    node.onDraw();
+
     // Update flash state.
     var self = this;
     function __updateFlash(meta, darkColor, lightColor, pauseColor, keepPaused, colorMul) {
@@ -1292,12 +1306,18 @@ wcPlayEditor.prototype = {
             <li><span class="wcPlayEditorMenuOptionComposite wcPlayMenuItem" title="Combine all selected nodes into a new \'Composite\' Node."><i class="wcPlayEditorMenuIcon wcButton fa fa-share-alt-square fa-lg"/>Create Composite<span></span></span></li>\
           </ul>\
         </li>\
+        <li><span>View</span>\
+          <ul>\
+            <li><span class="wcPlayEditorMenuOptionCenter wcPlayMenuItem" title="Fit selected nodes into view."><i class="wcPlayEditorMenuIcon wcButton fa fa-crosshairs fa-lg"/>Center View<span>F</span></span></li>\
+          </ul>\
+        </li>\
         <li><span>Debugging</span>\
           <ul>\
+            <li><span class="wcPlayEditorMenuOptionRestart wcPlayMenuItem" title="Reset all property values to their initial state and restart the execution of the script."><i class="wcPlayEditorMenuIcon wcButton fa fa-refresh fa-lg"/>Restart Script<span></span></span></li>\
+            <li><hr class="wcPlayMenuSeparator"></li>\
             <li><span class="wcPlayEditorMenuOptionDebugging wcPlayMenuItem" title="Toggle debugging mode for the entire script."><i class="wcPlayEditorMenuIcon wcButton fa fa-dot-circle-o fa-lg"/>Toggle Debug Mode<span></span></span></li>\
             <li><span class="wcPlayEditorMenuOptionSilence wcPlayMenuItem" title="Toggle silent mode for the entire script (Nodes with debug log enabled will not log when this is active)."><i class="wcPlayEditorMenuIcon wcButton fa fa-volume-up fa-lg"/>Toggle Silence Mode<span></span></span></li>\
             <li><hr class="wcPlayMenuSeparator"></li>\
-            <li><span class="wcPlayEditorMenuOptionRestart wcPlayMenuItem" title="Reset all property values to their initial state and restart the execution of the script."><i class="wcPlayEditorMenuIcon wcButton fa fa-refresh fa-lg"/>Restart Script<span></span></span></li>\
             <li><span class="wcPlayEditorMenuOptionPausePlay wcPlayMenuItem" title="Pause or Continue execution of the script."><i class="wcPlayEditorMenuIcon wcButton fa fa-pause fa-lg"/>Pause/Continue Script<span>Return</span></span></li>\
             <li><span class="wcPlayEditorMenuOptionStep wcPlayMenuItem" title="Steps execution of the script by a single update."><i class="wcPlayEditorMenuIcon wcButton fa fa-forward fa-lg"/>Step Script<span>Spacebar</span></span></li>\
           </ul>\
@@ -1327,10 +1347,13 @@ wcPlayEditor.prototype = {
         <div class="ARPG_Separator"></div>\
         <div class="wcPlayEditorMenuOptionComposite"><span class="wcPlayEditorMenuIcon wcButton fa fa-share-alt-square fa-lg" title="Combine all selected nodes into a new \'Composite\' Node."/></div>\
         <div class="ARPG_Separator"></div>\
+        <div class="wcPlayEditorMenuOptionCenter"><span class="wcPlayEditorMenuIcon wcButton fa fa-crosshairs fa-lg" title="Fit selected nodes into view."/></div>\
+        <div class="ARPG_Separator"></div>\
+        <div class="wcPlayEditorMenuOptionRestart"><span class="wcPlayEditorMenuIcon wcButton fa fa-refresh fa-lg" title="Reset all property values to their initial state and restart the execution of the script."/></div>\
+        <div class="ARPG_Separator"></div>\
         <div class="wcPlayEditorMenuOptionDebugging"><span class="wcPlayEditorMenuIcon wcButton fa fa-dot-circle-o fa-lg" title="Toggle debugging mode for the entire script."/></div>\
         <div class="wcPlayEditorMenuOptionSilence"><span class="wcPlayEditorMenuIcon wcButton fa fa-volume-up fa-lg" title="Toggle silent mode for the entire script (Nodes with debug log enabled will not log when this is active)."/></div>\
         <div class="ARPG_Separator"></div>\
-        <div class="wcPlayEditorMenuOptionRestart"><span class="wcPlayEditorMenuIcon wcButton fa fa-refresh fa-lg" title="Reset all property values to their initial state and restart the execution of the script."/></div>\
         <div class="wcPlayEditorMenuOptionPausePlay"><span class="wcPlayEditorMenuIcon wcButton fa fa-pause fa-lg" title="Pause or Continue execution of the script."/></div>\
         <div class="wcPlayEditorMenuOptionStep"><span class="wcPlayEditorMenuIcon wcButton fa fa-forward fa-lg" title="Steps execution of the script by a single update."/></div>\
         <div class="ARPG_Separator"></div>\
@@ -1392,10 +1415,19 @@ wcPlayEditor.prototype = {
       var data = wcPlay.NODE_LIBRARY[i];
 
       // Skip categories we are not showing.
-      var catIndex = this._options.category.items.indexOf(data.category);
-      if ((!this._options.category.isBlacklist && catIndex === -1) ||
-          (this._options.category.isBlacklist && catIndex > -1)) {
-        continue;
+      if (data.type !== wcPlay.NODE_TYPE.COMPOSITE) {
+        var catIndex = this._options.category.items.indexOf(data.category);
+        if ((!this._options.category.isBlacklist && catIndex === -1) ||
+            (this._options.category.isBlacklist && catIndex > -1)) {
+          continue;
+        }
+      } else {
+        // Skip composite node special 'link' nodes if we are not inside a composite.
+        if (this._engine === this._parent) {
+          if (data.category === 'Link') {
+            continue;
+          }
+        }
       }
 
       // Initialize the node category if it is new.
@@ -1407,7 +1439,7 @@ wcPlayEditor.prototype = {
       if (!this._nodeLibrary[data.category].hasOwnProperty(data.type)) {
         var typeData = {
           $category: $('<div class="wcPlayTypeCategory">'),
-          $button: $('<button class="wcPlayCategoryButton wcToggled" title="Toggle visibility of this category.">' + data.category + '</button>'),
+          $button: $('<button class="wcPlayCategoryButton" title="Toggle visibility of this category.">' + data.category + '</button>'),
           $canvas: $('<canvas class="wcPlayTypeCategoryArea">'),
           context: null,
           nodes: [],
@@ -1419,11 +1451,11 @@ wcPlayEditor.prototype = {
 
         (function __setupCollapseHandler(d) {
           d.$button.click(function() {
-            if (d.$button.hasClass('wcToggled')) {
-              d.$button.removeClass('wcToggled');
+            if (!d.$button.hasClass('wcToggled')) {
+              d.$button.addClass('wcToggled');
               d.$canvas.addClass('wcPlayHidden');
             } else {
-              d.$button.addClass('wcToggled');
+              d.$button.removeClass('wcToggled');
               d.$canvas.removeClass('wcPlayHidden');
             }
           });
@@ -1516,7 +1548,7 @@ wcPlayEditor.prototype = {
         var typeData = this._nodeLibrary[cat][type];
 
         // Ignore categories that are not visible.
-        if (!typeData.$button.hasClass('wcToggled')) continue;
+        if (typeData.$button.hasClass('wcToggled')) continue;
 
         var yPos = this._drawStyle.palette.spacing;
         var xPos = this.$paletteInner.width() / 2;
@@ -2821,14 +2853,21 @@ wcPlayEditor.prototype = {
         // Undo
         function() {
           var myNode = this.editor._engine.nodeById(this.id);
+          var oldName = myNode.name;
           myNode.name = this.oldValue;
+          myNode.onNameChanged(oldName, myNode.name);
         },
         // Redo
         function() {
           var myNode = this.editor._engine.nodeById(this.id);
+          var oldName = myNode.name;
           myNode.name = this.newValue;
+          myNode.onNameChanged(oldName, myNode.name);
         });
+
+        var oldName = node.name;
         node.name = $control.val();
+        node.onNameChanged(oldName, node.name);
       }
     });
 
@@ -3027,6 +3066,83 @@ wcPlayEditor.prototype = {
   },
 
   /**
+   * Destroys a node and creates an undo event for it.
+   * @function wcPlayEditor#__destroyNode
+   * @param {wcNode} node - the node to destroy.
+   */
+  __destroyNode: function(node) {
+    self._undoManager && self._undoManager.addEvent('',
+    {
+      id: node.id,
+      className: node.className,
+      pos: {
+        x: node.pos.x,
+        y: node.pos.y,
+      },
+      collapsed: node.collapsed(),
+      breakpoint: node._break,
+      properties: node.listProperties(),
+      entryChains: node.listEntryChains(),
+      exitChains: node.listExitChains(),
+      inputChains: node.listInputChains(),
+      outputChains: node.listOutputChains(),
+      editor: self,
+    },
+    // Undo
+    function() {
+      var myNode = new window[this.className](this.editor._parent, this.pos);
+      myNode.id = this.id;
+      myNode.collapsed(this.collapsed);
+      myNode.debugBreak(this.breakpoint);
+      // Restore property values.
+      for (var i = 0; i < this.properties.length; ++i) {
+        myNode.initialProperty(this.properties[i].name, this.properties[i].initialValue);
+        myNode.property(this.properties[i].name, this.properties[i].value);
+      }
+      // Re-connect all chains.
+      for (var i = 0; i < this.entryChains.length; ++i) {
+        var chain = this.entryChains[i];
+        var targetNode = this.editor._engine.nodeById(chain.outNodeId);
+        myNode.connectEntry(chain.inName, targetNode, chain.outName);
+      }
+      for (var i = 0; i < this.exitChains.length; ++i) {
+        var chain = this.exitChains[i];
+        var targetNode = this.editor._engine.nodeById(chain.inNodeId);
+        myNode.connectExit(chain.outName, targetNode, chain.inName);
+      }
+      for (var i = 0; i < this.inputChains.length; ++i) {
+        var chain = this.inputChains[i];
+        var targetNode = this.editor._engine.nodeById(chain.outNodeId);
+        myNode.connectInput(chain.inName, targetNode, chain.outName);
+      }
+      for (var i = 0; i < this.outputChains.length; ++i) {
+        var chain = this.outputChains[i];
+        var targetNode = this.editor._engine.nodeById(chain.inNodeId);
+        myNode.connectOutput(chain.outName, targetNode, chain.inName);
+      }
+    },
+    // Redo
+    function() {
+      var myNode = this.editor._engine.nodeById(this.id);
+
+      // If we are viewing a script inside the node that is being removed, re-direct our view to its parents.
+      var parent = self.editor._parent;
+      while (!(parent instanceof wcPlay)) {
+        if (parent == myNode) {
+          // TODO: Redirect view to myNode._parent.
+        }
+
+        parent = parent._parent;
+      }
+
+      // Now destroy this node.
+      myNode.destroy();
+    });
+
+    node.destroy();
+  },
+
+  /**
    * Initializes user control.
    * @funciton wcPlayEditor#__setupControls
    * @private
@@ -3176,6 +3292,7 @@ wcPlayEditor.prototype = {
     $body.on('click', '.wcPlayEditorMenuOptionNew', function() {
       if (self._engine) {
         self._engine.clear();
+        self._parent = self._engine;
       }
     });
     $body.on('click', '.wcPlayEditorMenuOptionOpen', function() {
@@ -3197,66 +3314,7 @@ wcPlayEditor.prototype = {
       if (self._selectedNodes.length) {
         self._undoManager && self._undoManager.beginGroup('Removed Nodes');
         for (var i = 0; i < self._selectedNodes.length; ++i) {
-          var node = self._selectedNodes[i];
-
-          self._undoManager && self._undoManager.addEvent('',
-          {
-            id: node.id,
-            className: node.className,
-            pos: {
-              x: node.pos.x,
-              y: node.pos.y,
-            },
-            collapsed: node.collapsed(),
-            breakpoint: node._break,
-            properties: node.listProperties(),
-            entryChains: node.listEntryChains(),
-            exitChains: node.listExitChains(),
-            inputChains: node.listInputChains(),
-            outputChains: node.listOutputChains(),
-            editor: self,
-          },
-          // Undo
-          function() {
-            var myNode = new window[this.className](this.editor._engine, this.pos);
-            myNode.id = this.id;
-            myNode.collapsed(this.collapsed);
-            myNode.debugBreak(this.breakpoint);
-            // Restore property values.
-            for (var i = 0; i < this.properties.length; ++i) {
-              myNode.initialProperty(this.properties[i].name, this.properties[i].initialValue);
-              myNode.property(this.properties[i].name, this.properties[i].value);
-            }
-            // Re-connect all chains.
-            for (var i = 0; i < this.entryChains.length; ++i) {
-              var chain = this.entryChains[i];
-              var targetNode = this.editor._engine.nodeById(chain.outNodeId);
-              myNode.connectEntry(chain.inName, targetNode, chain.outName);
-            }
-            for (var i = 0; i < this.exitChains.length; ++i) {
-              var chain = this.exitChains[i];
-              var targetNode = this.editor._engine.nodeById(chain.inNodeId);
-              myNode.connectExit(chain.outName, targetNode, chain.inName);
-            }
-            for (var i = 0; i < this.inputChains.length; ++i) {
-              var chain = this.inputChains[i];
-              var targetNode = this.editor._engine.nodeById(chain.outNodeId);
-              myNode.connectInput(chain.inName, targetNode, chain.outName);
-            }
-            for (var i = 0; i < this.outputChains.length; ++i) {
-              var chain = this.outputChains[i];
-              var targetNode = this.editor._engine.nodeById(chain.outNodeId);
-              myNode.connectOutput(chain.inName, targetNode, chain.outName);
-            }
-          },
-          // Redo
-          function() {
-            var myNode = this.editor._engine.nodeById(this.id);
-            myNode.destroy();
-          });
-
-          node.destroy();
-          node = null;
+          self.__destroyNode(self._selectedNodes[i]);
         }
         self._selectedNode = null;
         self._selectedNodes = [];
@@ -3265,43 +3323,135 @@ wcPlayEditor.prototype = {
     });
 
     $body.on('click', '.wcPlayEditorMenuOptionComposite', function() {
-      if (self._selectedNodes.length && self._engine) {
+      if (self._selectedNodes.length && self._parent) {
         // Find a unique class name to use for this new composite node.
         var index = 0;
+        var number = '';
         var className = '';
         do {
           index++
-          className = 'wcNodeComposite' + '0000'.substr(0, 4-('' + index).length) + index;
+          number = '0000'.substr(0, 4-('' + index).length) + index;
+          className = 'wcNodeComposite' + number;
         } while (window[className]);
 
-        // TODO: Find all chains that lead to external nodes and generate composite links for them.
-
-        // Remove the selected nodes from the script so they can be put into the composite node.
-        var exportedNodes = [];
-        for (var i = 0; i < self._selectedNodes.length; ++i) {
-          self._engine.__removeNode(self._selectedNodes[i]);
-          exportedNodes.push(self._selectedNodes[i].export());
-        }
-
         // Dynamically extend a new composite node class.
-        wcNodeComposite.extend(className, 'Composite', 'Core', {
-          nodes: exportedNodes,
+        wcNodeComposite.extend(className, 'Composite', 'Custom', {
+          name: number,
         });
 
-        // Determine the bounding area of the group of nodes being imported.
+        self._undoManager && self._undoManager.beginGroup("Combined Nodes into Composite: " + number);
+
+        var compNode = new window[className](self._parent, {x: 0, y: 0}, self._selectedNodes);
+
         var boundList = [];
+        var exportedNodes = [];
         for (var i = 0; i < self._selectedNodes.length; ++i) {
-          boundList.push(self._selectedNodes[i]._meta.bounds.farRect);
+          var node = self._selectedNodes[i];
+
+          // Calculate the bounding box of all moved nodes.
+          boundList.push(node._meta.bounds.farRect);
+
+          // The node was already moved to the composite node, now remove it from the parent object.
+          self._parent.__removeNode(node);
+
+          // Find all chains that connect to an external node.
+          var entryChains = node.listEntryChains(undefined, self._selectedNodes);
+          var exitChains = node.listExitChains(undefined, self._selectedNodes);
+          var inputChains = node.listInputChains(undefined, self._selectedNodes);
+          var outputChains = node.listOutputChains(undefined, self._selectedNodes);
+
+          // External entry chains.
+          var createdLinks = [];
+          for (var a = 0; a < entryChains.length; ++a) {
+            var targetNode = self._engine.nodeById(entryChains[a].outNodeId);
+            var targetName = entryChains[a].outName;
+            var node = self._engine.nodeById(entryChains[a].inNodeId);
+            var linkName = entryChains[a].inName;
+
+            // Make sure we only create one Composite Entry per link.
+            var linkNode = null;
+            for (var b = 0; b < createdLinks.length; ++b) {
+              if (createdLinks[b].name === linkName) {
+                linkNode = createdLinks[b].node;
+                break;
+              }
+            }
+            if (!linkNode) {
+              // Create a Composite Entry Node, this acts as a surrogate entry link for the Composite node.
+              linkNode = new wcNodeCompositeEntry(compNode, {x: node.pos.x, y: node.pos.y - 100}, linkName);
+              createdLinks.push({
+                name: linkName,
+                node: linkNode,
+              });
+            }
+
+            linkNode.connectExit('out', node, linkName);
+            compNode.connectEntry(linkNode.property('link name'), targetNode, targetName);
+            targetNode.disconnectExit(targetName, node, linkName);
+          }
+
+          // External exit chains.
+          createdLinks = [];
+          for (var a = 0; a < exitChains.length; ++a) {
+            var targetNode = self._engine.nodeById(exitChains[a].inNodeId);
+            var targetName = exitChains[a].inName;
+            var node = self._engine.nodeById(exitChains[a].outNodeId);
+            var linkName = exitChains[a].outName;
+
+            // Make sure we only create one Composite Entry per link.
+            var linkNode = null;
+            for (var b = 0; b < createdLinks.length; ++b) {
+              if (createdLinks[b].name === linkName) {
+                linkNode = createdLinks[b].node;
+                break;
+              }
+            }
+            if (!linkNode) {
+              // Create a Composite Entry Node, this acts as a surrogate entry link for the Composite node.
+              linkNode = new wcNodeCompositeExit(compNode, {x: node.pos.x, y: node.pos.y + 200}, linkName);
+              createdLinks.push({
+                name: linkName,
+                node: linkNode,
+              });
+            }
+
+            linkNode.connectEntry('in', node, linkName);
+            compNode.connectExit(linkNode.property('link name'), targetNode, targetName);
+            targetNode.disconnectEntry(targetName, node, linkName);
+          }
         }
         var bounds = self.__expandRect(boundList);
+        compNode.pos.x = bounds.left + bounds.width/2;
+        compNode.pos.y = bounds.top + bounds.height/2;
 
-        // TODO: Instead of giving it the engine, we need to give it the parent who could possibly be another composite node.
-        var compNode = new window[className](self._engine, {x: bounds.left + bounds.width/2, y: bounds.top + bounds.height/2}, this._selectedNodes);
+        compNode.compile();
+
+        // var boundList = [];
+        // var exportedNodes = [];
+        // for (var i = 0; i < self._selectedNodes.length; ++i) {
+        //   boundList.push(self._selectedNodes[i]._meta.bounds.farRect);
+        //   exportedNodes.push(self._selectedNodes[i].export());
+        //   self.__destroyNode(self._selectedNodes[i]);
+        // }
+        // var bounds = self.__expandRect(boundList);
+
+        // TODO: Create undo event for moving the selected nodes into the new composite node.
+
+        self._undoManager && self._undoManager.endGroup();
 
         self.__setupPalette();
       }
     });
 
+
+    // View
+    $body.on('click', '.wcPlayEditorMenuOptionCenter', function() {
+      if (self._selectedNodes.length) {
+        self.focus(self._selectedNodes);
+      } else {
+        self.center();
+      }
+    });
 
     // Debugger
     $body.on('click', '.wcPlayEditorMenuOptionDebugging', function() {
@@ -3481,7 +3631,7 @@ wcPlayEditor.prototype = {
     }
 
     // Box selection.
-    if (this._highlightRect && this._engine) {
+    if (this._highlightRect && this._parent) {
       this._highlightRect.x = ((mouse.x - this._viewportCamera.x) / this._viewportCamera.z) - this._highlightRect.ox;
       this._highlightRect.y = ((mouse.y - this._viewportCamera.y) / this._viewportCamera.z) - this._highlightRect.oy;
 
@@ -3506,10 +3656,10 @@ wcPlayEditor.prototype = {
           }
         }
       };
-      __nodesInRect(this._engine._storageNodes);
-      __nodesInRect(this._engine._compositeNodes);
-      __nodesInRect(this._engine._processNodes);
-      __nodesInRect(this._engine._entryNodes);
+      __nodesInRect(this._parent._storageNodes);
+      __nodesInRect(this._parent._compositeNodes);
+      __nodesInRect(this._parent._processNodes);
+      __nodesInRect(this._parent._entryNodes);
       this._mouse = mouse;
       return;
     }
@@ -4021,7 +4171,7 @@ wcPlayEditor.prototype = {
     if (this._draggingNodeData) {
       // Create an instance of the node and add it to the script.
       var mouse = this.__mouse(event, this.$viewport.offset(), this._viewportCamera);
-      var newNode = new window[this._draggingNodeData.node.className](this._engine, {
+      var newNode = new window[this._draggingNodeData.node.className](this._parent, {
         x: (mouse.x + (this._draggingNodeData.$canvas.width()/2 + this._draggingNodeData.offset.x)) / this._viewportCamera.z,
         y: (mouse.y + this._draggingNodeData.offset.y) / this._viewportCamera.z,
       });
@@ -4034,16 +4184,16 @@ wcPlayEditor.prototype = {
           x: newNode.pos.x,
           y: newNode.pos.y,
         },
-        editor: this,
+        parent: this._parent,
       },
       // Undo
       function() {
-        var myNode = this.editor._engine.nodeById(this.id);
+        var myNode = this.parent.nodeById(this.id);
         myNode.destroy();
       },
       // Redo
       function() {
-        var myNode = new window[this.className](this.editor._engine, this.pos);
+        var myNode = new window[this.className](this.parent, this.pos);
         myNode.id = this.id;
       });
 
@@ -4057,7 +4207,7 @@ wcPlayEditor.prototype = {
       this.$viewport.removeClass('wcMoving');
     }
 
-    if (this._highlightRect && this._engine) {
+    if (this._highlightRect && this._parent) {
       this._highlightRect = null;
       return;
     }
@@ -4558,7 +4708,7 @@ wcPlayEditor.prototype = {
    * @returns {wcNode|null} - A node at the given position, or null if none was found.
    */
   __findNodeAtPos: function(pos, camera, nodes) {
-    if (this._engine) {
+    if (this._parent) {
       var self = this;
       function __test(nodes) {
         // Iterate backwards so we always test the nodes that are drawn on top first.
@@ -4571,10 +4721,10 @@ wcPlayEditor.prototype = {
       };
 
       if (nodes === undefined) {
-        return __test(this._engine._storageNodes) ||
-               __test(this._engine._compositeNodes) ||
-               __test(this._engine._processNodes) ||
-               __test(this._engine._entryNodes);
+        return __test(this._parent._storageNodes) ||
+               __test(this._parent._compositeNodes) ||
+               __test(this._parent._processNodes) ||
+               __test(this._parent._entryNodes);
       } else {
         return __test(nodes);
       }
@@ -4599,7 +4749,7 @@ wcPlayEditor.prototype = {
         var typeData = this._nodeLibrary[cat][type];
 
         // Ignore categories that are not visible.
-        if (!typeData.$button.hasClass('wcToggled')) continue;
+        if (typeData.$button.hasClass('wcToggled')) continue;
 
         var rect = typeData.$canvas.offset();
         rect.width = typeData.$canvas.width();
@@ -4627,8 +4777,10 @@ Class.extend('wcNode', 'Node', '', {
    */
   init: function(parent, pos) {
     this.id = ++wcNodeNextID;
-    this.name = '';
     this.color = '#FFFFFF';
+    if (!this.name) {
+      this.name = '';
+    }
 
     this._viewportSize = null;
 
@@ -4661,8 +4813,8 @@ Class.extend('wcNode', 'Node', '', {
     this.createProperty(wcNode.PROPERTY.ENABLED, wcPlay.PROPERTY_TYPE.TOGGLE, true, {collapsible: true, description: "Disabled nodes will be treated as if they were not there, all connections will be ignored."});
     this.createProperty(wcNode.PROPERTY.DEBUG_LOG, wcPlay.PROPERTY_TYPE.TOGGLE, false, {collapsible: true, description: "Output various debugging information about this node."});
 
-    var engine = this.engine();
-    engine && engine.__addNode(this);
+    // Add this node to its parent.
+    this._parent && this._parent.__addNode(this);
   },
 
   /**
@@ -4670,6 +4822,8 @@ Class.extend('wcNode', 'Node', '', {
    * @function wcNode#destroy
    */
   destroy: function() {
+    this.onDestroy();
+
     // Remove all links.
     for (var i = 0; i < this.chain.entry.length; ++i) {
       var item = this.chain.entry[i];
@@ -4689,9 +4843,14 @@ Class.extend('wcNode', 'Node', '', {
 
     this.reset();
 
-    // Remove the node from wcPlay
-    var engine = this.engine();
-    engine && engine.__removeNode(this);
+    var instanceIndex = window.wcNodeInstances[this.className].indexOf(this);
+    if (instanceIndex === -1) {
+      console.log("ERROR: Could not remove instance of node.");
+    }
+    window.wcNodeInstances[this.className].splice(instanceIndex, 1);
+
+    // Remove the node from its parent.
+    this._parent && this._parent.__removeNode(this);
   },
 
   /**
@@ -4699,6 +4858,8 @@ Class.extend('wcNode', 'Node', '', {
    * @function wcNode#reset
    */
   reset: function() {
+    this.onReset();
+
     for (var i = 0; i < this.properties.length; ++i) {
       this.properties[i].value = this.properties[i].initialValue;
     }
@@ -5042,6 +5203,107 @@ Class.extend('wcNode', 'Node', '', {
       }
     }
     return false;
+  },
+
+  /**
+   * Renames an entry link on this node while preserving all connected chains.
+   * @function wcNode#renameEntry
+   * @param {String} oldName - The old (current) name of the link.
+   * @param {String} newName - The new name of the link.
+   * @returns {Boolean} - Fails if the new name already exists, or the old name does not.
+   */
+  renameEntry: function(oldName, newName) {
+    if (!this.createEntry(newName)) {
+      return false;
+    }
+
+    if (this.createEntry(oldName)) {
+      this.removeEntry(oldName);
+      this.removeEntry(newName);
+      return false;
+    }
+
+    var chains = this.listEntryChains(oldName);
+    this.removeEntry(oldName);
+
+    var engine = this.engine();
+    if (engine) {
+      for (var i = 0; i < chains.length; ++i) {
+        this.connectEntry(newName, engine.nodeById(chains[i].outNodeId), chains[i].outName);
+      }
+    }
+    return true;
+  },
+
+  /**
+   * Renames an exit link on this node while preserving all connected chains.
+   * @function wcNode#renameExit
+   * @param {String} oldName - The old (current) name of the link.
+   * @param {String} newName - The new name of the link.
+   * @returns {Boolean} - Fails if the new name already exists, or the old name does not.
+   */
+  renameExit: function(oldName, newName) {
+    if (!this.createExit(newName)) {
+      return false;
+    }
+
+    if (this.createExit(oldName)) {
+      this.removeExit(oldName);
+      this.removeExit(newName);
+      return false;
+    }
+
+    var chains = this.listExitChains(oldName);
+    this.removeExit(oldName);
+
+    var engine = this.engine();
+    if (engine) {
+      for (var i = 0; i < chains.length; ++i) {
+        this.connectEntry(newName, engine.nodeById(chains[i].inNodeId), chains[i].inName);
+      }
+    }
+    return true;
+  },
+
+  /**
+   * Renames a property on this node while preserving all connected chains.
+   * @function wcNode#renameProperty
+   * @param {String} oldName - The old (current) name of the link.
+   * @param {String} newName - The new name of the link.
+   * @returns {Boolean} - Fails if the new name already exists, or the old name does not.
+   */
+  renameProperty: function(oldName, newName) {
+    var prop;
+    for (var i = 0; i < this.properties.length; ++i) {
+      if (this.properties[i].name === oldName) {
+        prop = this.properties[i];
+      }
+      if (this.properties[i].name === newName) {
+        return false;
+      }
+    }
+
+    if (!prop) {
+      return false;
+    }
+
+    this.createProperty(newName, prop.type, prop.initialValue, prop.options);
+    this.property(newName, prop.value, false);
+
+    var inputChains = this.listInputChains(oldName);
+    var outputChains= this.listOutputChains(oldName);
+    this.removeProperty(oldName);
+
+    var engine = this.engine();
+    if (engine) {
+      for (var i = 0; i < inputChains.length; ++i) {
+        this.connectInput(newName, engine.nodeById(inputChains[i].outNodeId), inputChains[i].outName);
+      }
+      for (var i = 0; i < outputChains.length; ++i) {
+        this.connectOutput(newName, engine.nodeById(outputChains[i].inNodeId), outputChains[i].inName);
+      }
+    }
+    return true;
   },
 
   /**
@@ -5453,125 +5715,6 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
-   * Retrieves a list of all chains connected to an entry link on this node.
-   * @function wcNode#listEntryChains
-   * @param {String} [name] - The entry link, if omitted, all link chains are retrieved.
-   * @returns {wcNode~ChainData[]} - A list of all chains connected to this link, if the link was not found, an empty list is returned.
-   */
-  listEntryChains: function(name) {
-    var result = [];
-    for (var i = 0; i < this.chain.entry.length; ++i) {
-      if (!name || this.chain.entry[i].name === name) {
-        var myLink = this.chain.entry[i];
-        for (var a = 0; a < myLink.links.length; ++a) {
-          result.push({
-            inName: myLink.name,
-            inNodeId: this.id,
-            outName: myLink.links[a].name,
-            outNodeId: myLink.links[a].node.id,
-          });
-        }
-      }
-    }
-
-    return result;
-  },
-
-  /**
-   * Retrieves a list of all chains connected to an exit link on this node.
-   * @function wcNode#listExitChains
-   * @param {String} [name] - The exit link, if omitted, all link chains are retrieved.
-   * @returns {wcNode~ChainData[]} - A list of all chains connected to this link, if the link was not found, an empty list is returned.
-   */
-  listExitChains: function(name) {
-    var result = [];
-    for (var i = 0; i < this.chain.exit.length; ++i) {
-      if (!name || this.chain.exit[i].name === name) {
-        var myLink = this.chain.exit[i];
-        for (var a = 0; a < myLink.links.length; ++a) {
-          result.push({
-            inName: myLink.links[a].name,
-            inNodeId: myLink.links[a].node.id,
-            outName: myLink.name,
-            outNodeId: this.id,
-          });
-        }
-      }
-    }
-
-    return result;
-  },
-
-  /**
-   * Retrieves a list of all chains connected to a property input link on this node.
-   * @function wcNode#listInputChains
-   * @param {String} [name] - The property input link, if omitted, all link chains are retrieved.
-   * @returns {wcNode~ChainData[]} - A list of all chains connected to this link, if the link was not found, an empty list is returned.
-   */
-  listInputChains: function(name) {
-    var result = [];
-    for (var i = 0; i < this.properties.length; ++i) {
-      if (!name || this.properties[i].name === name) {
-        var myProp = this.properties[i];
-        for (var a = 0; a < myProp.inputs.length; ++a) {
-          result.push({
-            inName: myProp.name,
-            inNodeId: this.id,
-            outName: myProp.inputs[a].name,
-            outNodeId: myProp.inputs[a].node.id,
-          });
-        }
-      }
-    }
-
-    return result;
-  },
-
-  /**
-   * Retrieves a list of all chains connected to a property output link on this node.
-   * @function wcNode#listOutputChains
-   * @param {String} [name] - The property output link, if omitted, all link chains are retrieved.
-   * @returns {wcNode~ChainData[]} - A list of all chains connected to this link, if the link was not found, an empty list is returned.
-   */
-  listOutputChains: function(name) {
-    var result = [];
-    for (var i = 0; i < this.properties.length; ++i) {
-      if (!name || this.properties[i].name === name) {
-        var myProp = this.properties[i];
-        for (var a = 0; a < myProp.outputs.length; ++a) {
-          result.push({
-            inName: myProp.outputs[a].name,
-            inNodeId: myProp.outputs[a].node.id,
-            outName: myProp.name,
-            outNodeId: this.id,
-          });
-        }
-      }
-    }
-
-    return result;
-  },
-
-  /**
-   * Retrieves a list of all properties and their values for this node.
-   * @function wcNode#listProperties
-   * @returns {wcNode~PropertyData[]} - A list of all property data.
-   */
-  listProperties: function() {
-    var result = [];
-    for (var i = 0; i < this.properties.length; ++i) {
-      var myProp = this.properties[i];
-      result.push({
-        name: myProp.name,
-        value: myProp.value,
-        initialValue: myProp.initialValue,
-      });
-    }
-
-    return result;
-  },
-
-  /**
    * Triggers an entry link and activates this node.
    * @function wcNode#triggerEntry
    * @param {String} name - The name of the entry link to trigger.
@@ -5774,6 +5917,137 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
+   * Retrieves a list of all chains connected to an entry link on this node.
+   * @function wcNode#listEntryChains
+   * @param {String} [name] - The entry link, if omitted, all link chains are retrieved.
+   * @param {wcNode[]} [ignoreNodes] - If supplied, will ignore all chains connected to a node in this list.
+   * @returns {wcNode~ChainData[]} - A list of all chains connected to this link, if the link was not found, an empty list is returned.
+   */
+  listEntryChains: function(name, ignoreNodes) {
+    var result = [];
+    for (var i = 0; i < this.chain.entry.length; ++i) {
+      if (!name || this.chain.entry[i].name === name) {
+        var myLink = this.chain.entry[i];
+        for (var a = 0; a < myLink.links.length; ++a) {
+          if (!ignoreNodes || ignoreNodes.indexOf(myLink.links[a].node) === -1) {
+            result.push({
+              inName: myLink.name,
+              inNodeId: this.id,
+              outName: myLink.links[a].name,
+              outNodeId: myLink.links[a].node.id,
+            });
+          }
+        }
+      }
+    }
+
+    return result;
+  },
+
+  /**
+   * Retrieves a list of all chains connected to an exit link on this node.
+   * @function wcNode#listExitChains
+   * @param {String} [name] - The exit link, if omitted, all link chains are retrieved.
+   * @param {wcNode[]} [ignoreNodes] - If supplied, will ignore all chains connected to a node in this list.
+   * @returns {wcNode~ChainData[]} - A list of all chains connected to this link, if the link was not found, an empty list is returned.
+   */
+  listExitChains: function(name, ignoreNodes) {
+    var result = [];
+    for (var i = 0; i < this.chain.exit.length; ++i) {
+      if (!name || this.chain.exit[i].name === name) {
+        var myLink = this.chain.exit[i];
+        for (var a = 0; a < myLink.links.length; ++a) {
+          if (!ignoreNodes || ignoreNodes.indexOf(myLink.links[a].node) === -1) {
+            result.push({
+              inName: myLink.links[a].name,
+              inNodeId: myLink.links[a].node.id,
+              outName: myLink.name,
+              outNodeId: this.id,
+            });
+          }
+        }
+      }
+    }
+
+    return result;
+  },
+
+  /**
+   * Retrieves a list of all chains connected to a property input link on this node.
+   * @function wcNode#listInputChains
+   * @param {String} [name] - The property input link, if omitted, all link chains are retrieved.
+   * @param {wcNode[]} [ignoreNodes] - If supplied, will ignore all chains connected to a node in this list.
+   * @returns {wcNode~ChainData[]} - A list of all chains connected to this link, if the link was not found, an empty list is returned.
+   */
+  listInputChains: function(name, ignoreNodes) {
+    var result = [];
+    for (var i = 0; i < this.properties.length; ++i) {
+      if (!name || this.properties[i].name === name) {
+        var myProp = this.properties[i];
+        for (var a = 0; a < myProp.inputs.length; ++a) {
+          if (!ignoreNodes || ignoreNodes.indexOf(myProp.inputs[a].node) === -1) {
+            result.push({
+              inName: myProp.name,
+              inNodeId: this.id,
+              outName: myProp.inputs[a].name,
+              outNodeId: myProp.inputs[a].node.id,
+            });
+          }
+        }
+      }
+    }
+
+    return result;
+  },
+
+  /**
+   * Retrieves a list of all chains connected to a property output link on this node.
+   * @function wcNode#listOutputChains
+   * @param {String} [name] - The property output link, if omitted, all link chains are retrieved.
+   * @param {wcNode[]} [ignoreNodes] - If supplied, will ignore all chains connected to a node in this list.
+   * @returns {wcNode~ChainData[]} - A list of all chains connected to this link, if the link was not found, an empty list is returned.
+   */
+  listOutputChains: function(name, ignoreNodes) {
+    var result = [];
+    for (var i = 0; i < this.properties.length; ++i) {
+      if (!name || this.properties[i].name === name) {
+        var myProp = this.properties[i];
+        for (var a = 0; a < myProp.outputs.length; ++a) {
+          if (!ignoreNodes || ignoreNodes.indexOf(myProp.outputs[a].node) === -1) {
+            result.push({
+              inName: myProp.outputs[a].name,
+              inNodeId: myProp.outputs[a].node.id,
+              outName: myProp.name,
+              outNodeId: this.id,
+            });
+          }
+        }
+      }
+    }
+
+    return result;
+  },
+
+  /**
+   * Retrieves a list of all properties and their values for this node.
+   * @function wcNode#listProperties
+   * @returns {wcNode~PropertyData[]} - A list of all property data.
+   */
+  listProperties: function() {
+    var result = [];
+    for (var i = 0; i < this.properties.length; ++i) {
+      var myProp = this.properties[i];
+      result.push({
+        name: myProp.name,
+        value: myProp.value,
+        initialValue: myProp.initialValue,
+      });
+    }
+
+    return result;
+  },
+
+  /**
    * Sets a size for the custom viewport.<br>
    * The custom viewport is a rectangular area embedded into the node's visual display in which you can 'draw' whatever you wish. It appears below the title text and above properties.
    * @function wcNode#viewportSize
@@ -5936,6 +6210,15 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
+   * Event that is called when this node is about to be drawn.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onDraw
+   */
+  onDraw: function() {
+    // this._super();
+  },
+
+  /**
    * Event that is called when an entry link has been triggered.<br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onTriggered
@@ -5946,6 +6229,17 @@ Class.extend('wcNode', 'Node', '', {
     if (this.debugLog()) {
       console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Triggered Entry link "' + name + '"');
     }
+  },
+
+  /**
+   * Event that is called when the name of this node has changed.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onNameChanged
+   * @param {String} oldName - The current name.
+   * @param {String} newName - The new name.
+   */
+  onNameChanged: function(oldName, newName) {
+    // this._super(oldName, newName);
   },
 
   /**
@@ -6036,6 +6330,24 @@ Class.extend('wcNode', 'Node', '', {
     // if (this.debugLog()) {
     //   console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Requested Property "' + name + '"');
     // }
+  },
+
+  /**
+   * Event that is called when the node is about to be destroyed.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onDestroy
+   */
+  onDestroy: function() {
+    // this._super();
+  },
+
+  /**
+   * Event that is called when the node is about to be reset.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onReset
+   */
+  onReset: function() {
+    // this._super();
   },
 
   /**
@@ -6292,7 +6604,7 @@ wcNode.extend('wcNodeComposite', 'Composite', '', {
    */
   init: function(parent, pos, nodes) {
     this._super(parent, pos);
-    this.color = '#009999';
+    this.color = '#990099';
 
     this._entryNodes = [];
     this._processNodes = [];
@@ -6302,6 +6614,7 @@ wcNode.extend('wcNodeComposite', 'Composite', '', {
     if (nodes !== undefined) {
       for (var i = 0; i < nodes.length; ++i) {
         this.__addNode(nodes[i]);
+        nodes[i]._parent = this;
       }
     } else {
       // TODO: Create all nodes based on their exported data found in this.nodes[]
@@ -6322,6 +6635,203 @@ wcNode.extend('wcNodeComposite', 'Composite', '', {
       this.type = type;
       this.category = category;
       wcPlay.registerNodeType(className, type, category, wcPlay.NODE_TYPE.COMPOSITE);
+    }
+  },
+
+  /**
+   * Compiles all nodes inside this composite into meta-data and stores it with the constructor object.
+   * @function wcNodeComposite#compile
+   */
+  compile: function() {
+    // // Find all chains and record them.
+    // var chains = {
+    //   flow: [],
+    //   property: [],
+    // };
+
+    // var entryChains = [];
+    // var exitChains = [];
+    // var inputChains = [];
+    // var outputChains = [];
+
+    // for (var i = 0; i < self._selectedNodes.length; ++i) {
+    //   var node = self._selectedNodes[i];
+
+    //   // Flow chains.
+    //   for (var a = 0; a < node.chain.entry.length; ++a) {
+    //     var link = node.chain.entry[a];
+    //     for (var b = 0; b < link.links.length; ++b) {
+    //       var targetLink = link.links[b];
+    //       var outIndex = self._selectedNodes.indexOf(targetLink.node);
+    //       if (outIndex === -1) {
+    //         // External chains have to be reconnected later.
+    //         entryChains.push({
+    //           index: i,
+    //           targetNode: targetLink.node,
+    //           targetName: targetLink.name,
+    //         });
+    //       } else {
+    //         // Internal chains are recorded.
+    //         chains.flow.push({
+    //           inIndex: i,
+    //           inName: link.name,
+    //           outIndex: outIndex,
+    //           outName: targetLink.name,
+    //         });
+    //       }
+    //     }
+    //   }
+
+    //   for (var a = 0; a < node.chain.exit.length; ++a) {
+    //     var link = node.chain.exit[a];
+    //     for (var b = 0; b < link.links.length; ++b) {
+    //       var targetLink = link.links[b];
+    //       var outIndex = self._selectedNodes.indexOf(targetLink.node);
+    //       if (outIndex === -1) {
+    //         // External chains have to be reconnected later.
+    //         exitChains.push({
+    //           index: i,
+    //           targetNode: targetLink.node,
+    //           targetName: targetLink.name,
+    //         });
+    //       }
+    //     }
+    //   }
+  },
+
+  /**
+   * Retrieves a node from a given ID, if it exists in this script.
+   * @function wcNodeComposite#nodeById
+   * @param {Number} id - The ID of the node.
+   * @returns {wcNode|null} - Either the found node, or null.
+   */
+  nodeById: function(id) {
+    for (var i = 0; i < this._entryNodes.length; ++i) {
+      if (this._entryNodes[i].id === id) {
+        return this._entryNodes[i];
+      }
+    }
+    for (var i = 0; i < this._processNodes.length; ++i) {
+      if (this._processNodes[i].id === id) {
+        return this._processNodes[i];
+      }
+    }
+    for (var i = 0; i < this._storageNodes.length; ++i) {
+      if (this._storageNodes[i].id === id) {
+        return this._storageNodes[i];
+      }
+    }
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      if (this._compositeNodes[i].id === id) {
+        return this._compositeNodes[i];
+      }
+    }
+
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      var found = this._compositeNodes[i].nodeById(id);
+      if (found) {
+        return found;
+      }
+    }
+    return null;
+  },
+
+  /**
+   * Check children nodes, if any one is awake, this node should also be awake.<br>
+   * Event that is called when this node is about to be drawn.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onDraw
+   */
+  onDraw: function() {
+    this._super();
+    this._meta.awake = false;
+
+    for (var i = 0; i < this._entryNodes.length; ++i) {
+      if (this._entryNodes[i]._meta.awake) {
+        this._meta.awake = true;
+        this._meta.flash = true;
+        return;
+      }
+    }
+    for (var i = 0; i < this._processNodes.length; ++i) {
+      if (this._processNodes[i]._meta.awake) {
+        this._meta.awake = true;
+        this._meta.flash = true;
+        return;
+      }
+    }
+    for (var i = 0; i < this._storageNodes.length; ++i) {
+      if (this._storageNodes[i]._meta.awake) {
+        this._meta.awake = true;
+        this._meta.flash = true;
+        return;
+      }
+    }
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      if (this._compositeNodes[i]._meta.awake) {
+        this._meta.awake = true;
+        this._meta.flash = true;
+        return;
+      }
+    }
+  },
+
+  /**
+   * Event that is called when an entry link has been triggered.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeComposite#onTriggered
+   * @param {String} name - The name of the entry link triggered.
+   */
+  onTriggered: function(name) {
+    this._super(name);
+
+    // Find the Composite Entry node that matches the triggered entry.
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      var node = this._compositeNodes[i];
+      if (node instanceof wcNodeCompositeEntry) {
+        if (node.property('link name') === name) {
+          node.triggerExit('out');
+          break;
+        }
+      }
+    }
+  },
+
+  /**
+   * Event that is called when the name of this node has changed.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeComposite#onNameChanged
+   * @param {String} oldName - The current name.
+   * @param {String} newName - The new name.
+   */
+  onNameChanged: function(oldName, newName) {
+    this._super(oldName, newName);
+    window[this.className].name = newName;
+
+    for (var i = 0; i < window.wcNodeInstances[this.className].length; ++i) {
+      window.wcNodeInstances[this.className][i].name = newName;
+    }
+  },
+
+  /**
+   * Event that is called when the node is about to be destroyed.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeComposite#onDestroy
+   */
+  onDestroy: function() {
+    this._super();
+
+    for (var i = 0; i < this._entryNodes.length; ++i) {
+      this._entryNodes[i].destroy();
+    }
+    for (var i = 0; i < this._processNodes.length; ++i) {
+      this._processNodes[i].destroy();
+    }
+    for (var i = 0; i < this._storageNodes.length; ++i) {
+      this._storageNodes[i].destroy();
+    }
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      this._compositeNodes[i].destroy();
     }
   },
 
@@ -6387,6 +6897,185 @@ wcNode.extend('wcNodeComposite', 'Composite', '', {
   },
 });
 
+wcNodeComposite.extend('wcNodeCompositeEntry', 'Composite Entry', 'Link', {
+  /**
+   * @class
+   * This node acts as a connection between entry links on a composite node and the script inside.<br>
+   * When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.
+   *
+   * @constructor wcNodeCompositeEntry
+   * @param {String} parent - The parent object of this node.
+   * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
+   * @param {String} linkName - The name of the entry link.
+   */
+  init: function(parent, pos, linkName) {
+    this._super(parent, pos);
+
+    if (!(parent instanceof wcNodeComposite)) {
+      console.log('ERROR: Attempted to use the Composite Entry node while not inside a Composite Node!');
+      this._invalid = true;
+    }
+
+    this.description("Activates when the corresponding Entry link of the parent Composite node has been activated.");
+
+    // Prevent duplicate link names.
+    var name = linkName;
+    var index = 0;
+    while (true) {
+      if (this._parent.createEntry(name)) {
+        break;
+      }
+      index++;
+      name = linkName + index;
+    }
+
+    this.removeEntry('in');
+    this.createExit('out');
+
+    this.createProperty('link name', wcPlay.PROPERTY_TYPE.STRING, name);
+  },
+
+  /**
+   * Event that is called when a property is about to be changed.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeCompositeEntry#onPropertyChanging
+   * @param {String} name - The name of the property.
+   * @param {Object} oldValue - The current value of the property.
+   * @param {Object} newValue - The new, proposed, value of the property.
+   * @returns {Object} - Return the new value of the property (usually newValue unless you are proposing restrictions). If no value is returned, newValue is assumed.
+   */
+  onPropertyChanging: function(name, oldValue, newValue) {
+    this._super(name, oldValue, newValue);
+
+    if (this._invalid) {
+      return 'error';
+    }
+
+    // Prevent renaming to a link that already exists.
+    for (var i = 0; i < this._parent.chain.entry.length; ++i) {
+      if (this._parent.chain.entry[i].name === newValue) {
+        return oldValue;
+      }
+    }
+  },
+
+  /**
+   * Event that is called when a property has changed.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeCompositeEntry#onPropertyChanged
+   * @param {String} name - The name of the property.
+   * @param {Object} oldValue - The old value of the property.
+   * @param {Object} newValue - The new value of the property.
+   */
+  onPropertyChanged: function(name, oldValue, newValue) {
+    this._super(name, oldValue, newValue);
+
+    if (this._invalid) {
+      return;
+    }
+
+    // Rename the appropriate composite link.
+    this._parent.renameEntry(oldValue, newValue);
+  },
+});
+wcNodeComposite.extend('wcNodeCompositeExit', 'Composite Exit', 'Link', {
+  /**
+   * @class
+   * This node acts as a connection between exit links on a composite node and the script inside.<br>
+   * When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.
+   *
+   * @constructor wcNodeCompositeExit
+   * @param {String} parent - The parent object of this node.
+   * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
+   * @param {String} linkName - The name of the exit link.
+   */
+  init: function(parent, pos, linkName) {
+    this._super(parent, pos);
+
+    if (!(parent instanceof wcNodeComposite)) {
+      console.log('ERROR: Attempted to use the Composite Exit node while not inside a Composite Node!');
+      this._invalid = true;
+    }
+
+    this.description("Activates the corresponding Exit link of the parent Composite node when it has been activated.");
+
+    // Prevent duplicate link names.
+    var name = linkName;
+    var index = 0;
+    while (true) {
+      if (this._parent.createExit(name)) {
+        break;
+      }
+      index++;
+      name = linkName + index;
+    }
+
+    this.createEntry('in');
+    this.removeExit('out');
+
+    this.createProperty('link name', wcPlay.PROPERTY_TYPE.STRING, name);
+  },
+
+  /**
+   * Event that is called when an entry link has been triggered.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeCompositeExit#onTriggered
+   * @param {String} name - The name of the entry link triggered.
+   */
+  onTriggered: function(name) {
+    this._super(name);
+
+    if (this._invalid) {
+      return 'error';
+    }
+
+    // Trigger the corresponding exit link on the parent Composite node.
+    this._parent.triggerExit(this.property('link name'));
+  },
+
+  /**
+   * Event that is called when a property is about to be changed.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeCompositeExit#onPropertyChanging
+   * @param {String} name - The name of the property.
+   * @param {Object} oldValue - The current value of the property.
+   * @param {Object} newValue - The new, proposed, value of the property.
+   * @returns {Object} - Return the new value of the property (usually newValue unless you are proposing restrictions). If no value is returned, newValue is assumed.
+   */
+  onPropertyChanging: function(name, oldValue, newValue) {
+    this._super(name, oldValue, newValue);
+
+    if (this._invalid) {
+      return 'error';
+    }
+
+    // Prevent renaming to a link that already exists.
+    for (var i = 0; i < this._parent.chain.exit.length; ++i) {
+      if (this._parent.chain.exit[i].name === newValue) {
+        return oldValue;
+      }
+    }
+  },
+
+  /**
+   * Event that is called when a property has changed.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeCompositeExit#onPropertyChanged
+   * @param {String} name - The name of the property.
+   * @param {Object} oldValue - The old value of the property.
+   * @param {Object} newValue - The new value of the property.
+   */
+  onPropertyChanged: function(name, oldValue, newValue) {
+    this._super(name, oldValue, newValue);
+
+    if (this._invalid) {
+      return;
+    }
+
+    // Rename the appropriate composite link.
+    this._parent.renameExit(oldValue, newValue);
+  },
+});
 wcNodeEntry.extend('wcNodeEntryStart', 'Start', 'Core', {
   /**
    * @class
@@ -6820,291 +7509,5 @@ wcNodeStorage.extend('wcNodeStorageString', 'String', 'Core', {
     this.description("Stores a string value.");
 
     this.createProperty('value', wcPlay.PROPERTY_TYPE.STRING, '', {multiline: true});
-  },
-});
-
-wcNodeProcess.extend('wcNodeProcessTutorialViewport', 'Example Viewport', 'Tutorial', {
-  /**
-   * @class
-   * This node demonstrates an example of using the node's viewport for displaying graphics directly on your node. It can also receive mouse events for interactivity.
-   * When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.
-   *
-   * @constructor wcNodeProcessTutorialViewport
-   * @param {String} parent - The parent object of this node.
-   * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
-   */
-  init: function(parent, pos) {
-    this._super(parent, pos);
-
-    this.description("This node demonstrates an example of using the node's viewport for displaying graphics directly on your node. It can also receive mouse events for interactivity.");
-
-    // Get rid of the flow links, as they do not function.
-    this.removeEntry('in');
-    this.removeExit('out');
-
-    this.viewportSize(100, 100);
-    this.hoverPos = null;
-    this.mousePressed = false;
-    this.mouseClicked = false;
-    this.mouseDoubleClicked = false;
-
-    this.createProperty('lock viewport', wcPlay.PROPERTY_TYPE.TOGGLE, true, {description: "If true, dragging in the viewport will not move the node."});
-  },
-
-  /**
-   * Event that is called when it is time to draw the contents of your custom viewport. It is up to you to stay within the [wcNode.viewportSize]{@link wcNode~viewportSize} you've specified.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNodeProcessTutorialViewport#onViewportDraw
-   * @param {external:Canvas~Context} context - The canvas context to draw on, coordinates 0,0 will be the top left corner of your viewport. It is up to you to stay within the [viewport bounds]{@link wcNode#viewportSize} you have assigned.
-   * @see wcNode#viewportSize
-   */
-  onViewportDraw: function(context) {
-    this._super(context);
-
-    if (this.mouseClicked) {
-      context.fillStyle = "green";
-      context.fillRect(0, 0, 100, 50);
-    }
-    if (this.mouseDoubleClicked) {
-      context.fillStyle = "darkgreen";
-      context.fillRect(0, 50, 100, 50);
-    }
-
-    context.strokeStyle = "red";
-    context.strokeRect(0, 0, 100, 100);
-    context.beginPath();
-    context.moveTo(0,0);
-    context.lineTo(100, 100);
-    context.stroke();
-    context.beginPath();
-    context.moveTo(100,0);
-    context.lineTo(0, 100);
-    context.stroke();
-
-    if (this.hoverPos) {
-      context.fillStyle = this.mousePressed? "red": "blue";
-      context.fillRect(this.hoverPos.x - 5, this.hoverPos.y - 5, 10, 10);
-    }
-  },
-
-  /**
-   * Event that is called when the mouse has entered the viewport area.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNodeProcessTutorialViewport~onViewportMouseEnter
-   * @param {Object} event - The original jquery mouse event.
-   * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
-   */
-  onViewportMouseEnter: function(event, pos) {
-    this._super(event, pos);
-    this.hoverPos = pos;
-  },
-
-  /**
-   * Event that is called when the mouse has left the viewport area.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNodeProcessTutorialViewport~onViewportMouseLeave
-   * @param {Object} event - The original jquery mouse event.
-   */
-  onViewportMouseLeave: function(event) {
-    this._super(event);
-    this.hoverPos = null;
-    this.mousePressed = false;
-  },
-
-  /**
-   * Event that is called when the mouse button is pressed over your viewport area.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNodeProcessTutorialViewport~onViewportMouseDown
-   * @param {Object} event - The original jquery mouse event.
-   * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
-   * @returns {Boolean|undefined} - Return true if you want to disable node dragging during mouse down within your viewport.
-   */
-  onViewportMouseDown: function(event, pos) {
-    this._super(event, pos);
-    this.mousePressed = true;
-    return this.property('lock viewport');
-  },
-
-  /**
-   * Event that is called when the mouse button is released over your viewport area.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNodeProcessTutorialViewport~onViewportMouseUp
-   * @param {Object} event - The original jquery mouse event.
-   * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
-   */
-  onViewportMouseUp: function(event, pos) {
-    this._super(event, pos);
-    this.mousePressed = false;
-  },
-
-  /**
-   * Event that is called when the mouse has moved over your viewport area.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNodeProcessTutorialViewport~onViewportMouseMove
-   * @param {Object} event - The original jquery mouse event.
-   * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
-   */
-  onViewportMouseMove: function(event, pos) {
-    this._super(event, pos);
-    this.hoverPos = pos;
-  },
-
-  /**
-   * Event that is called when the mouse wheel is used over your viewport area.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNodeProcessTutorialViewport~onViewportMouseWheel
-   * @param {Object} event - The original jquery mouse event.
-   * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
-   * @param {Number} scroll - The scroll amount and direction.
-   */
-  onViewportMouseWheel: function(event, pos, scroll) {
-    this._super(event, pos, scroll);
-    return this.property('lock viewport');
-  },
-
-  /**
-   * Event that is called when the mouse button is pressed and released in the same spot over your viewport area.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNodeProcessTutorialViewport~onViewportMouseClick
-   * @param {Object} event - The original jquery mouse event.
-   * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
-   */
-  onViewportMouseClick: function(event, pos) {
-    this._super(event, pos);
-    this.mouseClicked = !this.mouseClicked;
-  },
-
-  /**
-   * Event that is called when the mouse button is double clicked in the same spot over your viewport area.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNodeProcessTutorialViewport~onViewportMouseClick
-   * @param {Object} event - The original jquery mouse event.
-   * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
-   * @returns {Boolean|undefined} - Return true if you want to disable node auto-collapse when double clicking.
-   */
-  onViewportMouseDoubleClick: function(event, pos) {
-    this._super(event, pos);
-    this.mouseDoubleClicked = !this.mouseDoubleClicked;
-    return true;
-  },
-});
-
-wcNodeProcess.extend('wcNodeProcessTutorialProperties', 'Example Properties', 'Tutorial', {
-  /**
-   * @class
-   * This node demonstrates an example of the different property types and how their values can be limited.
-   * When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.
-   *
-   * @constructor wcNodeProcessTutorialProperties
-   * @param {String} parent - The parent object of this node.
-   * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
-   */
-  init: function(parent, pos) {
-    this._super(parent, pos);
-
-    this.description("This node demonstrates an example of the different property types and how their values can be limited.");
-
-    // Get rid of the flow links, as they do not function.
-    this.removeEntry('in');
-    this.removeExit('out');
-
-    this.createProperty('toggle', wcPlay.PROPERTY_TYPE.TOGGLE, true, {description: "Demonstration of the toggle property type."});
-    this.createProperty('number', wcPlay.PROPERTY_TYPE.NUMBER, 3, {description: "Demonstration of the number property type with a clamped range of 1-5.", min: 1, max: 5});
-    this.createProperty('string', wcPlay.PROPERTY_TYPE.STRING, 'Text', {description: "Demonstration of the string property with a max character length of 10.", maxlength: 10});
-    this.createProperty('select', wcPlay.PROPERTY_TYPE.SELECT, 3, {description: "Demonstration of the select property with a dynamic number of options based on the 'number' property.", items: this.selectItems});
-  },
-
-  /**
-   * This function is used in the 'select' property to list a dynamic number of items that appear in edit combo box.
-   * @function wcNodeProcessTutorialProperties#selectItems
-   * @returns {wcNode~SelectItem[]} - A list of items to populate in the combo box.
-   */
-  selectItems: function() {
-    var result = [];
-
-    var count = parseInt(this.property('number'));
-    for (var i = 0; i < count; ++i) {
-      result.push({
-        name: 'Option ' + (i+1),
-        value: i+1,
-      });
-    }
-
-    return result;
-  },
-});
-
-wcNodeProcess.extend('wcNodeProcessTutorialDynamic', 'Example Dynamic', 'Tutorial', {
-  /**
-   * @class
-   * This node demonstrates an example of a number of possible dynamic behaviors.
-   * When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.
-   *
-   * @constructor wcNodeProcessTutorialDynamic
-   * @param {String} parent - The parent object of this node.
-   * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
-   */
-  init: function(parent, pos) {
-    this._super(parent, pos);
-
-    this.description("This node demonstrates an example of using different flow links to determine how this node behaves.");
-
-    // Remove the default 'in' entry link.
-    this.removeEntry('in');
-
-    this.createEntry('change color', "Change the color of this node!");
-
-    this._propCount = 0;
-    this.createProperty('count', wcPlay.PROPERTY_TYPE.NUMBER, 0, {min: 0, max: 10, description: "Dynamically create a property for each count."});
-  },
-
-  /**
-   * Event that is called when an entry link has been triggered.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNodeProcessTutorialDynamic#onTriggered
-   * @param {String} name - The name of the entry link triggered.
-   */
-  onTriggered: function(name) {
-    this._super(name);
-
-    switch (name) {
-      case 'change color':
-        if (this.color == '#007ACC') {
-          this.color = '#00CC7A';
-        } else {
-          this.color = '#007ACC';
-        }
-        break;
-    }
-
-    this.triggerExit('out');
-  },
-
-  /**
-   * Event that is called when a property has changed.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNodeProcessTutorialDynamic#onPropertyChanged
-   * @param {String} name - The name of the property.
-   * @param {Object} oldValue - The old value of the property.
-   * @param {Object} newValue - The new value of the property.
-   */
-  onPropertyChanged: function(name, oldValue, newValue) {
-    this._super(name, oldValue, newValue);
-
-    if (name === 'count') {
-      var count = parseInt(newValue);
-
-      if (count < this._propCount) {
-        while (this._propCount > count) {
-          this.removeProperty('Prop ' + this._propCount);
-          this._propCount--;
-        }
-      } else if (count > this._propCount) {
-        while (this._propCount < count) {
-          this._propCount++;
-          this.createProperty('Prop ' + this._propCount, wcPlay.PROPERTY_TYPE.STRING, 'val ' + this._propCount, {description: "Dynamically created property!"});
-        }
-      }
-    }
   },
 });

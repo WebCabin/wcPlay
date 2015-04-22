@@ -64,6 +64,8 @@ concat({
     '../Code/nodes/process.js',
     '../Code/nodes/storage.js',
     '../Code/nodes/composite.js',
+    '../Code/nodes/composite/compositeentry.js',
+    '../Code/nodes/composite/compositeexit.js',
     '../Code/nodes/entry/start.js',
     '../Code/nodes/process/delay.js',
     '../Code/nodes/process/consolelog.js',
@@ -73,11 +75,18 @@ concat({
     '../Code/nodes/storage/toggle.js',
     '../Code/nodes/storage/number.js',
     '../Code/nodes/storage/string.js',
+  ],
+  dest: '../Build/wcPlay.js',
+});
+
+// Combine the source files
+concat({
+  src: [
     '../Code/nodes/process/tutorialviewport.js',
     '../Code/nodes/process/tutorialproperties.js',
     '../Code/nodes/process/tutorialdynamic.js',
   ],
-  dest: '../Build/wcPlay.js',
+  dest: '../Build/wcPlayTutorialNodes.js',
 });
 
 concat({

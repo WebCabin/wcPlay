@@ -206,9 +206,9 @@ wcPlay.prototype = {
    * @returns {wcNode|null} - Either the found node, or null.
    */
   nodeById: function(id) {
-    for (var i = 0; i < this._storageNodes.length; ++i) {
-      if (this._storageNodes[i].id === id) {
-        return this._storageNodes[i];
+    for (var i = 0; i < this._entryNodes.length; ++i) {
+      if (this._entryNodes[i].id === id) {
+        return this._entryNodes[i];
       }
     }
     for (var i = 0; i < this._processNodes.length; ++i) {
@@ -216,14 +216,21 @@ wcPlay.prototype = {
         return this._processNodes[i];
       }
     }
+    for (var i = 0; i < this._storageNodes.length; ++i) {
+      if (this._storageNodes[i].id === id) {
+        return this._storageNodes[i];
+      }
+    }
     for (var i = 0; i < this._compositeNodes.length; ++i) {
       if (this._compositeNodes[i].id === id) {
         return this._compositeNodes[i];
       }
     }
-    for (var i = 0; i < this._entryNodes.length; ++i) {
-      if (this._entryNodes[i].id === id) {
-        return this._entryNodes[i];
+
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      var found = this._compositeNodes[i].nodeById(id);
+      if (found) {
+        return found;
       }
     }
     return null;
