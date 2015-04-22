@@ -190,7 +190,7 @@ wcPlayEditor.prototype = {
       this.__updateNodes(nodes, 0);
       this.__drawNodes(nodes, this._viewportContext);
       var boundList = [];
-      for (var i = 1; i < nodes.length; ++i) {
+      for (var i = 0; i < nodes.length; ++i) {
         boundList.push(nodes[i]._meta.bounds.farRect);
       }
       this.focusRect(this.__expandRect(boundList));
@@ -284,7 +284,7 @@ wcPlayEditor.prototype = {
    */
   __clampString: function(str, len) {
     if (str.length > len) {
-      return str.substring(0, len) + '...';
+      return str.substr(0, len) + '...';
     }
     return str;
   },
@@ -2404,6 +2404,13 @@ wcPlayEditor.prototype = {
       case 13: // Enter to continue;
         $('.wcPlayEditorMenuOptionPausePlay').first().click();
         break;
+      case 'F'.charCodeAt(0): // F to focus on selected nodes, or entire view.
+        if (this._selectedNodes.length) {
+          this.focus(this._selectedNodes);
+        } else {
+          this.center();
+        }
+        break;
     }
   },
 
@@ -2573,8 +2580,40 @@ wcPlayEditor.prototype = {
     });
 
     $body.on('click', '.wcPlayEditorMenuOptionComposite', function() {
-      if (self._selectedNodes.length) {
-        // TODO:
+      if (self._selectedNodes.length && self._engine) {
+        // Find a unique class name to use for this new composite node.
+        var index = 0;
+        var className = '';
+        do {
+          index++
+          className = 'wcNodeComposite' + '0000'.substr(0, 4-('' + index).length) + index;
+        } while (window[className]);
+
+        // TODO: Find all chains that lead to external nodes and generate composite links for them.
+
+        // Remove the selected nodes from the script so they can be put into the composite node.
+        var exportedNodes = [];
+        for (var i = 0; i < self._selectedNodes.length; ++i) {
+          self._engine.__removeNode(self._selectedNodes[i]);
+          exportedNodes.push(self._selectedNodes[i].export());
+        }
+
+        // Dynamically extend a new composite node class.
+        wcNodeComposite.extend(className, 'Composite', 'Core', {
+          nodes: exportedNodes,
+        });
+
+        // Determine the bounding area of the group of nodes being imported.
+        var boundList = [];
+        for (var i = 0; i < self._selectedNodes.length; ++i) {
+          boundList.push(self._selectedNodes[i]._meta.bounds.farRect);
+        }
+        var bounds = self.__expandRect(boundList);
+
+        // TODO: Instead of giving it the engine, we need to give it the parent who could possibly be another composite node.
+        var compNode = new window[className](self._engine, {x: bounds.left + bounds.width/2, y: bounds.top + bounds.height/2}, this._selectedNodes);
+
+        self.__setupPalette();
       }
     });
 

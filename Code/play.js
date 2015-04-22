@@ -520,17 +520,42 @@ wcPlay.prototype = {
    * @function wcPlay#__removeNode
    * @private
    * @param {wcNode} node - The node to remove.
+   * @returns {Boolean} - Fails if the node was not found in this script.
    */
   __removeNode: function(node) {
+    var index = -1;
     if (node instanceof wcNodeEntry) {
-      this._entryNodes.splice(this._entryNodes.indexOf(node), 1);
+      index = this._entryNodes.indexOf(node);
+      if (index > -1) {
+        this._entryNodes.splice(index, 1);
+      }
     } else if (node instanceof wcNodeProcess) {
-      this._processNodes.splice(this._processNodes.indexOf(node), 1);
+      index = this._processNodes.indexOf(node);
+      if (index > -1) {
+        this._processNodes.splice(index, 1);
+      }
     } else if (node instanceof wcNodeStorage) {
-      this._storageNodes.splice(this._storageNodes.indexOf(node), 1);
+      index = this._storageNodes.indexOf(node);
+      if (index > -1) {
+        this._storageNodes.splice(index, 1);
+      }
     } else if (node instanceof wcNodeComposite) {
-      this._compositeNodes.splice(this._compositeNodes.indexOf(node), 1);
+      index = this._compositeNodes.indexOf(node);
+      if (index > -1) {
+        this._compositeNodes.splice(index, 1);
+      }
     }
+
+    // If the node was not found, propagate the removal to all composite nodes.
+    if (index === -1) {
+      for (var i = 0; i < this._compositeNodes.length; ++i) {
+        if (this._compositeNodes[i].__removeNode(node)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   },
 
   /**

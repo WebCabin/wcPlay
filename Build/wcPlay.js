@@ -593,17 +593,42 @@ wcPlay.prototype = {
    * @function wcPlay#__removeNode
    * @private
    * @param {wcNode} node - The node to remove.
+   * @returns {Boolean} - Fails if the node was not found in this script.
    */
   __removeNode: function(node) {
+    var index = -1;
     if (node instanceof wcNodeEntry) {
-      this._entryNodes.splice(this._entryNodes.indexOf(node), 1);
+      index = this._entryNodes.indexOf(node);
+      if (index > -1) {
+        this._entryNodes.splice(index, 1);
+      }
     } else if (node instanceof wcNodeProcess) {
-      this._processNodes.splice(this._processNodes.indexOf(node), 1);
+      index = this._processNodes.indexOf(node);
+      if (index > -1) {
+        this._processNodes.splice(index, 1);
+      }
     } else if (node instanceof wcNodeStorage) {
-      this._storageNodes.splice(this._storageNodes.indexOf(node), 1);
+      index = this._storageNodes.indexOf(node);
+      if (index > -1) {
+        this._storageNodes.splice(index, 1);
+      }
     } else if (node instanceof wcNodeComposite) {
-      this._compositeNodes.splice(this._compositeNodes.indexOf(node), 1);
+      index = this._compositeNodes.indexOf(node);
+      if (index > -1) {
+        this._compositeNodes.splice(index, 1);
+      }
     }
+
+    // If the node was not found, propagate the removal to all composite nodes.
+    if (index === -1) {
+      for (var i = 0; i < this._compositeNodes.length; ++i) {
+        if (this._compositeNodes[i].__removeNode(node)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   },
 
   /**
@@ -850,7 +875,7 @@ wcPlayEditor.prototype = {
       this.__updateNodes(nodes, 0);
       this.__drawNodes(nodes, this._viewportContext);
       var boundList = [];
-      for (var i = 1; i < nodes.length; ++i) {
+      for (var i = 0; i < nodes.length; ++i) {
         boundList.push(nodes[i]._meta.bounds.farRect);
       }
       this.focusRect(this.__expandRect(boundList));
@@ -944,7 +969,7 @@ wcPlayEditor.prototype = {
    */
   __clampString: function(str, len) {
     if (str.length > len) {
-      return str.substring(0, len) + '...';
+      return str.substr(0, len) + '...';
     }
     return str;
   },
@@ -3064,6 +3089,13 @@ wcPlayEditor.prototype = {
       case 13: // Enter to continue;
         $('.wcPlayEditorMenuOptionPausePlay').first().click();
         break;
+      case 'F'.charCodeAt(0): // F to focus on selected nodes, or entire view.
+        if (this._selectedNodes.length) {
+          this.focus(this._selectedNodes);
+        } else {
+          this.center();
+        }
+        break;
     }
   },
 
@@ -3233,8 +3265,40 @@ wcPlayEditor.prototype = {
     });
 
     $body.on('click', '.wcPlayEditorMenuOptionComposite', function() {
-      if (self._selectedNodes.length) {
-        // TODO:
+      if (self._selectedNodes.length && self._engine) {
+        // Find a unique class name to use for this new composite node.
+        var index = 0;
+        var className = '';
+        do {
+          index++
+          className = 'wcNodeComposite' + '0000'.substr(0, 4-('' + index).length) + index;
+        } while (window[className]);
+
+        // TODO: Find all chains that lead to external nodes and generate composite links for them.
+
+        // Remove the selected nodes from the script so they can be put into the composite node.
+        var exportedNodes = [];
+        for (var i = 0; i < self._selectedNodes.length; ++i) {
+          self._engine.__removeNode(self._selectedNodes[i]);
+          exportedNodes.push(self._selectedNodes[i].export());
+        }
+
+        // Dynamically extend a new composite node class.
+        wcNodeComposite.extend(className, 'Composite', 'Core', {
+          nodes: exportedNodes,
+        });
+
+        // Determine the bounding area of the group of nodes being imported.
+        var boundList = [];
+        for (var i = 0; i < self._selectedNodes.length; ++i) {
+          boundList.push(self._selectedNodes[i]._meta.bounds.farRect);
+        }
+        var bounds = self.__expandRect(boundList);
+
+        // TODO: Instead of giving it the engine, we need to give it the parent who could possibly be another composite node.
+        var compNode = new window[className](self._engine, {x: bounds.left + bounds.width/2, y: bounds.top + bounds.height/2}, this._selectedNodes);
+
+        self.__setupPalette();
       }
     });
 
@@ -4649,6 +4713,32 @@ Class.extend('wcNode', 'Node', '', {
     }
     this._meta.threads = [];
     this._meta.awake = false;
+  },
+
+  /**
+   * Imports previously [exported]{@link wcNode#export} data to generate this node.
+   * @function wcNode#import
+   * @param {Object} data - The data to import.
+   */
+  import: function(data) {
+
+  },
+
+  /**
+   * Exports information about this node so it can be [imported]{@link wcNode#import} later.
+   * @function wcNode#export
+   * @returns {Object} - The exported data for this node.
+   */
+  export: function() {
+    var data = {
+      className: this.className,
+      name: this.name,
+      color: this.color,
+      pos: {
+        x: this.pos.x,
+        y: this.pos.y,
+      },
+    };
   },
 
   /**
@@ -6198,10 +6288,24 @@ wcNode.extend('wcNodeComposite', 'Composite', '', {
    * @constructor wcNodeComposite
    * @param {String} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
+   * @param {wcNode[]} [nodes] - An optional set a nodes to use, instead of it's default behavior of generating a new set of nodes. Use this when porting existing nodes into a new composite.
    */
-  init: function(parent, pos) {
+  init: function(parent, pos, nodes) {
     this._super(parent, pos);
     this.color = '#009999';
+
+    this._entryNodes = [];
+    this._processNodes = [];
+    this._storageNodes = [];
+    this._compositeNodes = [];
+
+    if (nodes !== undefined) {
+      for (var i = 0; i < nodes.length; ++i) {
+        this.__addNode(nodes[i]);
+      }
+    } else {
+      // TODO: Create all nodes based on their exported data found in this.nodes[]
+    }
   },
 
   /**
@@ -6219,6 +6323,67 @@ wcNode.extend('wcNodeComposite', 'Composite', '', {
       this.category = category;
       wcPlay.registerNodeType(className, type, category, wcPlay.NODE_TYPE.COMPOSITE);
     }
+  },
+
+  /**
+   * Adds a node into the known node stacks.
+   * @function wcNodeComposite#__addNode
+   * @private
+   * @param {wcNode} node - The node to add.
+   */
+  __addNode: function(node) {
+    if (node instanceof wcNodeEntry) {
+      this._entryNodes.push(node);
+    } else if (node instanceof wcNodeProcess) {
+      this._processNodes.push(node);
+    } else if (node instanceof wcNodeStorage) {
+      this._storageNodes.push(node);
+    } else if (node instanceof wcNodeComposite) {
+      this._compositeNodes.push(node);
+    }
+  },
+
+  /**
+   * Removes a node from the known node stacks.
+   * @function wcNodeComposite#__removeNode
+   * @private
+   * @param {wcNode} node - The node to remove.
+   * @returns {Boolean} - Fails if the node was not found in this script.
+   */
+  __removeNode: function(node) {
+    var index = -1;
+    if (node instanceof wcNodeEntry) {
+      index = this._entryNodes.indexOf(node);
+      if (index > -1) {
+        this._entryNodes.splice(index, 1);
+      }
+    } else if (node instanceof wcNodeProcess) {
+      index = this._processNodes.indexOf(node);
+      if (index > -1) {
+        this._processNodes.splice(index, 1);
+      }
+    } else if (node instanceof wcNodeStorage) {
+      index = this._storageNodes.indexOf(node);
+      if (index > -1) {
+        this._storageNodes.splice(index, 1);
+      }
+    } else if (node instanceof wcNodeComposite) {
+      index = this._compositeNodes.indexOf(node);
+      if (index > -1) {
+        this._compositeNodes.splice(index, 1);
+      }
+    }
+
+    // If the node was not found, propagate the removal to all composite nodes.
+    if (index === -1) {
+      for (var i = 0; i < this._compositeNodes.length; ++i) {
+        if (this._compositeNodes[i].__removeNode(node)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   },
 });
 

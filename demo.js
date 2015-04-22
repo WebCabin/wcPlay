@@ -7,22 +7,21 @@ $(document).ready(function() {
     debugging: true,
   });
 
-  wcNodeComposite.extend('wcNodeCompositeTest', 'Test', 'Core', {
-    init: function(parent, pos) {
-      this._super(parent, pos);
-      this.color = this.myCol;
-    },
-    myCol: "#FF0000",
-  });
+  // wcNodeComposite.extend('wcNodeCompositeTest', 'Test', 'Core', {
+  //   init: function(parent, pos) {
+  //     this._super(parent, pos);
+  //     this.color = this.myCol;
+  //   },
+  //   myCol: "#FF0000",
+  // });
 
-  wcNodeComposite.extend('wcNodeCompositeTest2', 'Test2', 'Core', {
-    init: function(parent, pos) {
-      this._super(parent, pos);
-      this.color = this.myCol;
-    },
-    myCol: "#0000FF",
-  });
-  // var testComposite = new wcNodeComposite(null, {x: 0, y: 0});
+  // wcNodeComposite.extend('wcNodeCompositeTest2', 'Test2', 'Core', {
+  //   init: function(parent, pos) {
+  //     this._super(parent, pos);
+  //     this.color = this.myCol;
+  //   },
+  //   myCol: "#0000FF",
+  // });
 
   // Create an instance of our script editor.
   var myPlayEditor = new wcPlayEditor('.playContainer', {
@@ -76,10 +75,4 @@ $(document).ready(function() {
 
   // Start execution of the script.
   myPlay.start();
-
-  $('body').keyup(function(event) {
-    if (event.keyCode === 'F'.charCodeAt(0)) {
-      myPlayEditor.center();
-    }
-  })
 });

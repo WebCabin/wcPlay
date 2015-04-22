@@ -102,6 +102,32 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
+   * Imports previously [exported]{@link wcNode#export} data to generate this node.
+   * @function wcNode#import
+   * @param {Object} data - The data to import.
+   */
+  import: function(data) {
+
+  },
+
+  /**
+   * Exports information about this node so it can be [imported]{@link wcNode#import} later.
+   * @function wcNode#export
+   * @returns {Object} - The exported data for this node.
+   */
+  export: function() {
+    var data = {
+      className: this.className,
+      name: this.name,
+      color: this.color,
+      pos: {
+        x: this.pos.x,
+        y: this.pos.y,
+      },
+    };
+  },
+
+  /**
    * Retrieves the wcPlay engine that owns this node.
    * @function wcNode#engine
    * @returns {wcPlay|null} - Either the wcPlay engine, or null if it doesn't belong to one.
