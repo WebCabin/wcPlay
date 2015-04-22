@@ -32,32 +32,33 @@ function wcPlayEditor(container, options) {
 
   this._drawStyle = {
     palette: {
-      spacing: 20,        // Spacing between nodes in the palette view.
+      spacing: 20,          // Spacing between nodes in the palette view.
     },
     node: {
-      radius: 10,         // The radius to draw node corners.
-      margin: 15,         // The pixel space between the property text and the edge of the node border.
+      radius: 10,           // The radius to draw node corners.
+      margin: 15,           // The pixel space between the property text and the edge of the node border.
     },
     title: {
-      spacing: 5,         // The pixel space between the title text and the bar that separates the properties.
-      wrapL: '  ',        // The left string to wrap around the title text.
-      wrapR: '  ',        // The right string to wrap around the title text.
+      spacing: 5,           // The pixel space between the title text and the bar that separates the properties.
+      wrapL: '  ',          // The left string to wrap around the title text.
+      wrapR: '  ',          // The right string to wrap around the title text.
+      placeholder: '[name]', // A placeholder label if there is no title name.
     },
     links: {
-      length: 12,         // Length of each link 'nub'
-      width: 8,           // Width of each link 'nub'
-      spacing: 10,        // The pixel space between the text of adjacent links.
-      padding: 5,         // The pixel space between the link and its text.
-      margin: 10,         // The pixel space between the link text and the edge of the node border.
+      length: 12,           // Length of each link 'nub'
+      width: 8,             // Width of each link 'nub'
+      spacing: 10,          // The pixel space between the text of adjacent links.
+      padding: 5,           // The pixel space between the link and its text.
+      margin: 10,           // The pixel space between the link text and the edge of the node border.
     },
     property: {
-      spacing: 5,         // The pixel space between adjacent properties.
-      strLen: 10,         // The maximum character length a property value can display.
-      minLength: 30,      // The minimum length the property value can be.
-      valueWrapL: ' ',    // The left string to wrap around a property value.
-      valueWrapR: ' ',    // The right string to wrap around a property value.
-      initialWrapL: ' [', // The left string to wrap around a property initial value.
-      initialWrapR: '] ', // The right string to wrap around a property initial value.
+      spacing: 5,           // The pixel space between adjacent properties.
+      strLen: 10,           // The maximum character length a property value can display.
+      minLength: 30,        // The minimum length the property value can be.
+      valueWrapL: ' ',      // The left string to wrap around a property value.
+      valueWrapR: ' ',      // The right string to wrap around a property value.
+      initialWrapL: ' [',   // The left string to wrap around a property initial value.
+      initialWrapR: '] ',   // The right string to wrap around a property initial value.
     },
   };
 
@@ -1158,10 +1159,12 @@ wcPlayEditor.prototype = {
 
     // Measure the title bar area.
     this.__setCanvasFont(this._font.title, context);
-    bounds.width = context.measureText(this._drawStyle.title.wrapL + node.type + (node.name? ': ': '') + this._drawStyle.title.wrapR).width;
+    bounds.width = context.measureText(this._drawStyle.title.wrapL + node.type + ': ' + this._drawStyle.title.wrapR).width;
+    this.__setCanvasFont(this._font.titleDesc, context);
     if (node.name) {
-      this.__setCanvasFont(this._font.titleDesc, context);
       bounds.width += context.measureText(node.name).width;
+    } else {
+      bounds.width += context.measureText(this._drawStyle.title.placeholder).width;
     }
 
     // Measure the node's viewport.
@@ -1394,26 +1397,24 @@ wcPlayEditor.prototype = {
       context.stroke();
     }
 
+    // Measure the title bar area.
+    this.__setCanvasFont(this._font.title, context);
+    var titleTypeWidth = context.measureText(this._drawStyle.title.wrapL + node.type + ': ').width;
+    var titleWrapRWidth = context.measureText(this._drawStyle.title.wrapR).width;
+    var titleTextWidth = 0;
+    this.__setCanvasFont(this._font.titleDesc, context);
+    titleTextWidth = context.measureText(node.name || this._drawStyle.title.placeholder).width;
+
     result.titleBounds = {
       top: rect.top + upper,
-      left: rect.left + this._drawStyle.node.margin,
-      width: rect.width - this._drawStyle.node.margin * 2,
+      left: rect.left + titleTypeWidth + (rect.width - (titleTypeWidth + titleWrapRWidth + titleTextWidth))/2,
+      width: titleTextWidth,
       height: this._font.title.size + this._drawStyle.title.spacing - 1,
     };
 
     // Highlight title text.
     if (this._highlightTitle && this._highlightNode === node) {
       this.__drawRoundedRect(result.titleBounds, 'rgba(255, 255, 255, 0.5)', -1, this._font.title.size/2, context);
-    }
-
-    // Measure the title bar area.
-    this.__setCanvasFont(this._font.title, context);
-    var titleTypeWidth = context.measureText(this._drawStyle.title.wrapL + node.type + (node.name? ': ': '')).width;
-    var titleWrapRWidth = context.measureText(this._drawStyle.title.wrapR).width;
-    var titleTextWidth = 0;
-    if (node.name) {
-      this.__setCanvasFont(this._font.titleDesc, context);
-      titleTextWidth = context.measureText(node.name).width;
     }
 
     // Title Text
@@ -1423,12 +1424,10 @@ wcPlayEditor.prototype = {
     context.strokeStyle = "black";
     context.textAlign = "left";
     this.__setCanvasFont(this._font.title, context);
-    context.fillText(this._drawStyle.title.wrapL + node.type + (node.name? ': ': ''), rect.left + (rect.width - (titleTypeWidth + titleWrapRWidth + titleTextWidth)) / 2, rect.top + upper);
+    context.fillText(this._drawStyle.title.wrapL + node.type + ': ', rect.left + (rect.width - (titleTypeWidth + titleWrapRWidth + titleTextWidth)) / 2, rect.top + upper);
 
-    if (node.name) {
-      this.__setCanvasFont(this._font.titleDesc, context);
-      context.fillText(node.name, rect.left + titleTypeWidth + (rect.width - (titleTypeWidth + titleWrapRWidth + titleTextWidth))/2, rect.top + upper);
-    }
+    this.__setCanvasFont(this._font.titleDesc, context);
+    context.fillText(node.name || this._drawStyle.title.placeholder, rect.left + titleTypeWidth + (rect.width - (titleTypeWidth + titleWrapRWidth + titleTextWidth))/2, rect.top + upper);
 
     context.textAlign = "right";
     this.__setCanvasFont(this._font.title, context);
