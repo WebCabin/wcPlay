@@ -220,6 +220,28 @@ wcNode.extend('wcNodeComposite', 'Composite', '', {
   },
 
   /**
+   * Event that is called when a property has changed.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeComposite#onPropertyChanged
+   * @param {String} name - The name of the property.
+   * @param {Object} oldValue - The old value of the property.
+   * @param {Object} newValue - The new value of the property.
+   */
+  onPropertyChanged: function(name, oldValue, newValue) {
+    this._super(name, oldValue, newValue);
+
+    // Find all Composite Property nodes that match the changed property.
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      var node = this._compositeNodes[i];
+      if (node instanceof wcNodeCompositeProperty) {
+        if (node.property('property') === name) {
+          node.property('value', newValue, true);
+        }
+      }
+    }
+  },
+
+  /**
    * Event that is called when the node is about to be destroyed.<br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNodeComposite#onDestroy
