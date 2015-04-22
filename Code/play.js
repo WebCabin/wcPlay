@@ -556,7 +556,8 @@ wcPlay.prototype = {
     // If the node was not found, propagate the removal to all composite nodes.
     if (index === -1) {
       for (var i = 0; i < this._compositeNodes.length; ++i) {
-        if (this._compositeNodes[i].__removeNode(node)) {
+        if (this._compositeNodes[i] instanceof wcNodeCompositeScript &&
+            this._compositeNodes[i].__removeNode(node)) {
           return true;
         }
       }

@@ -64,6 +64,7 @@ concat({
     '../Code/nodes/process.js',
     '../Code/nodes/storage.js',
     '../Code/nodes/composite.js',
+    '../Code/nodes/composite/compositescript.js',
     '../Code/nodes/composite/compositeentry.js',
     '../Code/nodes/composite/compositeexit.js',
     '../Code/nodes/composite/compositeproperty.js',

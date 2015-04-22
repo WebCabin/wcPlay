@@ -195,7 +195,13 @@ wcPlayEditor.prototype = {
       for (var i = 0; i < nodes.length; ++i) {
         boundList.push(nodes[i]._meta.bounds.farRect);
       }
-      this.focusRect(this.__expandRect(boundList));
+      var focusRect = this.__expandRect(boundList)
+      // Clamp the focus rect to a minimum size, so we can not zoom in too far.
+      if (focusRect.width < 1000) {
+        focusRect.left -= (1000 - focusRect.width)/2;
+        focusRect.width = 1000;
+      }
+      this.focusRect(focusRect);
     }
   },
 
@@ -726,13 +732,13 @@ wcPlayEditor.prototype = {
             (this._options.category.isBlacklist && catIndex > -1)) {
           continue;
         }
-      } else {
-        // Skip composite node special 'link' nodes if we are not inside a composite.
-        if (this._engine === this._parent) {
-          if (data.category === 'Link') {
-            continue;
-          }
-        }
+      // } else {
+      //   // Skip composite node special 'link' nodes if we are not inside a composite.
+      //   if (this._engine === this._parent) {
+      //     if (data.category === 'Link') {
+      //       continue;
+      //     }
+      //   }
       }
 
       // Initialize the node category if it is new.
@@ -2159,20 +2165,32 @@ wcPlayEditor.prototype = {
         function() {
           var myNode = this.editor._engine.nodeById(this.id);
           var oldName = myNode.name;
-          myNode.name = this.oldValue;
-          myNode.onNameChanged(oldName, myNode.name);
+          var newName = myNode.onNameChanging(oldName, this.oldValue);
+          if (newName === undefined) {
+            newName = this.oldValue;
+          }
+          myNode.name = newName;
+          myNode.onNameChanged(oldName, newName);
         },
         // Redo
         function() {
           var myNode = this.editor._engine.nodeById(this.id);
           var oldName = myNode.name;
-          myNode.name = this.newValue;
-          myNode.onNameChanged(oldName, myNode.name);
+          var newName = myNode.onNameChanging(oldName, this.newValue);
+          if (newName === undefined) {
+            newName = this.newValue;
+          }
+          myNode.name = newName;
+          myNode.onNameChanged(oldName, newName);
         });
 
         var oldName = node.name;
-        node.name = $control.val();
-        node.onNameChanged(oldName, node.name);
+        var newName = node.onNameChanging(oldName, $control.val());
+        if (newName === undefined) {
+          newName = $control.val();
+        }
+        node.name = newName;
+        node.onNameChanged(oldName, newName);
       }
     });
 
@@ -2636,11 +2654,11 @@ wcPlayEditor.prototype = {
         do {
           index++
           number = '0000'.substr(0, 4-('' + index).length) + index;
-          className = 'wcNodeComposite' + number;
+          className = 'wcNodeCompositeScript' + number;
         } while (window[className]);
 
         // Dynamically extend a new composite node class.
-        wcNodeComposite.extend(className, 'Composite', 'Custom', {
+        wcNodeCompositeScript.extend(className, 'Composite', 'Custom', {
           name: number,
         });
 
@@ -2684,6 +2702,7 @@ wcPlayEditor.prototype = {
             if (!linkNode) {
               // Create a Composite Entry Node, this acts as a surrogate entry link for the Composite node.
               linkNode = new wcNodeCompositeEntry(compNode, {x: node.pos.x, y: node.pos.y - 100}, linkName);
+              linkNode.collapsed(true);
               createdLinks.push({
                 name: linkName,
                 node: linkNode,
@@ -2691,7 +2710,7 @@ wcPlayEditor.prototype = {
             }
 
             linkNode.connectExit('out', node, linkName);
-            compNode.connectEntry(linkNode.property('link name'), targetNode, targetName);
+            compNode.connectEntry(linkNode.name, targetNode, targetName);
             targetNode.disconnectExit(targetName, node, linkName);
           }
 
@@ -2714,6 +2733,7 @@ wcPlayEditor.prototype = {
             if (!linkNode) {
               // Create a Composite Exit Node, this acts as a surrogate exit link for the Composite node.
               linkNode = new wcNodeCompositeExit(compNode, {x: node.pos.x, y: node.pos.y + 200}, linkName);
+              linkNode.collapsed(true);
               createdLinks.push({
                 name: linkName,
                 node: linkNode,
@@ -2721,7 +2741,7 @@ wcPlayEditor.prototype = {
             }
 
             linkNode.connectEntry('in', node, linkName);
-            compNode.connectExit(linkNode.property('link name'), targetNode, targetName);
+            compNode.connectExit(linkNode.name, targetNode, targetName);
             targetNode.disconnectEntry(targetName, node, linkName);
           }
 
@@ -2744,6 +2764,7 @@ wcPlayEditor.prototype = {
             if (!linkNode) {
               // Create a Composite Property Node, this acts as a surrogate property link for the Composite node.
               linkNode = new wcNodeCompositeProperty(compNode, {x: node.pos.x - 200, y: node.pos.y}, linkName);
+              linkNode.collapsed(true);
               createdLinks.push({
                 name: linkName,
                 node: linkNode,
@@ -2751,7 +2772,7 @@ wcPlayEditor.prototype = {
             }
 
             linkNode.connectOutput('value', node, linkName);
-            compNode.connectInput(linkNode.property('property'), targetNode, targetName);
+            compNode.connectInput(linkNode.name, targetNode, targetName);
             targetNode.disconnectOutput(targetName, node, linkName);
           }
 
@@ -2774,6 +2795,7 @@ wcPlayEditor.prototype = {
             if (!linkNode) {
               // Create a Composite Property Node, this acts as a surrogate property link for the Composite node.
               linkNode = new wcNodeCompositeProperty(compNode, {x: node.pos.x + 200, y: node.pos.y}, linkName);
+              linkNode.collapsed(true);
               createdLinks.push({
                 name: linkName,
                 node: linkNode,
@@ -2781,7 +2803,7 @@ wcPlayEditor.prototype = {
             }
 
             linkNode.connectInput('value', node, linkName);
-            compNode.connectOutput(linkNode.property('property'), targetNode, targetName);
+            compNode.connectOutput(linkNode.name, targetNode, targetName);
             targetNode.disconnectInput(targetName, node, linkName);
           }
         }
@@ -3039,8 +3061,23 @@ wcPlayEditor.prototype = {
       var moveX = mouse.x - this._mouse.x;
       var moveY = mouse.y - this._mouse.y;
       for (var i = 0; i < this._selectedNodes.length; ++i) {
-        this._selectedNodes[i].pos.x += moveX / this._viewportCamera.z;
-        this._selectedNodes[i].pos.y += moveY / this._viewportCamera.z;
+        var node = this._selectedNodes[i];
+        var oldPos = {
+          x: node.pos.x,
+          y: node.pos.y,
+        };
+        var newPos = {
+          x: node.pos.x + (moveX / this._viewportCamera.z),
+          y: node.pos.y + (moveY / this._viewportCamera.z),
+        };
+
+        var newPos = node.onMoving(oldPos, newPos) || newPos;
+
+        if (oldPos.x !== newPos.x || oldPos.y !== newPos.y) {
+          node.pos.x = newPos.x;
+          node.pos.y = newPos.y;
+          node.onMoved(oldPos, newPos);
+        }
       }
       this._mouse = mouse;
       return;
@@ -3591,14 +3628,18 @@ wcPlayEditor.prototype = {
           // Undo
           function() {
             var myNode = this.editor._engine.nodeById(this.id);
+            var pos = myNode.onMoving({x: this.end.x, y: this.end.y}, {x: this.start.x, y: this.start.y}) || this.start;
             myNode.pos.x = this.start.x;
             myNode.pos.y = this.start.y;
+            myNode.onMoving({x: this.end.x, y: this.end.y}, {x: pos.x, y: pos.y});
           },
           // Redo
           function() {
             var myNode = this.editor._engine.nodeById(this.id);
+            var pos = myNode.onMoving({x: this.start.x, y: this.start.y}, {x: this.end.x, y: this.end.y}) || this.end;
             myNode.pos.x = this.end.x;
             myNode.pos.y = this.end.y;
+            myNode.onMoving({x: this.start.x, y: this.start.y}, {x: pos.x, y: pos.y});
           });
         }
       }
@@ -4022,7 +4063,23 @@ wcPlayEditor.prototype = {
       // Center area.
       if (!hasTarget && this.__inRect(this._mouse, node._meta.bounds.inner, this._viewportCamera)) {
         hasTarget = true;
-        node.collapsed(!node.collapsed());
+        if (node instanceof wcNodeCompositeScript) {
+          // Step into composite script nodes.
+          this._parent = node;
+          this._selectedNode = null;
+          this._selectedNodes = [];
+          this.center();
+        } else if (node instanceof wcNodeComposite && !(this._parent instanceof wcPlay)) {
+          // Step out if double clicking on an external link node.
+          var focusNode = this._parent;
+          this._parent = this._parent._parent;
+
+          this._selectedNode = focusNode;
+          this._selectedNodes = [focusNode];
+          this.focus(this._selectedNodes);
+        } else {
+          node.collapsed(!node.collapsed());
+        }
       }
     }
   },

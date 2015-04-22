@@ -1,4 +1,4 @@
-wcNodeComposite.extend('wcNodeCompositeExit', 'Composite Exit', 'Link', {
+wcNodeComposite.extend('wcNodeCompositeExit', 'Exit', 'Link', {
   /**
    * @class
    * This node acts as a connection between exit links on a composite node and the script inside.<br>
@@ -12,28 +12,31 @@ wcNodeComposite.extend('wcNodeCompositeExit', 'Composite Exit', 'Link', {
   init: function(parent, pos, linkName) {
     this._super(parent, pos);
 
-    if (!(parent instanceof wcNodeComposite)) {
-      console.log('ERROR: Attempted to use the Composite Exit node while not inside a Composite Node!');
+    if (!(parent instanceof wcNodeCompositeScript)) {
       this._invalid = true;
     }
 
     this.description("Activates the corresponding Exit link of the parent Composite node when it has been activated.");
 
     // Prevent duplicate link names.
+    linkName = linkName || 'out'
     var name = linkName;
-    var index = 0;
-    while (true) {
-      if (this._parent.createExit(name)) {
-        break;
+
+    if (!this._invalid) {
+      var index = 0;
+      while (true) {
+        if (this._parent.createExit(name)) {
+          break;
+        }
+        index++;
+        name = linkName + index;
       }
-      index++;
-      name = linkName + index;
     }
 
     this.createEntry('in');
     this.removeExit('out');
 
-    this.createProperty('link name', wcPlay.PROPERTY_TYPE.STRING, name);
+    this.name = name;
   },
 
   /**
@@ -46,53 +49,84 @@ wcNodeComposite.extend('wcNodeCompositeExit', 'Composite Exit', 'Link', {
     this._super(name);
 
     if (this._invalid) {
-      return 'error';
+      return;
     }
 
     // Trigger the corresponding exit link on the parent Composite node.
-    this._parent.triggerExit(this.property('link name'));
+    this._parent.triggerExit(this.name);
   },
 
   /**
-   * Event that is called when a property is about to be changed.<br>
+   * Event that is called when the name of this node is about to change.<br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNodeCompositeExit#onPropertyChanging
-   * @param {String} name - The name of the property.
-   * @param {Object} oldValue - The current value of the property.
-   * @param {Object} newValue - The new, proposed, value of the property.
-   * @returns {Object} - Return the new value of the property (usually newValue unless you are proposing restrictions). If no value is returned, newValue is assumed.
+   * @function wcNodeCompositeEntry#onNameChanging
+   * @param {String} oldName - The current name.
+   * @param {String} newName - The new name.
+   * @return {String|undefined} - Return the new value of the name (usually newValue unless you are restricting the name). If no value is returned, newValue is assumed.
    */
-  onPropertyChanging: function(name, oldValue, newValue) {
-    this._super(name, oldValue, newValue);
+  onNameChanging: function(oldName, newName) {
+    this._super(oldName, newName);
 
     if (this._invalid) {
-      return 'error';
+      return;
     }
 
     // Prevent renaming to a link that already exists.
     for (var i = 0; i < this._parent.chain.exit.length; ++i) {
-      if (this._parent.chain.exit[i].name === newValue) {
-        return oldValue;
+      if (this._parent.chain.exit[i].name === newName) {
+        return oldName;
       }
     }
   },
 
   /**
-   * Event that is called when a property has changed.<br>
+   * Event that is called when the name of this node has changed.<br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNodeCompositeExit#onPropertyChanged
-   * @param {String} name - The name of the property.
-   * @param {Object} oldValue - The old value of the property.
-   * @param {Object} newValue - The new value of the property.
+   * @function wcNodeCompositeExit#onNameChanged
+   * @param {String} oldName - The current name.
+   * @param {String} newName - The new name.
    */
-  onPropertyChanged: function(name, oldValue, newValue) {
-    this._super(name, oldValue, newValue);
+  onNameChanged: function(oldName, newName) {
+    this._super(oldName, newName);
 
     if (this._invalid) {
       return;
     }
 
     // Rename the appropriate composite link.
-    this._parent.renameExit(oldValue, newValue);
+    this._parent.renameExit(oldName, newName);
+    this._parent.sortExitLinks();
+  },
+
+  /**
+   * Event that is called after the node has changed its position.
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeCompositeExit#onMoving
+   * @param {wcPlay~Coordinates} oldPos - The old position of the node.
+   * @param {wcPlay~Coordinates} newPos - The new position of the node.
+   */
+  onMoved: function(oldPos, newPos) {
+    this._super(oldPos, newPos);
+
+    if (this._invalid) {
+      return;
+    }
+
+    this._parent.sortExitLinks();
+  },
+
+  /**
+   * Event that is called after the node has been destroyed.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeCompositeExit#onDestroyed
+   */
+  onDestroyed: function() {
+    this._super();
+
+    if (this._invalid) {
+      return;
+    }
+
+    this._parent.sortExitLinks();
   },
 });

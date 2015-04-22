@@ -1,4 +1,4 @@
-wcNodeComposite.extend('wcNodeCompositeProperty', 'Composite Property', 'Link', {
+wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'Link', {
   /**
    * @class
    * This node acts as a connection between exit links on a composite node and the script inside.<br>
@@ -12,17 +12,52 @@ wcNodeComposite.extend('wcNodeCompositeProperty', 'Composite Property', 'Link', 
   init: function(parent, pos, linkName) {
     this._super(parent, pos);
 
-    if (!(parent instanceof wcNodeComposite)) {
-      console.log('ERROR: Attempted to use the Composite Property node while not inside a Composite Node!');
+    if (!(parent instanceof wcNodeCompositeScript)) {
       this._invalid = true;
     }
 
     this.description("References a property from its parent Composite Node.");
+    this.name = linkName || 'value';
 
-    this._parent && this._parent.createProperty(linkName, wcPlay.PROPERTY_TYPE.STRING, '');
+    if (!this._invalid) {
+      this._parent && this._parent.createProperty(this.name, wcPlay.PROPERTY_TYPE.STRING, '');
+    }
 
-    this.createProperty('property', wcPlay.PROPERTY_TYPE.STRING, linkName);
     this.createProperty('value', wcPlay.PROPERTY_TYPE.STRING, '');
+  },
+
+  /**
+   * Event that is called when the name of this node has changed.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeCompositeProperty#onNameChanged
+   * @param {String} oldName - The current name.
+   * @param {String} newName - The new name.
+   */
+  onNameChanged: function(oldName, newName) {
+    this._super(oldName, newName);
+
+    if (newName) {
+      // Attempt to create a new property, if it does not exist, then synchronize our local property.
+      if (this._parent) {
+        this._parent.createProperty(newName, wcPlay.PROPERTY_TYPE.STRING, '');
+        // Copy all chains from the old property links to the new.
+        var inputChains = this._parent.listInputChains(oldName);
+        var outputChains = this._parent.listOutputChains(oldName);
+        var engine = this.engine();
+        if (engine) {
+          for (var i = 0; i < inputChains.length; ++i) {
+            this._parent.connectInput(newName, engine.nodeById(inputChains[i].outNodeId), inputChains[i].outName);
+          }
+          for (var i = 0; i < outputChains.length; ++i) {
+            this._parent.connectOutput(newName, engine.nodeById(outputChains[i].inNodeId), outputChains[i].inName);
+          }
+        }
+        this._parent.sortPropertyLinks();
+      }
+      this.property('value', this.property('value'));
+    } else {
+      this.property('value', '');
+    }
   },
 
   /**
@@ -42,17 +77,8 @@ wcNodeComposite.extend('wcNodeCompositeProperty', 'Composite Property', 'Link', 
     }
 
     if (name === 'value') {
-      var propName = this.property('property');
-      if (propName) {
-        this._parent && this._parent.property(propName, newValue);
-      }
-    } else if (name === 'property') {
-      if (newValue) {
-        // Attempt to create a new property, if it does not exist, then synchronize our local property.
-        this._parent && this._parent.createProperty(newValue, wcPlay.PROPERTY_TYPE.STRING, '');
-        this.property('value', this.property('value'));
-      } else {
-        this.property('value', '');
+      if (this.name) {
+        this._parent && this._parent.property(this.name, newValue);
       }
     }
   },
@@ -73,9 +99,8 @@ wcNodeComposite.extend('wcNodeCompositeProperty', 'Composite Property', 'Link', 
     }
 
     if (name === 'value') {
-      var propName = this.property('property');
-      if (propName) {
-        return (this._parent && this._parent.property(propName)) || 0;
+      if (this.name) {
+        return this._parent.property(this.name);
       }
     }
   },
@@ -98,12 +123,9 @@ wcNodeComposite.extend('wcNodeCompositeProperty', 'Composite Property', 'Link', 
     }
 
     if (name === 'value') {
-      var propName = this.property('property');
-      if (propName) {
-        this._parent && this._parent.initialProperty(propName, newValue);
+      if (this.name) {
+        this._parent.initialProperty(this.name, newValue);
       }
-    } else if (name === 'property') {
-      this._parent && this.property('value', this._parent.property(newValue));
     }
   },
 
@@ -118,11 +140,46 @@ wcNodeComposite.extend('wcNodeCompositeProperty', 'Composite Property', 'Link', 
   onInitialPropertyGet: function(name) {
     this._super(name);
 
+    if (this._invalid) {
+      return 'error';
+    }
+
     if (name === 'value') {
-      var propName = this.property('property');
-      if (propName) {
-        return (this._parent && this._parent.initialProperty(propName)) || 0;
+      if (this.name) {
+        return this._parent.initialProperty(this.name);
       }
     }
+  },
+
+  /**
+   * Event that is called after the node has changed its position.
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeCompositeProperty#onMoving
+   * @param {wcPlay~Coordinates} oldPos - The old position of the node.
+   * @param {wcPlay~Coordinates} newPos - The new position of the node.
+   */
+  onMoved: function(oldPos, newPos) {
+    this._super(oldPos, newPos);
+
+    if (this._invalid) {
+      return;
+    }
+
+    this._parent.sortPropertyLinks();
+  },
+
+  /**
+   * Event that is called after the node has been destroyed.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeCompositeProperty#onDestroyed
+   */
+  onDestroyed: function() {
+    this._super();
+
+    if (this._invalid) {
+      return;
+    }
+
+    this._parent.sortPropertyLinks();
   },
 });

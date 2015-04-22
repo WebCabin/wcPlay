@@ -58,7 +58,7 @@ Class.extend('wcNode', 'Node', '', {
    * @function wcNode#destroy
    */
   destroy: function() {
-    this.onDestroy();
+    this.onDestroying();
 
     // Remove all links.
     for (var i = 0; i < this.chain.entry.length; ++i) {
@@ -87,6 +87,7 @@ Class.extend('wcNode', 'Node', '', {
 
     // Remove the node from its parent.
     this._parent && this._parent.__removeNode(this);
+    this.onDestroyed();
   },
 
   /**
@@ -495,7 +496,7 @@ Class.extend('wcNode', 'Node', '', {
     var engine = this.engine();
     if (engine) {
       for (var i = 0; i < chains.length; ++i) {
-        this.connectEntry(newName, engine.nodeById(chains[i].inNodeId), chains[i].inName);
+        this.connectExit(newName, engine.nodeById(chains[i].inNodeId), chains[i].inName);
       }
     }
     return true;
@@ -1468,6 +1469,41 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
+   * Event that is called when the node is about to change its position.
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onMoving
+   * @param {wcPlay~Coordinates} oldPos - The current position of the node.
+   * @param {wcPlay~Coordinates} newPos - The new position to move the node.
+   * @returns {wcPlay~Coordinates|undefined} - Return the new position of the node (usually newPos unless you are restricting the position). If no value is returned, newPos is assumed.
+   */
+  onMoving: function(oldPos, newPos) {
+    // this._super(oldPos, newPos);
+  },
+
+  /**
+   * Event that is called after the node has changed its position.
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onMoving
+   * @param {wcPlay~Coordinates} oldPos - The old position of the node.
+   * @param {wcPlay~Coordinates} newPos - The new position of the node.
+   */
+  onMoved: function(oldPos, newPos) {
+    // this._super(oldPos, newPos);
+  },
+
+  /**
+   * Event that is called when the name of this node is about to change.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onNameChanging
+   * @param {String} oldName - The current name.
+   * @param {String} newName - The new name.
+   * @return {String|undefined} - Return the new value of the name (usually newValue unless you are restricting the name). If no value is returned, newValue is assumed.
+   */
+  onNameChanging: function(oldName, newName) {
+    // this._super(oldName, newName);
+  },
+
+  /**
    * Event that is called when the name of this node has changed.<br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onNameChanged
@@ -1571,9 +1607,18 @@ Class.extend('wcNode', 'Node', '', {
   /**
    * Event that is called when the node is about to be destroyed.<br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNode#onDestroy
+   * @function wcNode#onDestroying
    */
-  onDestroy: function() {
+  onDestroying: function() {
+    // this._super();
+  },
+
+  /**
+   * Event that is called after the node has been destroyed.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onDestroyed
+   */
+  onDestroyed: function() {
     // this._super();
   },
 
