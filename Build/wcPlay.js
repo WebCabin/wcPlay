@@ -738,7 +738,9 @@ function wcPlayEditor(container, options) {
       spacing: 5,           // The pixel space between the title text and the bar that separates the properties.
       wrapL: '  ',          // The left string to wrap around the title text.
       wrapR: '  ',          // The right string to wrap around the title text.
-      placeholder: '[name]', // A placeholder label if there is no title name.
+      placeholder: '  ',    // A placeholder label if there is no title name.
+      nameWrapL: ' (',      // The left string to wrap around the name portion of the title text.
+      nameWrapR: ') ',      // The right string to wrap around the name portion of the title text.
     },
     links: {
       length: 12,           // Length of each link 'nub'
@@ -1156,6 +1158,8 @@ wcPlayEditor.prototype = {
     $('.wcPlayEditorMenuOptionPausePlay').children('i:first-child, span:first-child').toggleClass('fa-play', this._engine.paused()).toggleClass('fa-pause', !this._engine.paused());
     $('.wcPlayEditorMenuOptionDelete').toggleClass('disabled', this._selectedNodes.length === 0);
     $('.wcPlayEditorMenuOptionComposite').toggleClass('disabled', this._selectedNodes.length === 0);
+    $('.wcPlayEditorMenuOptionCompositeExit').toggleClass('disabled', this._parent instanceof wcPlay);
+    $('.wcPlayEditorMenuOptionCompositeEnter').toggleClass('disabled', this._selectedNodes.length !== 1 || !(this._selectedNodes[0] instanceof wcNodeCompositeScript));
 
 
     this.onResized();
@@ -1311,12 +1315,14 @@ wcPlayEditor.prototype = {
             <li><span class="wcPlayEditorMenuOptionPaste wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-paste fa-lg"/>Paste<span>Ctrl+P</span></span></li>\
             <li><span class="wcPlayEditorMenuOptionDelete wcPlayMenuItem"><i class="wcPlayEditorMenuIcon wcButton fa fa-trash-o fa-lg"/>Delete<span>Del</span></span></li>\
             <li><hr class="wcPlayMenuSeparator"></li>\
-            <li><span class="wcPlayEditorMenuOptionComposite wcPlayMenuItem" title="Combine all selected nodes into a new \'Composite\' Node."><i class="wcPlayEditorMenuIcon wcButton fa fa-share-alt-square fa-lg"/>Create Composite<span></span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionComposite wcPlayMenuItem" title="Combine all selected nodes into a new \'Composite\' Node."><i class="wcPlayEditorMenuIcon wcButton fa fa-share-alt-square fa-lg"/>Create Composite<span>C</span></span></li>\
           </ul>\
         </li>\
         <li><span>View</span>\
           <ul>\
             <li><span class="wcPlayEditorMenuOptionCenter wcPlayMenuItem" title="Fit selected nodes into view."><i class="wcPlayEditorMenuIcon wcButton fa fa-crosshairs fa-lg"/>Center View<span>F</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionCompositeExit wcPlayMenuItem" title="Exit out of this Composite node."><i class="wcPlayEditorMenuIcon wcButton fa fa-level-up fa-lg"/>Exit Composite<span>O</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionCompositeEnter wcPlayMenuItem" title="Enter into this Composite node."><i class="wcPlayEditorMenuIcon wcButton fa fa-level-down fa-lg"/>Enter Composite<span>I</span></span></li>\
           </ul>\
         </li>\
         <li><span>Debugging</span>\
@@ -1356,6 +1362,8 @@ wcPlayEditor.prototype = {
         <div class="wcPlayEditorMenuOptionComposite"><span class="wcPlayEditorMenuIcon wcButton fa fa-share-alt-square fa-lg" title="Combine all selected nodes into a new \'Composite\' Node."/></div>\
         <div class="ARPG_Separator"></div>\
         <div class="wcPlayEditorMenuOptionCenter"><span class="wcPlayEditorMenuIcon wcButton fa fa-crosshairs fa-lg" title="Fit selected nodes into view."/></div>\
+        <div class="wcPlayEditorMenuOptionCompositeExit"><span class="wcPlayEditorMenuIcon wcButton fa fa-level-up fa-lg" title="Exit out of this Composite node."/></div>\
+        <div class="wcPlayEditorMenuOptionCompositeEnter"><span class="wcPlayEditorMenuIcon wcButton fa fa-level-down fa-lg" title="Enter into this Composite node."/></div>\
         <div class="ARPG_Separator"></div>\
         <div class="wcPlayEditorMenuOptionRestart"><span class="wcPlayEditorMenuIcon wcButton fa fa-refresh fa-lg" title="Reset all property values to their initial state and restart the execution of the script."/></div>\
         <div class="ARPG_Separator"></div>\
@@ -1857,11 +1865,7 @@ wcPlayEditor.prototype = {
     this.__setCanvasFont(this._font.title, context);
     bounds.width = context.measureText(this._drawStyle.title.wrapL + node.type + ': ' + this._drawStyle.title.wrapR).width;
     this.__setCanvasFont(this._font.titleDesc, context);
-    if (node.name) {
-      bounds.width += context.measureText(node.name).width;
-    } else {
-      bounds.width += context.measureText(this._drawStyle.title.placeholder).width;
-    }
+    bounds.width += context.measureText(this._drawStyle.title.nameWrapL + (node.name || this._drawStyle.title.placeholder) + this._drawStyle.title.nameWrapR).width;
 
     // Measure the node's viewport.
     if (node._viewportSize) {
@@ -2099,7 +2103,7 @@ wcPlayEditor.prototype = {
     var titleWrapRWidth = context.measureText(this._drawStyle.title.wrapR).width;
     var titleTextWidth = 0;
     this.__setCanvasFont(this._font.titleDesc, context);
-    titleTextWidth = context.measureText(node.name || this._drawStyle.title.placeholder).width;
+    titleTextWidth = context.measureText(this._drawStyle.title.nameWrapL + (node.name || this._drawStyle.title.placeholder) + this._drawStyle.title.nameWrapR).width;
 
     result.titleBounds = {
       top: rect.top + upper,
@@ -2123,7 +2127,7 @@ wcPlayEditor.prototype = {
     context.fillText(this._drawStyle.title.wrapL + node.type + ': ', rect.left + (rect.width - (titleTypeWidth + titleWrapRWidth + titleTextWidth)) / 2, rect.top + upper);
 
     this.__setCanvasFont(this._font.titleDesc, context);
-    context.fillText(node.name || this._drawStyle.title.placeholder, rect.left + titleTypeWidth + (rect.width - (titleTypeWidth + titleWrapRWidth + titleTextWidth))/2, rect.top + upper);
+    context.fillText(this._drawStyle.title.nameWrapL + (node.name || this._drawStyle.title.placeholder) + this._drawStyle.title.nameWrapR, rect.left + titleTypeWidth + (rect.width - (titleTypeWidth + titleWrapRWidth + titleTextWidth))/2, rect.top + upper);
 
     context.textAlign = "right";
     this.__setCanvasFont(this._font.title, context);
@@ -3230,6 +3234,15 @@ wcPlayEditor.prototype = {
           this.center();
         }
         break;
+      case 'O'.charCodeAt(0): // O to step outside of a Composite Node.
+        $('.wcPlayEditorMenuOptionCompositeExit').first().click();
+        break;
+      case 'I'.charCodeAt(0): // O to step outside of a Composite Node.
+        $('.wcPlayEditorMenuOptionCompositeEnter').first().click();
+        break;
+      case 'C'.charCodeAt(0): // C to create a Composite node from the selected nodes.
+        $('.wcPlayEditorMenuOptionComposite').first().click();
+        break;
     }
   },
 
@@ -3523,6 +3536,25 @@ wcPlayEditor.prototype = {
       if (self._selectedNodes.length) {
         self.focus(self._selectedNodes);
       } else {
+        self.center();
+      }
+    });
+    $body.on('click', '.wcPlayEditorMenuOptionCompositeExit', function() {
+      if (self._parent instanceof wcNodeCompositeScript) {
+        var focusNode = self._parent;
+        self._parent = self._parent._parent;
+
+        self._selectedNode = focusNode;
+        self._selectedNodes = [focusNode];
+        self.focus(self._selectedNodes);
+      }
+    });
+    $body.on('click', '.wcPlayEditorMenuOptionCompositeEnter', function() {
+      if (self._selectedNodes.length && self._selectedNodes[0] instanceof wcNodeCompositeScript) {
+        self._parent = self._selectedNodes[0];
+        self._selectedNode = null;
+        self._selectedNodes = [];
+
         self.center();
       }
     });
@@ -4764,7 +4796,7 @@ wcPlayEditor.prototype = {
           this._selectedNode = null;
           this._selectedNodes = [];
           this.center();
-        } else if (node instanceof wcNodeComposite && !(this._parent instanceof wcPlay)) {
+        } else if (node instanceof wcNodeComposite && this._parent instanceof wcNodeCompositeScript) {
           // Step out if double clicking on an external link node.
           var focusNode = this._parent;
           this._parent = this._parent._parent;
