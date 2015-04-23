@@ -77,10 +77,10 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '', {
    * @param {Number[]} [idMap] - If supplied, identifies a mapping of old ID's to new ID's, any not found in this list will be unchanged.
    */
   import: function(data, idMap) {
-    this._super(data, idMap);
-
     this.compiledNodes = data.compiledNodes;
     this.decompile(true);
+
+    this._super(data, idMap);
   },
 
   /**
@@ -344,11 +344,11 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '', {
   },
 
   /**
-   * Event that is called when the node is about to be destroyed.<br>
+   * Event that is called after the node has been destroyed.<br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNodeCompositeScript#onDestroying
+   * @function wcNodeCompositeScript#onDestroyed
    */
-  onDestroying: function() {
+  onDestroyed: function() {
     this._super();
 
     for (var i = 0; i < this._entryNodes.length; ++i) {

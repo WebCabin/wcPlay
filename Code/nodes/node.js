@@ -144,28 +144,28 @@ Class.extend('wcNode', 'Node', '', {
     for (var i = 0; i < data.entryChains.length; ++i) {
       var chain = data.entryChains[i];
       var targetNode = engine.nodeById((idMap && idMap[chain.outNodeId]) || chain.outNodeId);
-      if (this._parent === targetNode._parent) {
+      if (targetNode && this._parent === targetNode._parent) {
         this.connectEntry(chain.inName, targetNode, chain.outName);
       }
     }
     for (var i = 0; i < data.exitChains.length; ++i) {
       var chain = data.exitChains[i];
       var targetNode = engine.nodeById((idMap && idMap[chain.inNodeId]) || chain.inNodeId);
-      if (this._parent === targetNode._parent) {
+      if (targetNode && this._parent === targetNode._parent) {
         this.connectExit(chain.outName, targetNode, chain.inName);
       }
     }
     for (var i = 0; i < data.inputChains.length; ++i) {
       var chain = data.inputChains[i];
       var targetNode = engine.nodeById((idMap && idMap[chain.outNodeId]) || chain.outNodeId);
-      if (this._parent === targetNode._parent) {
+      if (targetNode && this._parent === targetNode._parent) {
         this.connectInput(chain.inName, targetNode, chain.outName);
       }
     }
     for (var i = 0; i < data.outputChains.length; ++i) {
       var chain = data.outputChains[i];
       var targetNode = engine.nodeById((idMap && idMap[chain.inNodeId]) || chain.inNodeId);
-      if (this._parent === targetNode._parent) {
+      if (targetNode && this._parent === targetNode._parent) {
         this.connectOutput(chain.outName, targetNode, chain.inName);
       }
     }

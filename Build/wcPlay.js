@@ -3407,7 +3407,7 @@ wcPlayEditor.prototype = {
           self.__onDestroyNode(self._selectedNodes[i]);
 
           // Now give this node a new ID so it is treated like a different node.
-          self._selectedNodes[i].id = ++wcNodeNextID;
+          self._selectedNodes[i].id = ++window.wcNodeNextID;
         }
 
         var compNode = new window[className](self._parent, {x: 0, y: 0}, self._selectedNodes);
@@ -3564,7 +3564,7 @@ wcPlayEditor.prototype = {
 
         // Compile the meta data for this node based on the nodes inside.
         compNode.compile();
-        window[className].prototype.compiledNodes = compNode.compiledNodes;
+        // window[className].prototype.compiledNodes = compNode.compiledNodes;
 
         // Create undo event for creating the composite node.
         self.__onCreateNode(compNode);
@@ -5105,28 +5105,28 @@ Class.extend('wcNode', 'Node', '', {
     for (var i = 0; i < data.entryChains.length; ++i) {
       var chain = data.entryChains[i];
       var targetNode = engine.nodeById((idMap && idMap[chain.outNodeId]) || chain.outNodeId);
-      if (this._parent === targetNode._parent) {
+      if (targetNode && this._parent === targetNode._parent) {
         this.connectEntry(chain.inName, targetNode, chain.outName);
       }
     }
     for (var i = 0; i < data.exitChains.length; ++i) {
       var chain = data.exitChains[i];
       var targetNode = engine.nodeById((idMap && idMap[chain.inNodeId]) || chain.inNodeId);
-      if (this._parent === targetNode._parent) {
+      if (targetNode && this._parent === targetNode._parent) {
         this.connectExit(chain.outName, targetNode, chain.inName);
       }
     }
     for (var i = 0; i < data.inputChains.length; ++i) {
       var chain = data.inputChains[i];
       var targetNode = engine.nodeById((idMap && idMap[chain.outNodeId]) || chain.outNodeId);
-      if (this._parent === targetNode._parent) {
+      if (targetNode && this._parent === targetNode._parent) {
         this.connectInput(chain.inName, targetNode, chain.outName);
       }
     }
     for (var i = 0; i < data.outputChains.length; ++i) {
       var chain = data.outputChains[i];
       var targetNode = engine.nodeById((idMap && idMap[chain.inNodeId]) || chain.inNodeId);
-      if (this._parent === targetNode._parent) {
+      if (targetNode && this._parent === targetNode._parent) {
         this.connectOutput(chain.outName, targetNode, chain.inName);
       }
     }
@@ -7003,10 +7003,10 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '', {
    * @param {Number[]} [idMap] - If supplied, identifies a mapping of old ID's to new ID's, any not found in this list will be unchanged.
    */
   import: function(data, idMap) {
-    this._super(data, idMap);
-
     this.compiledNodes = data.compiledNodes;
     this.decompile(true);
+
+    this._super(data, idMap);
   },
 
   /**
@@ -7270,11 +7270,11 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '', {
   },
 
   /**
-   * Event that is called when the node is about to be destroyed.<br>
+   * Event that is called after the node has been destroyed.<br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNodeCompositeScript#onDestroying
+   * @function wcNodeCompositeScript#onDestroyed
    */
-  onDestroying: function() {
+  onDestroyed: function() {
     this._super();
 
     for (var i = 0; i < this._entryNodes.length; ++i) {

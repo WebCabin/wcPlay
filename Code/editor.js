@@ -2703,7 +2703,7 @@ wcPlayEditor.prototype = {
           self.__onDestroyNode(self._selectedNodes[i]);
 
           // Now give this node a new ID so it is treated like a different node.
-          self._selectedNodes[i].id = ++wcNodeNextID;
+          self._selectedNodes[i].id = ++window.wcNodeNextID;
         }
 
         var compNode = new window[className](self._parent, {x: 0, y: 0}, self._selectedNodes);
@@ -2860,7 +2860,7 @@ wcPlayEditor.prototype = {
 
         // Compile the meta data for this node based on the nodes inside.
         compNode.compile();
-        window[className].prototype.compiledNodes = compNode.compiledNodes;
+        // window[className].prototype.compiledNodes = compNode.compiledNodes;
 
         // Create undo event for creating the composite node.
         self.__onCreateNode(compNode);
