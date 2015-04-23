@@ -13,6 +13,6 @@ wcNodeStorage.extend('wcNodeStorageToggle', 'Toggle', 'Core', {
 
     this.description("Stores a boolean (toggleable) value.");
 
-    this.createProperty('value', wcPlay.PROPERTY_TYPE.TOGGLE, false);
+    this.createProperty('value', wcPlay.PROPERTY.TOGGLE, false);
   },
 });

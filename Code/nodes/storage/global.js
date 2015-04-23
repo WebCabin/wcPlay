@@ -13,7 +13,7 @@ wcNodeStorage.extend('wcNodeStorageGlobal', 'Global', 'Core', {
 
     this.description("References a global property on the script.");
 
-    this.createProperty('value', wcPlay.PROPERTY_TYPE.STRING, '', {description: "The current value of the global property (Use the title to identify the property)."});
+    this.createProperty('value', wcPlay.PROPERTY.STRING, '', {description: "The current value of the global property (Use the title to identify the property)."});
   },
 
   /**
@@ -29,7 +29,7 @@ wcNodeStorage.extend('wcNodeStorageGlobal', 'Global', 'Core', {
     // Attempt to create a new property if it does not exist.
     var engine = this.engine();
     if (engine) {
-      engine.createProperty(newName, wcPlay.PROPERTY_TYPE.STRING, '');
+      engine.createProperty(newName, wcPlay.PROPERTY.STRING, '');
       
       // Perform a search and remove all global properties no longer being referenced.
       var propList = engine.listProperties();

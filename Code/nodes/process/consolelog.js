@@ -14,7 +14,7 @@ wcNodeProcess.extend('wcNodeProcessConsoleLog', 'Console Log', 'Debugging', {
     this.description("For debugging purposes, will print out a message into the console log the moment it is activated (only if silent mode is not on).");
 
     // Create the message property so we know what to output in the log.
-    this.createProperty('message', wcPlay.PROPERTY_TYPE.STRING, 'Log message.', {description: "The message that will appear in the console log."});
+    this.createProperty('message', wcPlay.PROPERTY.STRING, 'Log message.', {description: "The message that will appear in the console log."});
   },
 
   /**

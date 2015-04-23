@@ -42,12 +42,13 @@ Class.extend('wcNode', 'Node', '', {
     };
     this._collapsed = true;
     this._break = false;
+    this._log = false;
 
     this._parent = parent;
 
     // Give the node its default properties.
-    this.createProperty(wcNode.PROPERTY.ENABLED, wcPlay.PROPERTY_TYPE.TOGGLE, true, {collapsible: true, description: "Disabled nodes will be treated as if they were not there, all connections will be ignored."});
-    this.createProperty(wcNode.PROPERTY.DEBUG_LOG, wcPlay.PROPERTY_TYPE.TOGGLE, false, {collapsible: true, description: "Output various debugging information about this node."});
+    this.createProperty(wcNode.PROPERTY_ENABLED, wcPlay.PROPERTY.TOGGLE, true, {collapsible: true, description: "Disabled nodes will be treated as if they were not there, all connections will be ignored."});
+    // this.createProperty(wcNode.PROPERTY.DEBUG_LOG, wcPlay.PROPERTY.TOGGLE, false, {collapsible: true, description: "Output various debugging information about this node."});
 
     // Add this node to its parent.
     this._parent && this._parent.__addNode(this);
@@ -216,10 +217,10 @@ Class.extend('wcNode', 'Node', '', {
    */
   enabled: function(enabled) {
     if (enabled !== undefined) {
-      this.property(wcNode.PROPERTY.ENABLED, enabled? true: false);
+      this.property(wcNode.PROPERTY_ENABLED, enabled? true: false);
     }
 
-    return this.property(wcNode.PROPERTY.ENABLED);
+    return this.property(wcNode.PROPERTY_ENABLED);
   },
 
   /**
@@ -230,11 +231,11 @@ Class.extend('wcNode', 'Node', '', {
    */
   debugLog: function(enabled) {
     if (enabled !== undefined) {
-      this.property(wcNode.PROPERTY.DEBUG_LOG, enabled? true: false);
+      this._log = enabled? true: false;
     }
 
     var engine = this.engine();
-    return (!engine || engine.silent())? false: this.property(wcNode.PROPERTY.DEBUG_LOG);
+    return (!engine || engine.silent())? false: this._log;
   },
 
   /**
@@ -404,9 +405,9 @@ Class.extend('wcNode', 'Node', '', {
    * Creates a new property.
    * @function wcNode#createProperty
    * @param {String} name - The name of the property.
-   * @param {wcPlay.PROPERTY_TYPE} type - The type of property.
+   * @param {wcPlay.PROPERTY} type - The type of property.
    * @param {Object} [initialValue] - A initial value for this property when the script starts.
-   * @param {Object} [options] - Additional options for this property, see {@link wcPlay.PROPERTY_TYPE}.
+   * @param {Object} [options] - Additional options for this property, see {@link wcPlay.PROPERTY}.
    * @returns {Boolean} - Fails if the property does not exist.
    */
   createProperty: function(name, type, initialValue, options) {
@@ -1084,10 +1085,10 @@ Class.extend('wcNode', 'Node', '', {
 
           // Apply restrictions to the property based on its type and options supplied.
           switch (prop.type) {
-            case wcPlay.PROPERTY_TYPE.TOGGLE:
+            case wcPlay.PROPERTY.TOGGLE:
               value = value? true: false;
               break;
-            case wcPlay.PROPERTY_TYPE.NUMBER:
+            case wcPlay.PROPERTY.NUMBER:
               var min = (prop.options.min !== undefined? prop.options.min: -Infinity);
               var max = (prop.options.max !== undefined? prop.options.max:  Infinity);
               var num = Math.min(max, Math.max(min, parseInt(value)));
@@ -1095,13 +1096,13 @@ Class.extend('wcNode', 'Node', '', {
                 value = Math.min(max, Math.max(min, 0));
               }
               break;
-            case wcPlay.PROPERTY_TYPE.STRING:
+            case wcPlay.PROPERTY.STRING:
               var len = prop.options.maxlength;
               if (len) {
                 value = value.toString().substring(0, len);
               }
               break;
-            case wcPlay.PROPERTY_TYPE.SELECT:
+            case wcPlay.PROPERTY.SELECT:
               var items = prop.options.items;
               if (typeof items === 'function') {
                 items = items.call(this);
@@ -1756,10 +1757,7 @@ wcNode.CONNECT_RESULT = {
 
 
 /**
- * Default property type names.
- * @enum {String}
+ * Enabled property name.
+ * @typedef {String}
  */
-wcNode.PROPERTY = {
-  ENABLED: 'enabled',
-  DEBUG_LOG: 'debug log',
-};
+wcNode.PROPERTY_ENABLED = 'enabled';

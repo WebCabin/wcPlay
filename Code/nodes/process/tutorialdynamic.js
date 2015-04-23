@@ -19,7 +19,7 @@ wcNodeProcess.extend('wcNodeProcessTutorialDynamic', 'Example Dynamic', 'Tutoria
     this.createEntry('change color', "Change the color of this node!");
 
     this._propCount = 0;
-    this.createProperty('count', wcPlay.PROPERTY_TYPE.NUMBER, 0, {min: 0, max: 10, description: "Dynamically create a property for each count."});
+    this.createProperty('count', wcPlay.PROPERTY.NUMBER, 0, {min: 0, max: 10, description: "Dynamically create a property for each count."});
   },
 
   /**
@@ -66,7 +66,7 @@ wcNodeProcess.extend('wcNodeProcessTutorialDynamic', 'Example Dynamic', 'Tutoria
       } else if (count > this._propCount) {
         while (this._propCount < count) {
           this._propCount++;
-          this.createProperty('Prop ' + this._propCount, wcPlay.PROPERTY_TYPE.STRING, 'val ' + this._propCount, {description: "Dynamically created property!"});
+          this.createProperty('Prop ' + this._propCount, wcPlay.PROPERTY.STRING, 'val ' + this._propCount, {description: "Dynamically created property!"});
         }
       }
     }

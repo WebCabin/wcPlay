@@ -38,7 +38,7 @@ function wcPlay(options) {
  * Determines how a property's control should be rendered within the editor view.
  * @enum {String}
  */
-wcPlay.PROPERTY_TYPE = {
+wcPlay.PROPERTY = {
   /** Displays the property as a string, but does not enforce or convert its type. [Default options]{@link wcNode~PropertyOptions} are used. */
   DYNAMIC: 'dynamic',
   /** Displays the property as a checkbox. [Default options]{@link wcNode~PropertyOptions} are used. */
@@ -55,7 +55,7 @@ wcPlay.PROPERTY_TYPE = {
  * The different types of nodes.
  * @enum {String}
  */
-wcPlay.NODE_TYPE = {
+wcPlay.NODE = {
   /** Entry nodes mark the beginning of an execution flow chain and are usually triggered by some type of event that happens outside of the script. */
   ENTRY: 'entry',
   /** Process nodes perform a process, often very simple, and make up the bulk of a flow chain within the script. */
@@ -77,7 +77,7 @@ wcPlay.NODE_LIBRARY = [];
  * @param {String} name - The name of the node constructor.
  * @param {String} displayName - The display name.
  * @param {String} category - The display category name.
- * @param {wcPlay.NODE_TYPE} type - The node's type.
+ * @param {wcPlay.NODE} type - The node's type.
  * @returns {Boolean} - Success or failure.
  */
 wcPlay.registerNodeType = function(name, displayName, category, type) {
@@ -297,9 +297,9 @@ wcPlay.prototype = {
   /**
    * Creates a new global property (can be used with the global storage node).
    * @param {String} name - The name of the property.
-   * @param {wcPlay.PROPERTY_TYPE} type - The type of property.
+   * @param {wcPlay.PROPERTY} type - The type of property.
    * @param {Object} [initialValue] - A default value for this property.
-   * @param {Object} [options] - Additional options for this property, see {@link wcPlay.PROPERTY_TYPE}.
+   * @param {Object} [options] - Additional options for this property, see {@link wcPlay.PROPERTY}.
    * @returns {Boolean} - Fails if the property does not exist.
    */
   createProperty: function(name, type, initialValue, options) {

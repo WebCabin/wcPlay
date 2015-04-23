@@ -20,10 +20,10 @@ wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'Link', {
     this.name = linkName || 'value';
 
     if (!this._invalid) {
-      this._parent && this._parent.createProperty(this.name, wcPlay.PROPERTY_TYPE.STRING, '');
+      this._parent && this._parent.createProperty(this.name, wcPlay.PROPERTY.STRING, '');
     }
 
-    this.createProperty('value', wcPlay.PROPERTY_TYPE.STRING, '');
+    this.createProperty('value', wcPlay.PROPERTY.STRING, '');
   },
 
   /**
@@ -39,7 +39,7 @@ wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'Link', {
     if (newName) {
       // Attempt to create a new property, if it does not exist, then synchronize our local property.
       if (this._parent) {
-        this._parent.createProperty(newName, wcPlay.PROPERTY_TYPE.STRING, '');
+        this._parent.createProperty(newName, wcPlay.PROPERTY.STRING, '');
         // Copy all chains from the old property links to the new.
         var inputChains = this._parent.listInputChains(oldName);
         var outputChains = this._parent.listOutputChains(oldName);

@@ -32,7 +32,7 @@ wcNode.extend('wcNodeProcess', 'Node Process', '', {
       this.className = className;
       this.type = type;
       this.category = category;
-      wcPlay.registerNodeType(className, type, category, wcPlay.NODE_TYPE.PROCESS);
+      wcPlay.registerNodeType(className, type, category, wcPlay.NODE.PROCESS);
     }
   },
 });

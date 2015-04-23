@@ -83,7 +83,7 @@ function wcPlayEditor(container, options) {
   this._expandedSelectedNode = null;
 
   this._highlightTitle = false;
-  // this._highlightCollapser = false;
+  this._highlightDebugLog = false;
   this._highlightBreakpoint = false;
   this._highlightEntryLink = false;
   this._highlightExitLink = false;
@@ -581,15 +581,15 @@ wcPlayEditor.prototype = {
    * Retrieves the index for a node type.
    * @function wcPlayEditor#__typeIndex
    * @private
-   * @param {wcPlay.NODE_TYPE} type - The node type.
+   * @param {wcPlay.NODE} type - The node type.
    * @returns {Number} - The type index.
    */
   __typeIndex: function(type) {
     switch (type) {
-      case wcPlay.NODE_TYPE.ENTRY: return 0;
-      case wcPlay.NODE_TYPE.PROCESS: return 1;
-      case wcPlay.NODE_TYPE.STORAGE: return 2;
-      case wcPlay.NODE_TYPE.COMPOSITE: return 3;
+      case wcPlay.NODE.ENTRY: return 0;
+      case wcPlay.NODE.PROCESS: return 1;
+      case wcPlay.NODE.STORAGE: return 2;
+      case wcPlay.NODE.COMPOSITE: return 3;
     }
   },
 
@@ -736,7 +736,7 @@ wcPlayEditor.prototype = {
       var data = wcPlay.NODE_LIBRARY[i];
 
       // Skip categories we are not showing.
-      if (data.type !== wcPlay.NODE_TYPE.COMPOSITE) {
+      if (data.type !== wcPlay.NODE.COMPOSITE) {
         var catIndex = this._options.category.items.indexOf(data.category);
         if ((!this._options.category.isBlacklist && catIndex === -1) ||
             (this._options.category.isBlacklist && catIndex > -1)) {
@@ -998,36 +998,42 @@ wcPlayEditor.prototype = {
       height: data.inner.height + 60,
     };
 
-    // // Add a collapse button to the node in the left margin of the title.
-    // data.collapser = {
-    //   left: data.inner.left + 4,
-    //   top: data.inner.top + 4 + (node.chain.entry.length? this._font.links.size + this._drawStyle.links.padding: 0),
-    //   width: this._drawStyle.node.margin - 5,
-    //   height: this._font.title.size - 4,
-    // };
+    // Add a collapse button to the node in the left margin of the title.
+    data.debugLog = {
+      left: data.inner.left + 4,
+      top: data.inner.top + 4 + (node.chain.entry.length? this._font.links.size + this._drawStyle.links.padding: 0),
+      width: this._drawStyle.node.margin - 5,
+      height: this._font.title.size - 4,
+    };
 
-    // context.save();
-    // context.fillStyle = (this._highlightCollapser && this._highlightNode === node? "black": "white");
-    // context.strokeStyle = "black";
-    // context.lineWidth = 1;
-    // context.fillRect(data.collapser.left, data.collapser.top, data.collapser.width, data.collapser.height);
-    // context.strokeRect(data.collapser.left, data.collapser.top, data.collapser.width, data.collapser.height);
+    context.save();
+    context.fillStyle = (this._highlightDebugLog && this._highlightNode === node? "black": "white");
+    context.strokeStyle = "black";
+    context.lineWidth = 1;
+    context.fillRect(data.debugLog.left, data.debugLog.top, data.debugLog.width, data.debugLog.height);
+    context.strokeRect(data.debugLog.left, data.debugLog.top, data.debugLog.width, data.debugLog.height);
 
-    // context.strokeStyle = (this._highlightCollapser && this._highlightNode === node? "white": "black");
-    // context.lineWidth = 2;
-    // context.beginPath();
-    // context.moveTo(data.collapser.left + 1, data.collapser.top + data.collapser.height/2);
-    // context.lineTo(data.collapser.left + data.collapser.width - 1, data.collapser.top + data.collapser.height/2);
-    // if (node.collapsed()) {
-    //   context.moveTo(data.collapser.left + data.collapser.width/2, data.collapser.top + 1);
-    //   context.lineTo(data.collapser.left + data.collapser.width/2, data.collapser.top + data.collapser.height - 1);
-    // }
-    // context.stroke();
-    // context.restore();
+    context.strokeStyle = (this._highlightDebugLog && this._highlightNode === node? "white": "black");
+    context.lineWidth = 2;
+    context.beginPath();
+    if (!node.debugLog()) {
+      context.moveTo(data.debugLog.left + 1, data.debugLog.top + data.debugLog.height/2);
+      context.lineTo(data.debugLog.left + data.debugLog.width - 1, data.debugLog.top + data.debugLog.height/2);
+    }
+
+    if (node.debugLog()) {
+      context.moveTo(data.debugLog.left + 1, data.debugLog.top + 1);
+      context.lineTo(data.debugLog.left + data.debugLog.width/2, data.debugLog.top + data.debugLog.height/2);
+      context.lineTo(data.debugLog.left + 1, data.debugLog.top + data.debugLog.height - 1);
+      context.moveTo(data.debugLog.left + data.debugLog.width/2, data.debugLog.top + data.debugLog.height - 2);
+      context.lineTo(data.debugLog.left + data.debugLog.width, data.debugLog.top + data.debugLog.height - 2);
+    }
+    context.stroke();
+    context.restore();
 
     // Add breakpoint button to the node in the right margin of the title.
     data.breakpoint = {
-      left: data.inner.left + 4,
+      left: data.inner.left + data.inner.width - this._drawStyle.node.margin + 2,
       top: data.inner.top + 4 + (node.chain.entry.length? this._font.links.size + this._drawStyle.links.padding: 0),
       width: this._drawStyle.node.margin - 5,
       height: this._font.title.size - 4,
@@ -2107,10 +2113,10 @@ wcPlayEditor.prototype = {
     } else {
       // Handle custom display of certain property types.
       switch (property.type) {
-        case wcPlay.PROPERTY_TYPE.TOGGLE:
+        case wcPlay.PROPERTY.TOGGLE:
           // Display toggle buttons as 'yes', 'no'
           return (value? 'yes': 'no');
-        case wcPlay.PROPERTY_TYPE.SELECT:
+        case wcPlay.PROPERTY.SELECT:
           if (value == '') {
             return '<none>';
           }
@@ -2253,14 +2259,14 @@ wcPlayEditor.prototype = {
     var propFn = (initial? 'initialProperty': 'property');
 
     var type = property.type;
-    // if (type === wcPlay.PROPERTY_TYPE.DYNAMIC) {
+    // if (type === wcPlay.PROPERTY.DYNAMIC) {
     //   var value = node.property(property.name);
     //   if (typeof value === 'string') {
-    //     type = wcPlay.PROPERTY_TYPE.STRING;
+    //     type = wcPlay.PROPERTY.STRING;
     //   } else if (typeof value === 'bool') {
-    //     type = wcPlay.PROPERTY_TYPE.TOGGLE;
+    //     type = wcPlay.PROPERTY.TOGGLE;
     //   } else if (typeof value === 'number') {
-    //     type = wcPlay.PROPERTY_TYPE.NUMBER;
+    //     type = wcPlay.PROPERTY.NUMBER;
     //   }
     // }
 
@@ -2289,13 +2295,13 @@ wcPlayEditor.prototype = {
 
     // Determine what editor to use for the property.
     switch (type) {
-      case wcPlay.PROPERTY_TYPE.TOGGLE:
+      case wcPlay.PROPERTY.TOGGLE:
         // Toggles do not show an editor, instead, they just toggle their state.
         var state = node[propFn](property.name);
         undoChange(node, property.name, state, !state);
         node[propFn](property.name, !state);
         break;
-      case wcPlay.PROPERTY_TYPE.NUMBER:
+      case wcPlay.PROPERTY.NUMBER:
         $control = $('<input type="number"' + (property.options.min? ' min="' + property.options.min + '"': '') + (property.options.max? ' max="' + property.options.max + '"': '') + (property.options.step? ' step="' + property.options.step + '"': '') + '>');
         $control.val(parseFloat(node[propFn](property.name)));
         $control.change(function() {
@@ -2308,8 +2314,8 @@ wcPlayEditor.prototype = {
           }
         });
         break;
-      case wcPlay.PROPERTY_TYPE.STRING:
-      case wcPlay.PROPERTY_TYPE.DYNAMIC:
+      case wcPlay.PROPERTY.STRING:
+      case wcPlay.PROPERTY.DYNAMIC:
         if (property.options.multiline) {
           $control = $('<textarea' + (property.options.maxlength? ' maxlength="' + property.options.maxlength + '"': '') + '>');
           enterConfirms = false;
@@ -2324,7 +2330,7 @@ wcPlayEditor.prototype = {
           }
         });
         break;
-      case wcPlay.PROPERTY_TYPE.SELECT:
+      case wcPlay.PROPERTY.SELECT:
         var value = node[propFn](property.name);
         $control = $('<select>');
 
@@ -2948,7 +2954,7 @@ wcPlayEditor.prototype = {
     var mouse = this.__mouse(event);
 
     this._highlightTitle = false;
-    // this._highlightCollapser = false;
+    this._highlightDebugLog = false;
     this._highlightBreakpoint = false;
     this._highlightEntryLink = false;
     this._highlightExitLink = false;
@@ -3147,7 +3153,7 @@ wcPlayEditor.prototype = {
 
     this._mouse = mouse;
     this._highlightTitle = false;
-    // this._highlightCollapser = false;
+    this._highlightDebugLog = false;
     this._highlightBreakpoint = false;
     this._highlightEntryLink = false;
     this._highlightExitLink = false;
@@ -3170,16 +3176,16 @@ wcPlayEditor.prototype = {
       }
 
       if (!this._selectedEntryLink && !this._selectedExitLink && !this._selectedInputLink && !this._selectedOutputLink) {
-        // // Collapser button.
-        // if (this.__inRect(mouse, node._meta.bounds.collapser, this._viewportCamera)) {
-        //   this._highlightCollapser = true;
-        //   this.$viewport.addClass('wcClickable');
-        //   if (node.collapsed()) {
-        //     this.$viewport.attr('title', 'Expand this node.');
-        //   } else {
-        //     this.$viewport.attr('title', 'Collapse this node.');
-        //   }
-        // }
+        // Debug Log button.
+        if (this.__inRect(mouse, node._meta.bounds.debugLog, this._viewportCamera)) {
+          this._highlightDebugLog = true;
+          this.$viewport.addClass('wcClickable');
+          if (node.debugLog()) {
+            this.$viewport.attr('title', 'Disable debug logging for this node.');
+          } else {
+            this.$viewport.attr('title', 'Enable debug logging for this node.');
+          }
+        }
 
         // Breakpoint button.
         if (this.__inRect(mouse, node._meta.bounds.breakpoint, this._viewportCamera)) {
@@ -3959,27 +3965,27 @@ wcPlayEditor.prototype = {
       var hasTarget = false;
       var node = this.__findNodeAtPos(this._mouse, this._viewportCamera);
       if (node) {
-        // // Collapser button.
-        // if (this.__inRect(this._mouse, node._meta.bounds.collapser, this._viewportCamera)) {
-        //   var state = !node.collapsed();
-        //   node.collapsed(state);
-        //   this._undoManager && this._undoManager.addEvent((state? 'Collapsed': 'Expanded') + ' Node "' + node.category + '.' + node.type + '"',
-        //   {
-        //     id: node.id,
-        //     state: state,
-        //     editor: this,
-        //   },
-        //   // Undo
-        //   function() {
-        //     var myNode = this.editor._engine.nodeById(this.id);
-        //     myNode.collapsed(!this.state);
-        //   },
-        //   // Redo
-        //   function() {
-        //     var myNode = this.editor._engine.nodeById(this.id);
-        //     myNode.collapsed(this.state);
-        //   });
-        // }
+        // Debug Log button.
+        if (this.__inRect(this._mouse, node._meta.bounds.debugLog, this._viewportCamera)) {
+          var state = !node.debugLog();
+          node.debugLog(state);
+          this._undoManager && this._undoManager.addEvent((state? 'Enabled': 'Disabled') + ' Debug Logging for Node "' + node.category + '.' + node.type + '"',
+          {
+            id: node.id,
+            state: state,
+            editor: this,
+          },
+          // Undo
+          function() {
+            var myNode = this.editor._engine.nodeById(this.id);
+            myNode.debugLog(!this.state);
+          },
+          // Redo
+          function() {
+            var myNode = this.editor._engine.nodeById(this.id);
+            myNode.debugLog(this.state);
+          });
+        }
 
         // Breakpoint button.
         if (this.__inRect(this._mouse, node._meta.bounds.breakpoint, this._viewportCamera)) {
@@ -4071,10 +4077,10 @@ wcPlayEditor.prototype = {
     var hasTarget = false;
     var node = this.__findNodeAtPos(this._mouse, this._viewportCamera);
     if (node) {
-      // // Collapser button.
-      // if (this.__inRect(this._mouse, node._meta.bounds.collapser, this._viewportCamera)) {
-      //   hasTarget = true;
-      // }
+      // Debug Log button.
+      if (this.__inRect(this._mouse, node._meta.bounds.debugLog, this._viewportCamera)) {
+        hasTarget = true;
+      }
 
       // Breakpoint button.
       if (this.__inRect(this._mouse, node._meta.bounds.breakpoint, this._viewportCamera)) {
@@ -4154,8 +4160,8 @@ wcPlayEditor.prototype = {
           this._selectedNode = focusNode;
           this._selectedNodes = [focusNode];
           this.focus(this._selectedNodes);
-        } else {
-          node.collapsed(!node.collapsed());
+        // } else {
+        //   node.collapsed(!node.collapsed());
         }
       }
     }

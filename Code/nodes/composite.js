@@ -28,7 +28,7 @@ wcNode.extend('wcNodeComposite', 'Composite', '', {
       this.className = className;
       this.type = type;
       this.category = category;
-      wcPlay.registerNodeType(className, type, category, wcPlay.NODE_TYPE.COMPOSITE);
+      wcPlay.registerNodeType(className, type, category, wcPlay.NODE.COMPOSITE);
     }
   },
 });
