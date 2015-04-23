@@ -2392,12 +2392,12 @@ wcPlayEditor.prototype = {
   },
 
   /**
-   * Destroys a node and creates an undo event for it.
-   * @function wcPlayEditor#__destroyNode
-   * @param {wcNode} node - the node to destroy.
+   * Generates an undo event for a node that was created.
+   * @function wcPlayEditor#__onCreateNode
+   * @param {wcNode} node - The node that was created.
    */
-  __destroyNode: function(node) {
-    self._undoManager && self._undoManager.addEvent('',
+  __onCreateNode: function(node) {
+    this._undoManager && this._undoManager.addEvent('Created Node "' + node.category + '.' + node.type + '"',
     {
       id: node.id,
       className: node.className,
@@ -2405,6 +2405,52 @@ wcPlayEditor.prototype = {
         x: node.pos.x,
         y: node.pos.y,
       },
+      data: node.export(),
+      editor: this,
+      parent: this._parent,
+    },
+    // Undo
+    function() {
+      var myNode = this.editor._engine.nodeById(this.id);
+
+      // If we are viewing a script inside the node that is being removed, re-direct our view to its parents.
+      var parent = this.editor._parent;
+      while (!(parent instanceof wcPlay)) {
+        if (parent == myNode) {
+          this.editor._parent = myNode._parent;
+          this.editor.center();
+          break;
+        }
+
+        parent = parent._parent;
+      }
+
+      // Now destroy this node.
+      myNode.destroy();
+    },
+    // Redo
+    function() {
+      var myNode = new window[this.className](this.parent, this.pos);
+      myNode.id = this.id;
+      myNode.import(this.data);
+    });
+  },
+
+  /**
+   * Generates an undo event for a node that is destroyed.
+   * @function wcPlayEditor#__onDestroyNode
+   * @param {wcNode} node - the node to destroy.
+   */
+  __onDestroyNode: function(node) {
+    this._undoManager && this._undoManager.addEvent('',
+    {
+      id: node.id,
+      className: node.className,
+      pos: {
+        x: node.pos.x,
+        y: node.pos.y,
+      },
+      data: node.export(),
       collapsed: node.collapsed(),
       breakpoint: node._break,
       properties: node.listProperties(),
@@ -2412,11 +2458,12 @@ wcPlayEditor.prototype = {
       exitChains: node.listExitChains(),
       inputChains: node.listInputChains(),
       outputChains: node.listOutputChains(),
-      editor: self,
+      editor: this,
+      parent: this._parent,
     },
     // Undo
     function() {
-      var myNode = new window[this.className](this.editor._parent, this.pos);
+      var myNode = new window[this.className](this.parent, this.pos);
       myNode.id = this.id;
       myNode.collapsed(this.collapsed);
       myNode.debugBreak(this.breakpoint);
@@ -2446,16 +2493,19 @@ wcPlayEditor.prototype = {
         var targetNode = this.editor._engine.nodeById(chain.inNodeId);
         myNode.connectOutput(chain.outName, targetNode, chain.inName);
       }
+      myNode.import(this.data);
     },
     // Redo
     function() {
       var myNode = this.editor._engine.nodeById(this.id);
 
       // If we are viewing a script inside the node that is being removed, re-direct our view to its parents.
-      var parent = self.editor._parent;
+      var parent = this.editor._parent;
       while (!(parent instanceof wcPlay)) {
         if (parent == myNode) {
-          // TODO: Redirect view to myNode._parent.
+          this.editor._parent = myNode._parent;
+          this.editor.center();
+          break;
         }
 
         parent = parent._parent;
@@ -2464,8 +2514,6 @@ wcPlayEditor.prototype = {
       // Now destroy this node.
       myNode.destroy();
     });
-
-    node.destroy();
   },
 
   /**
@@ -2649,7 +2697,8 @@ wcPlayEditor.prototype = {
       if (self._selectedNodes.length) {
         self._undoManager && self._undoManager.beginGroup('Removed Nodes');
         for (var i = 0; i < self._selectedNodes.length; ++i) {
-          self.__destroyNode(self._selectedNodes[i]);
+          self.__onDestroyNode(self._selectedNodes[i]);
+          self._selectedNodes[i].destroy();
         }
         self._selectedNode = null;
         self._selectedNodes = [];
@@ -2675,6 +2724,9 @@ wcPlayEditor.prototype = {
         });
 
         self._undoManager && self._undoManager.beginGroup("Combined Nodes into Composite: " + number);
+        for (var i = 0; i < self._selectedNodes.length; ++i) {
+          self.__onDestroyNode(self._selectedNodes[i]);
+        }
 
         var compNode = new window[className](self._parent, {x: 0, y: 0}, self._selectedNodes);
 
@@ -2827,6 +2879,7 @@ wcPlayEditor.prototype = {
         compNode.compile();
 
         // TODO: Create undo event for moving the selected nodes into the new composite node.
+        self.__onCreateNode(compNode);
 
         self._undoManager && self._undoManager.endGroup();
 
@@ -3601,27 +3654,7 @@ wcPlayEditor.prototype = {
         x: (mouse.x + (this._draggingNodeData.$canvas.width()/2 + this._draggingNodeData.offset.x)) / this._viewportCamera.z,
         y: (mouse.y + this._draggingNodeData.offset.y) / this._viewportCamera.z,
       });
-
-      this._undoManager && this._undoManager.addEvent('Created Node "' + newNode.category + '.' + newNode.type + '"',
-      {
-        id: newNode.id,
-        className: newNode.className,
-        pos: {
-          x: newNode.pos.x,
-          y: newNode.pos.y,
-        },
-        parent: this._parent,
-      },
-      // Undo
-      function() {
-        var myNode = this.parent.nodeById(this.id);
-        myNode.destroy();
-      },
-      // Redo
-      function() {
-        var myNode = new window[this.className](this.parent, this.pos);
-        myNode.id = this.id;
-      });
+      this.__onCreateNode(newNode);
 
       this._selectedNode = newNode;
       this._selectedNodes = [newNode];
