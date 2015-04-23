@@ -85,32 +85,35 @@ function wcPlayEditor(container, options) {
 
   this._drawStyle = {
     palette: {
-      spacing: 20,        // Spacing between nodes in the palette view.
+      spacing: 20,          // Spacing between nodes in the palette view.
     },
     node: {
-      radius: 10,         // The radius to draw node corners.
-      margin: 15,         // The pixel space between the property text and the edge of the node border.
+      radius: 10,           // The radius to draw node corners.
+      margin: 15,           // The pixel space between the property text and the edge of the node border.
     },
     title: {
-      spacing: 5,         // The pixel space between the title text and the bar that separates the properties.
-      wrapL: '  ',        // The left string to wrap around the title text.
-      wrapR: '  ',        // The right string to wrap around the title text.
+      spacing: 5,           // The pixel space between the title text and the bar that separates the properties.
+      wrapL: '  ',          // The left string to wrap around the title text.
+      wrapR: '  ',          // The right string to wrap around the title text.
+      placeholder: '  ',    // A placeholder label if there is no title name.
+      nameWrapL: ' (',      // The left string to wrap around the name portion of the title text.
+      nameWrapR: ') ',      // The right string to wrap around the name portion of the title text.
     },
     links: {
-      length: 12,         // Length of each link 'nub'
-      width: 8,           // Width of each link 'nub'
-      spacing: 10,        // The pixel space between the text of adjacent links.
-      padding: 5,         // The pixel space between the link and its text.
-      margin: 10,         // The pixel space between the link text and the edge of the node border.
+      length: 12,           // Length of each link 'nub'
+      width: 8,             // Width of each link 'nub'
+      spacing: 10,          // The pixel space between the text of adjacent links.
+      padding: 5,           // The pixel space between the link and its text.
+      margin: 10,           // The pixel space between the link text and the edge of the node border.
     },
     property: {
-      spacing: 5,         // The pixel space between adjacent properties.
-      strLen: 10,         // The maximum character length a property value can display.
-      minLength: 30,      // The minimum length the property value can be.
-      valueWrapL: ' ',    // The left string to wrap around a property value.
-      valueWrapR: ' ',    // The right string to wrap around a property value.
-      initialWrapL: ' [', // The left string to wrap around a property initial value.
-      initialWrapR: '] ', // The right string to wrap around a property initial value.
+      spacing: 5,           // The pixel space between adjacent properties.
+      strLen: 10,           // The maximum character length a property value can display.
+      minLength: 30,        // The minimum length the property value can be.
+      valueWrapL: ' ',      // The left string to wrap around a property value.
+      valueWrapR: ' ',      // The right string to wrap around a property value.
+      initialWrapL: ' [',   // The left string to wrap around a property initial value.
+      initialWrapR: '] ',   // The right string to wrap around a property initial value.
     },
   };
 
@@ -248,7 +251,13 @@ wcPlayEditor.prototype = {
       for (var i = 0; i &lt; nodes.length; ++i) {
         boundList.push(nodes[i]._meta.bounds.farRect);
       }
-      this.focusRect(this.__expandRect(boundList));
+      var focusRect = this.__expandRect(boundList)
+      // Clamp the focus rect to a minimum size, so we can not zoom in too far.
+      if (focusRect.width &lt; 1000) {
+        focusRect.left -= (1000 - focusRect.width)/2;
+        focusRect.width = 1000;
+      }
+      this.focusRect(focusRect);
     }
   },
 
@@ -506,6 +515,8 @@ wcPlayEditor.prototype = {
     $('.wcPlayEditorMenuOptionPausePlay').children('i:first-child, span:first-child').toggleClass('fa-play', this._engine.paused()).toggleClass('fa-pause', !this._engine.paused());
     $('.wcPlayEditorMenuOptionDelete').toggleClass('disabled', this._selectedNodes.length === 0);
     $('.wcPlayEditorMenuOptionComposite').toggleClass('disabled', this._selectedNodes.length === 0);
+    $('.wcPlayEditorMenuOptionCompositeExit').toggleClass('disabled', this._parent instanceof wcPlay);
+    $('.wcPlayEditorMenuOptionCompositeEnter').toggleClass('disabled', this._selectedNodes.length !== 1 || !(this._selectedNodes[0] instanceof wcNodeCompositeScript));
 
 
     this.onResized();
@@ -525,8 +536,8 @@ wcPlayEditor.prototype = {
       // Update nodes.
       this.__updateNodes(this._parent._entryNodes, elapsed);
       this.__updateNodes(this._parent._processNodes, elapsed);
-      this.__updateNodes(this._parent._compositeNodes, elapsed);
       this.__updateNodes(this._parent._storageNodes, elapsed);
+      this.__updateNodes(this._parent._compositeNodes, elapsed);
 
       // Render the nodes in the main script.
       this.__drawNodes(this._parent._entryNodes, this._viewportContext);
@@ -661,12 +672,14 @@ wcPlayEditor.prototype = {
             &lt;li>&lt;span class="wcPlayEditorMenuOptionPaste wcPlayMenuItem disabled">&lt;i class="wcPlayEditorMenuIcon wcButton fa fa-paste fa-lg"/>Paste&lt;span>Ctrl+P&lt;/span>&lt;/span>&lt;/li>\
             &lt;li>&lt;span class="wcPlayEditorMenuOptionDelete wcPlayMenuItem">&lt;i class="wcPlayEditorMenuIcon wcButton fa fa-trash-o fa-lg"/>Delete&lt;span>Del&lt;/span>&lt;/span>&lt;/li>\
             &lt;li>&lt;hr class="wcPlayMenuSeparator">&lt;/li>\
-            &lt;li>&lt;span class="wcPlayEditorMenuOptionComposite wcPlayMenuItem" title="Combine all selected nodes into a new \'Composite\' Node.">&lt;i class="wcPlayEditorMenuIcon wcButton fa fa-share-alt-square fa-lg"/>Create Composite&lt;span>&lt;/span>&lt;/span>&lt;/li>\
+            &lt;li>&lt;span class="wcPlayEditorMenuOptionComposite wcPlayMenuItem" title="Combine all selected nodes into a new \'Composite\' Node.">&lt;i class="wcPlayEditorMenuIcon wcButton fa fa-share-alt-square fa-lg"/>Create Composite&lt;span>C&lt;/span>&lt;/span>&lt;/li>\
           &lt;/ul>\
         &lt;/li>\
         &lt;li>&lt;span>View&lt;/span>\
           &lt;ul>\
-            &lt;li>&lt;span class="wcPlayEditorMenuOptionCenter wcPlayMenuItem" title="Fit selected nodes into view.">&lt;i class="wcPlayEditorMenuIcon wcButton fa fa-crosshairs fa-lg"/>Center View&lt;span>F&lt;/span>&lt;/span>&lt;/li>\
+            &lt;li>&lt;span class="wcPlayEditorMenuOptionCenter wcPlayMenuItem" title="Fit selected nodes into view.">&lt;i class="wcPlayEditorMenuIcon wcButton fa fa-crosshairs fa-lg"/>Fit in View&lt;span>F&lt;/span>&lt;/span>&lt;/li>\
+            &lt;li>&lt;span class="wcPlayEditorMenuOptionCompositeExit wcPlayMenuItem" title="Exit out of this Composite node.">&lt;i class="wcPlayEditorMenuIcon wcButton fa fa-level-up fa-lg"/>Exit Composite&lt;span>O&lt;/span>&lt;/span>&lt;/li>\
+            &lt;li>&lt;span class="wcPlayEditorMenuOptionCompositeEnter wcPlayMenuItem" title="Enter into this Composite node.">&lt;i class="wcPlayEditorMenuIcon wcButton fa fa-level-down fa-lg"/>Enter Composite&lt;span>I&lt;/span>&lt;/span>&lt;/li>\
           &lt;/ul>\
         &lt;/li>\
         &lt;li>&lt;span>Debugging&lt;/span>\
@@ -705,8 +718,6 @@ wcPlayEditor.prototype = {
         &lt;div class="ARPG_Separator">&lt;/div>\
         &lt;div class="wcPlayEditorMenuOptionComposite">&lt;span class="wcPlayEditorMenuIcon wcButton fa fa-share-alt-square fa-lg" title="Combine all selected nodes into a new \'Composite\' Node."/>&lt;/div>\
         &lt;div class="ARPG_Separator">&lt;/div>\
-        &lt;div class="wcPlayEditorMenuOptionCenter">&lt;span class="wcPlayEditorMenuIcon wcButton fa fa-crosshairs fa-lg" title="Fit selected nodes into view."/>&lt;/div>\
-        &lt;div class="ARPG_Separator">&lt;/div>\
         &lt;div class="wcPlayEditorMenuOptionRestart">&lt;span class="wcPlayEditorMenuIcon wcButton fa fa-refresh fa-lg" title="Reset all property values to their initial state and restart the execution of the script."/>&lt;/div>\
         &lt;div class="ARPG_Separator">&lt;/div>\
         &lt;div class="wcPlayEditorMenuOptionDebugging">&lt;span class="wcPlayEditorMenuIcon wcButton fa fa-dot-circle-o fa-lg" title="Toggle debugging mode for the entire script."/>&lt;/div>\
@@ -715,8 +726,9 @@ wcPlayEditor.prototype = {
         &lt;div class="wcPlayEditorMenuOptionPausePlay">&lt;span class="wcPlayEditorMenuIcon wcButton fa fa-pause fa-lg" title="Pause or Continue execution of the script."/>&lt;/div>\
         &lt;div class="wcPlayEditorMenuOptionStep">&lt;span class="wcPlayEditorMenuIcon wcButton fa fa-forward fa-lg" title="Steps execution of the script by a single update."/>&lt;/div>\
         &lt;div class="ARPG_Separator">&lt;/div>\
-        &lt;div class="wcPlayEditorMenuOptionDocs">&lt;span class="wcPlayEditorMenuIcon wcButton fa fa-file-pdf-o fa-lg" title="Open the documentation for wcPlay in another window."/>&lt;/div>\
-        &lt;div class="wcPlayEditorMenuOptionAbout disabled">&lt;span class="wcPlayEditorMenuIcon wcButton fa fa-question fa-lg"/>&lt;/div>\
+        &lt;div class="wcPlayEditorMenuOptionCenter">&lt;span class="wcPlayEditorMenuIcon wcButton fa fa-crosshairs fa-lg" title="Fit selected nodes into view."/>&lt;/div>\
+        &lt;div class="wcPlayEditorMenuOptionCompositeExit">&lt;span class="wcPlayEditorMenuIcon wcButton fa fa-level-up fa-lg" title="Exit out of this Composite node."/>&lt;/div>\
+        &lt;div class="wcPlayEditorMenuOptionCompositeEnter">&lt;span class="wcPlayEditorMenuIcon wcButton fa fa-level-down fa-lg" title="Enter into this Composite node."/>&lt;/div>\
       &lt;/div>\
     ');
 
@@ -779,13 +791,13 @@ wcPlayEditor.prototype = {
             (this._options.category.isBlacklist &amp;&amp; catIndex > -1)) {
           continue;
         }
-      } else {
-        // Skip composite node special 'link' nodes if we are not inside a composite.
-        if (this._engine === this._parent) {
-          if (data.category === 'Link') {
-            continue;
-          }
-        }
+      // } else {
+      //   // Skip composite node special 'link' nodes if we are not inside a composite.
+      //   if (this._engine === this._parent) {
+      //     if (data.category === 'Link') {
+      //       continue;
+      //     }
+      //   }
       }
 
       // Initialize the node category if it is new.
@@ -824,6 +836,9 @@ wcPlayEditor.prototype = {
 
       // Now create an instance of the node.
       var node = new window[data.name](null);
+      if (node.decompile) {
+        node.decompile();
+      }
       this._nodeLibrary[data.category][data.type].nodes.push(node);
       this.__updateNode(node, 0);
     }
@@ -1205,11 +1220,9 @@ wcPlayEditor.prototype = {
 
     // Measure the title bar area.
     this.__setCanvasFont(this._font.title, context);
-    bounds.width = context.measureText(this._drawStyle.title.wrapL + node.type + (node.name? ': ': '') + this._drawStyle.title.wrapR).width;
-    if (node.name) {
-      this.__setCanvasFont(this._font.titleDesc, context);
-      bounds.width += context.measureText(node.name).width;
-    }
+    bounds.width = context.measureText(this._drawStyle.title.wrapL + node.type + ': ' + this._drawStyle.title.wrapR).width;
+    this.__setCanvasFont(this._font.titleDesc, context);
+    bounds.width += context.measureText(this._drawStyle.title.nameWrapL + (node.name || this._drawStyle.title.placeholder) + this._drawStyle.title.nameWrapR).width;
 
     // Measure the node's viewport.
     if (node._viewportSize) {
@@ -1441,26 +1454,24 @@ wcPlayEditor.prototype = {
       context.stroke();
     }
 
+    // Measure the title bar area.
+    this.__setCanvasFont(this._font.title, context);
+    var titleTypeWidth = context.measureText(this._drawStyle.title.wrapL + node.type + ': ').width;
+    var titleWrapRWidth = context.measureText(this._drawStyle.title.wrapR).width;
+    var titleTextWidth = 0;
+    this.__setCanvasFont(this._font.titleDesc, context);
+    titleTextWidth = context.measureText(this._drawStyle.title.nameWrapL + (node.name || this._drawStyle.title.placeholder) + this._drawStyle.title.nameWrapR).width;
+
     result.titleBounds = {
       top: rect.top + upper,
-      left: rect.left + this._drawStyle.node.margin,
-      width: rect.width - this._drawStyle.node.margin * 2,
+      left: rect.left + titleTypeWidth + (rect.width - (titleTypeWidth + titleWrapRWidth + titleTextWidth))/2,
+      width: titleTextWidth,
       height: this._font.title.size + this._drawStyle.title.spacing - 1,
     };
 
     // Highlight title text.
     if (this._highlightTitle &amp;&amp; this._highlightNode === node) {
       this.__drawRoundedRect(result.titleBounds, 'rgba(255, 255, 255, 0.5)', -1, this._font.title.size/2, context);
-    }
-
-    // Measure the title bar area.
-    this.__setCanvasFont(this._font.title, context);
-    var titleTypeWidth = context.measureText(this._drawStyle.title.wrapL + node.type + (node.name? ': ': '')).width;
-    var titleWrapRWidth = context.measureText(this._drawStyle.title.wrapR).width;
-    var titleTextWidth = 0;
-    if (node.name) {
-      this.__setCanvasFont(this._font.titleDesc, context);
-      titleTextWidth = context.measureText(node.name).width;
     }
 
     // Title Text
@@ -1470,12 +1481,10 @@ wcPlayEditor.prototype = {
     context.strokeStyle = "black";
     context.textAlign = "left";
     this.__setCanvasFont(this._font.title, context);
-    context.fillText(this._drawStyle.title.wrapL + node.type + (node.name? ': ': ''), rect.left + (rect.width - (titleTypeWidth + titleWrapRWidth + titleTextWidth)) / 2, rect.top + upper);
+    context.fillText(this._drawStyle.title.wrapL + node.type + ': ', rect.left + (rect.width - (titleTypeWidth + titleWrapRWidth + titleTextWidth)) / 2, rect.top + upper);
 
-    if (node.name) {
-      this.__setCanvasFont(this._font.titleDesc, context);
-      context.fillText(node.name, rect.left + titleTypeWidth + (rect.width - (titleTypeWidth + titleWrapRWidth + titleTextWidth))/2, rect.top + upper);
-    }
+    this.__setCanvasFont(this._font.titleDesc, context);
+    context.fillText(this._drawStyle.title.nameWrapL + (node.name || this._drawStyle.title.placeholder) + this._drawStyle.title.nameWrapR, rect.left + titleTypeWidth + (rect.width - (titleTypeWidth + titleWrapRWidth + titleTextWidth))/2, rect.top + upper);
 
     context.textAlign = "right";
     this.__setCanvasFont(this._font.title, context);
@@ -2212,20 +2221,32 @@ wcPlayEditor.prototype = {
         function() {
           var myNode = this.editor._engine.nodeById(this.id);
           var oldName = myNode.name;
-          myNode.name = this.oldValue;
-          myNode.onNameChanged(oldName, myNode.name);
+          var newName = myNode.onNameChanging(oldName, this.oldValue);
+          if (newName === undefined) {
+            newName = this.oldValue;
+          }
+          myNode.name = newName;
+          myNode.onNameChanged(oldName, newName);
         },
         // Redo
         function() {
           var myNode = this.editor._engine.nodeById(this.id);
           var oldName = myNode.name;
-          myNode.name = this.newValue;
-          myNode.onNameChanged(oldName, myNode.name);
+          var newName = myNode.onNameChanging(oldName, this.newValue);
+          if (newName === undefined) {
+            newName = this.newValue;
+          }
+          myNode.name = newName;
+          myNode.onNameChanged(oldName, newName);
         });
 
         var oldName = node.name;
-        node.name = $control.val();
-        node.onNameChanged(oldName, node.name);
+        var newName = node.onNameChanging(oldName, $control.val());
+        if (newName === undefined) {
+          newName = $control.val();
+        }
+        node.name = newName;
+        node.onNameChanged(oldName, newName);
       }
     });
 
@@ -2424,12 +2445,13 @@ wcPlayEditor.prototype = {
   },
 
   /**
-   * Destroys a node and creates an undo event for it.
-   * @function wcPlayEditor#__destroyNode
-   * @param {wcNode} node - the node to destroy.
+   * Generates an undo event for a node that was created.
+   * @function wcPlayEditor#__onCreateNode
+   * @param {wcNode} node - The node that was created.
+   * @param {Boolean} [decompile] - If true, will also decompile the node if able.
    */
-  __destroyNode: function(node) {
-    self._undoManager &amp;&amp; self._undoManager.addEvent('',
+  __onCreateNode: function(node, decompile) {
+    this._undoManager &amp;&amp; this._undoManager.addEvent('Created Node "' + node.category + '.' + node.type + '"',
     {
       id: node.id,
       className: node.className,
@@ -2437,57 +2459,69 @@ wcPlayEditor.prototype = {
         x: node.pos.x,
         y: node.pos.y,
       },
-      collapsed: node.collapsed(),
-      breakpoint: node._break,
-      properties: node.listProperties(),
-      entryChains: node.listEntryChains(),
-      exitChains: node.listExitChains(),
-      inputChains: node.listInputChains(),
-      outputChains: node.listOutputChains(),
-      editor: self,
+      decompile: decompile,
+      data: node.export(),
+      editor: this,
+      parent: this._parent,
     },
     // Undo
-    function() {
-      var myNode = new window[this.className](this.editor._parent, this.pos);
-      myNode.id = this.id;
-      myNode.collapsed(this.collapsed);
-      myNode.debugBreak(this.breakpoint);
-      // Restore property values.
-      for (var i = 0; i &lt; this.properties.length; ++i) {
-        myNode.initialProperty(this.properties[i].name, this.properties[i].initialValue);
-        myNode.property(this.properties[i].name, this.properties[i].value);
-      }
-      // Re-connect all chains.
-      for (var i = 0; i &lt; this.entryChains.length; ++i) {
-        var chain = this.entryChains[i];
-        var targetNode = this.editor._engine.nodeById(chain.outNodeId);
-        myNode.connectEntry(chain.inName, targetNode, chain.outName);
-      }
-      for (var i = 0; i &lt; this.exitChains.length; ++i) {
-        var chain = this.exitChains[i];
-        var targetNode = this.editor._engine.nodeById(chain.inNodeId);
-        myNode.connectExit(chain.outName, targetNode, chain.inName);
-      }
-      for (var i = 0; i &lt; this.inputChains.length; ++i) {
-        var chain = this.inputChains[i];
-        var targetNode = this.editor._engine.nodeById(chain.outNodeId);
-        myNode.connectInput(chain.inName, targetNode, chain.outName);
-      }
-      for (var i = 0; i &lt; this.outputChains.length; ++i) {
-        var chain = this.outputChains[i];
-        var targetNode = this.editor._engine.nodeById(chain.inNodeId);
-        myNode.connectOutput(chain.outName, targetNode, chain.inName);
-      }
-    },
-    // Redo
     function() {
       var myNode = this.editor._engine.nodeById(this.id);
 
       // If we are viewing a script inside the node that is being removed, re-direct our view to its parents.
-      var parent = self.editor._parent;
+      var parent = this.editor._parent;
       while (!(parent instanceof wcPlay)) {
         if (parent == myNode) {
-          // TODO: Redirect view to myNode._parent.
+          this.editor._parent = myNode._parent;
+          this.editor.center();
+          break;
+        }
+
+        parent = parent._parent;
+      }
+
+      // Now destroy this node.
+      myNode.destroy();
+    },
+    // Redo
+    function() {
+      var myNode = new window[this.className](this.parent, this.pos);
+      myNode.id = this.id;
+      if (this.decompile &amp;&amp; myNode.decompile) {
+        myNode.decompile();
+      }
+      myNode.import(this.data);
+    });
+  },
+
+  /**
+   * Generates an undo event for a node that is destroyed.
+   * @function wcPlayEditor#__onDestroyNode
+   * @param {wcNode} node - the node to destroy.
+   */
+  __onDestroyNode: function(node) {
+    this._undoManager &amp;&amp; this._undoManager.addEvent('',
+    {
+      data: node.export(),
+      parent: this._parent,
+      editor: this,
+    },
+    // Undo
+    function() {
+      var myNode = new window[this.data.className](this.parent, this.data.pos);
+      myNode.import(this.data);
+    },
+    // Redo
+    function() {
+      var myNode = this.editor._engine.nodeById(this.data.id);
+
+      // If we are viewing a script inside the node that is being removed, re-direct our view to its parents.
+      var parent = this.editor._parent;
+      while (!(parent instanceof wcPlay)) {
+        if (parent == myNode) {
+          this.editor._parent = myNode._parent;
+          this.editor.center();
+          break;
         }
 
         parent = parent._parent;
@@ -2496,8 +2530,6 @@ wcPlayEditor.prototype = {
       // Now destroy this node.
       myNode.destroy();
     });
-
-    node.destroy();
   },
 
   /**
@@ -2569,6 +2601,15 @@ wcPlayEditor.prototype = {
         } else {
           this.center();
         }
+        break;
+      case 'O'.charCodeAt(0): // O to step outside of a Composite Node.
+        $('.wcPlayEditorMenuOptionCompositeExit').first().click();
+        break;
+      case 'I'.charCodeAt(0): // O to step outside of a Composite Node.
+        $('.wcPlayEditorMenuOptionCompositeEnter').first().click();
+        break;
+      case 'C'.charCodeAt(0): // C to create a Composite node from the selected nodes.
+        $('.wcPlayEditorMenuOptionComposite').first().click();
         break;
     }
   },
@@ -2672,7 +2713,8 @@ wcPlayEditor.prototype = {
       if (self._selectedNodes.length) {
         self._undoManager &amp;&amp; self._undoManager.beginGroup('Removed Nodes');
         for (var i = 0; i &lt; self._selectedNodes.length; ++i) {
-          self.__destroyNode(self._selectedNodes[i]);
+          self.__onDestroyNode(self._selectedNodes[i]);
+          self._selectedNodes[i].destroy();
         }
         self._selectedNode = null;
         self._selectedNodes = [];
@@ -2689,15 +2731,22 @@ wcPlayEditor.prototype = {
         do {
           index++
           number = '0000'.substr(0, 4-('' + index).length) + index;
-          className = 'wcNodeComposite' + number;
+          className = 'wcNodeCompositeScript' + number;
         } while (window[className]);
 
         // Dynamically extend a new composite node class.
-        wcNodeComposite.extend(className, 'Composite', 'Custom', {
+        wcNodeCompositeScript.extend(className, 'Composite', 'Custom', {
           name: number,
         });
 
         self._undoManager &amp;&amp; self._undoManager.beginGroup("Combined Nodes into Composite: " + number);
+        // Create undo events for removing the selected nodes.
+        for (var i = 0; i &lt; self._selectedNodes.length; ++i) {
+          self.__onDestroyNode(self._selectedNodes[i]);
+
+          // Now give this node a new ID so it is treated like a different node.
+          self._selectedNodes[i].id = ++wcNodeNextID;
+        }
 
         var compNode = new window[className](self._parent, {x: 0, y: 0}, self._selectedNodes);
 
@@ -2737,6 +2786,7 @@ wcPlayEditor.prototype = {
             if (!linkNode) {
               // Create a Composite Entry Node, this acts as a surrogate entry link for the Composite node.
               linkNode = new wcNodeCompositeEntry(compNode, {x: node.pos.x, y: node.pos.y - 100}, linkName);
+              linkNode.collapsed(true);
               createdLinks.push({
                 name: linkName,
                 node: linkNode,
@@ -2744,7 +2794,7 @@ wcPlayEditor.prototype = {
             }
 
             linkNode.connectExit('out', node, linkName);
-            compNode.connectEntry(linkNode.property('link name'), targetNode, targetName);
+            compNode.connectEntry(linkNode.name, targetNode, targetName);
             targetNode.disconnectExit(targetName, node, linkName);
           }
 
@@ -2765,8 +2815,9 @@ wcPlayEditor.prototype = {
               }
             }
             if (!linkNode) {
-              // Create a Composite Entry Node, this acts as a surrogate entry link for the Composite node.
+              // Create a Composite Exit Node, this acts as a surrogate exit link for the Composite node.
               linkNode = new wcNodeCompositeExit(compNode, {x: node.pos.x, y: node.pos.y + 200}, linkName);
+              linkNode.collapsed(true);
               createdLinks.push({
                 name: linkName,
                 node: linkNode,
@@ -2774,26 +2825,82 @@ wcPlayEditor.prototype = {
             }
 
             linkNode.connectEntry('in', node, linkName);
-            compNode.connectExit(linkNode.property('link name'), targetNode, targetName);
+            compNode.connectExit(linkNode.name, targetNode, targetName);
             targetNode.disconnectEntry(targetName, node, linkName);
+          }
+
+          // External property input chains.
+          createdLinks = [];
+          for (var a = 0; a &lt; inputChains.length; ++a) {
+            var targetNode = self._engine.nodeById(inputChains[a].outNodeId);
+            var targetName = inputChains[a].outName;
+            var node = self._engine.nodeById(inputChains[a].inNodeId);
+            var linkName = inputChains[a].inName;
+
+            // Make sure we only create one Composite Entry per link.
+            var linkNode = null;
+            for (var b = 0; b &lt; createdLinks.length; ++b) {
+              if (createdLinks[b].name === linkName) {
+                linkNode = createdLinks[b].node;
+                break;
+              }
+            }
+            if (!linkNode) {
+              // Create a Composite Property Node, this acts as a surrogate property link for the Composite node.
+              linkNode = new wcNodeCompositeProperty(compNode, {x: node.pos.x - 200, y: node.pos.y}, linkName);
+              linkNode.collapsed(true);
+              createdLinks.push({
+                name: linkName,
+                node: linkNode,
+              });
+            }
+
+            linkNode.connectOutput('value', node, linkName);
+            compNode.connectInput(linkNode.name, targetNode, targetName);
+            targetNode.disconnectOutput(targetName, node, linkName);
+          }
+
+          // External property output chains.
+          createdLinks = [];
+          for (var a = 0; a &lt; outputChains.length; ++a) {
+            var targetNode = self._engine.nodeById(outputChains[a].inNodeId);
+            var targetName = outputChains[a].inName;
+            var node = self._engine.nodeById(outputChains[a].outNodeId);
+            var linkName = outputChains[a].outName;
+
+            // Make sure we only create one Composite Entry per link.
+            var linkNode = null;
+            for (var b = 0; b &lt; createdLinks.length; ++b) {
+              if (createdLinks[b].name === linkName) {
+                linkNode = createdLinks[b].node;
+                break;
+              }
+            }
+            if (!linkNode) {
+              // Create a Composite Property Node, this acts as a surrogate property link for the Composite node.
+              linkNode = new wcNodeCompositeProperty(compNode, {x: node.pos.x + 200, y: node.pos.y}, linkName);
+              linkNode.collapsed(true);
+              createdLinks.push({
+                name: linkName,
+                node: linkNode,
+              });
+            }
+
+            linkNode.connectInput('value', node, linkName);
+            compNode.connectOutput(linkNode.name, targetNode, targetName);
+            targetNode.disconnectInput(targetName, node, linkName);
           }
         }
         var bounds = self.__expandRect(boundList);
         compNode.pos.x = bounds.left + bounds.width/2;
         compNode.pos.y = bounds.top + bounds.height/2;
 
+        // Compile the meta data for this node based on the nodes inside.
         compNode.compile();
+        window[className].prototype.compiledNodes = compNode.compiledNodes;
 
-        // var boundList = [];
-        // var exportedNodes = [];
-        // for (var i = 0; i &lt; self._selectedNodes.length; ++i) {
-        //   boundList.push(self._selectedNodes[i]._meta.bounds.farRect);
-        //   exportedNodes.push(self._selectedNodes[i].export());
-        //   self.__destroyNode(self._selectedNodes[i]);
-        // }
-        // var bounds = self.__expandRect(boundList);
-
-        // TODO: Create undo event for moving the selected nodes into the new composite node.
+        // Create undo event for creating the composite node.
+        self.__onCreateNode(compNode);
 
         self._undoManager &amp;&amp; self._undoManager.endGroup();
 
@@ -2807,6 +2914,25 @@ wcPlayEditor.prototype = {
       if (self._selectedNodes.length) {
         self.focus(self._selectedNodes);
       } else {
+        self.center();
+      }
+    });
+    $body.on('click', '.wcPlayEditorMenuOptionCompositeExit', function() {
+      if (self._parent instanceof wcNodeCompositeScript) {
+        var focusNode = self._parent;
+        self._parent = self._parent._parent;
+
+        self._selectedNode = focusNode;
+        self._selectedNodes = [focusNode];
+        self.focus(self._selectedNodes);
+      }
+    });
+    $body.on('click', '.wcPlayEditorMenuOptionCompositeEnter', function() {
+      if (self._selectedNodes.length &amp;&amp; self._selectedNodes[0] instanceof wcNodeCompositeScript) {
+        self._parent = self._selectedNodes[0];
+        self._selectedNode = null;
+        self._selectedNodes = [];
+
         self.center();
       }
     });
@@ -3040,8 +3166,23 @@ wcPlayEditor.prototype = {
       var moveX = mouse.x - this._mouse.x;
       var moveY = mouse.y - this._mouse.y;
       for (var i = 0; i &lt; this._selectedNodes.length; ++i) {
-        this._selectedNodes[i].pos.x += moveX / this._viewportCamera.z;
-        this._selectedNodes[i].pos.y += moveY / this._viewportCamera.z;
+        var node = this._selectedNodes[i];
+        var oldPos = {
+          x: node.pos.x,
+          y: node.pos.y,
+        };
+        var newPos = {
+          x: node.pos.x + (moveX / this._viewportCamera.z),
+          y: node.pos.y + (moveY / this._viewportCamera.z),
+        };
+
+        var newPos = node.onMoving(oldPos, newPos) || newPos;
+
+        if (oldPos.x !== newPos.x || oldPos.y !== newPos.y) {
+          node.pos.x = newPos.x;
+          node.pos.y = newPos.y;
+          node.onMoved(oldPos, newPos);
+        }
       }
       this._mouse = mouse;
       return;
@@ -3161,6 +3302,7 @@ wcPlayEditor.prototype = {
         if (this.__inRect(this._mouse, node._meta.bounds.titleBounds, this._viewportCamera)) {
           this._highlightNode = node;
           this._highlightTitle = true;
+          this.$viewport.attr('title', 'Click to add or modify an additional label for this title.');
         }
 
         // Property labels.
@@ -3282,6 +3424,9 @@ wcPlayEditor.prototype = {
    */
   __onViewportMouseDown: function(event, elem) {
     this._mouse = this.__mouse(event, this.$viewport.offset());
+    if (this._mouse.which === 3) {
+      return;
+    }
     this._mouseMoved = false;
 
     // Control+drag or middle+drag to box select.
@@ -3533,27 +3678,10 @@ wcPlayEditor.prototype = {
         x: (mouse.x + (this._draggingNodeData.$canvas.width()/2 + this._draggingNodeData.offset.x)) / this._viewportCamera.z,
         y: (mouse.y + this._draggingNodeData.offset.y) / this._viewportCamera.z,
       });
-
-      this._undoManager &amp;&amp; this._undoManager.addEvent('Created Node "' + newNode.category + '.' + newNode.type + '"',
-      {
-        id: newNode.id,
-        className: newNode.className,
-        pos: {
-          x: newNode.pos.x,
-          y: newNode.pos.y,
-        },
-        parent: this._parent,
-      },
-      // Undo
-      function() {
-        var myNode = this.parent.nodeById(this.id);
-        myNode.destroy();
-      },
-      // Redo
-      function() {
-        var myNode = new window[this.className](this.parent, this.pos);
-        myNode.id = this.id;
-      });
+      if (newNode.decompile) {
+        newNode.decompile();
+      }
+      this.__onCreateNode(newNode, true);
 
       this._selectedNode = newNode;
       this._selectedNodes = [newNode];
@@ -3591,14 +3719,18 @@ wcPlayEditor.prototype = {
           // Undo
           function() {
             var myNode = this.editor._engine.nodeById(this.id);
+            var pos = myNode.onMoving({x: this.end.x, y: this.end.y}, {x: this.start.x, y: this.start.y}) || this.start;
             myNode.pos.x = this.start.x;
             myNode.pos.y = this.start.y;
+            myNode.onMoving({x: this.end.x, y: this.end.y}, {x: pos.x, y: pos.y});
           },
           // Redo
           function() {
             var myNode = this.editor._engine.nodeById(this.id);
+            var pos = myNode.onMoving({x: this.start.x, y: this.start.y}, {x: this.end.x, y: this.end.y}) || this.end;
             myNode.pos.x = this.end.x;
             myNode.pos.y = this.end.y;
+            myNode.onMoving({x: this.start.x, y: this.start.y}, {x: pos.x, y: pos.y});
           });
         }
       }
@@ -4022,7 +4154,23 @@ wcPlayEditor.prototype = {
       // Center area.
       if (!hasTarget &amp;&amp; this.__inRect(this._mouse, node._meta.bounds.inner, this._viewportCamera)) {
         hasTarget = true;
-        node.collapsed(!node.collapsed());
+        if (node instanceof wcNodeCompositeScript) {
+          // Step into composite script nodes.
+          this._parent = node;
+          this._selectedNode = null;
+          this._selectedNodes = [];
+          this.center();
+        } else if (node instanceof wcNodeComposite &amp;&amp; this._parent instanceof wcNodeCompositeScript) {
+          // Step out if double clicking on an external link node.
+          var focusNode = this._parent;
+          this._parent = this._parent._parent;
+
+          this._selectedNode = focusNode;
+          this._selectedNodes = [focusNode];
+          this.focus(this._selectedNodes);
+        } else {
+          node.collapsed(!node.collapsed());
+        }
       }
     }
   },

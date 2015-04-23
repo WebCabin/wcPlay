@@ -48,7 +48,7 @@ wcNodeProcess.extend('wcNodeProcessOperation', 'Operation', 'Core', {
       case 'div': result = a / b; break;
     }
 
-    this.property('result', result);
+    this.property('result', result, true);
     this.triggerExit('out');
   },
 });

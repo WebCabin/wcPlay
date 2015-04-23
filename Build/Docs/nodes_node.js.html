@@ -111,7 +111,7 @@ Class.extend('wcNode', 'Node', '', {
    * @function wcNode#destroy
    */
   destroy: function() {
-    this.onDestroy();
+    this.onDestroying();
 
     // Remove all links.
     for (var i = 0; i &lt; this.chain.entry.length; ++i) {
@@ -140,6 +140,7 @@ Class.extend('wcNode', 'Node', '', {
 
     // Remove the node from its parent.
     this._parent &amp;&amp; this._parent.__removeNode(this);
+    this.onDestroyed();
   },
 
   /**
@@ -169,25 +170,73 @@ Class.extend('wcNode', 'Node', '', {
    * Imports previously [exported]{@link wcNode#export} data to generate this node.
    * @function wcNode#import
    * @param {Object} data - The data to import.
+   * @param {Number[]} [idMap] - If supplied, identifies a mapping of old ID's to new ID's, any not found in this list will be unchanged.
    */
-  import: function(data) {
+  import: function(data, idMap) {
+    this.id = idMap &amp;&amp; idMap[data.id] || data.id;
+    this.name = data.name,
+    this.color = data.color,
+    this.pos.x = data.pos.x,
+    this.pos.y = data.pos.y,
+    this.collapsed(data.collapsed);
+    this.debugBreak(data.breakpoint);
 
+    // Restore property values.
+    for (var i = 0; i &lt; data.properties.length; ++i) {
+      this.initialProperty(data.properties[i].name, data.properties[i].initialValue);
+      this.property(data.properties[i].name, data.properties[i].value);
+    }
+
+    var engine = this.engine();
+    if (!engine) {
+      return;
+    }
+
+    // Re-connect all chains.
+    for (var i = 0; i &lt; data.entryChains.length; ++i) {
+      var chain = data.entryChains[i];
+      var targetNode = engine.nodeById((idMap &amp;&amp; idMap[chain.outNodeId]) || chain.outNodeId);
+      this.connectEntry(chain.inName, targetNode, chain.outName);
+    }
+    for (var i = 0; i &lt; data.exitChains.length; ++i) {
+      var chain = data.exitChains[i];
+      var targetNode = engine.nodeById((idMap &amp;&amp; idMap[chain.inNodeId]) || chain.inNodeId);
+      this.connectExit(chain.outName, targetNode, chain.inName);
+    }
+    for (var i = 0; i &lt; data.inputChains.length; ++i) {
+      var chain = data.inputChains[i];
+      var targetNode = engine.nodeById((idMap &amp;&amp; idMap[chain.outNodeId]) || chain.outNodeId);
+      this.connectInput(chain.inName, targetNode, chain.outName);
+    }
+    for (var i = 0; i &lt; data.outputChains.length; ++i) {
+      var chain = data.outputChains[i];
+      var targetNode = engine.nodeById((idMap &amp;&amp; idMap[chain.inNodeId]) || chain.inNodeId);
+      this.connectOutput(chain.outName, targetNode, chain.inName);
+    }
   },
 
   /**
-   * Exports information about this node so it can be [imported]{@link wcNode#import} later.
+   * Exports information about this node as well as all connected chain data so it can be [imported]{@link wcNode#import} later.
    * @function wcNode#export
    * @returns {Object} - The exported data for this node.
    */
   export: function() {
-    var data = {
+    return {
       className: this.className,
+      id: this.id,
       name: this.name,
       color: this.color,
       pos: {
         x: this.pos.x,
         y: this.pos.y,
       },
+      collapsed: this.collapsed(),
+      breakpoint: this._break,
+      properties: this.listProperties(),
+      entryChains: this.listEntryChains(),
+      exitChains: this.listExitChains(),
+      inputChains: this.listInputChains(),
+      outputChains: this.listOutputChains(),
     };
   },
 
@@ -548,7 +597,7 @@ Class.extend('wcNode', 'Node', '', {
     var engine = this.engine();
     if (engine) {
       for (var i = 0; i &lt; chains.length; ++i) {
-        this.connectEntry(newName, engine.nodeById(chains[i].inNodeId), chains[i].inName);
+        this.connectExit(newName, engine.nodeById(chains[i].inNodeId), chains[i].inName);
       }
     }
     return true;
@@ -1521,6 +1570,41 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
+   * Event that is called when the node is about to change its position.
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onMoving
+   * @param {wcPlay~Coordinates} oldPos - The current position of the node.
+   * @param {wcPlay~Coordinates} newPos - The new position to move the node.
+   * @returns {wcPlay~Coordinates|undefined} - Return the new position of the node (usually newPos unless you are restricting the position). If no value is returned, newPos is assumed.
+   */
+  onMoving: function(oldPos, newPos) {
+    // this._super(oldPos, newPos);
+  },
+
+  /**
+   * Event that is called after the node has changed its position.
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onMoving
+   * @param {wcPlay~Coordinates} oldPos - The old position of the node.
+   * @param {wcPlay~Coordinates} newPos - The new position of the node.
+   */
+  onMoved: function(oldPos, newPos) {
+    // this._super(oldPos, newPos);
+  },
+
+  /**
+   * Event that is called when the name of this node is about to change.&lt;br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onNameChanging
+   * @param {String} oldName - The current name.
+   * @param {String} newName - The new name.
+   * @return {String|undefined} - Return the new value of the name (usually newValue unless you are restricting the name). If no value is returned, newValue is assumed.
+   */
+  onNameChanging: function(oldName, newName) {
+    // this._super(oldName, newName);
+  },
+
+  /**
    * Event that is called when the name of this node has changed.&lt;br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onNameChanged
@@ -1624,9 +1708,18 @@ Class.extend('wcNode', 'Node', '', {
   /**
    * Event that is called when the node is about to be destroyed.&lt;br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNode#onDestroy
+   * @function wcNode#onDestroying
    */
-  onDestroy: function() {
+  onDestroying: function() {
+    // this._super();
+  },
+
+  /**
+   * Event that is called after the node has been destroyed.&lt;br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onDestroyed
+   */
+  onDestroyed: function() {
     // this._super();
   },
 

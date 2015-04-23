@@ -1,4 +1,4 @@
-wcNodeStorage.extend('wcNodeStorageGlobal', 'Global Property', 'Core', {
+wcNodeStorage.extend('wcNodeStorageGlobal', 'Global', 'Core', {
   /**
    * @class
    * References a global property on the script.
@@ -13,33 +13,48 @@ wcNodeStorage.extend('wcNodeStorageGlobal', 'Global Property', 'Core', {
 
     this.description("References a global property on the script.");
 
-    this.createProperty('property', wcPlay.PROPERTY_TYPE.SELECT, '', {items: this.propertyList, description: "The global script property to reference."});
-    this.createProperty('value', wcPlay.PROPERTY_TYPE.STRING, '', {description: "The current value of the global property chosen above."});
+    this.createProperty('value', wcPlay.PROPERTY_TYPE.STRING, '', {description: "The current value of the global property (Use the title to identify the property)."});
   },
 
   /**
-   * Callback to retrieve a list of properties to display in the combo box.
-   * @function wcNodeStorageGlobal#propertyList
-   * @returns {String[]} - A list of property names.
+   * Event that is called when the name of this node has changed.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeStorageGlobal#onNameChanged
+   * @param {String} oldName - The current name.
+   * @param {String} newName - The new name.
    */
-  propertyList: function() {
-    var result = [];
+  onNameChanged: function(oldName, newName) {
+    this._super(oldName, newName);
+
+    // Attempt to create a new property if it does not exist.
     var engine = this.engine();
     if (engine) {
-      var props = engine.listProperties();
-      for (var i = 0; i < props.length; ++i) {
-        result.push(props[i].name);
+      engine.createProperty(newName, wcPlay.PROPERTY_TYPE.STRING, '');
+      
+      // Perform a search and remove all global properties no longer being referenced.
+      var propList = engine.listProperties();
+
+      for (var i = 0; i < window.wcNodeInstances.wcNodeStorageGlobal.length; ++i) {
+        var name = window.wcNodeInstances.wcNodeStorageGlobal[i].name;
+        for (var a = 0; a < propList.length; ++a) {
+          if (propList[a].name === name) {
+            propList.splice(a, 1);
+            break;
+          }
+        }
+      }
+
+      for (var i = 0; i < propList.length; ++i) {
+        engine.removeProperty(propList[i].name);
       }
     }
-
-    return result;
   },
 
   /**
    * Any changes to the 'value' property will also change the global property.<br>
    * Event that is called when a property has changed.<br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNode#onPropertyChanged
+   * @function wcNodeStorageGlobal#onPropertyChanged
    * @param {String} name - The name of the property.
    * @param {Object} oldValue - The old value of the property.
    * @param {Object} newValue - The new value of the property.
@@ -48,16 +63,9 @@ wcNodeStorage.extend('wcNodeStorageGlobal', 'Global Property', 'Core', {
     this._super(name, oldValue, newValue);
 
     if (name === 'value') {
-      var propVal = this.property('property');
-      if (propVal) {
+      if (this.name) {
         var engine = this.engine();
-        engine && engine.property(propVal, newValue);
-      }
-    } else if (name === 'property') {
-      if (newValue) {
-        this.property('value', this.property('value'));
-      } else {
-        this.property('value', '');
+        engine && engine.property(this.name, newValue);
       }
     }
   },
@@ -74,10 +82,9 @@ wcNodeStorage.extend('wcNodeStorageGlobal', 'Global Property', 'Core', {
     this._super(name);
 
     if (name === 'value') {
-      var propVal = this.property('property');
-      if (propVal) {
+      if (this.name) {
         var engine = this.engine();
-        return (engine && engine.property(propVal)) || 0;
+        return (engine && engine.property(this.name)) || 0;
       }
     }
   },
@@ -96,14 +103,10 @@ wcNodeStorage.extend('wcNodeStorageGlobal', 'Global Property', 'Core', {
     this._super(name, oldValue, newValue);
 
     if (name === 'value') {
-      var propVal = this.property('property');
-      if (propVal) {
+      if (this.name) {
         var engine = this.engine();
-        engine && engine.initialProperty(propVal, newValue);
+        engine && engine.initialProperty(this.name, newValue);
       }
-    } else if (name === 'property') {
-      var engine = this.engine();
-      engine && this.property('value', engine.property(newValue));
     }
   },
 
@@ -119,10 +122,9 @@ wcNodeStorage.extend('wcNodeStorageGlobal', 'Global Property', 'Core', {
     this._super(name);
 
     if (name === 'value') {
-      var propVal = this.property('property');
-      if (propVal) {
+      if (this.name) {
         var engine = this.engine();
-        return (engine && engine.initialProperty(propVal)) || 0;
+        return (engine && engine.initialProperty(this.name)) || 0;
       }
     }
   },
@@ -138,7 +140,7 @@ wcNodeStorage.extend('wcNodeStorageGlobal', 'Global Property', 'Core', {
    * @param {Object} newValue - The new value of the global property.
    */
   onGlobalPropertyChanged: function(name, oldValue, newValue) {
-    if (this.property('property') == name) {
+    if (this.name == name) {
       this.property('value', this.property('value'), true);
     };
   },
@@ -151,8 +153,8 @@ wcNodeStorage.extend('wcNodeStorageGlobal', 'Global Property', 'Core', {
    * @param {String} name - The name of the global property.
    */
   onGlobalPropertyRemoved: function(name) {
-    if (this.property('property') == name) {
-      this.property('property', '');
+    if (this.name == name) {
+      this.name = '';
     }
   },
 
@@ -165,8 +167,8 @@ wcNodeStorage.extend('wcNodeStorageGlobal', 'Global Property', 'Core', {
    * @param {String} newName - The new name of the global property.
    */
   onGlobalPropertyRenamed: function(oldName, newName) {
-    if (this.property('property') == oldName) {
-      this.property('property', newName);
+    if (this.name == oldName) {
+      this.name = newName;
     }
   },
 });

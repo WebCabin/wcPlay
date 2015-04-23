@@ -272,7 +272,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="__destroyNode"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>__destroyNode</b>(node)</toc>
+    <h4 class="name" id="__onCreateNode"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>__onCreateNode</b>(node, <span class="optional">decompile</span>)</toc>
         
     </h4>
 
@@ -282,7 +282,192 @@
     
     
     <div class="description">
-        <p style="margin-left: 20px;">Destroys a node and creates an undo event for it.</p>
+        <p style="margin-left: 20px;">Generates an undo event for a node that was created.</p>
+    </div>
+    
+
+    
+
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>node</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="wcNode.html">wcNode</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The node that was created.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>decompile</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">If true, will also decompile the node if able.</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="editor.js.html">editor.js</a>,
+     <a href="editor.js.html#sunlight-1-line-2394">line 2394</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="editor.js.html">editor.js</a>,
+				 <a href="editor.js.html#sunlight-1-line-2394">line 2394</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="__onDestroyNode"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>__onDestroyNode</b>(node)</toc>
+        
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p style="margin-left: 20px;">Generates an undo event for a node that is destroyed.</p>
     </div>
     
 
@@ -389,13 +574,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="editor.js.html">editor.js</a>,
-     <a href="editor.js.html#sunlight-1-line-2373">line 2373</a>
+     <a href="editor.js.html#sunlight-1-line-2444">line 2444</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.js.html">editor.js</a>,
-				 <a href="editor.js.html#sunlight-1-line-2373">line 2373</a>
+				 <a href="editor.js.html#sunlight-1-line-2444">line 2444</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -482,13 +667,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="editor.js.html">editor.js</a>,
-     <a href="editor.js.html#sunlight-1-line-175">line 175</a>
+     <a href="editor.js.html#sunlight-1-line-178">line 178</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.js.html">editor.js</a>,
-				 <a href="editor.js.html#sunlight-1-line-175">line 175</a>
+				 <a href="editor.js.html#sunlight-1-line-178">line 178</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -655,13 +840,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="editor.js.html">editor.js</a>,
-     <a href="editor.js.html#sunlight-1-line-142">line 142</a>
+     <a href="editor.js.html#sunlight-1-line-145">line 145</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.js.html">editor.js</a>,
-				 <a href="editor.js.html#sunlight-1-line-142">line 142</a>
+				 <a href="editor.js.html#sunlight-1-line-145">line 145</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -797,13 +982,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="editor.js.html">editor.js</a>,
-     <a href="editor.js.html#sunlight-1-line-185">line 185</a>
+     <a href="editor.js.html#sunlight-1-line-188">line 188</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.js.html">editor.js</a>,
-				 <a href="editor.js.html#sunlight-1-line-185">line 185</a>
+				 <a href="editor.js.html#sunlight-1-line-188">line 188</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -939,13 +1124,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="editor.js.html">editor.js</a>,
-     <a href="editor.js.html#sunlight-1-line-202">line 202</a>
+     <a href="editor.js.html#sunlight-1-line-211">line 211</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.js.html">editor.js</a>,
-				 <a href="editor.js.html#sunlight-1-line-202">line 202</a>
+				 <a href="editor.js.html#sunlight-1-line-211">line 211</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -1032,13 +1217,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="editor.js.html">editor.js</a>,
-     <a href="editor.js.html#sunlight-1-line-220">line 220</a>
+     <a href="editor.js.html#sunlight-1-line-229">line 229</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.js.html">editor.js</a>,
-				 <a href="editor.js.html#sunlight-1-line-220">line 220</a>
+				 <a href="editor.js.html#sunlight-1-line-229">line 229</a>
 			</li>
 		</ul>
 	</dd> -->

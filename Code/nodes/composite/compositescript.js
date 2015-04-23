@@ -64,9 +64,9 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '', {
       }
     };
 
+    __compileNodes.call(this, this._storageNodes);
     __compileNodes.call(this, this._entryNodes);
     __compileNodes.call(this, this._processNodes);
-    __compileNodes.call(this, this._storageNodes);
     __compileNodes.call(this, this._compositeNodes);
   },
 

@@ -47,9 +47,6 @@ $(document).ready(function() {
   operationNode.collapsed(true);
   numberNode.collapsed(true);
 
-  myPlay.createProperty('Test property', wcPlay.PROPERTY_TYPE.STRING, 'Foo');
-  myPlay.createProperty('ValueB', wcPlay.PROPERTY_TYPE.STRING, 'Asdf');
-
   // Start execution of the script.
   myPlay.start();
 });
