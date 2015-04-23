@@ -87,12 +87,22 @@
   pointer-events: none;
 }
 
+.wcMoving {
+  cursor: move;
+}
+
 .wcClickable {
   cursor: pointer;
 }
 
-.wcMoving {
-  cursor: move;
+.wcGrab {
+  cursor: -webkit-pointer;
+  cursor: pointer;
+}
+
+.wcGrabbing {
+  cursor: -webkit-pointer;
+  cursor: pointer;
 }
 
 .wcPlayEditorControl {

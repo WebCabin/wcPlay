@@ -40,7 +40,7 @@ Class.extend('wcNode', 'Node', '', {
       threads: [],
       description: '',
     };
-    this._collapsed = false;
+    this._collapsed = true;
     this._break = false;
 
     this._parent = parent;
@@ -143,22 +143,30 @@ Class.extend('wcNode', 'Node', '', {
     for (var i = 0; i < data.entryChains.length; ++i) {
       var chain = data.entryChains[i];
       var targetNode = engine.nodeById((idMap && idMap[chain.outNodeId]) || chain.outNodeId);
-      this.connectEntry(chain.inName, targetNode, chain.outName);
+      if (this._parent === targetNode._parent) {
+        this.connectEntry(chain.inName, targetNode, chain.outName);
+      }
     }
     for (var i = 0; i < data.exitChains.length; ++i) {
       var chain = data.exitChains[i];
       var targetNode = engine.nodeById((idMap && idMap[chain.inNodeId]) || chain.inNodeId);
-      this.connectExit(chain.outName, targetNode, chain.inName);
+      if (this._parent === targetNode._parent) {
+        this.connectExit(chain.outName, targetNode, chain.inName);
+      }
     }
     for (var i = 0; i < data.inputChains.length; ++i) {
       var chain = data.inputChains[i];
       var targetNode = engine.nodeById((idMap && idMap[chain.outNodeId]) || chain.outNodeId);
-      this.connectInput(chain.inName, targetNode, chain.outName);
+      if (this._parent === targetNode._parent) {
+        this.connectInput(chain.inName, targetNode, chain.outName);
+      }
     }
     for (var i = 0; i < data.outputChains.length; ++i) {
       var chain = data.outputChains[i];
       var targetNode = engine.nodeById((idMap && idMap[chain.inNodeId]) || chain.inNodeId);
-      this.connectOutput(chain.outName, targetNode, chain.inName);
+      if (this._parent === targetNode._parent) {
+        this.connectOutput(chain.outName, targetNode, chain.inName);
+      }
     }
   },
 
