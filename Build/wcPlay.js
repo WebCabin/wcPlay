@@ -1721,8 +1721,8 @@ wcPlayEditor.prototype = {
     context.lineWidth = 2;
     context.beginPath();
     if (!node.debugLog()) {
-      context.moveTo(data.debugLog.left + 1, data.debugLog.top + data.debugLog.height/2);
-      context.lineTo(data.debugLog.left + data.debugLog.width - 1, data.debugLog.top + data.debugLog.height/2);
+      // context.moveTo(data.debugLog.left + 1, data.debugLog.top + data.debugLog.height/2);
+      // context.lineTo(data.debugLog.left + data.debugLog.width - 1, data.debugLog.top + data.debugLog.height/2);
     }
 
     if (node.debugLog()) {
