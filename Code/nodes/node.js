@@ -117,25 +117,73 @@ Class.extend('wcNode', 'Node', '', {
    * Imports previously [exported]{@link wcNode#export} data to generate this node.
    * @function wcNode#import
    * @param {Object} data - The data to import.
+   * @param {Number[]} [idMap] - If supplied, identifies a mapping of old ID's to new ID's, any not found in this list will be unchanged.
    */
-  import: function(data) {
+  import: function(data, idMap) {
+    this.id = idMap && idMap[data.id] || data.id;
+    this.name = data.name,
+    this.color = data.color,
+    this.pos.x = data.pos.x,
+    this.pos.y = data.pos.y,
+    this.collapsed(data.collapsed);
+    this.debugBreak(data.breakpoint);
 
+    // Restore property values.
+    for (var i = 0; i < data.properties.length; ++i) {
+      this.initialProperty(data.properties[i].name, data.properties[i].initialValue);
+      this.property(data.properties[i].name, data.properties[i].value);
+    }
+
+    var engine = this.engine();
+    if (!engine) {
+      return;
+    }
+
+    // Re-connect all chains.
+    for (var i = 0; i < data.entryChains.length; ++i) {
+      var chain = data.entryChains[i];
+      var targetNode = engine.nodeById((idMap && idMap[chain.outNodeId]) || chain.outNodeId);
+      this.connectEntry(chain.inName, targetNode, chain.outName);
+    }
+    for (var i = 0; i < data.exitChains.length; ++i) {
+      var chain = data.exitChains[i];
+      var targetNode = engine.nodeById((idMap && idMap[chain.inNodeId]) || chain.inNodeId);
+      this.connectExit(chain.outName, targetNode, chain.inName);
+    }
+    for (var i = 0; i < data.inputChains.length; ++i) {
+      var chain = data.inputChains[i];
+      var targetNode = engine.nodeById((idMap && idMap[chain.outNodeId]) || chain.outNodeId);
+      this.connectInput(chain.inName, targetNode, chain.outName);
+    }
+    for (var i = 0; i < data.outputChains.length; ++i) {
+      var chain = data.outputChains[i];
+      var targetNode = engine.nodeById((idMap && idMap[chain.inNodeId]) || chain.inNodeId);
+      this.connectOutput(chain.outName, targetNode, chain.inName);
+    }
   },
 
   /**
-   * Exports information about this node so it can be [imported]{@link wcNode#import} later.
+   * Exports information about this node as well as all connected chain data so it can be [imported]{@link wcNode#import} later.
    * @function wcNode#export
    * @returns {Object} - The exported data for this node.
    */
   export: function() {
-    var data = {
+    return {
       className: this.className,
+      id: this.id,
       name: this.name,
       color: this.color,
       pos: {
         x: this.pos.x,
         y: this.pos.y,
       },
+      collapsed: this.collapsed(),
+      breakpoint: this._break,
+      properties: this.listProperties(),
+      entryChains: this.listEntryChains(),
+      exitChains: this.listExitChains(),
+      inputChains: this.listInputChains(),
+      outputChains: this.listOutputChains(),
     };
   },
 

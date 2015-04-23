@@ -228,9 +228,11 @@ wcPlay.prototype = {
     }
 
     for (var i = 0; i < this._compositeNodes.length; ++i) {
-      var found = this._compositeNodes[i].nodeById(id);
-      if (found) {
-        return found;
+      if (this._compositeNodes[i] instanceof wcNodeCompositeScript) {
+        var found = this._compositeNodes[i].nodeById(id);
+        if (found) {
+          return found;
+        }
       }
     }
     return null;
@@ -587,16 +589,22 @@ wcPlay.prototype = {
         self[func].apply(self, args);
       }
     }
+    for (var i = 0; i < this._entryNodes.length; ++i) {
+      self = this._entryNodes[i];
+      if (typeof self[func] === 'function') {
+        self[func].apply(self, args);
+      }
+    }
     for (var i = 0; i < this._compositeNodes.length; ++i) {
       self = this._compositeNodes[i];
       if (typeof self[func] === 'function') {
         self[func].apply(self, args);
       }
     }
-    for (var i = 0; i < this._entryNodes.length; ++i) {
-      self = this._entryNodes[i];
-      if (typeof self[func] === 'function') {
-        self[func].apply(self, args);
+
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      if (this._compositeNodes[i] instanceof wcNodeCompositeScript) {
+        this._compositeNodes[i].__notifyNodes(func, args);
       }
     }
   },

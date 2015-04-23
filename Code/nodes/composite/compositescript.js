@@ -16,75 +16,87 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '', {
     this._storageNodes = [];
     this._compositeNodes = [];
 
-    if (nodes !== undefined) {
+    if ($.isArray(nodes)) {
       for (var i = 0; i < nodes.length; ++i) {
         this.__addNode(nodes[i]);
         nodes[i]._parent = this;
       }
-    } else {
-      // TODO: Create all nodes based on their exported data found in this.nodes[]
     }
   },
 
   /**
-   * Compiles all nodes inside this composite into meta-data and stores it with the constructor object.
+   * Loads the contents of this node based on its compiled data.
+   * @function wcNodeCompositeScript#decompile
+   * @param {Boolean} [restoreIds] - If true, nodes created will be restored to their original ID's rather than assigned new ones.
+   */
+  decompile: function(restoreIds) {
+    this.onDestroying();
+
+    var idMap = [];
+    var newNodes = [];
+
+    if (this.compiledNodes) {
+      for (var i = 0; i < this.compiledNodes.length; ++i) {
+        var data = this.compiledNodes[i];
+        var newNode = new window[data.className](this, data.pos, data.name);
+        if (!restoreIds) {
+          idMap[data.id] = newNode.id;
+        }
+        newNodes.push(newNode);
+      }
+      for (var i = 0; i < this.compiledNodes.length; ++i) {
+        var data = this.compiledNodes[i];
+        newNodes[i].import(data, idMap);
+      }
+    }
+  },
+
+  /**
+   * Compiles all nodes inside this composite into meta-data.
    * @function wcNodeCompositeScript#compile
    */
   compile: function() {
-    // // Find all chains and record them.
-    // var chains = {
-    //   flow: [],
-    //   property: [],
-    // };
+    this.compiledNodes = [];
 
-    // var entryChains = [];
-    // var exitChains = [];
-    // var inputChains = [];
-    // var outputChains = [];
+    function __compileNodes(nodes) {
+      for (var i = 0; i < nodes.length; ++i) {
+        this.compiledNodes.push(nodes[i].export());
+      }
+    };
 
-    // for (var i = 0; i < self._selectedNodes.length; ++i) {
-    //   var node = self._selectedNodes[i];
+    __compileNodes.call(this, this._entryNodes);
+    __compileNodes.call(this, this._processNodes);
+    __compileNodes.call(this, this._storageNodes);
+    __compileNodes.call(this, this._compositeNodes);
+  },
 
-    //   // Flow chains.
-    //   for (var a = 0; a < node.chain.entry.length; ++a) {
-    //     var link = node.chain.entry[a];
-    //     for (var b = 0; b < link.links.length; ++b) {
-    //       var targetLink = link.links[b];
-    //       var outIndex = self._selectedNodes.indexOf(targetLink.node);
-    //       if (outIndex === -1) {
-    //         // External chains have to be reconnected later.
-    //         entryChains.push({
-    //           index: i,
-    //           targetNode: targetLink.node,
-    //           targetName: targetLink.name,
-    //         });
-    //       } else {
-    //         // Internal chains are recorded.
-    //         chains.flow.push({
-    //           inIndex: i,
-    //           inName: link.name,
-    //           outIndex: outIndex,
-    //           outName: targetLink.name,
-    //         });
-    //       }
-    //     }
-    //   }
+  /**
+   * Imports previously [exported]{@link wcNode#export} data to generate this node.
+   * @function wcNode#import
+   * @param {Object} data - The data to import.
+   * @param {Number[]} [idMap] - If supplied, identifies a mapping of old ID's to new ID's, any not found in this list will be unchanged.
+   */
+  import: function(data, idMap) {
+    this._super(data, idMap);
 
-    //   for (var a = 0; a < node.chain.exit.length; ++a) {
-    //     var link = node.chain.exit[a];
-    //     for (var b = 0; b < link.links.length; ++b) {
-    //       var targetLink = link.links[b];
-    //       var outIndex = self._selectedNodes.indexOf(targetLink.node);
-    //       if (outIndex === -1) {
-    //         // External chains have to be reconnected later.
-    //         exitChains.push({
-    //           index: i,
-    //           targetNode: targetLink.node,
-    //           targetName: targetLink.name,
-    //         });
-    //       }
-    //     }
-    //   }
+    this.compiledNodes = data.compiledNodes;
+    this.decompile(true);
+  },
+
+  /**
+   * Exports information about this node as well as all connected chain data so it can be [imported]{@link wcNode#import} later.
+   * @function wcNodeCompositeScript#export
+   * @returns {Object} - The exported data for this node.
+   */
+  export: function() {
+    var data = this._super();
+
+    // Export the current set of nodes into our data.
+    this.compile();
+    data.compiledNodes = this.compiledNodes;
+
+    // data.instanceIdMap = JSON.parse(JSON.stringify(data));
+    return data;
   },
 
   /**
@@ -302,11 +314,11 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '', {
    */
   onNameChanged: function(oldName, newName) {
     this._super(oldName, newName);
-    window[this.className].prototype.name = newName;
+    // window[this.className].prototype.name = newName;
 
-    for (var i = 0; i < window.wcNodeInstances[this.className].length; ++i) {
-      window.wcNodeInstances[this.className][i].name = newName;
-    }
+    // for (var i = 0; i < window.wcNodeInstances[this.className].length; ++i) {
+    //   window.wcNodeInstances[this.className][i].name = newName;
+    // }
   },
 
   /**
@@ -351,6 +363,10 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '', {
     for (var i = 0; i < this._compositeNodes.length; ++i) {
       this._compositeNodes[i].destroy();
     }
+    this._entryNodes = [];
+    this._processNodes = [];
+    this._storageNodes = [];
+    this._compositeNodes = [];
   },
 
   /**
@@ -413,5 +429,46 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '', {
     }
 
     return false;
+  },
+
+  /**
+   * Sends a custom notification event to all nodes.
+   * @function wcNodeCompositeScript#__notifyNodes
+   * @private
+   * @param {String} func - The node function to call.
+   * @param {Object[]} args - A list of arguments to forward into the function call.
+   */
+  __notifyNodes: function(func, args) {
+    var self;
+    for (var i = 0; i < this._storageNodes.length; ++i) {
+      self = this._storageNodes[i];
+      if (typeof self[func] === 'function') {
+        self[func].apply(self, args);
+      }
+    }
+    for (var i = 0; i < this._processNodes.length; ++i) {
+      self = this._processNodes[i];
+      if (typeof self[func] === 'function') {
+        self[func].apply(self, args);
+      }
+    }
+    for (var i = 0; i < this._entryNodes.length; ++i) {
+      self = this._entryNodes[i];
+      if (typeof self[func] === 'function') {
+        self[func].apply(self, args);
+      }
+    }
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      self = this._compositeNodes[i];
+      if (typeof self[func] === 'function') {
+        self[func].apply(self, args);
+      }
+    }
+
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      if (this._compositeNodes[i] instanceof wcNodeCompositeScript) {
+        this._compositeNodes[i].__notifyNodes(func, args);
+      }
+    }
   },
 });

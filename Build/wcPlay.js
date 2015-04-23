@@ -304,9 +304,11 @@ wcPlay.prototype = {
     }
 
     for (var i = 0; i < this._compositeNodes.length; ++i) {
-      var found = this._compositeNodes[i].nodeById(id);
-      if (found) {
-        return found;
+      if (this._compositeNodes[i] instanceof wcNodeCompositeScript) {
+        var found = this._compositeNodes[i].nodeById(id);
+        if (found) {
+          return found;
+        }
       }
     }
     return null;
@@ -663,16 +665,22 @@ wcPlay.prototype = {
         self[func].apply(self, args);
       }
     }
+    for (var i = 0; i < this._entryNodes.length; ++i) {
+      self = this._entryNodes[i];
+      if (typeof self[func] === 'function') {
+        self[func].apply(self, args);
+      }
+    }
     for (var i = 0; i < this._compositeNodes.length; ++i) {
       self = this._compositeNodes[i];
       if (typeof self[func] === 'function') {
         self[func].apply(self, args);
       }
     }
-    for (var i = 0; i < this._entryNodes.length; ++i) {
-      self = this._entryNodes[i];
-      if (typeof self[func] === 'function') {
-        self[func].apply(self, args);
+
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      if (this._compositeNodes[i] instanceof wcNodeCompositeScript) {
+        this._compositeNodes[i].__notifyNodes(func, args);
       }
     }
   },
@@ -1179,8 +1187,8 @@ wcPlayEditor.prototype = {
       // Update nodes.
       this.__updateNodes(this._parent._entryNodes, elapsed);
       this.__updateNodes(this._parent._processNodes, elapsed);
-      this.__updateNodes(this._parent._compositeNodes, elapsed);
       this.__updateNodes(this._parent._storageNodes, elapsed);
+      this.__updateNodes(this._parent._compositeNodes, elapsed);
 
       // Render the nodes in the main script.
       this.__drawNodes(this._parent._entryNodes, this._viewportContext);
@@ -1320,7 +1328,7 @@ wcPlayEditor.prototype = {
         </li>\
         <li><span>View</span>\
           <ul>\
-            <li><span class="wcPlayEditorMenuOptionCenter wcPlayMenuItem" title="Fit selected nodes into view."><i class="wcPlayEditorMenuIcon wcButton fa fa-crosshairs fa-lg"/>Center View<span>F</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionCenter wcPlayMenuItem" title="Fit selected nodes into view."><i class="wcPlayEditorMenuIcon wcButton fa fa-crosshairs fa-lg"/>Fit in View<span>F</span></span></li>\
             <li><span class="wcPlayEditorMenuOptionCompositeExit wcPlayMenuItem" title="Exit out of this Composite node."><i class="wcPlayEditorMenuIcon wcButton fa fa-level-up fa-lg"/>Exit Composite<span>O</span></span></li>\
             <li><span class="wcPlayEditorMenuOptionCompositeEnter wcPlayMenuItem" title="Enter into this Composite node."><i class="wcPlayEditorMenuIcon wcButton fa fa-level-down fa-lg"/>Enter Composite<span>I</span></span></li>\
           </ul>\
@@ -1361,10 +1369,6 @@ wcPlayEditor.prototype = {
         <div class="ARPG_Separator"></div>\
         <div class="wcPlayEditorMenuOptionComposite"><span class="wcPlayEditorMenuIcon wcButton fa fa-share-alt-square fa-lg" title="Combine all selected nodes into a new \'Composite\' Node."/></div>\
         <div class="ARPG_Separator"></div>\
-        <div class="wcPlayEditorMenuOptionCenter"><span class="wcPlayEditorMenuIcon wcButton fa fa-crosshairs fa-lg" title="Fit selected nodes into view."/></div>\
-        <div class="wcPlayEditorMenuOptionCompositeExit"><span class="wcPlayEditorMenuIcon wcButton fa fa-level-up fa-lg" title="Exit out of this Composite node."/></div>\
-        <div class="wcPlayEditorMenuOptionCompositeEnter"><span class="wcPlayEditorMenuIcon wcButton fa fa-level-down fa-lg" title="Enter into this Composite node."/></div>\
-        <div class="ARPG_Separator"></div>\
         <div class="wcPlayEditorMenuOptionRestart"><span class="wcPlayEditorMenuIcon wcButton fa fa-refresh fa-lg" title="Reset all property values to their initial state and restart the execution of the script."/></div>\
         <div class="ARPG_Separator"></div>\
         <div class="wcPlayEditorMenuOptionDebugging"><span class="wcPlayEditorMenuIcon wcButton fa fa-dot-circle-o fa-lg" title="Toggle debugging mode for the entire script."/></div>\
@@ -1373,8 +1377,9 @@ wcPlayEditor.prototype = {
         <div class="wcPlayEditorMenuOptionPausePlay"><span class="wcPlayEditorMenuIcon wcButton fa fa-pause fa-lg" title="Pause or Continue execution of the script."/></div>\
         <div class="wcPlayEditorMenuOptionStep"><span class="wcPlayEditorMenuIcon wcButton fa fa-forward fa-lg" title="Steps execution of the script by a single update."/></div>\
         <div class="ARPG_Separator"></div>\
-        <div class="wcPlayEditorMenuOptionDocs"><span class="wcPlayEditorMenuIcon wcButton fa fa-file-pdf-o fa-lg" title="Open the documentation for wcPlay in another window."/></div>\
-        <div class="wcPlayEditorMenuOptionAbout disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-question fa-lg"/></div>\
+        <div class="wcPlayEditorMenuOptionCenter"><span class="wcPlayEditorMenuIcon wcButton fa fa-crosshairs fa-lg" title="Fit selected nodes into view."/></div>\
+        <div class="wcPlayEditorMenuOptionCompositeExit"><span class="wcPlayEditorMenuIcon wcButton fa fa-level-up fa-lg" title="Exit out of this Composite node."/></div>\
+        <div class="wcPlayEditorMenuOptionCompositeEnter"><span class="wcPlayEditorMenuIcon wcButton fa fa-level-down fa-lg" title="Enter into this Composite node."/></div>\
       </div>\
     ');
 
@@ -1482,6 +1487,9 @@ wcPlayEditor.prototype = {
 
       // Now create an instance of the node.
       var node = new window[data.name](null);
+      if (node.decompile) {
+        node.decompile();
+      }
       this._nodeLibrary[data.category][data.type].nodes.push(node);
       this.__updateNode(node, 0);
     }
@@ -3088,12 +3096,13 @@ wcPlayEditor.prototype = {
   },
 
   /**
-   * Destroys a node and creates an undo event for it.
-   * @function wcPlayEditor#__destroyNode
-   * @param {wcNode} node - the node to destroy.
+   * Generates an undo event for a node that was created.
+   * @function wcPlayEditor#__onCreateNode
+   * @param {wcNode} node - The node that was created.
+   * @param {Boolean} [decompile] - If true, will also decompile the node if able.
    */
-  __destroyNode: function(node) {
-    self._undoManager && self._undoManager.addEvent('',
+  __onCreateNode: function(node, decompile) {
+    this._undoManager && this._undoManager.addEvent('Created Node "' + node.category + '.' + node.type + '"',
     {
       id: node.id,
       className: node.className,
@@ -3101,57 +3110,69 @@ wcPlayEditor.prototype = {
         x: node.pos.x,
         y: node.pos.y,
       },
-      collapsed: node.collapsed(),
-      breakpoint: node._break,
-      properties: node.listProperties(),
-      entryChains: node.listEntryChains(),
-      exitChains: node.listExitChains(),
-      inputChains: node.listInputChains(),
-      outputChains: node.listOutputChains(),
-      editor: self,
+      decompile: decompile,
+      data: node.export(),
+      editor: this,
+      parent: this._parent,
     },
     // Undo
-    function() {
-      var myNode = new window[this.className](this.editor._parent, this.pos);
-      myNode.id = this.id;
-      myNode.collapsed(this.collapsed);
-      myNode.debugBreak(this.breakpoint);
-      // Restore property values.
-      for (var i = 0; i < this.properties.length; ++i) {
-        myNode.initialProperty(this.properties[i].name, this.properties[i].initialValue);
-        myNode.property(this.properties[i].name, this.properties[i].value);
-      }
-      // Re-connect all chains.
-      for (var i = 0; i < this.entryChains.length; ++i) {
-        var chain = this.entryChains[i];
-        var targetNode = this.editor._engine.nodeById(chain.outNodeId);
-        myNode.connectEntry(chain.inName, targetNode, chain.outName);
-      }
-      for (var i = 0; i < this.exitChains.length; ++i) {
-        var chain = this.exitChains[i];
-        var targetNode = this.editor._engine.nodeById(chain.inNodeId);
-        myNode.connectExit(chain.outName, targetNode, chain.inName);
-      }
-      for (var i = 0; i < this.inputChains.length; ++i) {
-        var chain = this.inputChains[i];
-        var targetNode = this.editor._engine.nodeById(chain.outNodeId);
-        myNode.connectInput(chain.inName, targetNode, chain.outName);
-      }
-      for (var i = 0; i < this.outputChains.length; ++i) {
-        var chain = this.outputChains[i];
-        var targetNode = this.editor._engine.nodeById(chain.inNodeId);
-        myNode.connectOutput(chain.outName, targetNode, chain.inName);
-      }
-    },
-    // Redo
     function() {
       var myNode = this.editor._engine.nodeById(this.id);
 
       // If we are viewing a script inside the node that is being removed, re-direct our view to its parents.
-      var parent = self.editor._parent;
+      var parent = this.editor._parent;
       while (!(parent instanceof wcPlay)) {
         if (parent == myNode) {
-          // TODO: Redirect view to myNode._parent.
+          this.editor._parent = myNode._parent;
+          this.editor.center();
+          break;
+        }
+
+        parent = parent._parent;
+      }
+
+      // Now destroy this node.
+      myNode.destroy();
+    },
+    // Redo
+    function() {
+      var myNode = new window[this.className](this.parent, this.pos);
+      myNode.id = this.id;
+      if (this.decompile && myNode.decompile) {
+        myNode.decompile();
+      }
+      myNode.import(this.data);
+    });
+  },
+
+  /**
+   * Generates an undo event for a node that is destroyed.
+   * @function wcPlayEditor#__onDestroyNode
+   * @param {wcNode} node - the node to destroy.
+   */
+  __onDestroyNode: function(node) {
+    this._undoManager && this._undoManager.addEvent('',
+    {
+      data: node.export(),
+      parent: this._parent,
+      editor: this,
+    },
+    // Undo
+    function() {
+      var myNode = new window[this.data.className](this.parent, this.data.pos);
+      myNode.import(this.data);
+    },
+    // Redo
+    function() {
+      var myNode = this.editor._engine.nodeById(this.data.id);
+
+      // If we are viewing a script inside the node that is being removed, re-direct our view to its parents.
+      var parent = this.editor._parent;
+      while (!(parent instanceof wcPlay)) {
+        if (parent == myNode) {
+          this.editor._parent = myNode._parent;
+          this.editor.center();
+          break;
         }
 
         parent = parent._parent;
@@ -3160,8 +3181,6 @@ wcPlayEditor.prototype = {
       // Now destroy this node.
       myNode.destroy();
     });
-
-    node.destroy();
   },
 
   /**
@@ -3345,7 +3364,8 @@ wcPlayEditor.prototype = {
       if (self._selectedNodes.length) {
         self._undoManager && self._undoManager.beginGroup('Removed Nodes');
         for (var i = 0; i < self._selectedNodes.length; ++i) {
-          self.__destroyNode(self._selectedNodes[i]);
+          self.__onDestroyNode(self._selectedNodes[i]);
+          self._selectedNodes[i].destroy();
         }
         self._selectedNode = null;
         self._selectedNodes = [];
@@ -3371,6 +3391,13 @@ wcPlayEditor.prototype = {
         });
 
         self._undoManager && self._undoManager.beginGroup("Combined Nodes into Composite: " + number);
+        // Create undo events for removing the selected nodes.
+        for (var i = 0; i < self._selectedNodes.length; ++i) {
+          self.__onDestroyNode(self._selectedNodes[i]);
+
+          // Now give this node a new ID so it is treated like a different node.
+          self._selectedNodes[i].id = ++wcNodeNextID;
+        }
 
         var compNode = new window[className](self._parent, {x: 0, y: 0}, self._selectedNodes);
 
@@ -3521,8 +3548,10 @@ wcPlayEditor.prototype = {
 
         // Compile the meta data for this node based on the nodes inside.
         compNode.compile();
+        window[className].prototype.compiledNodes = compNode.compiledNodes;
 
-        // TODO: Create undo event for moving the selected nodes into the new composite node.
+        // Create undo event for creating the composite node.
+        self.__onCreateNode(compNode);
 
         self._undoManager && self._undoManager.endGroup();
 
@@ -4046,6 +4075,9 @@ wcPlayEditor.prototype = {
    */
   __onViewportMouseDown: function(event, elem) {
     this._mouse = this.__mouse(event, this.$viewport.offset());
+    if (this._mouse.which === 3) {
+      return;
+    }
     this._mouseMoved = false;
 
     // Control+drag or middle+drag to box select.
@@ -4297,27 +4329,10 @@ wcPlayEditor.prototype = {
         x: (mouse.x + (this._draggingNodeData.$canvas.width()/2 + this._draggingNodeData.offset.x)) / this._viewportCamera.z,
         y: (mouse.y + this._draggingNodeData.offset.y) / this._viewportCamera.z,
       });
-
-      this._undoManager && this._undoManager.addEvent('Created Node "' + newNode.category + '.' + newNode.type + '"',
-      {
-        id: newNode.id,
-        className: newNode.className,
-        pos: {
-          x: newNode.pos.x,
-          y: newNode.pos.y,
-        },
-        parent: this._parent,
-      },
-      // Undo
-      function() {
-        var myNode = this.parent.nodeById(this.id);
-        myNode.destroy();
-      },
-      // Redo
-      function() {
-        var myNode = new window[this.className](this.parent, this.pos);
-        myNode.id = this.id;
-      });
+      if (newNode.decompile) {
+        newNode.decompile();
+      }
+      this.__onCreateNode(newNode, true);
 
       this._selectedNode = newNode;
       this._selectedNodes = [newNode];
@@ -5023,25 +5038,73 @@ Class.extend('wcNode', 'Node', '', {
    * Imports previously [exported]{@link wcNode#export} data to generate this node.
    * @function wcNode#import
    * @param {Object} data - The data to import.
+   * @param {Number[]} [idMap] - If supplied, identifies a mapping of old ID's to new ID's, any not found in this list will be unchanged.
    */
-  import: function(data) {
+  import: function(data, idMap) {
+    this.id = idMap && idMap[data.id] || data.id;
+    this.name = data.name,
+    this.color = data.color,
+    this.pos.x = data.pos.x,
+    this.pos.y = data.pos.y,
+    this.collapsed(data.collapsed);
+    this.debugBreak(data.breakpoint);
 
+    // Restore property values.
+    for (var i = 0; i < data.properties.length; ++i) {
+      this.initialProperty(data.properties[i].name, data.properties[i].initialValue);
+      this.property(data.properties[i].name, data.properties[i].value);
+    }
+
+    var engine = this.engine();
+    if (!engine) {
+      return;
+    }
+
+    // Re-connect all chains.
+    for (var i = 0; i < data.entryChains.length; ++i) {
+      var chain = data.entryChains[i];
+      var targetNode = engine.nodeById((idMap && idMap[chain.outNodeId]) || chain.outNodeId);
+      this.connectEntry(chain.inName, targetNode, chain.outName);
+    }
+    for (var i = 0; i < data.exitChains.length; ++i) {
+      var chain = data.exitChains[i];
+      var targetNode = engine.nodeById((idMap && idMap[chain.inNodeId]) || chain.inNodeId);
+      this.connectExit(chain.outName, targetNode, chain.inName);
+    }
+    for (var i = 0; i < data.inputChains.length; ++i) {
+      var chain = data.inputChains[i];
+      var targetNode = engine.nodeById((idMap && idMap[chain.outNodeId]) || chain.outNodeId);
+      this.connectInput(chain.inName, targetNode, chain.outName);
+    }
+    for (var i = 0; i < data.outputChains.length; ++i) {
+      var chain = data.outputChains[i];
+      var targetNode = engine.nodeById((idMap && idMap[chain.inNodeId]) || chain.inNodeId);
+      this.connectOutput(chain.outName, targetNode, chain.inName);
+    }
   },
 
   /**
-   * Exports information about this node so it can be [imported]{@link wcNode#import} later.
+   * Exports information about this node as well as all connected chain data so it can be [imported]{@link wcNode#import} later.
    * @function wcNode#export
    * @returns {Object} - The exported data for this node.
    */
   export: function() {
-    var data = {
+    return {
       className: this.className,
+      id: this.id,
       name: this.name,
       color: this.color,
       pos: {
         x: this.pos.x,
         y: this.pos.y,
       },
+      collapsed: this.collapsed(),
+      breakpoint: this._break,
+      properties: this.listProperties(),
+      entryChains: this.listEntryChains(),
+      exitChains: this.listExitChains(),
+      inputChains: this.listInputChains(),
+      outputChains: this.listOutputChains(),
     };
   },
 
@@ -6832,75 +6895,87 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '', {
     this._storageNodes = [];
     this._compositeNodes = [];
 
-    if (nodes !== undefined) {
+    if ($.isArray(nodes)) {
       for (var i = 0; i < nodes.length; ++i) {
         this.__addNode(nodes[i]);
         nodes[i]._parent = this;
       }
-    } else {
-      // TODO: Create all nodes based on their exported data found in this.nodes[]
     }
   },
 
   /**
-   * Compiles all nodes inside this composite into meta-data and stores it with the constructor object.
+   * Loads the contents of this node based on its compiled data.
+   * @function wcNodeCompositeScript#decompile
+   * @param {Boolean} [restoreIds] - If true, nodes created will be restored to their original ID's rather than assigned new ones.
+   */
+  decompile: function(restoreIds) {
+    this.onDestroying();
+
+    var idMap = [];
+    var newNodes = [];
+
+    if (this.compiledNodes) {
+      for (var i = 0; i < this.compiledNodes.length; ++i) {
+        var data = this.compiledNodes[i];
+        var newNode = new window[data.className](this, data.pos, data.name);
+        if (!restoreIds) {
+          idMap[data.id] = newNode.id;
+        }
+        newNodes.push(newNode);
+      }
+      for (var i = 0; i < this.compiledNodes.length; ++i) {
+        var data = this.compiledNodes[i];
+        newNodes[i].import(data, idMap);
+      }
+    }
+  },
+
+  /**
+   * Compiles all nodes inside this composite into meta-data.
    * @function wcNodeCompositeScript#compile
    */
   compile: function() {
-    // // Find all chains and record them.
-    // var chains = {
-    //   flow: [],
-    //   property: [],
-    // };
+    this.compiledNodes = [];
 
-    // var entryChains = [];
-    // var exitChains = [];
-    // var inputChains = [];
-    // var outputChains = [];
+    function __compileNodes(nodes) {
+      for (var i = 0; i < nodes.length; ++i) {
+        this.compiledNodes.push(nodes[i].export());
+      }
+    };
 
-    // for (var i = 0; i < self._selectedNodes.length; ++i) {
-    //   var node = self._selectedNodes[i];
+    __compileNodes.call(this, this._entryNodes);
+    __compileNodes.call(this, this._processNodes);
+    __compileNodes.call(this, this._storageNodes);
+    __compileNodes.call(this, this._compositeNodes);
+  },
 
-    //   // Flow chains.
-    //   for (var a = 0; a < node.chain.entry.length; ++a) {
-    //     var link = node.chain.entry[a];
-    //     for (var b = 0; b < link.links.length; ++b) {
-    //       var targetLink = link.links[b];
-    //       var outIndex = self._selectedNodes.indexOf(targetLink.node);
-    //       if (outIndex === -1) {
-    //         // External chains have to be reconnected later.
-    //         entryChains.push({
-    //           index: i,
-    //           targetNode: targetLink.node,
-    //           targetName: targetLink.name,
-    //         });
-    //       } else {
-    //         // Internal chains are recorded.
-    //         chains.flow.push({
-    //           inIndex: i,
-    //           inName: link.name,
-    //           outIndex: outIndex,
-    //           outName: targetLink.name,
-    //         });
-    //       }
-    //     }
-    //   }
+  /**
+   * Imports previously [exported]{@link wcNode#export} data to generate this node.
+   * @function wcNode#import
+   * @param {Object} data - The data to import.
+   * @param {Number[]} [idMap] - If supplied, identifies a mapping of old ID's to new ID's, any not found in this list will be unchanged.
+   */
+  import: function(data, idMap) {
+    this._super(data, idMap);
 
-    //   for (var a = 0; a < node.chain.exit.length; ++a) {
-    //     var link = node.chain.exit[a];
-    //     for (var b = 0; b < link.links.length; ++b) {
-    //       var targetLink = link.links[b];
-    //       var outIndex = self._selectedNodes.indexOf(targetLink.node);
-    //       if (outIndex === -1) {
-    //         // External chains have to be reconnected later.
-    //         exitChains.push({
-    //           index: i,
-    //           targetNode: targetLink.node,
-    //           targetName: targetLink.name,
-    //         });
-    //       }
-    //     }
-    //   }
+    this.compiledNodes = data.compiledNodes;
+    this.decompile(true);
+  },
+
+  /**
+   * Exports information about this node as well as all connected chain data so it can be [imported]{@link wcNode#import} later.
+   * @function wcNodeCompositeScript#export
+   * @returns {Object} - The exported data for this node.
+   */
+  export: function() {
+    var data = this._super();
+
+    // Export the current set of nodes into our data.
+    this.compile();
+    data.compiledNodes = this.compiledNodes;
+
+    // data.instanceIdMap = JSON.parse(JSON.stringify(data));
+    return data;
   },
 
   /**
@@ -7118,11 +7193,11 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '', {
    */
   onNameChanged: function(oldName, newName) {
     this._super(oldName, newName);
-    window[this.className].prototype.name = newName;
+    // window[this.className].prototype.name = newName;
 
-    for (var i = 0; i < window.wcNodeInstances[this.className].length; ++i) {
-      window.wcNodeInstances[this.className][i].name = newName;
-    }
+    // for (var i = 0; i < window.wcNodeInstances[this.className].length; ++i) {
+    //   window.wcNodeInstances[this.className][i].name = newName;
+    // }
   },
 
   /**
@@ -7167,6 +7242,10 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '', {
     for (var i = 0; i < this._compositeNodes.length; ++i) {
       this._compositeNodes[i].destroy();
     }
+    this._entryNodes = [];
+    this._processNodes = [];
+    this._storageNodes = [];
+    this._compositeNodes = [];
   },
 
   /**
@@ -7229,6 +7308,47 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '', {
     }
 
     return false;
+  },
+
+  /**
+   * Sends a custom notification event to all nodes.
+   * @function wcNodeCompositeScript#__notifyNodes
+   * @private
+   * @param {String} func - The node function to call.
+   * @param {Object[]} args - A list of arguments to forward into the function call.
+   */
+  __notifyNodes: function(func, args) {
+    var self;
+    for (var i = 0; i < this._storageNodes.length; ++i) {
+      self = this._storageNodes[i];
+      if (typeof self[func] === 'function') {
+        self[func].apply(self, args);
+      }
+    }
+    for (var i = 0; i < this._processNodes.length; ++i) {
+      self = this._processNodes[i];
+      if (typeof self[func] === 'function') {
+        self[func].apply(self, args);
+      }
+    }
+    for (var i = 0; i < this._entryNodes.length; ++i) {
+      self = this._entryNodes[i];
+      if (typeof self[func] === 'function') {
+        self[func].apply(self, args);
+      }
+    }
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      self = this._compositeNodes[i];
+      if (typeof self[func] === 'function') {
+        self[func].apply(self, args);
+      }
+    }
+
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      if (this._compositeNodes[i] instanceof wcNodeCompositeScript) {
+        this._compositeNodes[i].__notifyNodes(func, args);
+      }
+    }
   },
 });
 
