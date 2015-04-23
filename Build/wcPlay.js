@@ -4626,16 +4626,11 @@ wcPlayEditor.prototype = {
       this._selectedNode.onViewportMouseUp(event, pos);
     }
 
-    // Re-collapse the node, if necessary.
-    if (this._expandedHighlightNode && this._expandedSelectedNode !== this._expandedHighlightNode) {
-      this._expandedHighlightNode.collapsed(true);
-    }
-    if (this._expandedSelectedNode) {
+    if (this._expandedSelectedNode && this._expandedSelectedNode !== this._expandedHighlightNode) {
       this._expandedSelectedNode.collapsed(true);
     }
 
     this._expandedSelectedNode = null;
-    this._expandedHighlightNode = null;
     this._selectedEntryLink = false;
     this._selectedExitLink = false;
     this._selectedInputLink = false;
