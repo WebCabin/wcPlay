@@ -3339,6 +3339,7 @@ wcPlayEditor.prototype = {
           if (this.__inRect(this._mouse, node._meta.bounds.viewportBounds, this._viewportCamera)) {
             this._highlightNode = node;
             this._highlightViewport = true;
+            this.$viewport.addClass('wcClickable');
 
             if (!wasOverViewport) {
               node.onViewportMouseEnter(event, pos);
