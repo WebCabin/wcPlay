@@ -6003,7 +6003,7 @@ Class.extend('wcNode', 'Node', '', {
       return false;
     }
     if (this.debugLog()) {
-      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Triggered Exit link "' + name + '"');
+      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" Triggered Exit link "' + name + '"');
     }
 
     for (var i = 0; i < this.chain.exit.length; ++i) {
@@ -6347,7 +6347,7 @@ Class.extend('wcNode', 'Node', '', {
   onViewportMouseEnter: function(event, pos) {
     // this._super(event, pos);
     if (this.debugLog()) {
-      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" mouse entered custom viewport!');
+      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" mouse entered custom viewport!');
     }
   },
 
@@ -6360,7 +6360,7 @@ Class.extend('wcNode', 'Node', '', {
   onViewportMouseLeave: function(event) {
     // this._super(event);
     if (this.debugLog()) {
-      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" mouse left custom viewport!');
+      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" mouse left custom viewport!');
     }
   },
 
@@ -6460,7 +6460,7 @@ Class.extend('wcNode', 'Node', '', {
   onStart: function() {
     // this._super();
     if (this.debugLog()) {
-      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" started!');
+      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" started!');
     }
   },
 
@@ -6482,7 +6482,7 @@ Class.extend('wcNode', 'Node', '', {
   onTriggered: function(name) {
     // this._super(name);
     if (this.debugLog()) {
-      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Triggered Entry link "' + name + '"');
+      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" Triggered Entry link "' + name + '"');
     }
   },
 
@@ -6544,7 +6544,7 @@ Class.extend('wcNode', 'Node', '', {
   onPropertyChanging: function(name, oldValue, newValue) {
     // this._super(name, oldValue, newValue);
     // if (this.debugLog()) {
-    //   console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Changing Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
+    //   console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" Changing Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
     // }
   },
 
@@ -6559,7 +6559,7 @@ Class.extend('wcNode', 'Node', '', {
   onPropertyChanged: function(name, oldValue, newValue) {
     // this._super(name, oldValue, newValue);
     if (this.debugLog()) {
-      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Changed Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
+      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" Changed Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
     }
   },
 
@@ -6573,7 +6573,7 @@ Class.extend('wcNode', 'Node', '', {
   onPropertyGet: function(name) {
     // this._super(name);
     // if (this.debugLog()) {
-    //   console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Requested Property "' + name + '"');
+    //   console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" Requested Property "' + name + '"');
     // }
   },
 
@@ -6589,7 +6589,7 @@ Class.extend('wcNode', 'Node', '', {
   onInitialPropertyChanging: function(name, oldValue, newValue) {
     // this._super(name, oldValue, newValue);
     // if (this.debugLog()) {
-    //   console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Changing Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
+    //   console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" Changing Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
     // }
   },
 
@@ -6604,7 +6604,7 @@ Class.extend('wcNode', 'Node', '', {
   onInitialPropertyChanged: function(name, oldValue, newValue) {
     // this._super(name, oldValue, newValue);
     if (this.debugLog()) {
-      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Changed Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
+      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" Changed Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
     }
   },
 
@@ -6618,7 +6618,7 @@ Class.extend('wcNode', 'Node', '', {
   onInitialPropertyGet: function(name) {
     // this._super(name);
     // if (this.debugLog()) {
-    //   console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' - ' + this.name: '') + '" Requested Property "' + name + '"');
+    //   console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" Requested Property "' + name + '"');
     // }
   },
 
