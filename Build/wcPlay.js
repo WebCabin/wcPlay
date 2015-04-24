@@ -3745,6 +3745,9 @@ wcPlayEditor.prototype = {
           }
         }
 
+        self._selectedNode = null;
+        self._selectedNodes = [];
+
         compNode.pos.x = bounds.left + bounds.width/2;
         compNode.pos.y = bounds.top + bounds.height/2;
 
