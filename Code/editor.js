@@ -2686,9 +2686,6 @@ wcPlayEditor.prototype = {
           var evt = document.createEvent("MouseEvents");
           evt.initEvent("click", true, false);
           self.$hiddenFileInput[0].dispatchEvent(evt);
-          setTimeout(function() {
-            self.$hiddenFileInput.blur();
-          }, 100);
         }
       }
     });
@@ -3111,6 +3108,7 @@ wcPlayEditor.prototype = {
    * @param {Object} elem - The target element.
    */
   __onPaletteMouseDown: function(event, elem) {
+    this.$hiddenFileInput.blur();
     if (this._highlightNode) {
       this.__onPaletteMouseUp(event, elem);
       var mouse = this.__mouse(event);
@@ -3509,6 +3507,7 @@ wcPlayEditor.prototype = {
    * @param {Object} elem - The target element.
    */
   __onViewportMouseDown: function(event, elem) {
+    this.$hiddenFileInput.blur();
     this._mouse = this.__mouse(event, this.$viewport.offset());
     if (this._mouse.which === 3) {
       return;

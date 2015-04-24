@@ -131,6 +131,10 @@ Class.extend('wcNode', 'Node', '', {
     this.collapsed(data.collapsed);
     this.debugBreak(data.breakpoint);
 
+    if (this.id > wcNodeNextID) {
+      wcNodeNextID = this.id;
+    }
+
     // Restore property values.
     for (var i = 0; i < data.properties.length; ++i) {
       this.initialProperty(data.properties[i].name, data.properties[i].initialValue);

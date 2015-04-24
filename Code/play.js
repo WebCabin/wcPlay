@@ -176,9 +176,6 @@ wcPlay.prototype = {
     data.properties = this.listProperties();
 
     data.nodes = [];
-    for (var i = 0; i < this._compositeNodes.length; ++i) {
-      data.nodes.push(this._compositeNodes[i].export());
-    }
     for (var i = 0; i < this._entryNodes.length; ++i) {
       data.nodes.push(this._entryNodes[i].export());
     }
@@ -187,6 +184,9 @@ wcPlay.prototype = {
     }
     for (var i = 0; i < this._storageNodes.length; ++i) {
       data.nodes.push(this._storageNodes[i].export());
+    }
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      data.nodes.push(this._compositeNodes[i].export());
     }
 
     return JSON.stringify(data, function(key, value) {
