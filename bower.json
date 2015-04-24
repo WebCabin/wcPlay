@@ -29,7 +29,8 @@
   "dependencies": {
     "jquery": "1.11.1",
     "font-awesome": "4.2.0",
-    "wc-undo-manager": "master"
+    "wc-undo-manager": "master",
+    "FileSaver": "master"
   },
   "license": "MIT"
 }

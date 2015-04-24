@@ -1,4 +1,4 @@
-wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '', {
+wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '__Hidden__', {
   /**
    * @class
    * A composite script node. These are nodes that contain additional nodes inside.<br>
@@ -38,11 +38,15 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '', {
     if (this.compiledNodes) {
       for (var i = 0; i < this.compiledNodes.length; ++i) {
         var data = this.compiledNodes[i];
-        var newNode = new window[data.className](this, data.pos, data.name);
-        if (!restoreIds) {
-          idMap[data.id] = newNode.id;
+        if (window[data.className]) {
+          var newNode = new window[data.className](this, data.pos, data.name);
+          if (!restoreIds) {
+            idMap[data.id] = newNode.id;
+          }
+          newNodes.push(newNode);
+        } else {
+          console.log('ERROR: Attempted to load node "' + data.nodes[i].category + '.' + data.nodes[i].type + '", but the constructor could not be found!');
         }
-        newNodes.push(newNode);
       }
       for (var i = 0; i < this.compiledNodes.length; ++i) {
         var data = this.compiledNodes[i];

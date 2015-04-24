@@ -132,6 +132,9 @@ function wcPlayEditor(container, options) {
   this.$container.append(this.$top);
   this.$container.append(this.$main);
 
+  this.$hiddenFileInput = $('<input type="file" id="wcPlayEditorFileOpener" class="wcPlayNoHighlights" />');
+  this.$container.append(this.$hiddenFileInput);
+
   this.onResized();
 
   this.__setupMenu();
@@ -451,11 +454,11 @@ wcPlayEditor.prototype = {
     var self = this;
     $('.wcPlayEditorMenuOptionUndo').each(function() {
       $(this).toggleClass('disabled', !self._undoManager.canUndo()).find('.wcButton').toggleClass('disabled', !self._undoManager.canUndo());
-      $(this).attr('title', 'Undo ' + self._undoManager.undoInfo());
+      $(this).attr('title', 'Undo ' + self._undoManager.undoInfo() + ' (Ctrl+Z)');
     });
     $('.wcPlayEditorMenuOptionRedo').each(function() {
       $(this).toggleClass('disabled', !self._undoManager.canRedo()).find('.wcButton').toggleClass('disabled', !self._undoManager.canRedo());
-      $(this).attr('title', 'Redo ' + self._undoManager.redoInfo());
+      $(this).attr('title', 'Redo ' + self._undoManager.redoInfo() + ' (Ctrl+Y)');
     });
     $('.wcPlayEditorMenuOptionDebugging').children('i:first-child, span:first-child').toggleClass('fa-dot-circle-o', this._engine.debugging()).toggleClass('fa-circle-o', !this._engine.debugging());
     $('.wcPlayEditorMenuOptionSilence').children(':first-child, span:first-child').toggleClass('fa-volume-off', this._engine.silent()).toggleClass('fa-volume-up', !this._engine.silent());
@@ -604,9 +607,9 @@ wcPlayEditor.prototype = {
         <span class="wcPlayVersionTag wcPlayNoHighlights"></span>\
         <li><span>File</span>\
           <ul>\
-            <li><span class="wcPlayEditorMenuOptionNew wcPlayMenuItem"><i class="wcPlayEditorMenuIcon wcButton fa fa-file-o fa-lg"/>New Script...<span>Ctrl+N</span></span></li>\
-            <li><span class="wcPlayEditorMenuOptionOpen wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-folder-open-o fa-lg"/>Open Script...<span>Ctrl+O</span></span></li>\
-            <li><span class="wcPlayEditorMenuOptionSave wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-save fa-lg"/>Save Script<span>Ctrl+S</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionNew wcPlayMenuItem"><i class="wcPlayEditorMenuIcon wcButton fa fa-file-o fa-lg"/>New Script...<span>Alt+N</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionOpen wcPlayMenuItem"><i class="wcPlayEditorMenuIcon wcButton fa fa-folder-open-o fa-lg"/>Open Script...<span>Ctrl+O</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionSave wcPlayMenuItem"><i class="wcPlayEditorMenuIcon wcButton fa fa-save fa-lg"/>Save Script<span>Ctrl+S</span></span></li>\
             <li><hr class="wcPlayMenuSeparator"></li>\
             <li><span class="wcPlayEditorMenuOptionImport wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-plus-square-o fa-lg"/>Import...<span>Ctrl+I</span></span></li>\
           </ul>\
@@ -627,21 +630,20 @@ wcPlayEditor.prototype = {
         <li><span>View</span>\
           <ul>\
             <li><span class="wcPlayEditorMenuOptionCenter wcPlayMenuItem" title="Fit selected nodes into view."><i class="wcPlayEditorMenuIcon wcButton fa fa-crosshairs fa-lg"/>Fit in View<span>F</span></span></li>\
-            <li><span class="wcPlayEditorMenuOptionCompositeExit wcPlayMenuItem" title="Exit out of this Composite node."><i class="wcPlayEditorMenuIcon wcButton fa fa-level-up fa-lg"/>Exit Composite<span>O</span></span></li>\
-            <li><span class="wcPlayEditorMenuOptionCompositeEnter wcPlayMenuItem" title="Enter into this Composite node."><i class="wcPlayEditorMenuIcon wcButton fa fa-level-down fa-lg"/>Enter Composite<span>I</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionCompositeExit wcPlayMenuItem" title="Step out of Composite Node."><i class="wcPlayEditorMenuIcon wcButton fa fa-level-up fa-lg"/>Exit Composite<span>O</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionCompositeEnter wcPlayMenuItem" title="Step in to selected Composite Node."><i class="wcPlayEditorMenuIcon wcButton fa fa-level-down fa-lg"/>Enter Composite<span>I</span></span></li>\
             <li><hr class="wcPlayMenuSeparator"></li>\
             <li><span class="wcPlayEditorMenuOptionCompositeSearch wcPlayMenuItem disabled" title="Search for nodes in your script."><i class="wcPlayEditorMenuIcon wcButton fa fa-search fa-lg"/>Search Nodes<span>Ctrl+F</span></span></li>\
           </ul>\
         </li>\
         <li><span>Debugging</span>\
           <ul>\
-            <li><span class="wcPlayEditorMenuOptionRestart wcPlayMenuItem" title="Reset all property values to their initial state and restart the execution of the script."><i class="wcPlayEditorMenuIcon wcButton fa fa-refresh fa-lg"/>Restart Script<span></span></span></li>\
-            <li><hr class="wcPlayMenuSeparator"></li>\
             <li><span class="wcPlayEditorMenuOptionDebugging wcPlayMenuItem" title="Toggle debugging mode for the entire script."><i class="wcPlayEditorMenuIcon wcButton fa fa-dot-circle-o fa-lg"/>Toggle Debug Mode<span></span></span></li>\
             <li><span class="wcPlayEditorMenuOptionSilence wcPlayMenuItem" title="Toggle silent mode for the entire script (Nodes with debug log enabled will not log when this is active)."><i class="wcPlayEditorMenuIcon wcButton fa fa-volume-up fa-lg"/>Toggle Silence Mode<span></span></span></li>\
             <li><hr class="wcPlayMenuSeparator"></li>\
-            <li><span class="wcPlayEditorMenuOptionPausePlay wcPlayMenuItem" title="Pause or Continue execution of the script."><i class="wcPlayEditorMenuIcon wcButton fa fa-pause fa-lg"/>Pause/Continue Script<span>Return</span></span></li>\
-            <li><span class="wcPlayEditorMenuOptionStep wcPlayMenuItem" title="Steps execution of the script by a single update."><i class="wcPlayEditorMenuIcon wcButton fa fa-fast-forward fa-lg"/>Step Script<span>Spacebar</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionRestart wcPlayMenuItem" title="Runs or restarts the script."><i class="wcPlayEditorMenuIcon wcButton fa fa-play-circle fa-lg"/>Run/Restart Script<span></span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionPausePlay wcPlayMenuItem" title="Pause or Continue the script."><i class="wcPlayEditorMenuIcon wcButton fa fa-pause fa-lg"/>Pause/Continue Script<span>Enter</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionStep wcPlayMenuItem" title="Perform a single script update."><i class="wcPlayEditorMenuIcon wcButton fa fa-fast-forward fa-lg"/>Step Script<span>Spacebar</span></span></li>\
           </ul>\
         </li>\
         <li><span>Help</span>\
@@ -655,34 +657,33 @@ wcPlayEditor.prototype = {
 
     var $toolbar = $('\
       <div class="wcPlayEditorToolbar wcPlayNoHighlights">\
-        <div class="wcPlayEditorMenuOptionNew"><span class="wcPlayEditorMenuIcon wcButton fa fa-file-o fa-lg" title="New Project"/></div>\
-        <div class="wcPlayEditorMenuOptionOpen disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-folder-open-o fa-lg" title="Open Project"></div>\
-        <div class="wcPlayEditorMenuOptionSave disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-save fa-lg" title="Save Project"></div>\
+        <div class="wcPlayEditorMenuOptionNew"><span class="wcPlayEditorMenuIcon wcButton fa fa-file-o fa-lg" title="New Project. (Alt+N)"/></div>\
+        <div class="wcPlayEditorMenuOptionOpen"><span class="wcPlayEditorMenuIcon wcButton fa fa-folder-open-o fa-lg" title="Open Project. (Ctrl+O)"></div>\
+        <div class="wcPlayEditorMenuOptionSave"><span class="wcPlayEditorMenuIcon wcButton fa fa-save fa-lg" title="Save Project. (Ctrl+S)"></div>\
         <div class="wcPlayEditorMenuOptionImport disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-plus-square-o fa-lg" title="Import..."></div>\
         <div class="ARPG_Separator"></div>\
         <div class="wcPlayEditorMenuOptionUndo"><span class="wcPlayEditorMenuIcon wcButton fa fa-backward fa-lg"/></div>\
         <div class="wcPlayEditorMenuOptionRedo"><span class="wcPlayEditorMenuIcon wcButton fa fa-forward fa-lg"/></div>\
         <div class="ARPG_Separator"></div>\
-        <div class="wcPlayEditorMenuOptionCut disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-cut fa-lg" title="Cut"/></div>\
-        <div class="wcPlayEditorMenuOptionCopy disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-copy fa-lg" title="Copy"/></div>\
-        <div class="wcPlayEditorMenuOptionPaste disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-paste fa-lg" title="Paste"/></div>\
-        <div class="wcPlayEditorMenuOptionDelete"><span class="wcPlayEditorMenuIcon wcButton fa fa-trash-o fa-lg" title="Delete"/></div>\
+        <div class="wcPlayEditorMenuOptionCut disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-cut fa-lg" title="Cut Selected Nodes. (Ctrl+X)"/></div>\
+        <div class="wcPlayEditorMenuOptionCopy disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-copy fa-lg" title="Copy Selected Nodes. (Ctrl+C)"/></div>\
+        <div class="wcPlayEditorMenuOptionPaste disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-paste fa-lg" title="Paste Copied Nodes. (Ctrl+V)"/></div>\
+        <div class="wcPlayEditorMenuOptionDelete"><span class="wcPlayEditorMenuIcon wcButton fa fa-trash-o fa-lg" title="Delete Selected Nodes. (Del)"/></div>\
         <div class="ARPG_Separator"></div>\
-        <div class="wcPlayEditorMenuOptionComposite"><span class="wcPlayEditorMenuIcon wcButton fa fa-share-alt-square fa-lg" title="Combine all selected nodes into a new \'Composite\' Node."/></div>\
-        <div class="ARPG_Separator"></div>\
-        <div class="wcPlayEditorMenuOptionRestart"><span class="wcPlayEditorMenuIcon wcButton fa fa-refresh fa-lg" title="Reset all property values to their initial state and restart the execution of the script."/></div>\
+        <div class="wcPlayEditorMenuOptionComposite"><span class="wcPlayEditorMenuIcon wcButton fa fa-share-alt-square fa-lg" title="Combine all selected nodes into a new \'Composite\' Node. (C)"/></div>\
         <div class="ARPG_Separator"></div>\
         <div class="wcPlayEditorMenuOptionDebugging"><span class="wcPlayEditorMenuIcon wcButton fa fa-dot-circle-o fa-lg" title="Toggle debugging mode for the entire script."/></div>\
         <div class="wcPlayEditorMenuOptionSilence"><span class="wcPlayEditorMenuIcon wcButton fa fa-volume-up fa-lg" title="Toggle silent mode for the entire script (Nodes with debug log enabled will not log when this is active)."/></div>\
         <div class="ARPG_Separator"></div>\
-        <div class="wcPlayEditorMenuOptionPausePlay"><span class="wcPlayEditorMenuIcon wcButton fa fa-pause fa-lg" title="Pause or Continue execution of the script."/></div>\
-        <div class="wcPlayEditorMenuOptionStep"><span class="wcPlayEditorMenuIcon wcButton fa fa-fast-forward fa-lg" title="Steps execution of the script by a single update."/></div>\
+        <div class="wcPlayEditorMenuOptionRestart"><span class="wcPlayEditorMenuIcon wcButton fa fa-play-circle fa-lg" title="Runs or restarts the script."/></div>\
+        <div class="wcPlayEditorMenuOptionPausePlay"><span class="wcPlayEditorMenuIcon wcButton fa fa-pause fa-lg" title="Pause or Continue script. (Enter)"/></div>\
+        <div class="wcPlayEditorMenuOptionStep"><span class="wcPlayEditorMenuIcon wcButton fa fa-fast-forward fa-lg" title="Perform a single script update. (Spacebar)"/></div>\
         <div class="ARPG_Separator"></div>\
-        <div class="wcPlayEditorMenuOptionCenter"><span class="wcPlayEditorMenuIcon wcButton fa fa-crosshairs fa-lg" title="Fit selected nodes into view."/></div>\
-        <div class="wcPlayEditorMenuOptionCompositeExit"><span class="wcPlayEditorMenuIcon wcButton fa fa-level-up fa-lg" title="Exit out of this Composite node."/></div>\
-        <div class="wcPlayEditorMenuOptionCompositeEnter"><span class="wcPlayEditorMenuIcon wcButton fa fa-level-down fa-lg" title="Enter into this Composite node."/></div>\
+        <div class="wcPlayEditorMenuOptionCenter"><span class="wcPlayEditorMenuIcon wcButton fa fa-crosshairs fa-lg" title="Fit selected nodes into view. (F)"/></div>\
+        <div class="wcPlayEditorMenuOptionCompositeExit"><span class="wcPlayEditorMenuIcon wcButton fa fa-level-up fa-lg" title="Step out of Composite node. (O)"/></div>\
+        <div class="wcPlayEditorMenuOptionCompositeEnter"><span class="wcPlayEditorMenuIcon wcButton fa fa-level-down fa-lg" title="Step in to selected Composite node. (I)"/></div>\
         <div class="ARPG_Separator"></div>\
-        <div class="wcPlayEditorMenuOptionCompositeSearch disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-search fa-lg" title="Search for nodes in your script."/></div>\
+        <div class="wcPlayEditorMenuOptionCompositeSearch disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-search fa-lg" title="Search for nodes in your script. (Ctrl+F)"/></div>\
       </div>\
     ');
 
@@ -748,7 +749,7 @@ wcPlayEditor.prototype = {
       } else {
         // Skip composite node special 'link' nodes if we are not inside a composite.
         if (this._engine === this._parent) {
-          if (data.category === '__Custom__') {
+          if (data.category === '__Hidden__') {
             continue;
           }
         }
@@ -2523,7 +2524,7 @@ wcPlayEditor.prototype = {
     // this.$viewport.on('mouseleave', function(event){self.__onViewportMouseUp(event, this);});
     this.$viewport.on('mousewheel DOMMouseScroll', function(event) {self.__onViewportMouseWheel(event, this);});
 
-    $('body').keyup(function(event) {self.__onKey(event, this);});
+    $(window).keydown(function(event) {self.__onKey(event, this);});
   },
 
   /**
@@ -2545,7 +2546,7 @@ wcPlayEditor.prototype = {
         if (!event.shiftKey) {
           break;
         }
-      case 'Y'.charCodeAt(0): // Ctrl+Shift+Z or Ctrl+Y to redo action.
+      case 'Y'.charCodeAt(0): // Alt+Shift+Z or Ctrl+Y to redo action.
         if (event.ctrlKey) {
           $('.wcPlayEditorMenuOptionRedo').first().click();
         }
@@ -2563,14 +2564,38 @@ wcPlayEditor.prototype = {
           this.center();
         }
         break;
-      case 'O'.charCodeAt(0): // O to step outside of a Composite Node.
+      case 'O'.charCodeAt(0):
+        // Ctrl+O to open a file. Does not work with FireFox, they do not allow opening a file from a key event.
+        if (event.ctrlKey) {
+          $('.wcPlayEditorMenuOptionOpen').first().click();
+          event.stopPropagation();
+          event.preventDefault();
+          return false;
+        }
+        // O to step outside of a Composite Node.
         $('.wcPlayEditorMenuOptionCompositeExit').first().click();
         break;
+      case 'S'.charCodeAt(0):
+        // Ctrl+S to save the script.
+        if (event.ctrlKey) {
+          $('.wcPlayEditorMenuOptionSave').first().click();
+          event.stopPropagation();
+          event.preventDefault();
+          return false;
+        }
       case 'I'.charCodeAt(0): // O to step outside of a Composite Node.
         $('.wcPlayEditorMenuOptionCompositeEnter').first().click();
         break;
       case 'C'.charCodeAt(0): // C to create a Composite node from the selected nodes.
         $('.wcPlayEditorMenuOptionComposite').first().click();
+        break;
+      case 'N'.charCodeAt(0): // Alt+N to start a new script.
+        if (event.altKey) {
+          $('.wcPlayEditorMenuOptionNew').first().click();
+          event.stopPropagation();
+          event.preventDefault();
+          return false;
+        }
         break;
     }
   },
@@ -2656,10 +2681,87 @@ wcPlayEditor.prototype = {
       }
     });
     $body.on('click', '.wcPlayEditorMenuOptionOpen', function() {
-      // TODO:
+      if (self._engine) {
+        if(document.createEvent) {
+          var evt = document.createEvent("MouseEvents");
+          evt.initEvent("click", true, false);
+          self.$hiddenFileInput[0].dispatchEvent(evt);
+        }
+      }
     });
+
+    // Import the contents of a file.
+    function __importScriptFile(file) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        if (self._engine) {
+          // Temporarily save the current script, just in case something goes wrong.
+          var saveData = self._engine.save();
+
+          self._parent = self._engine;
+          self._selectedNode = null;
+          self._selectedNodes = [];
+
+          try {
+            self._engine.restore(e.target.result);
+            self._undoManager && self._undoManager.clear();
+            self.center();
+          } catch (e) {
+            alert('Failed to open file "' + file.name + '"\nPlease check to ensure it is actually a wcPlay script file.');
+
+            // Something went wrong, restore the previous script.
+            self._engine.restore(saveData);
+          }
+        }
+      };
+
+      reader.readAsText(file);
+    }
+
+    // A hidden file input field that will handle opening the open file dialog for us.
+    this.$hiddenFileInput.change(function(event) {
+      if (event.target.files.length) {
+        __importScriptFile(event.target.files[0]);
+        $(this).val('');
+      }
+    });
+
+    // Support drag-drop over the entire window.
+    this.$container.on('dragover', function(event) {
+      event.stopPropagation();
+      event.preventDefault();
+      event.originalEvent.dataTransfer.dropEffect = 'copy';
+    });
+    this.$container.on('drop', function(event) {
+      event.stopPropagation();
+      event.preventDefault();
+
+      if (event.originalEvent.dataTransfer.files.length) {
+        __importScriptFile(event.originalEvent.dataTransfer.files[0]);
+      }
+    });
+
     $body.on('click', '.wcPlayEditorMenuOptionSave', function() {
-      // TODO:
+      if (self._engine) {
+        if (!saveAs) {
+          console.log("ERROR: Attempted to save the script when external dependency 'FileSaver' was not included.");
+          return;
+        }
+
+        var savedData = self._engine.save();
+
+        var blob;
+        try {
+          blob = new Blob([savedData], {type: 'text/plain'});
+        } catch (e) {
+          // Legacy support
+          var bb = new BlobBuilder();
+          bb.append(savedData);
+          blob = bb.getBlob('text/plain');
+        }
+
+        saveAs(blob, 'script.wcplay');
+      }
     });
 
     // Edit menu
@@ -2696,9 +2798,10 @@ wcPlayEditor.prototype = {
         } while (window[className]);
 
         // Dynamically extend a new composite node class.
-        wcNodeCompositeScript.extend(className, 'Composite', '__Custom__', {
-          name: number,
-        });
+
+        // wcNodeCompositeScript.extend(className, 'Composite', '__Custom__', {
+        //   name: number,
+        // });
 
         self._undoManager && self._undoManager.beginGroup("Combined Nodes into Composite: " + number);
         // Create undo events for removing the selected nodes.
@@ -2709,7 +2812,8 @@ wcPlayEditor.prototype = {
           self._selectedNodes[i].id = ++window.wcNodeNextID;
         }
 
-        var compNode = new window[className](self._parent, {x: 0, y: 0}, self._selectedNodes);
+        var compNode = new wcNodeCompositeScript(self._parent, {x: 0, y: 0}, self._selectedNodes);
+        compNode.name = number;
 
         // Calculate the bounding box of all moved nodes.
         var boundList = [];
@@ -4167,16 +4271,15 @@ wcPlayEditor.prototype = {
 
   __onViewportMouseWheel: function(event, elem) {
     var oldZoom = this._viewportCamera.z;
-    var mouse = this.__mouse(event, this.$viewport.offset());
 
     // Custom viewport area.
     if (this._highlightNode && this._highlightNode._meta.bounds.viewportBounds) {
       var pos = {
-        x: (mouse.x - this._viewportCamera.x) / this._viewportCamera.z - this._highlightNode._meta.bounds.viewportBounds.left,
-        y: (mouse.y - this._viewportCamera.y) / this._viewportCamera.z - this._highlightNode._meta.bounds.viewportBounds.top,
+        x: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z - this._highlightNode._meta.bounds.viewportBounds.left,
+        y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z - this._highlightNode._meta.bounds.viewportBounds.top,
       };
 
-      if (this.__inRect(mouse, this._highlightNode._meta.bounds.viewportBounds, this._viewportCamera) &&
+      if (this.__inRect(this._mouse, this._highlightNode._meta.bounds.viewportBounds, this._viewportCamera) &&
           this._highlightNode.onViewportMouseWheel(event, pos, (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0))) {
         return;
       }
@@ -4190,8 +4293,8 @@ wcPlayEditor.prototype = {
       this._viewportCamera.z = Math.max(this._viewportCamera.z * 0.75, 0.1);
     }
 
-    this._viewportCamera.x = (this._viewportCamera.x - mouse.x) / (oldZoom / this._viewportCamera.z) + mouse.x;
-    this._viewportCamera.y = (this._viewportCamera.y - mouse.y) / (oldZoom / this._viewportCamera.z) + mouse.y;
+    this._viewportCamera.x = (this._viewportCamera.x - this._mouse.x) / (oldZoom / this._viewportCamera.z) + this._mouse.x;
+    this._viewportCamera.y = (this._viewportCamera.y - this._mouse.y) / (oldZoom / this._viewportCamera.z) + this._mouse.y;
   },
 
   /**
@@ -4255,6 +4358,5 @@ wcPlayEditor.prototype = {
         }
       }
     }
-
   },
 };

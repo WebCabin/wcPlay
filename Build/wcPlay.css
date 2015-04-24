@@ -1,3 +1,8 @@
+.wcPlayEditorFileOpener {
+  opacity: 0.0;
+  position: absolute;
+}
+
 .wcPlayEditorTop {
   position: absolute;
   top: 0px;
