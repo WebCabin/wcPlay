@@ -1,7 +1,16 @@
 .wcPlayEditorFileOpener {
   opacity: 0.0;
+  display: none;
   position: absolute;
+  top: 0px;
+  right: 0px;
   pointer-events: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .wcPlayEditorTop {

@@ -915,8 +915,7 @@ function wcPlayEditor(container, options) {
   this.$container.append(this.$top);
   this.$container.append(this.$main);
 
-  this.$hiddenFileInput = $('<input type="file" id="wcPlayEditorFileOpener" class="wcPlayNoHighlights" />');
-  this.$container.append(this.$hiddenFileInput);
+  this.$hiddenFileInput = $('<input type="file" id="wcPlayEditorFileOpener"/>');
 
   this.onResized();
 
@@ -3468,6 +3467,7 @@ wcPlayEditor.prototype = {
         if(document.createEvent) {
           var evt = document.createEvent("MouseEvents");
           evt.initEvent("click", true, false);
+          self.$container.prepend(self.$hiddenFileInput);
           self.$hiddenFileInput[0].dispatchEvent(evt);
         }
       }
@@ -3502,11 +3502,11 @@ wcPlayEditor.prototype = {
     }
 
     // A hidden file input field that will handle opening the open file dialog for us.
-    this.$hiddenFileInput.change(function(event) {
+    $('body').on('change', '#wcPlayEditorFileOpener', function(event) {
       if (event.target.files.length) {
         __importScriptFile(event.target.files[0]);
         $(this).val('');
-        $(this).blur();
+        $(this).remove();
       }
     });
 
@@ -3522,7 +3522,6 @@ wcPlayEditor.prototype = {
 
       if (event.originalEvent.dataTransfer.files.length) {
         __importScriptFile(event.originalEvent.dataTransfer.files[0]);
-        this.$container.blur();
       }
     });
 
@@ -3891,7 +3890,6 @@ wcPlayEditor.prototype = {
    * @param {Object} elem - The target element.
    */
   __onPaletteMouseDown: function(event, elem) {
-    this.$hiddenFileInput.blur();
     if (this._highlightNode) {
       this.__onPaletteMouseUp(event, elem);
       var mouse = this.__mouse(event);
@@ -4290,7 +4288,6 @@ wcPlayEditor.prototype = {
    * @param {Object} elem - The target element.
    */
   __onViewportMouseDown: function(event, elem) {
-    this.$hiddenFileInput.blur();
     this._mouse = this.__mouse(event, this.$viewport.offset());
     if (this._mouse.which === 3) {
       return;
