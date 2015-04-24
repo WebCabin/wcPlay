@@ -1311,6 +1311,8 @@ wcPlayEditor.prototype = {
             <li><span class="wcPlayEditorMenuOptionNew wcPlayMenuItem"><i class="wcPlayEditorMenuIcon wcButton fa fa-file-o fa-lg"/>New Script...<span>Ctrl+N</span></span></li>\
             <li><span class="wcPlayEditorMenuOptionOpen wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-folder-open-o fa-lg"/>Open Script...<span>Ctrl+O</span></span></li>\
             <li><span class="wcPlayEditorMenuOptionSave wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-save fa-lg"/>Save Script<span>Ctrl+S</span></span></li>\
+            <li><hr class="wcPlayMenuSeparator"></li>\
+            <li><span class="wcPlayEditorMenuOptionImport wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-plus-square-o fa-lg"/>Import...<span>Ctrl+I</span></span></li>\
           </ul>\
         </li>\
         <li><span>Edit</span>\
@@ -1343,7 +1345,7 @@ wcPlayEditor.prototype = {
             <li><span class="wcPlayEditorMenuOptionSilence wcPlayMenuItem" title="Toggle silent mode for the entire script (Nodes with debug log enabled will not log when this is active)."><i class="wcPlayEditorMenuIcon wcButton fa fa-volume-up fa-lg"/>Toggle Silence Mode<span></span></span></li>\
             <li><hr class="wcPlayMenuSeparator"></li>\
             <li><span class="wcPlayEditorMenuOptionPausePlay wcPlayMenuItem" title="Pause or Continue execution of the script."><i class="wcPlayEditorMenuIcon wcButton fa fa-pause fa-lg"/>Pause/Continue Script<span>Return</span></span></li>\
-            <li><span class="wcPlayEditorMenuOptionStep wcPlayMenuItem" title="Steps execution of the script by a single update."><i class="wcPlayEditorMenuIcon wcButton fa fa-forward fa-lg"/>Step Script<span>Spacebar</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionStep wcPlayMenuItem" title="Steps execution of the script by a single update."><i class="wcPlayEditorMenuIcon wcButton fa fa-fast-forward fa-lg"/>Step Script<span>Spacebar</span></span></li>\
           </ul>\
         </li>\
         <li><span>Help</span>\
@@ -1360,6 +1362,7 @@ wcPlayEditor.prototype = {
         <div class="wcPlayEditorMenuOptionNew"><span class="wcPlayEditorMenuIcon wcButton fa fa-file-o fa-lg" title="New Project"/></div>\
         <div class="wcPlayEditorMenuOptionOpen disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-folder-open-o fa-lg" title="Open Project"></div>\
         <div class="wcPlayEditorMenuOptionSave disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-save fa-lg" title="Save Project"></div>\
+        <div class="wcPlayEditorMenuOptionImport disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-plus-square-o fa-lg" title="Import..."></div>\
         <div class="ARPG_Separator"></div>\
         <div class="wcPlayEditorMenuOptionUndo"><span class="wcPlayEditorMenuIcon wcButton fa fa-backward fa-lg"/></div>\
         <div class="wcPlayEditorMenuOptionRedo"><span class="wcPlayEditorMenuIcon wcButton fa fa-forward fa-lg"/></div>\
@@ -1377,7 +1380,7 @@ wcPlayEditor.prototype = {
         <div class="wcPlayEditorMenuOptionSilence"><span class="wcPlayEditorMenuIcon wcButton fa fa-volume-up fa-lg" title="Toggle silent mode for the entire script (Nodes with debug log enabled will not log when this is active)."/></div>\
         <div class="ARPG_Separator"></div>\
         <div class="wcPlayEditorMenuOptionPausePlay"><span class="wcPlayEditorMenuIcon wcButton fa fa-pause fa-lg" title="Pause or Continue execution of the script."/></div>\
-        <div class="wcPlayEditorMenuOptionStep"><span class="wcPlayEditorMenuIcon wcButton fa fa-forward fa-lg" title="Steps execution of the script by a single update."/></div>\
+        <div class="wcPlayEditorMenuOptionStep"><span class="wcPlayEditorMenuIcon wcButton fa fa-fast-forward fa-lg" title="Steps execution of the script by a single update."/></div>\
         <div class="ARPG_Separator"></div>\
         <div class="wcPlayEditorMenuOptionCenter"><span class="wcPlayEditorMenuIcon wcButton fa fa-crosshairs fa-lg" title="Fit selected nodes into view."/></div>\
         <div class="wcPlayEditorMenuOptionCompositeExit"><span class="wcPlayEditorMenuIcon wcButton fa fa-level-up fa-lg" title="Exit out of this Composite node."/></div>\
@@ -5082,6 +5085,8 @@ Class.extend('wcNode', 'Node', '', {
    * @param {Number[]} [idMap] - If supplied, identifies a mapping of old ID's to new ID's, any not found in this list will be unchanged.
    */
   import: function(data, idMap) {
+    this.onImporting(data, idMap);
+
     this.id = idMap && idMap[data.id] || data.id;
     this.name = data.name,
     this.color = data.color,
@@ -5130,6 +5135,8 @@ Class.extend('wcNode', 'Node', '', {
         this.connectOutput(chain.outName, targetNode, chain.inName);
       }
     }
+
+    this.onImported();
   },
 
   /**
@@ -5138,7 +5145,7 @@ Class.extend('wcNode', 'Node', '', {
    * @returns {Object} - The exported data for this node.
    */
   export: function() {
-    return {
+    var data = {
       className: this.className,
       id: this.id,
       name: this.name,
@@ -5155,6 +5162,9 @@ Class.extend('wcNode', 'Node', '', {
       inputChains: this.listInputChains(),
       outputChains: this.listOutputChains(),
     };
+
+    this.onExport(data);
+    return data;
   },
 
   /**
@@ -6623,33 +6633,6 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
-   * Event that is called when the node is about to be destroyed.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNode#onDestroying
-   */
-  onDestroying: function() {
-    // this._super();
-  },
-
-  /**
-   * Event that is called after the node has been destroyed.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNode#onDestroyed
-   */
-  onDestroyed: function() {
-    // this._super();
-  },
-
-  /**
-   * Event that is called when the node is about to be reset.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNode#onReset
-   */
-  onReset: function() {
-    // this._super();
-  },
-
-  /**
    * Event that is called when a global property value has changed.
    * Overload this in inherited nodes.<br>
    * <b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.
@@ -6693,6 +6676,63 @@ Class.extend('wcNode', 'Node', '', {
    */
   // onGlobalInitialPropertyChanged: function(name, oldValue, newValue) {
   // },
+
+  /**
+   * Event that is called when the node is about to be imported. This is your chance to prepare the node for import, or possibly modify the import data.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onImporting
+   * @param {Object} data - The data being imported.
+   * @param {Number[]} [idMap] - If supplied, identifies a mapping of old ID's to new ID's, any not found in this list will be unchanged.
+   */
+  onImporting: function(data, idMap) {
+    // this._super(data, idMap);
+  },
+
+  /**
+   * Event that is called after the node has imported.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onImported
+   */
+  onImported: function() {
+    // this._super();
+  },
+
+  /**
+   * Event that is called when the node is being exported, after the export data has been configured.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onExport
+   * @param {Object} data - The export data for this node.
+   */
+  onExport: function(data) {
+    // this._super(data);
+  },
+
+  /**
+   * Event that is called when the node is about to be reset.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onReset
+   */
+  onReset: function() {
+    // this._super();
+  },
+
+  /**
+   * Event that is called when the node is about to be destroyed.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onDestroying
+   */
+  onDestroying: function() {
+    // this._super();
+  },
+
+  /**
+   * Event that is called after the node has been destroyed.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onDestroyed
+   */
+  onDestroyed: function() {
+    // this._super();
+  },
 });
 
 /**
@@ -6997,35 +7037,6 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '', {
   },
 
   /**
-   * Imports previously [exported]{@link wcNode#export} data to generate this node.
-   * @function wcNode#import
-   * @param {Object} data - The data to import.
-   * @param {Number[]} [idMap] - If supplied, identifies a mapping of old ID's to new ID's, any not found in this list will be unchanged.
-   */
-  import: function(data, idMap) {
-    this.compiledNodes = data.compiledNodes;
-    this.decompile(true);
-
-    this._super(data, idMap);
-  },
-
-  /**
-   * Exports information about this node as well as all connected chain data so it can be [imported]{@link wcNode#import} later.
-   * @function wcNodeCompositeScript#export
-   * @returns {Object} - The exported data for this node.
-   */
-  export: function() {
-    var data = this._super();
-
-    // Export the current set of nodes into our data.
-    this.compile();
-    data.compiledNodes = this.compiledNodes;
-
-    // data.instanceIdMap = JSON.parse(JSON.stringify(data));
-    return data;
-  },
-
-  /**
    * Retrieves a node from a given ID, if it exists in this script.
    * @function wcNodeCompositeScript#nodeById
    * @param {Number} id - The ID of the node.
@@ -7267,6 +7278,34 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '', {
         }
       }
     }
+  },
+
+  /**
+   * Event that is called when the node is about to be imported. This is your chance to prepare the node for import, or possibly modify the import data.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeCompositeScript#onImporting
+   * @param {Object} data - The data being imported.
+   * @param {Number[]} [idMap] - If supplied, identifies a mapping of old ID's to new ID's, any not found in this list will be unchanged.
+   */
+  onImporting: function(data, idMap) {
+    this.compiledNodes = data.compiledNodes;
+    this.decompile(true);
+
+    this._super(data, idMap);
+  },
+
+  /**
+   * Event that is called when the node is being exported, after the export data has been configured.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeCompositeScript#onExport
+   * @param {Object} data - The export data for this node.
+   */
+  onExport: function(data) {
+    this._super(data);
+
+    // Export the current set of nodes into our data.
+    this.compile();
+    data.compiledNodes = this.compiledNodes;
   },
 
   /**

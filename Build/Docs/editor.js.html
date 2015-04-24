@@ -660,6 +660,8 @@ wcPlayEditor.prototype = {
             &lt;li>&lt;span class="wcPlayEditorMenuOptionNew wcPlayMenuItem">&lt;i class="wcPlayEditorMenuIcon wcButton fa fa-file-o fa-lg"/>New Script...&lt;span>Ctrl+N&lt;/span>&lt;/span>&lt;/li>\
             &lt;li>&lt;span class="wcPlayEditorMenuOptionOpen wcPlayMenuItem disabled">&lt;i class="wcPlayEditorMenuIcon wcButton fa fa-folder-open-o fa-lg"/>Open Script...&lt;span>Ctrl+O&lt;/span>&lt;/span>&lt;/li>\
             &lt;li>&lt;span class="wcPlayEditorMenuOptionSave wcPlayMenuItem disabled">&lt;i class="wcPlayEditorMenuIcon wcButton fa fa-save fa-lg"/>Save Script&lt;span>Ctrl+S&lt;/span>&lt;/span>&lt;/li>\
+            &lt;li>&lt;hr class="wcPlayMenuSeparator">&lt;/li>\
+            &lt;li>&lt;span class="wcPlayEditorMenuOptionImport wcPlayMenuItem disabled">&lt;i class="wcPlayEditorMenuIcon wcButton fa fa-plus-square-o fa-lg"/>Import...&lt;span>Ctrl+I&lt;/span>&lt;/span>&lt;/li>\
           &lt;/ul>\
         &lt;/li>\
         &lt;li>&lt;span>Edit&lt;/span>\
@@ -692,7 +694,7 @@ wcPlayEditor.prototype = {
             &lt;li>&lt;span class="wcPlayEditorMenuOptionSilence wcPlayMenuItem" title="Toggle silent mode for the entire script (Nodes with debug log enabled will not log when this is active).">&lt;i class="wcPlayEditorMenuIcon wcButton fa fa-volume-up fa-lg"/>Toggle Silence Mode&lt;span>&lt;/span>&lt;/span>&lt;/li>\
             &lt;li>&lt;hr class="wcPlayMenuSeparator">&lt;/li>\
             &lt;li>&lt;span class="wcPlayEditorMenuOptionPausePlay wcPlayMenuItem" title="Pause or Continue execution of the script.">&lt;i class="wcPlayEditorMenuIcon wcButton fa fa-pause fa-lg"/>Pause/Continue Script&lt;span>Return&lt;/span>&lt;/span>&lt;/li>\
-            &lt;li>&lt;span class="wcPlayEditorMenuOptionStep wcPlayMenuItem" title="Steps execution of the script by a single update.">&lt;i class="wcPlayEditorMenuIcon wcButton fa fa-forward fa-lg"/>Step Script&lt;span>Spacebar&lt;/span>&lt;/span>&lt;/li>\
+            &lt;li>&lt;span class="wcPlayEditorMenuOptionStep wcPlayMenuItem" title="Steps execution of the script by a single update.">&lt;i class="wcPlayEditorMenuIcon wcButton fa fa-fast-forward fa-lg"/>Step Script&lt;span>Spacebar&lt;/span>&lt;/span>&lt;/li>\
           &lt;/ul>\
         &lt;/li>\
         &lt;li>&lt;span>Help&lt;/span>\
@@ -709,6 +711,7 @@ wcPlayEditor.prototype = {
         &lt;div class="wcPlayEditorMenuOptionNew">&lt;span class="wcPlayEditorMenuIcon wcButton fa fa-file-o fa-lg" title="New Project"/>&lt;/div>\
         &lt;div class="wcPlayEditorMenuOptionOpen disabled">&lt;span class="wcPlayEditorMenuIcon wcButton fa fa-folder-open-o fa-lg" title="Open Project">&lt;/div>\
         &lt;div class="wcPlayEditorMenuOptionSave disabled">&lt;span class="wcPlayEditorMenuIcon wcButton fa fa-save fa-lg" title="Save Project">&lt;/div>\
+        &lt;div class="wcPlayEditorMenuOptionImport disabled">&lt;span class="wcPlayEditorMenuIcon wcButton fa fa-plus-square-o fa-lg" title="Import...">&lt;/div>\
         &lt;div class="ARPG_Separator">&lt;/div>\
         &lt;div class="wcPlayEditorMenuOptionUndo">&lt;span class="wcPlayEditorMenuIcon wcButton fa fa-backward fa-lg"/>&lt;/div>\
         &lt;div class="wcPlayEditorMenuOptionRedo">&lt;span class="wcPlayEditorMenuIcon wcButton fa fa-forward fa-lg"/>&lt;/div>\
@@ -726,7 +729,7 @@ wcPlayEditor.prototype = {
         &lt;div class="wcPlayEditorMenuOptionSilence">&lt;span class="wcPlayEditorMenuIcon wcButton fa fa-volume-up fa-lg" title="Toggle silent mode for the entire script (Nodes with debug log enabled will not log when this is active)."/>&lt;/div>\
         &lt;div class="ARPG_Separator">&lt;/div>\
         &lt;div class="wcPlayEditorMenuOptionPausePlay">&lt;span class="wcPlayEditorMenuIcon wcButton fa fa-pause fa-lg" title="Pause or Continue execution of the script."/>&lt;/div>\
-        &lt;div class="wcPlayEditorMenuOptionStep">&lt;span class="wcPlayEditorMenuIcon wcButton fa fa-forward fa-lg" title="Steps execution of the script by a single update."/>&lt;/div>\
+        &lt;div class="wcPlayEditorMenuOptionStep">&lt;span class="wcPlayEditorMenuIcon wcButton fa fa-fast-forward fa-lg" title="Steps execution of the script by a single update."/>&lt;/div>\
         &lt;div class="ARPG_Separator">&lt;/div>\
         &lt;div class="wcPlayEditorMenuOptionCenter">&lt;span class="wcPlayEditorMenuIcon wcButton fa fa-crosshairs fa-lg" title="Fit selected nodes into view."/>&lt;/div>\
         &lt;div class="wcPlayEditorMenuOptionCompositeExit">&lt;span class="wcPlayEditorMenuIcon wcButton fa fa-level-up fa-lg" title="Exit out of this Composite node."/>&lt;/div>\

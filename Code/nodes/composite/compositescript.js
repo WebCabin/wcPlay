@@ -71,35 +71,6 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '', {
   },
 
   /**
-   * Imports previously [exported]{@link wcNode#export} data to generate this node.
-   * @function wcNode#import
-   * @param {Object} data - The data to import.
-   * @param {Number[]} [idMap] - If supplied, identifies a mapping of old ID's to new ID's, any not found in this list will be unchanged.
-   */
-  import: function(data, idMap) {
-    this.compiledNodes = data.compiledNodes;
-    this.decompile(true);
-
-    this._super(data, idMap);
-  },
-
-  /**
-   * Exports information about this node as well as all connected chain data so it can be [imported]{@link wcNode#import} later.
-   * @function wcNodeCompositeScript#export
-   * @returns {Object} - The exported data for this node.
-   */
-  export: function() {
-    var data = this._super();
-
-    // Export the current set of nodes into our data.
-    this.compile();
-    data.compiledNodes = this.compiledNodes;
-
-    // data.instanceIdMap = JSON.parse(JSON.stringify(data));
-    return data;
-  },
-
-  /**
    * Retrieves a node from a given ID, if it exists in this script.
    * @function wcNodeCompositeScript#nodeById
    * @param {Number} id - The ID of the node.
@@ -341,6 +312,34 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '', {
         }
       }
     }
+  },
+
+  /**
+   * Event that is called when the node is about to be imported. This is your chance to prepare the node for import, or possibly modify the import data.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeCompositeScript#onImporting
+   * @param {Object} data - The data being imported.
+   * @param {Number[]} [idMap] - If supplied, identifies a mapping of old ID's to new ID's, any not found in this list will be unchanged.
+   */
+  onImporting: function(data, idMap) {
+    this.compiledNodes = data.compiledNodes;
+    this.decompile(true);
+
+    this._super(data, idMap);
+  },
+
+  /**
+   * Event that is called when the node is being exported, after the export data has been configured.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeCompositeScript#onExport
+   * @param {Object} data - The export data for this node.
+   */
+  onExport: function(data) {
+    this._super(data);
+
+    // Export the current set of nodes into our data.
+    this.compile();
+    data.compiledNodes = this.compiledNodes;
   },
 
   /**

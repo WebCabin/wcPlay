@@ -121,6 +121,8 @@ Class.extend('wcNode', 'Node', '', {
    * @param {Number[]} [idMap] - If supplied, identifies a mapping of old ID's to new ID's, any not found in this list will be unchanged.
    */
   import: function(data, idMap) {
+    this.onImporting(data, idMap);
+
     this.id = idMap && idMap[data.id] || data.id;
     this.name = data.name,
     this.color = data.color,
@@ -169,6 +171,8 @@ Class.extend('wcNode', 'Node', '', {
         this.connectOutput(chain.outName, targetNode, chain.inName);
       }
     }
+
+    this.onImported();
   },
 
   /**
@@ -177,7 +181,7 @@ Class.extend('wcNode', 'Node', '', {
    * @returns {Object} - The exported data for this node.
    */
   export: function() {
-    return {
+    var data = {
       className: this.className,
       id: this.id,
       name: this.name,
@@ -194,6 +198,9 @@ Class.extend('wcNode', 'Node', '', {
       inputChains: this.listInputChains(),
       outputChains: this.listOutputChains(),
     };
+
+    this.onExport(data);
+    return data;
   },
 
   /**
@@ -1662,33 +1669,6 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
-   * Event that is called when the node is about to be destroyed.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNode#onDestroying
-   */
-  onDestroying: function() {
-    // this._super();
-  },
-
-  /**
-   * Event that is called after the node has been destroyed.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNode#onDestroyed
-   */
-  onDestroyed: function() {
-    // this._super();
-  },
-
-  /**
-   * Event that is called when the node is about to be reset.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNode#onReset
-   */
-  onReset: function() {
-    // this._super();
-  },
-
-  /**
    * Event that is called when a global property value has changed.
    * Overload this in inherited nodes.<br>
    * <b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.
@@ -1732,6 +1712,63 @@ Class.extend('wcNode', 'Node', '', {
    */
   // onGlobalInitialPropertyChanged: function(name, oldValue, newValue) {
   // },
+
+  /**
+   * Event that is called when the node is about to be imported. This is your chance to prepare the node for import, or possibly modify the import data.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onImporting
+   * @param {Object} data - The data being imported.
+   * @param {Number[]} [idMap] - If supplied, identifies a mapping of old ID's to new ID's, any not found in this list will be unchanged.
+   */
+  onImporting: function(data, idMap) {
+    // this._super(data, idMap);
+  },
+
+  /**
+   * Event that is called after the node has imported.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onImported
+   */
+  onImported: function() {
+    // this._super();
+  },
+
+  /**
+   * Event that is called when the node is being exported, after the export data has been configured.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onExport
+   * @param {Object} data - The export data for this node.
+   */
+  onExport: function(data) {
+    // this._super(data);
+  },
+
+  /**
+   * Event that is called when the node is about to be reset.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onReset
+   */
+  onReset: function() {
+    // this._super();
+  },
+
+  /**
+   * Event that is called when the node is about to be destroyed.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onDestroying
+   */
+  onDestroying: function() {
+    // this._super();
+  },
+
+  /**
+   * Event that is called after the node has been destroyed.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onDestroyed
+   */
+  onDestroyed: function() {
+    // this._super();
+  },
 });
 
 /**
