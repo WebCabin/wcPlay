@@ -1,6 +1,7 @@
 .wcPlayEditorFileOpener {
   opacity: 0.0;
   position: absolute;
+  pointer-events: none;
 }
 
 .wcPlayEditorTop {

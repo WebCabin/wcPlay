@@ -2686,6 +2686,9 @@ wcPlayEditor.prototype = {
           var evt = document.createEvent("MouseEvents");
           evt.initEvent("click", true, false);
           self.$hiddenFileInput[0].dispatchEvent(evt);
+          setTimeout(function() {
+            self.$hiddenFileInput.blur();
+          }, 100);
         }
       }
     });
@@ -2723,6 +2726,7 @@ wcPlayEditor.prototype = {
       if (event.target.files.length) {
         __importScriptFile(event.target.files[0]);
         $(this).val('');
+        $(this).blur();
       }
     });
 
@@ -2738,6 +2742,7 @@ wcPlayEditor.prototype = {
 
       if (event.originalEvent.dataTransfer.files.length) {
         __importScriptFile(event.originalEvent.dataTransfer.files[0]);
+        this.$container.blur();
       }
     });
 
@@ -2788,14 +2793,14 @@ wcPlayEditor.prototype = {
     $body.on('click', '.wcPlayEditorMenuOptionComposite', function() {
       if (self._selectedNodes.length && self._parent) {
         // Find a unique class name to use for this new composite node.
-        var index = 0;
-        var number = '';
-        var className = '';
-        do {
-          index++
-          number = '0000'.substr(0, 4-('' + index).length) + index;
-          className = 'wcNodeCompositeScript' + number;
-        } while (window[className]);
+        // var index = 0;
+        // var number = '';
+        // var className = 'wcNodeCompositeScript';
+        // do {
+        //   index++
+        //   number = '0000'.substr(0, 4-('' + index).length) + index;
+        //   className = 'wcNodeCompositeScript' + number;
+        // } while (window[className]);
 
         // Dynamically extend a new composite node class.
 
@@ -2803,7 +2808,7 @@ wcPlayEditor.prototype = {
         //   name: number,
         // });
 
-        self._undoManager && self._undoManager.beginGroup("Combined Nodes into Composite: " + number);
+        self._undoManager && self._undoManager.beginGroup("Combined Nodes into Composite");
         // Create undo events for removing the selected nodes.
         for (var i = 0; i < self._selectedNodes.length; ++i) {
           self.__onDestroyNode(self._selectedNodes[i]);
@@ -2813,7 +2818,6 @@ wcPlayEditor.prototype = {
         }
 
         var compNode = new wcNodeCompositeScript(self._parent, {x: 0, y: 0}, self._selectedNodes);
-        compNode.name = number;
 
         // Calculate the bounding box of all moved nodes.
         var boundList = [];
@@ -3488,7 +3492,12 @@ wcPlayEditor.prototype = {
         this.__inRect(mouse, node._meta.bounds.inner, this._viewportCamera)) {
 
       this._expandedHighlightNode = this._highlightNode;
-      this._expandedHighlightNode.collapsed(false);
+      var self = this;
+      setTimeout(function() {
+        if (self._expandedHighlightNode) {
+          self._expandedHighlightNode.collapsed(false);
+        }
+      }, 500);
     }
   },
 

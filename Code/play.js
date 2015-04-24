@@ -6,9 +6,9 @@
  * @param {wcPlay~Options} [options] - Custom options.
  */
 function wcPlay(options) {
+  this._compositeNodes = [];
   this._entryNodes = [];
   this._processNodes = [];
-  this._compositeNodes = [];
   this._storageNodes = [];
 
   this._properties = [];
@@ -125,17 +125,17 @@ wcPlay.prototype = {
       this._properties[i].value = this._properties[i].initialValue;
     }
 
-    for (var i = 0; i < this._storageNodes.length; ++i) {
-      this._storageNodes[i].reset();
-    }
-    for (var i = 0; i < this._processNodes.length; ++i) {
-      this._processNodes[i].reset();
-    }
     for (var i = 0; i < this._compositeNodes.length; ++i) {
       this._compositeNodes[i].reset();
     }
     for (var i = 0; i < this._entryNodes.length; ++i) {
       this._entryNodes[i].reset();
+    }
+    for (var i = 0; i < this._processNodes.length; ++i) {
+      this._processNodes[i].reset();
+    }
+    for (var i = 0; i < this._storageNodes.length; ++i) {
+      this._storageNodes[i].reset();
     }
 
     this._queuedChain = [];
@@ -152,17 +152,17 @@ wcPlay.prototype = {
 
     this._properties = [];
 
-    while (this._storageNodes.length) {
-      this._storageNodes[0].destroy();
-    }
-    while (this._processNodes.length) {
-      this._processNodes[0].destroy();
-    }
     while (this._compositeNodes.length) {
       this._compositeNodes[0].destroy();
     }
     while (this._entryNodes.length) {
       this._entryNodes[0].destroy();
+    }
+    while (this._processNodes.length) {
+      this._processNodes[0].destroy();
+    }
+    while (this._storageNodes.length) {
+      this._storageNodes[0].destroy();
     }
   },
 
@@ -176,17 +176,17 @@ wcPlay.prototype = {
     data.properties = this.listProperties();
 
     data.nodes = [];
-    for (var i = 0; i < this._storageNodes.length; ++i) {
-      data.nodes.push(this._storageNodes[i].export());
-    }
-    for (var i = 0; i < this._processNodes.length; ++i) {
-      data.nodes.push(this._processNodes[i].export());
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      data.nodes.push(this._compositeNodes[i].export());
     }
     for (var i = 0; i < this._entryNodes.length; ++i) {
       data.nodes.push(this._entryNodes[i].export());
     }
-    for (var i = 0; i < this._compositeNodes.length; ++i) {
-      data.nodes.push(this._compositeNodes[i].export());
+    for (var i = 0; i < this._processNodes.length; ++i) {
+      data.nodes.push(this._processNodes[i].export());
+    }
+    for (var i = 0; i < this._storageNodes.length; ++i) {
+      data.nodes.push(this._storageNodes[i].export());
     }
 
     return JSON.stringify(data, function(key, value) {
@@ -283,6 +283,11 @@ wcPlay.prototype = {
    * @returns {wcNode|null} - Either the found node, or null.
    */
   nodeById: function(id) {
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      if (this._compositeNodes[i].id === id) {
+        return this._compositeNodes[i];
+      }
+    }
     for (var i = 0; i < this._entryNodes.length; ++i) {
       if (this._entryNodes[i].id === id) {
         return this._entryNodes[i];
@@ -296,11 +301,6 @@ wcPlay.prototype = {
     for (var i = 0; i < this._storageNodes.length; ++i) {
       if (this._storageNodes[i].id === id) {
         return this._storageNodes[i];
-      }
-    }
-    for (var i = 0; i < this._compositeNodes.length; ++i) {
-      if (this._compositeNodes[i].id === id) {
-        return this._compositeNodes[i];
       }
     }
 
@@ -592,14 +592,14 @@ wcPlay.prototype = {
    * @param {wcNode} node - The node to add.
    */
   __addNode: function(node) {
-    if (node instanceof wcNodeEntry) {
+    if (node instanceof wcNodeComposite) {
+      this._compositeNodes.push(node);
+    } else if (node instanceof wcNodeEntry) {
       this._entryNodes.push(node);
     } else if (node instanceof wcNodeProcess) {
       this._processNodes.push(node);
     } else if (node instanceof wcNodeStorage) {
       this._storageNodes.push(node);
-    } else if (node instanceof wcNodeComposite) {
-      this._compositeNodes.push(node);
     }
   },
 
@@ -612,7 +612,12 @@ wcPlay.prototype = {
    */
   __removeNode: function(node) {
     var index = -1;
-    if (node instanceof wcNodeEntry) {
+    if (node instanceof wcNodeComposite) {
+      index = this._compositeNodes.indexOf(node);
+      if (index > -1) {
+        this._compositeNodes.splice(index, 1);
+      }
+    } else if (node instanceof wcNodeEntry) {
       index = this._entryNodes.indexOf(node);
       if (index > -1) {
         this._entryNodes.splice(index, 1);
@@ -626,11 +631,6 @@ wcPlay.prototype = {
       index = this._storageNodes.indexOf(node);
       if (index > -1) {
         this._storageNodes.splice(index, 1);
-      }
-    } else if (node instanceof wcNodeComposite) {
-      index = this._compositeNodes.indexOf(node);
-      if (index > -1) {
-        this._compositeNodes.splice(index, 1);
       }
     }
 
@@ -656,14 +656,8 @@ wcPlay.prototype = {
    */
   __notifyNodes: function(func, args) {
     var self;
-    for (var i = 0; i < this._storageNodes.length; ++i) {
-      self = this._storageNodes[i];
-      if (typeof self[func] === 'function') {
-        self[func].apply(self, args);
-      }
-    }
-    for (var i = 0; i < this._processNodes.length; ++i) {
-      self = this._processNodes[i];
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      self = this._compositeNodes[i];
       if (typeof self[func] === 'function') {
         self[func].apply(self, args);
       }
@@ -674,8 +668,14 @@ wcPlay.prototype = {
         self[func].apply(self, args);
       }
     }
-    for (var i = 0; i < this._compositeNodes.length; ++i) {
-      self = this._compositeNodes[i];
+    for (var i = 0; i < this._processNodes.length; ++i) {
+      self = this._processNodes[i];
+      if (typeof self[func] === 'function') {
+        self[func].apply(self, args);
+      }
+    }
+    for (var i = 0; i < this._storageNodes.length; ++i) {
+      self = this._storageNodes[i];
       if (typeof self[func] === 'function') {
         self[func].apply(self, args);
       }

@@ -25,6 +25,25 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '__Hidden__', {
   },
 
   /**
+   * Compiles all nodes inside this composite into meta-data.
+   * @function wcNodeCompositeScript#compile
+   */
+  compile: function() {
+    this.compiledNodes = [];
+
+    function __compileNodes(nodes) {
+      for (var i = 0; i < nodes.length; ++i) {
+        this.compiledNodes.push(nodes[i].export());
+      }
+    };
+
+    __compileNodes.call(this, this._compositeNodes);
+    __compileNodes.call(this, this._entryNodes);
+    __compileNodes.call(this, this._processNodes);
+    __compileNodes.call(this, this._storageNodes);
+  },
+
+  /**
    * Loads the contents of this node based on its compiled data.
    * @function wcNodeCompositeScript#decompile
    * @param {Boolean} [restoreIds] - If true, nodes created will be restored to their original ID's rather than assigned new ones.
@@ -56,31 +75,17 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '__Hidden__', {
   },
 
   /**
-   * Compiles all nodes inside this composite into meta-data.
-   * @function wcNodeCompositeScript#compile
-   */
-  compile: function() {
-    this.compiledNodes = [];
-
-    function __compileNodes(nodes) {
-      for (var i = 0; i < nodes.length; ++i) {
-        this.compiledNodes.push(nodes[i].export());
-      }
-    };
-
-    __compileNodes.call(this, this._storageNodes);
-    __compileNodes.call(this, this._entryNodes);
-    __compileNodes.call(this, this._processNodes);
-    __compileNodes.call(this, this._compositeNodes);
-  },
-
-  /**
    * Retrieves a node from a given ID, if it exists in this script.
    * @function wcNodeCompositeScript#nodeById
    * @param {Number} id - The ID of the node.
    * @returns {wcNode|null} - Either the found node, or null.
    */
   nodeById: function(id) {
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      if (this._compositeNodes[i].id === id) {
+        return this._compositeNodes[i];
+      }
+    }
     for (var i = 0; i < this._entryNodes.length; ++i) {
       if (this._entryNodes[i].id === id) {
         return this._entryNodes[i];
@@ -94,11 +99,6 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '__Hidden__', {
     for (var i = 0; i < this._storageNodes.length; ++i) {
       if (this._storageNodes[i].id === id) {
         return this._storageNodes[i];
-      }
-    }
-    for (var i = 0; i < this._compositeNodes.length; ++i) {
-      if (this._compositeNodes[i].id === id) {
-        return this._compositeNodes[i];
       }
     }
 
@@ -354,6 +354,9 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '__Hidden__', {
   onDestroyed: function() {
     this._super();
 
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      this._compositeNodes[i].destroy();
+    }
     for (var i = 0; i < this._entryNodes.length; ++i) {
       this._entryNodes[i].destroy();
     }
@@ -363,13 +366,10 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '__Hidden__', {
     for (var i = 0; i < this._storageNodes.length; ++i) {
       this._storageNodes[i].destroy();
     }
-    for (var i = 0; i < this._compositeNodes.length; ++i) {
-      this._compositeNodes[i].destroy();
-    }
+    this._compositeNodes = [];
     this._entryNodes = [];
     this._processNodes = [];
     this._storageNodes = [];
-    this._compositeNodes = [];
   },
 
   /**
@@ -379,14 +379,14 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '__Hidden__', {
    * @param {wcNode} node - The node to add.
    */
   __addNode: function(node) {
-    if (node instanceof wcNodeEntry) {
+    if (node instanceof wcNodeComposite) {
+      this._compositeNodes.push(node);
+    } else if (node instanceof wcNodeEntry) {
       this._entryNodes.push(node);
     } else if (node instanceof wcNodeProcess) {
       this._processNodes.push(node);
     } else if (node instanceof wcNodeStorage) {
       this._storageNodes.push(node);
-    } else if (node instanceof wcNodeComposite) {
-      this._compositeNodes.push(node);
     }
   },
 
@@ -399,7 +399,12 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '__Hidden__', {
    */
   __removeNode: function(node) {
     var index = -1;
-    if (node instanceof wcNodeEntry) {
+    if (node instanceof wcNodeComposite) {
+      index = this._compositeNodes.indexOf(node);
+      if (index > -1) {
+        this._compositeNodes.splice(index, 1);
+      }
+    } else if (node instanceof wcNodeEntry) {
       index = this._entryNodes.indexOf(node);
       if (index > -1) {
         this._entryNodes.splice(index, 1);
@@ -413,11 +418,6 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '__Hidden__', {
       index = this._storageNodes.indexOf(node);
       if (index > -1) {
         this._storageNodes.splice(index, 1);
-      }
-    } else if (node instanceof wcNodeComposite) {
-      index = this._compositeNodes.indexOf(node);
-      if (index > -1) {
-        this._compositeNodes.splice(index, 1);
       }
     }
 
@@ -443,14 +443,8 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '__Hidden__', {
    */
   __notifyNodes: function(func, args) {
     var self;
-    for (var i = 0; i < this._storageNodes.length; ++i) {
-      self = this._storageNodes[i];
-      if (typeof self[func] === 'function') {
-        self[func].apply(self, args);
-      }
-    }
-    for (var i = 0; i < this._processNodes.length; ++i) {
-      self = this._processNodes[i];
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      self = this._compositeNodes[i];
       if (typeof self[func] === 'function') {
         self[func].apply(self, args);
       }
@@ -461,8 +455,14 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '__Hidden__', {
         self[func].apply(self, args);
       }
     }
-    for (var i = 0; i < this._compositeNodes.length; ++i) {
-      self = this._compositeNodes[i];
+    for (var i = 0; i < this._processNodes.length; ++i) {
+      self = this._processNodes[i];
+      if (typeof self[func] === 'function') {
+        self[func].apply(self, args);
+      }
+    }
+    for (var i = 0; i < this._storageNodes.length; ++i) {
+      self = this._storageNodes[i];
       if (typeof self[func] === 'function') {
         self[func].apply(self, args);
       }
