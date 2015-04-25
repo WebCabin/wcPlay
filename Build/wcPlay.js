@@ -841,8 +841,8 @@ function wcPlayEditor(container, options) {
       nameWrapR: ') ',      // The right string to wrap around the name portion of the title text.
     },
     links: {
-      length: 12,           // Length of each link 'nub'
-      width: 8,             // Width of each link 'nub'
+      length: 15,           // Length of each link 'nub'
+      width: 10,             // Width of each link 'nub'
       spacing: 10,          // The pixel space between the text of adjacent links.
       padding: 5,           // The pixel space between the link and its text.
       margin: 10,           // The pixel space between the link text and the edge of the node border.
@@ -856,9 +856,9 @@ function wcPlayEditor(container, options) {
       initialWrapL: ' [',   // The left string to wrap around a property initial value.
       initialWrapR: '] ',   // The right string to wrap around a property initial value.
       highlightColor: 'rgba(255, 255, 255, 0.5)',
-      normalColor:    'rgba(255, 255, 255, 0.10)',
+      normalColor:    'rgba(255, 255, 255, 0.5)',
       highlightBorder: -1,
-      normalBorder: 2,
+      normalBorder: 1,
     },
   };
 
@@ -2261,7 +2261,7 @@ wcPlayEditor.prototype = {
     // Highlight title text.
     if (this._highlightTitle && this._highlightNode === node) {
       this.__drawRoundedRect(result.titleBounds, this._drawStyle.property.highlightColor, this._drawStyle.property.highlightBorder, this._font.title.size/2, context);
-    } else {
+    } else if (this._highlightNode === node) {
       this.__drawRoundedRect(result.titleBounds, this._drawStyle.property.normalColor, this._drawStyle.property.normalBorder, this._font.title.size/2, context);
     }
 
@@ -2362,13 +2362,13 @@ wcPlayEditor.prototype = {
         // Highlight hovered values.
         if (this._highlightNode === node && this._highlightPropertyValue && this._highlightPropertyValue.name === props[i].name) {
           this.__drawRoundedRect(valueBound.rect, this._drawStyle.property.highlightColor, this._drawStyle.property.highlightBorder, this._font.property.size/2, context);
-        } else {
+        } else if (this._highlightNode === node) {
           this.__drawRoundedRect(valueBound.rect, this._drawStyle.property.normalColor, this._drawStyle.property.normalBorder, this._font.property.size/2, context);
         }
 
         if (this._highlightNode === node && this._highlightPropertyInitialValue && this._highlightPropertyInitialValue.name === props[i].name) {
           this.__drawRoundedRect(initialBound.rect, this._drawStyle.property.highlightColor, this._drawStyle.property.highlightBorder, this._font.property.size/2, context);
-        } else {
+        } else if (this._highlightNode === node) {
           this.__drawRoundedRect(initialBound.rect, this._drawStyle.property.normalColor, this._drawStyle.property.normalBorder, this._font.property.size/2, context);
         }
 
