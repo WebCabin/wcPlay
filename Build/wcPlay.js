@@ -1335,6 +1335,9 @@ wcPlayEditor.prototype = {
     $('.wcPlayEditorMenuOptionDebugging').children('i:first-child, span:first-child').toggleClass('fa-dot-circle-o', this._engine.debugging()).toggleClass('fa-circle-o', !this._engine.debugging());
     $('.wcPlayEditorMenuOptionSilence').children(':first-child, span:first-child').toggleClass('fa-volume-off', this._engine.silent()).toggleClass('fa-volume-up', !this._engine.silent());
     $('.wcPlayEditorMenuOptionPausePlay').children('i:first-child, span:first-child').toggleClass('fa-play', this._engine.paused()).toggleClass('fa-pause', !this._engine.paused());
+    $('.wcPlayEditorMenuOptionCut').toggleClass('disabled', this._selectedNodes.length === 0);
+    $('.wcPlayEditorMenuOptionCopy').toggleClass('disabled', this._selectedNodes.length === 0);
+    $('.wcPlayEditorMenuOptionPaste').toggleClass('disabled', window.wcPlayEditorClipboard.nodes.length === 0);
     $('.wcPlayEditorMenuOptionDelete').toggleClass('disabled', this._selectedNodes.length === 0);
     $('.wcPlayEditorMenuOptionComposite').toggleClass('disabled', this._selectedNodes.length === 0);
     $('.wcPlayEditorMenuOptionCompositeExit').toggleClass('disabled', this._parent instanceof wcPlay);
@@ -3627,6 +3630,7 @@ wcPlayEditor.prototype = {
     $body.on('click', '.wcPlayEditorMenuOptionNew', function() {
       if (self._engine) {
         self._engine.clear();
+        self._undoManager && self._undoManager.clear();
         self._parent = self._engine;
       }
     });
