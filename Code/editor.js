@@ -71,6 +71,10 @@ function wcPlayEditor(container, options) {
       valueWrapR: ' ',      // The right string to wrap around a property value.
       initialWrapL: ' [',   // The left string to wrap around a property initial value.
       initialWrapR: '] ',   // The right string to wrap around a property initial value.
+      highlightColor: 'rgba(255, 255, 255, 0.5)',
+      normalColor:    'rgba(255, 255, 255, 0.10)',
+      highlightBorder: -1,
+      normalBorder: 2,
     },
   };
 
@@ -1122,12 +1126,9 @@ wcPlayEditor.prototype = {
 
     this.__setCanvasFont(this._font.links, context);
 
-    var collapsed = node.collapsed();
     var links = node.chain.entry;
     for (var i = 0; i < links.length; ++i) {
-      if (!collapsed || links[i].links.length) {
-        bounds.width += context.measureText(links[i].name).width + this._drawStyle.links.spacing;
-      }
+      bounds.width += context.measureText(links[i].name).width + this._drawStyle.links.spacing;
     }
 
     bounds.left -= bounds.width/2 + this._drawStyle.links.margin;
@@ -1157,12 +1158,9 @@ wcPlayEditor.prototype = {
 
     this.__setCanvasFont(this._font.links, context);
 
-    var collapsed = node.collapsed();
     var links = node.chain.exit;
     for (var i = 0; i < links.length; ++i) {
-      if (!collapsed || links[i].links.length) {
-        bounds.width += context.measureText(links[i].name).width + this._drawStyle.links.spacing;
-      }
+      bounds.width += context.measureText(links[i].name).width + this._drawStyle.links.spacing;
     }
 
     bounds.left -= bounds.width/2 + this._drawStyle.links.margin;
@@ -1257,20 +1255,20 @@ wcPlayEditor.prototype = {
     var collapsed = node.collapsed();
     var links = node.chain.entry;
     for (var i = 0; i < links.length; ++i) {
+      // Link label
+      context.fillStyle = "black";
+      var w = context.measureText(links[i].name).width + this._drawStyle.links.spacing;
+      context.fillText(links[i].name, xPos + this._drawStyle.links.spacing/2, yPos);
+
+      // Link nub
+      var rect = {
+        top: yPos - this._drawStyle.links.length - this._font.links.size,
+        left: xPos + w/2 - this._drawStyle.links.width/2,
+        width: this._drawStyle.links.width,
+        height: this._drawStyle.links.length,
+      };
+
       if (!collapsed || links[i].links.length) {
-        // Link label
-        context.fillStyle = "black";
-        var w = context.measureText(links[i].name).width + this._drawStyle.links.spacing;
-        context.fillText(links[i].name, xPos + this._drawStyle.links.spacing/2, yPos);
-
-        // Link nub
-        var rect = {
-          top: yPos - this._drawStyle.links.length - this._font.links.size,
-          left: xPos + w/2 - this._drawStyle.links.width/2,
-          width: this._drawStyle.links.width,
-          height: this._drawStyle.links.length,
-        };
-
         context.fillStyle = (this._highlightEntryLink && this._highlightEntryLink.name === links[i].name && this._highlightNode === node? "cyan": links[i].meta.color);
         context.strokeStyle = "black";
         context.beginPath();
@@ -1282,22 +1280,22 @@ wcPlayEditor.prototype = {
         context.closePath();
         context.stroke();
         context.fill();
-
-        // Expand the bounding rect just a little so it is easier to click.
-        rect.left -= 5;
-        rect.width += 10;
-
-        result.push({
-          rect: rect,
-          point: {
-            x: rect.left + rect.width/2,
-            y: rect.top + rect.height/3 - 2,
-          },
-          name: links[i].name,
-        });
-
-        xPos += w;
       }
+
+      // Expand the bounding rect just a little so it is easier to click.
+      rect.left -= 5;
+      rect.width += 10;
+
+      result.push({
+        rect: rect,
+        point: {
+          x: rect.left + rect.width/2,
+          y: rect.top + rect.height/3 - 2,
+        },
+        name: links[i].name,
+      });
+
+      xPos += w;
     }
 
     return result;
@@ -1324,20 +1322,20 @@ wcPlayEditor.prototype = {
     var collapsed = node.collapsed();
     var links = node.chain.exit;
     for (var i = 0; i < links.length; ++i) {
+      // Link label
+      context.fillStyle = "black";
+      var w = context.measureText(links[i].name).width + this._drawStyle.links.spacing;
+      context.fillText(links[i].name, xPos + this._drawStyle.links.spacing/2, yPos);
+
+      // Link nub
+      var rect = {
+        top: yPos + this._drawStyle.links.padding,
+        left: xPos + w/2 - this._drawStyle.links.width/2,
+        width: this._drawStyle.links.width,
+        height: this._drawStyle.links.length,
+      };
+
       if (!collapsed || links[i].links.length) {
-        // Link label
-        context.fillStyle = "black";
-        var w = context.measureText(links[i].name).width + this._drawStyle.links.spacing;
-        context.fillText(links[i].name, xPos + this._drawStyle.links.spacing/2, yPos);
-
-        // Link nub
-        var rect = {
-          top: yPos + this._drawStyle.links.padding,
-          left: xPos + w/2 - this._drawStyle.links.width/2,
-          width: this._drawStyle.links.width,
-          height: this._drawStyle.links.length,
-        };
-
         context.fillStyle = (this._highlightExitLink && this._highlightExitLink.name === links[i].name && this._highlightNode === node? "cyan": links[i].meta.color);
         context.strokeStyle = "black";
         context.beginPath();
@@ -1349,22 +1347,22 @@ wcPlayEditor.prototype = {
         context.closePath();
         context.stroke();
         context.fill();
-
-        // Expand the bounding rect just a little so it is easier to click.
-        rect.left -= 5;
-        rect.width += 10;
-
-        result.push({
-          rect: rect,
-          point: {
-            x: rect.left + rect.width/2,
-            y: rect.top + rect.height + 1,
-          },
-          name: links[i].name,
-        });
-
-        xPos += w;
       }
+
+      // Expand the bounding rect just a little so it is easier to click.
+      rect.left -= 5;
+      rect.width += 10;
+
+      result.push({
+        rect: rect,
+        point: {
+          x: rect.left + rect.width/2,
+          y: rect.top + rect.height + 1,
+        },
+        name: links[i].name,
+      });
+
+      xPos += w;
     }
 
     return result;
@@ -1444,7 +1442,9 @@ wcPlayEditor.prototype = {
 
     // Highlight title text.
     if (this._highlightTitle && this._highlightNode === node) {
-      this.__drawRoundedRect(result.titleBounds, 'rgba(255, 255, 255, 0.5)', -1, this._font.title.size/2, context);
+      this.__drawRoundedRect(result.titleBounds, this._drawStyle.property.highlightColor, this._drawStyle.property.highlightBorder, this._font.title.size/2, context);
+    } else {
+      this.__drawRoundedRect(result.titleBounds, this._drawStyle.property.normalColor, this._drawStyle.property.normalBorder, this._font.title.size/2, context);
     }
 
     // Title Text
@@ -1543,10 +1543,15 @@ wcPlayEditor.prototype = {
 
         // Highlight hovered values.
         if (this._highlightNode === node && this._highlightPropertyValue && this._highlightPropertyValue.name === props[i].name) {
-          this.__drawRoundedRect(valueBound.rect, 'rgba(255, 255, 255, 0.5)', -1, this._font.property.size/2, context);
+          this.__drawRoundedRect(valueBound.rect, this._drawStyle.property.highlightColor, this._drawStyle.property.highlightBorder, this._font.property.size/2, context);
+        } else {
+          this.__drawRoundedRect(valueBound.rect, this._drawStyle.property.normalColor, this._drawStyle.property.normalBorder, this._font.property.size/2, context);
         }
+
         if (this._highlightNode === node && this._highlightPropertyInitialValue && this._highlightPropertyInitialValue.name === props[i].name) {
-          this.__drawRoundedRect(initialBound.rect, 'rgba(255, 255, 255, 0.5)', -1, this._font.property.size/2, context);
+          this.__drawRoundedRect(initialBound.rect, this._drawStyle.property.highlightColor, this._drawStyle.property.highlightBorder, this._font.property.size/2, context);
+        } else {
+          this.__drawRoundedRect(initialBound.rect, this._drawStyle.property.normalColor, this._drawStyle.property.normalBorder, this._font.property.size/2, context);
         }
 
         context.fillStyle = "black";
@@ -2239,6 +2244,9 @@ wcPlayEditor.prototype = {
       $(this).remove();
     });
 
+    $control.keydown(function(event) {
+      event.stopPropagation();
+    });
     $control.keyup(function(event) {
       switch (event.keyCode) {
         case 13: // Enter to confirm.
@@ -2395,6 +2403,9 @@ wcPlayEditor.prototype = {
         $(this).remove();
       });
 
+      $control.keydown(function(event) {
+        event.stopPropagation();
+      });
       $control.keyup(function(event) {
         switch (event.keyCode) {
           case 13: // Enter to confirm.
@@ -3902,6 +3913,7 @@ wcPlayEditor.prototype = {
       this._selectedNodes = [newNode];
       this._expandedHighlightNode = newNode;
 
+      newNode.collapsed(false);
       this.__updateNode(newNode, 0);
       this.__drawNode(newNode, newNode.pos, this._viewportContext);
 

@@ -40,13 +40,6 @@ $(document).ready(function() {
   operationNode.connectExit('out', logNode, 'in');
   delayNode.connectExit('out', exampleDynamicNode, 'change color');
 
-  // Lets collapse all the nodes so they take up less space.
-  startNode.collapsed(true);
-  logNode.collapsed(true);
-  delayNode.collapsed(true);
-  operationNode.collapsed(true);
-  numberNode.collapsed(true);
-
   // Start execution of the script.
   myPlay.start();
 });
