@@ -85,6 +85,7 @@ function wcPlayEditor(container, options) {
   this._nodeLibrary = {};
 
   this._font = {
+    breadcrumbs: {size: 15, family: 'Arial', weight: 'bold'},
     title: {size: 15, family: 'Arial', weight: 'bold'},
     titleDesc: {size: 15, family: 'Arial', weight: 'italic'},
     links: {size: 10, family: 'Arial'},
@@ -124,6 +125,10 @@ function wcPlayEditor(container, options) {
       valueWrapR: ' ',      // The right string to wrap around a property value.
       initialWrapL: ' [',   // The left string to wrap around a property initial value.
       initialWrapR: '] ',   // The right string to wrap around a property initial value.
+      highlightColor: 'rgba(255, 255, 255, 0.5)',
+      normalColor:    'rgba(255, 255, 255, 0.10)',
+      highlightBorder: -1,
+      normalBorder: 2,
     },
   };
 
@@ -164,6 +169,9 @@ function wcPlayEditor(container, options) {
   this._selectedNodeOrigins = [];
 
   this._draggingNodeData = null;
+
+  this._highlightCrumb = -1;
+  this._crumbBounds = [];
 
   // Undo management is optional.
   this._undoManager = null;
@@ -571,6 +579,45 @@ wcPlayEditor.prototype = {
       }
 
       this._viewportContext.restore();
+
+      // Draw breadcrumbs.
+      var scopes = [];
+      var scopeNames = [];
+      var scope = this._parent;
+      while (!(scope instanceof wcPlay)) {
+        scopes.unshift(scope);
+        scopeNames.unshift(scope.type + (scope.name? ' (' + scope.name + ')': ''));
+        scope = scope._parent;
+      }
+      scopes.unshift(this._engine);
+      scopeNames.unshift('Root');
+
+      this._viewportContext.fillStyle = 'black';
+      this.__setCanvasFont(this._font.breadcrumbs, this._viewportContext);
+
+      this._crumbBounds = [];
+      var left = 2;
+      for (var i = 0; i &lt; scopeNames.length; ++i) {
+        var w = this._viewportContext.measureText(scopeNames[i]).width;
+        var w2 = this._viewportContext.measureText(' / ').width;
+        var boundData = {
+          rect: {
+            top: 0,
+            left: left,
+            width: w + 6,
+            height: this._font.breadcrumbs.size + this._drawStyle.property.spacing,
+          },
+          parent: scopes[i],
+        };
+        this._crumbBounds.push(boundData);
+        left += w + w2;
+
+        if (this._highlightCrumb === i) {
+          this.__drawRoundedRect(boundData.rect, "rgba(0, 255, 255, 0.25)", -1, 3, this._viewportContext);
+          this.__drawRoundedRect(boundData.rect, "darkcyan", 2, 3, this._viewportContext);
+        }
+      }
+      this._viewportContext.fillText(scopeNames.join(' / '), 5, this._font.breadcrumbs.size);
     }
 
     window.requestAnimationFrame(this.__update.bind(this));
@@ -833,7 +880,6 @@ wcPlayEditor.prototype = {
           nodes: [],
         };
         typeData.context = typeData.$canvas[0].getContext('2d');
-        typeData.context.scale(0.5, 0.5);
         typeData.$category.append(typeData.$button);
         typeData.$category.append(typeData.$canvas);
         this.$typeArea[this.__typeIndex(data.type)].append(typeData.$category);
@@ -1081,21 +1127,14 @@ wcPlayEditor.prototype = {
     context.fillRect(data.debugLog.left, data.debugLog.top, data.debugLog.width, data.debugLog.height);
     context.strokeRect(data.debugLog.left, data.debugLog.top, data.debugLog.width, data.debugLog.height);
 
-    context.strokeStyle = (this._highlightDebugLog &amp;&amp; this._highlightNode === node? "white": "black");
+    context.strokeStyle = (node._log? "red": (this._highlightDebugLog &amp;&amp; this._highlightNode === node? "white": "black"));
     context.lineWidth = 2;
     context.beginPath();
-    if (!node.debugLog()) {
-      // context.moveTo(data.debugLog.left + 1, data.debugLog.top + data.debugLog.height/2);
-      // context.lineTo(data.debugLog.left + data.debugLog.width - 1, data.debugLog.top + data.debugLog.height/2);
-    }
-
-    if (node.debugLog()) {
-      context.moveTo(data.debugLog.left + 1, data.debugLog.top + 1);
-      context.lineTo(data.debugLog.left + data.debugLog.width/2, data.debugLog.top + data.debugLog.height/2);
-      context.lineTo(data.debugLog.left + 1, data.debugLog.top + data.debugLog.height - 1);
-      context.moveTo(data.debugLog.left + data.debugLog.width/2, data.debugLog.top + data.debugLog.height - 2);
-      context.lineTo(data.debugLog.left + data.debugLog.width, data.debugLog.top + data.debugLog.height - 2);
-    }
+    context.moveTo(data.debugLog.left + 1, data.debugLog.top + 1);
+    context.lineTo(data.debugLog.left + data.debugLog.width/2, data.debugLog.top + data.debugLog.height/2);
+    context.lineTo(data.debugLog.left + 1, data.debugLog.top + data.debugLog.height - 1);
+    context.moveTo(data.debugLog.left + data.debugLog.width/2, data.debugLog.top + data.debugLog.height - 2);
+    context.lineTo(data.debugLog.left + data.debugLog.width, data.debugLog.top + data.debugLog.height - 2);
     context.stroke();
     context.restore();
 
@@ -1111,8 +1150,8 @@ wcPlayEditor.prototype = {
     context.fillStyle = (this._highlightBreakpoint &amp;&amp; this._highlightNode === node? "black": "white");
     context.fillRect(data.breakpoint.left, data.breakpoint.top, data.breakpoint.width, data.breakpoint.height);
 
-    context.strokeStyle = (node._break? "darkred": (this._highlightBreakpoint &amp;&amp; this._highlightNode === node? "white": "black"));
-    context.fillStyle = "darkred";
+    context.strokeStyle = (node._break? "red": (this._highlightBreakpoint &amp;&amp; this._highlightNode === node? "white": "black"));
+    context.fillStyle = "red";
     context.lineWidth = 2;
     context.beginPath();
     context.arc(data.breakpoint.left + data.breakpoint.width/2, data.breakpoint.top + data.breakpoint.height/2, Math.min(data.breakpoint.width/2-2, data.breakpoint.height/2-2), 0, 2 * Math.PI);
@@ -1175,12 +1214,9 @@ wcPlayEditor.prototype = {
 
     this.__setCanvasFont(this._font.links, context);
 
-    var collapsed = node.collapsed();
     var links = node.chain.entry;
     for (var i = 0; i &lt; links.length; ++i) {
-      if (!collapsed || links[i].links.length) {
-        bounds.width += context.measureText(links[i].name).width + this._drawStyle.links.spacing;
-      }
+      bounds.width += context.measureText(links[i].name).width + this._drawStyle.links.spacing;
     }
 
     bounds.left -= bounds.width/2 + this._drawStyle.links.margin;
@@ -1210,12 +1246,9 @@ wcPlayEditor.prototype = {
 
     this.__setCanvasFont(this._font.links, context);
 
-    var collapsed = node.collapsed();
     var links = node.chain.exit;
     for (var i = 0; i &lt; links.length; ++i) {
-      if (!collapsed || links[i].links.length) {
-        bounds.width += context.measureText(links[i].name).width + this._drawStyle.links.spacing;
-      }
+      bounds.width += context.measureText(links[i].name).width + this._drawStyle.links.spacing;
     }
 
     bounds.left -= bounds.width/2 + this._drawStyle.links.margin;
@@ -1310,20 +1343,20 @@ wcPlayEditor.prototype = {
     var collapsed = node.collapsed();
     var links = node.chain.entry;
     for (var i = 0; i &lt; links.length; ++i) {
+      // Link label
+      context.fillStyle = "black";
+      var w = context.measureText(links[i].name).width + this._drawStyle.links.spacing;
+      context.fillText(links[i].name, xPos + this._drawStyle.links.spacing/2, yPos);
+
+      // Link nub
+      var rect = {
+        top: yPos - this._drawStyle.links.length - this._font.links.size,
+        left: xPos + w/2 - this._drawStyle.links.width/2,
+        width: this._drawStyle.links.width,
+        height: this._drawStyle.links.length,
+      };
+
       if (!collapsed || links[i].links.length) {
-        // Link label
-        context.fillStyle = "black";
-        var w = context.measureText(links[i].name).width + this._drawStyle.links.spacing;
-        context.fillText(links[i].name, xPos + this._drawStyle.links.spacing/2, yPos);
-
-        // Link nub
-        var rect = {
-          top: yPos - this._drawStyle.links.length - this._font.links.size,
-          left: xPos + w/2 - this._drawStyle.links.width/2,
-          width: this._drawStyle.links.width,
-          height: this._drawStyle.links.length,
-        };
-
         context.fillStyle = (this._highlightEntryLink &amp;&amp; this._highlightEntryLink.name === links[i].name &amp;&amp; this._highlightNode === node? "cyan": links[i].meta.color);
         context.strokeStyle = "black";
         context.beginPath();
@@ -1335,22 +1368,22 @@ wcPlayEditor.prototype = {
         context.closePath();
         context.stroke();
         context.fill();
-
-        // Expand the bounding rect just a little so it is easier to click.
-        rect.left -= 5;
-        rect.width += 10;
-
-        result.push({
-          rect: rect,
-          point: {
-            x: rect.left + rect.width/2,
-            y: rect.top + rect.height/3 - 2,
-          },
-          name: links[i].name,
-        });
-
-        xPos += w;
       }
+
+      // Expand the bounding rect just a little so it is easier to click.
+      rect.left -= 5;
+      rect.width += 10;
+
+      result.push({
+        rect: rect,
+        point: {
+          x: rect.left + rect.width/2,
+          y: rect.top + rect.height/3 - 2,
+        },
+        name: links[i].name,
+      });
+
+      xPos += w;
     }
 
     return result;
@@ -1377,20 +1410,20 @@ wcPlayEditor.prototype = {
     var collapsed = node.collapsed();
     var links = node.chain.exit;
     for (var i = 0; i &lt; links.length; ++i) {
+      // Link label
+      context.fillStyle = "black";
+      var w = context.measureText(links[i].name).width + this._drawStyle.links.spacing;
+      context.fillText(links[i].name, xPos + this._drawStyle.links.spacing/2, yPos);
+
+      // Link nub
+      var rect = {
+        top: yPos + this._drawStyle.links.padding,
+        left: xPos + w/2 - this._drawStyle.links.width/2,
+        width: this._drawStyle.links.width,
+        height: this._drawStyle.links.length,
+      };
+
       if (!collapsed || links[i].links.length) {
-        // Link label
-        context.fillStyle = "black";
-        var w = context.measureText(links[i].name).width + this._drawStyle.links.spacing;
-        context.fillText(links[i].name, xPos + this._drawStyle.links.spacing/2, yPos);
-
-        // Link nub
-        var rect = {
-          top: yPos + this._drawStyle.links.padding,
-          left: xPos + w/2 - this._drawStyle.links.width/2,
-          width: this._drawStyle.links.width,
-          height: this._drawStyle.links.length,
-        };
-
         context.fillStyle = (this._highlightExitLink &amp;&amp; this._highlightExitLink.name === links[i].name &amp;&amp; this._highlightNode === node? "cyan": links[i].meta.color);
         context.strokeStyle = "black";
         context.beginPath();
@@ -1402,22 +1435,22 @@ wcPlayEditor.prototype = {
         context.closePath();
         context.stroke();
         context.fill();
-
-        // Expand the bounding rect just a little so it is easier to click.
-        rect.left -= 5;
-        rect.width += 10;
-
-        result.push({
-          rect: rect,
-          point: {
-            x: rect.left + rect.width/2,
-            y: rect.top + rect.height + 1,
-          },
-          name: links[i].name,
-        });
-
-        xPos += w;
       }
+
+      // Expand the bounding rect just a little so it is easier to click.
+      rect.left -= 5;
+      rect.width += 10;
+
+      result.push({
+        rect: rect,
+        point: {
+          x: rect.left + rect.width/2,
+          y: rect.top + rect.height + 1,
+        },
+        name: links[i].name,
+      });
+
+      xPos += w;
     }
 
     return result;
@@ -1497,7 +1530,9 @@ wcPlayEditor.prototype = {
 
     // Highlight title text.
     if (this._highlightTitle &amp;&amp; this._highlightNode === node) {
-      this.__drawRoundedRect(result.titleBounds, 'rgba(255, 255, 255, 0.5)', -1, this._font.title.size/2, context);
+      this.__drawRoundedRect(result.titleBounds, this._drawStyle.property.highlightColor, this._drawStyle.property.highlightBorder, this._font.title.size/2, context);
+    } else {
+      this.__drawRoundedRect(result.titleBounds, this._drawStyle.property.normalColor, this._drawStyle.property.normalBorder, this._font.title.size/2, context);
     }
 
     // Title Text
@@ -1596,10 +1631,15 @@ wcPlayEditor.prototype = {
 
         // Highlight hovered values.
         if (this._highlightNode === node &amp;&amp; this._highlightPropertyValue &amp;&amp; this._highlightPropertyValue.name === props[i].name) {
-          this.__drawRoundedRect(valueBound.rect, 'rgba(255, 255, 255, 0.5)', -1, this._font.property.size/2, context);
+          this.__drawRoundedRect(valueBound.rect, this._drawStyle.property.highlightColor, this._drawStyle.property.highlightBorder, this._font.property.size/2, context);
+        } else {
+          this.__drawRoundedRect(valueBound.rect, this._drawStyle.property.normalColor, this._drawStyle.property.normalBorder, this._font.property.size/2, context);
         }
+
         if (this._highlightNode === node &amp;&amp; this._highlightPropertyInitialValue &amp;&amp; this._highlightPropertyInitialValue.name === props[i].name) {
-          this.__drawRoundedRect(initialBound.rect, 'rgba(255, 255, 255, 0.5)', -1, this._font.property.size/2, context);
+          this.__drawRoundedRect(initialBound.rect, this._drawStyle.property.highlightColor, this._drawStyle.property.highlightBorder, this._font.property.size/2, context);
+        } else {
+          this.__drawRoundedRect(initialBound.rect, this._drawStyle.property.normalColor, this._drawStyle.property.normalBorder, this._font.property.size/2, context);
         }
 
         context.fillStyle = "black";
@@ -2292,6 +2332,9 @@ wcPlayEditor.prototype = {
       $(this).remove();
     });
 
+    $control.keydown(function(event) {
+      event.stopPropagation();
+    });
     $control.keyup(function(event) {
       switch (event.keyCode) {
         case 13: // Enter to confirm.
@@ -2448,6 +2491,9 @@ wcPlayEditor.prototype = {
         $(this).remove();
       });
 
+      $control.keydown(function(event) {
+        event.stopPropagation();
+      });
       $control.keyup(function(event) {
         switch (event.keyCode) {
           case 13: // Enter to confirm.
@@ -3431,6 +3477,8 @@ wcPlayEditor.prototype = {
     }
 
     this._mouse = mouse;
+    this._highlightNode = null;
+    this._highlightCrumb = -1;
     this._highlightTitle = false;
     this._highlightDebugLog = false;
     this._highlightBreakpoint = false;
@@ -3444,14 +3492,31 @@ wcPlayEditor.prototype = {
     var wasOverViewport = this._highlightViewport;
     this._highlightViewport = false;
 
-    var node = this.__findNodeAtPos(mouse, this._viewportCamera);
+    this.$viewport.removeClass('wcClickable wcMoving wcGrab');
+    this.$viewport.attr('title', '');
+    
+    for (var i = 0; i &lt; this._crumbBounds.length; ++i) {
+      if (this.__inRect(mouse, this._crumbBounds[i].rect)) {
+        this._highlightCrumb = i;
+        this.$viewport.addClass('wcClickable');
+        this.$viewport.attr('title', 'Click to go to this level in the hierarchy.');
+        break;
+      }
+    }
+
+    var node = null;
+    if (this._highlightCrumb === -1) {
+      node = this.__findNodeAtPos(mouse, this._viewportCamera);
+    }
+
     if (node) {
       // Check for main node collision.
-      this.$viewport.removeClass('wcClickable wcMoving wcGrab');
-      if (this.__inRect(mouse, node._meta.bounds.inner, this._viewportCamera)) {
+      if (this.__inRect(mouse, node._meta.bounds.farRect, this._viewportCamera)) {
         this._highlightNode = node;
-        this.$viewport.attr('title', (node._meta.description? node._meta.description + '\n': '') + 'Click and drag to move this node. Double click to collapse/expand this node.');
-        this.$viewport.addClass('wcMoving');
+        if (this.__inRect(mouse, node._meta.bounds.inner, this._viewportCamera)) {
+          this.$viewport.attr('title', (node._meta.description? node._meta.description + '\n': '') + 'Click and drag to move this node. Double click to collapse/expand this node.');
+          this.$viewport.addClass('wcMoving');
+        }
       }
 
       if (!this._selectedEntryLink &amp;&amp; !this._selectedExitLink &amp;&amp; !this._selectedInputLink &amp;&amp; !this._selectedOutputLink) {
@@ -3459,7 +3524,7 @@ wcPlayEditor.prototype = {
         if (this.__inRect(mouse, node._meta.bounds.debugLog, this._viewportCamera)) {
           this._highlightDebugLog = true;
           this.$viewport.addClass('wcClickable');
-          if (node.debugLog()) {
+          if (node._log) {
             this.$viewport.attr('title', 'Disable debug logging for this node.');
           } else {
             this.$viewport.attr('title', 'Enable debug logging for this node.');
@@ -3636,10 +3701,6 @@ wcPlayEditor.prototype = {
           }
         }
       }
-    } else {
-      this._highlightNode = null;
-      this.$viewport.attr('title', '');
-      this.$viewport.removeClass('wcClickable');
     }
 
     // If you hover over a node that is not currently expanded by hovering, force the expanded node to collapse again.
@@ -3657,7 +3718,7 @@ wcPlayEditor.prototype = {
 
     // If the user is creating a new connection and hovering over another node, uncollapse it temporarily to expose links.
     if (!this._expandedHighlightNode &amp;&amp; this._highlightNode &amp;&amp; 
-        this.__inRect(mouse, node._meta.bounds.inner, this._viewportCamera)) {
+        this.__inRect(mouse, node._meta.bounds.farRect, this._viewportCamera)) {
 
       this._expandedHighlightNode = this._highlightNode;
       var self = this;
@@ -3955,6 +4016,7 @@ wcPlayEditor.prototype = {
       this._selectedNodes = [newNode];
       this._expandedHighlightNode = newNode;
 
+      newNode.collapsed(false);
       this.__updateNode(newNode, 0);
       this.__drawNode(newNode, newNode.pos, this._viewportContext);
 
@@ -4265,6 +4327,18 @@ wcPlayEditor.prototype = {
    */
   __onViewportMouseClick: function(event, elem) {
     if (!this._mouseMoved) {
+      if (this._highlightCrumb > -1) {
+        if (this._crumbBounds[this._highlightCrumb].parent !== this._parent) {
+          var focusNode = this._crumbBounds[this._highlightCrumb+1].parent;
+          this._parent = this._crumbBounds[this._highlightCrumb].parent;
+
+          this._selectedNode = focusNode;
+          this._selectedNodes = [focusNode];
+          this.focus(this._selectedNodes);
+        }
+        return;
+      }
+
       this._mouse = this.__mouse(event, this.$viewport.offset());
 
       var hasTarget = false;
@@ -4272,7 +4346,7 @@ wcPlayEditor.prototype = {
       if (node) {
         // Debug Log button.
         if (this.__inRect(this._mouse, node._meta.bounds.debugLog, this._viewportCamera)) {
-          var state = !node.debugLog();
+          var state = !node._log;
           node.debugLog(state);
           this._undoManager &amp;&amp; this._undoManager.addEvent((state? 'Enabled': 'Disabled') + ' Debug Logging for Node "' + node.category + '.' + node.type + '"',
           {
@@ -4465,8 +4539,6 @@ wcPlayEditor.prototype = {
           this._selectedNode = focusNode;
           this._selectedNodes = [focusNode];
           this.focus(this._selectedNodes);
-        // } else {
-        //   node.collapsed(!node.collapsed());
         }
       }
     }
@@ -4515,7 +4587,7 @@ wcPlayEditor.prototype = {
       function __test(nodes) {
         // Iterate backwards so we always test the nodes that are drawn on top first.
         for (var i = nodes.length-1; i >= 0; --i) {
-          if (nodes[i]._meta.bounds &amp;&amp; self.__inRect(pos, nodes[i]._meta.bounds.rect, camera)) {
+          if (nodes[i]._meta.bounds &amp;&amp; self.__inRect(pos, nodes[i]._meta.bounds.farRect, camera)) {
             return nodes[i];
           }
         }

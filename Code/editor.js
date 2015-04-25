@@ -32,6 +32,7 @@ function wcPlayEditor(container, options) {
   this._nodeLibrary = {};
 
   this._font = {
+    breadcrumbs: {size: 15, family: 'Arial', weight: 'bold'},
     title: {size: 15, family: 'Arial', weight: 'bold'},
     titleDesc: {size: 15, family: 'Arial', weight: 'italic'},
     links: {size: 10, family: 'Arial'},
@@ -115,6 +116,9 @@ function wcPlayEditor(container, options) {
   this._selectedNodeOrigins = [];
 
   this._draggingNodeData = null;
+
+  this._highlightCrumb = -1;
+  this._crumbBounds = [];
 
   // Undo management is optional.
   this._undoManager = null;
@@ -522,6 +526,45 @@ wcPlayEditor.prototype = {
       }
 
       this._viewportContext.restore();
+
+      // Draw breadcrumbs.
+      var scopes = [];
+      var scopeNames = [];
+      var scope = this._parent;
+      while (!(scope instanceof wcPlay)) {
+        scopes.unshift(scope);
+        scopeNames.unshift(scope.type + (scope.name? ' (' + scope.name + ')': ''));
+        scope = scope._parent;
+      }
+      scopes.unshift(this._engine);
+      scopeNames.unshift('Root');
+
+      this._viewportContext.fillStyle = 'black';
+      this.__setCanvasFont(this._font.breadcrumbs, this._viewportContext);
+
+      this._crumbBounds = [];
+      var left = 2;
+      for (var i = 0; i < scopeNames.length; ++i) {
+        var w = this._viewportContext.measureText(scopeNames[i]).width;
+        var w2 = this._viewportContext.measureText(' / ').width;
+        var boundData = {
+          rect: {
+            top: 0,
+            left: left,
+            width: w + 6,
+            height: this._font.breadcrumbs.size + this._drawStyle.property.spacing,
+          },
+          parent: scopes[i],
+        };
+        this._crumbBounds.push(boundData);
+        left += w + w2;
+
+        if (this._highlightCrumb === i) {
+          this.__drawRoundedRect(boundData.rect, "rgba(0, 255, 255, 0.25)", -1, 3, this._viewportContext);
+          this.__drawRoundedRect(boundData.rect, "darkcyan", 2, 3, this._viewportContext);
+        }
+      }
+      this._viewportContext.fillText(scopeNames.join(' / '), 5, this._font.breadcrumbs.size);
     }
 
     window.requestAnimationFrame(this.__update.bind(this));
@@ -784,7 +827,6 @@ wcPlayEditor.prototype = {
           nodes: [],
         };
         typeData.context = typeData.$canvas[0].getContext('2d');
-        typeData.context.scale(0.5, 0.5);
         typeData.$category.append(typeData.$button);
         typeData.$category.append(typeData.$canvas);
         this.$typeArea[this.__typeIndex(data.type)].append(typeData.$category);
@@ -1032,7 +1074,7 @@ wcPlayEditor.prototype = {
     context.fillRect(data.debugLog.left, data.debugLog.top, data.debugLog.width, data.debugLog.height);
     context.strokeRect(data.debugLog.left, data.debugLog.top, data.debugLog.width, data.debugLog.height);
 
-    context.strokeStyle = (node.debugLog()? "red": (this._highlightDebugLog && this._highlightNode === node? "white": "black"));
+    context.strokeStyle = (node._log? "red": (this._highlightDebugLog && this._highlightNode === node? "white": "black"));
     context.lineWidth = 2;
     context.beginPath();
     context.moveTo(data.debugLog.left + 1, data.debugLog.top + 1);
@@ -3382,6 +3424,8 @@ wcPlayEditor.prototype = {
     }
 
     this._mouse = mouse;
+    this._highlightNode = null;
+    this._highlightCrumb = -1;
     this._highlightTitle = false;
     this._highlightDebugLog = false;
     this._highlightBreakpoint = false;
@@ -3395,14 +3439,31 @@ wcPlayEditor.prototype = {
     var wasOverViewport = this._highlightViewport;
     this._highlightViewport = false;
 
-    var node = this.__findNodeAtPos(mouse, this._viewportCamera);
+    this.$viewport.removeClass('wcClickable wcMoving wcGrab');
+    this.$viewport.attr('title', '');
+    
+    for (var i = 0; i < this._crumbBounds.length; ++i) {
+      if (this.__inRect(mouse, this._crumbBounds[i].rect)) {
+        this._highlightCrumb = i;
+        this.$viewport.addClass('wcClickable');
+        this.$viewport.attr('title', 'Click to go to this level in the hierarchy.');
+        break;
+      }
+    }
+
+    var node = null;
+    if (this._highlightCrumb === -1) {
+      node = this.__findNodeAtPos(mouse, this._viewportCamera);
+    }
+
     if (node) {
       // Check for main node collision.
-      this.$viewport.removeClass('wcClickable wcMoving wcGrab');
-      if (this.__inRect(mouse, node._meta.bounds.inner, this._viewportCamera)) {
+      if (this.__inRect(mouse, node._meta.bounds.farRect, this._viewportCamera)) {
         this._highlightNode = node;
-        this.$viewport.attr('title', (node._meta.description? node._meta.description + '\n': '') + 'Click and drag to move this node. Double click to collapse/expand this node.');
-        this.$viewport.addClass('wcMoving');
+        if (this.__inRect(mouse, node._meta.bounds.inner, this._viewportCamera)) {
+          this.$viewport.attr('title', (node._meta.description? node._meta.description + '\n': '') + 'Click and drag to move this node. Double click to collapse/expand this node.');
+          this.$viewport.addClass('wcMoving');
+        }
       }
 
       if (!this._selectedEntryLink && !this._selectedExitLink && !this._selectedInputLink && !this._selectedOutputLink) {
@@ -3410,7 +3471,7 @@ wcPlayEditor.prototype = {
         if (this.__inRect(mouse, node._meta.bounds.debugLog, this._viewportCamera)) {
           this._highlightDebugLog = true;
           this.$viewport.addClass('wcClickable');
-          if (node.debugLog()) {
+          if (node._log) {
             this.$viewport.attr('title', 'Disable debug logging for this node.');
           } else {
             this.$viewport.attr('title', 'Enable debug logging for this node.');
@@ -3587,10 +3648,6 @@ wcPlayEditor.prototype = {
           }
         }
       }
-    } else {
-      this._highlightNode = null;
-      this.$viewport.attr('title', '');
-      this.$viewport.removeClass('wcClickable');
     }
 
     // If you hover over a node that is not currently expanded by hovering, force the expanded node to collapse again.
@@ -3608,7 +3665,7 @@ wcPlayEditor.prototype = {
 
     // If the user is creating a new connection and hovering over another node, uncollapse it temporarily to expose links.
     if (!this._expandedHighlightNode && this._highlightNode && 
-        this.__inRect(mouse, node._meta.bounds.inner, this._viewportCamera)) {
+        this.__inRect(mouse, node._meta.bounds.farRect, this._viewportCamera)) {
 
       this._expandedHighlightNode = this._highlightNode;
       var self = this;
@@ -4217,6 +4274,18 @@ wcPlayEditor.prototype = {
    */
   __onViewportMouseClick: function(event, elem) {
     if (!this._mouseMoved) {
+      if (this._highlightCrumb > -1) {
+        if (this._crumbBounds[this._highlightCrumb].parent !== this._parent) {
+          var focusNode = this._crumbBounds[this._highlightCrumb+1].parent;
+          this._parent = this._crumbBounds[this._highlightCrumb].parent;
+
+          this._selectedNode = focusNode;
+          this._selectedNodes = [focusNode];
+          this.focus(this._selectedNodes);
+        }
+        return;
+      }
+
       this._mouse = this.__mouse(event, this.$viewport.offset());
 
       var hasTarget = false;
@@ -4224,7 +4293,7 @@ wcPlayEditor.prototype = {
       if (node) {
         // Debug Log button.
         if (this.__inRect(this._mouse, node._meta.bounds.debugLog, this._viewportCamera)) {
-          var state = !node.debugLog();
+          var state = !node._log;
           node.debugLog(state);
           this._undoManager && this._undoManager.addEvent((state? 'Enabled': 'Disabled') + ' Debug Logging for Node "' + node.category + '.' + node.type + '"',
           {
@@ -4417,8 +4486,6 @@ wcPlayEditor.prototype = {
           this._selectedNode = focusNode;
           this._selectedNodes = [focusNode];
           this.focus(this._selectedNodes);
-        // } else {
-        //   node.collapsed(!node.collapsed());
         }
       }
     }
@@ -4467,7 +4534,7 @@ wcPlayEditor.prototype = {
       function __test(nodes) {
         // Iterate backwards so we always test the nodes that are drawn on top first.
         for (var i = nodes.length-1; i >= 0; --i) {
-          if (nodes[i]._meta.bounds && self.__inRect(pos, nodes[i]._meta.bounds.rect, camera)) {
+          if (nodes[i]._meta.bounds && self.__inRect(pos, nodes[i]._meta.bounds.farRect, camera)) {
             return nodes[i];
           }
         }
