@@ -30,6 +30,7 @@ wcNode.extend('wcNodeEntry', 'Entry Node', '', {
     if (category) {
       this.className = className;
       this.type = type;
+      this.nodeType = wcPlay.NODE.ENTRY;
       this.category = category;
       wcPlay.registerNodeType(className, type, category, wcPlay.NODE.ENTRY);
     }

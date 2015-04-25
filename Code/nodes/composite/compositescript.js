@@ -1,4 +1,4 @@
-wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '__Hidden__', {
+wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
   /**
    * @class
    * A composite script node. These are nodes that contain additional nodes inside.<br>
@@ -326,8 +326,8 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '__Hidden__', {
    * @param {Number[]} [idMap] - If supplied, identifies a mapping of old ID's to new ID's, any not found in this list will be unchanged.
    */
   onImporting: function(data, idMap) {
-    this.compiledNodes = data.compiledNodes;
-    this.decompile(idMap? false: true);
+    this.compiledNodes = data.nodes;
+    this.decompile(idMap? false: false);
 
     this._super(data, idMap);
   },
@@ -343,7 +343,29 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '__Hidden__', {
 
     // Export the current set of nodes into our data.
     this.compile();
-    data.compiledNodes = this.compiledNodes;
+    data.nodes = this.compiledNodes;
+  },
+
+  /**
+   * Event that is called when the node is about to be reset.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeCompositeScript#onReset
+   */
+  onReset: function() {
+    this._super();
+
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      this._compositeNodes[i].reset();
+    }
+    for (var i = 0; i < this._entryNodes.length; ++i) {
+      this._entryNodes[i].reset();
+    }
+    for (var i = 0; i < this._processNodes.length; ++i) {
+      this._processNodes[i].reset();
+    }
+    for (var i = 0; i < this._storageNodes.length; ++i) {
+      this._storageNodes[i].reset();
+    }
   },
 
   /**

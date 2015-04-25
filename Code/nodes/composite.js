@@ -27,6 +27,7 @@ wcNode.extend('wcNodeComposite', 'Composite', '', {
     if (category) {
       this.className = className;
       this.type = type;
+      this.nodeType = wcPlay.NODE.COMPOSITE;
       this.category = category;
       wcPlay.registerNodeType(className, type, category, wcPlay.NODE.COMPOSITE);
     }

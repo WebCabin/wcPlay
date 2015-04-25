@@ -31,6 +31,7 @@ wcNode.extend('wcNodeProcess', 'Node Process', '', {
     if (category) {
       this.className = className;
       this.type = type;
+      this.nodeType = wcPlay.NODE.PROCESS;
       this.category = category;
       wcPlay.registerNodeType(className, type, category, wcPlay.NODE.PROCESS);
     }

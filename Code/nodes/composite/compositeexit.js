@@ -1,4 +1,4 @@
-wcNodeComposite.extend('wcNodeCompositeExit', 'Exit', 'Link', {
+wcNodeComposite.extend('wcNodeCompositeExit', 'Exit', 'External', {
   /**
    * @class
    * This node acts as a connection between exit links on a composite node and the script inside.<br>

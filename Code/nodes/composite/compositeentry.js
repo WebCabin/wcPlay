@@ -1,4 +1,4 @@
-wcNodeComposite.extend('wcNodeCompositeEntry', 'Entry', 'Link', {
+wcNodeComposite.extend('wcNodeCompositeEntry', 'Entry', 'External', {
   /**
    * @class
    * This node acts as a connection between entry links on a composite node and the script inside.<br>

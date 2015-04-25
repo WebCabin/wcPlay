@@ -10,6 +10,7 @@ wcNodeStorage.extend('wcNodeStorageGlobal', 'Global', 'Core', {
    */
   init: function(parent, pos) {
     this._super(parent, pos);
+    this.color = '#77CC77';
 
     this.description("References a global property on the script.");
 

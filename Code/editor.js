@@ -151,12 +151,12 @@ function wcPlayEditor(container, options) {
   this.$container.append(this.$top);
   this.$container.append(this.$main);
 
-  this.$hiddenFileInput = $('<input type="file" id="wcPlayEditorFileOpener"/>');
+  this.$hiddenFileLoader = $('<input type="file" id="wcPlayEditorHiddenFileLoader"/>');
+  this.$hiddenFileImporter = $('<input type="file" id="wcPlayEditorHiddenFileImporter"/>');
 
   this.onResized();
 
   this.__setupMenu();
-  this.__setupPalette();
   this.__setupControls();
 
   window.requestAnimationFrame(this.__update.bind(this));
@@ -182,6 +182,7 @@ wcPlayEditor.prototype = {
 
       this._engine = engine;
       this._parent = engine;
+      this.__setupPalette();
 
       if (this._engine) {
         this._engine._editors.push(this);
@@ -668,7 +669,7 @@ wcPlayEditor.prototype = {
             <li><span class="wcPlayEditorMenuOptionOpen wcPlayMenuItem"><i class="wcPlayEditorMenuIcon wcButton fa fa-folder-open-o fa-lg"/>Open Script...<span>Ctrl+O</span></span></li>\
             <li><span class="wcPlayEditorMenuOptionSave wcPlayMenuItem"><i class="wcPlayEditorMenuIcon wcButton fa fa-save fa-lg"/>Save Script<span>Ctrl+S</span></span></li>\
             <li><hr class="wcPlayMenuSeparator"></li>\
-            <li><span class="wcPlayEditorMenuOptionImport wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-plus-square-o fa-lg"/>Import...<span>Ctrl+I</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionImport wcPlayMenuItem"><i class="wcPlayEditorMenuIcon wcButton fa fa-plus-square-o fa-lg"/>Import...<span>Ctrl+I</span></span></li>\
           </ul>\
         </li>\
         <li><span>Edit</span>\
@@ -717,7 +718,7 @@ wcPlayEditor.prototype = {
         <div class="wcPlayEditorMenuOptionNew"><span class="wcPlayEditorMenuIcon wcButton fa fa-file-o fa-lg" title="New Project. (Alt+N)"/></div>\
         <div class="wcPlayEditorMenuOptionOpen"><span class="wcPlayEditorMenuIcon wcButton fa fa-folder-open-o fa-lg" title="Open Project. (Ctrl+O)"></div>\
         <div class="wcPlayEditorMenuOptionSave"><span class="wcPlayEditorMenuIcon wcButton fa fa-save fa-lg" title="Save Project. (Ctrl+S)"></div>\
-        <div class="wcPlayEditorMenuOptionImport disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-plus-square-o fa-lg" title="Import..."></div>\
+        <div class="wcPlayEditorMenuOptionImport"><span class="wcPlayEditorMenuIcon wcButton fa fa-plus-square-o fa-lg" title="Import..."></div>\
         <div class="ARPG_Separator"></div>\
         <div class="wcPlayEditorMenuOptionUndo"><span class="wcPlayEditorMenuIcon wcButton fa fa-backward fa-lg"/></div>\
         <div class="wcPlayEditorMenuOptionRedo"><span class="wcPlayEditorMenuIcon wcButton fa fa-forward fa-lg"/></div>\
@@ -754,6 +755,9 @@ wcPlayEditor.prototype = {
    * @private
    */
   __setupPalette: function() {
+    if (!this._engine) {
+      return;
+    }
     if (this.$typeButton.length == 0) {
       // Create our top bar with buttons for each node type.
       this.$typeButton.push($('<button class="wcPlayEditorButton" title="Show Entry Nodes.">Entry</button>'));
@@ -792,33 +796,14 @@ wcPlayEditor.prototype = {
       this._nodeLibrary = {};
     }
 
-    // Initialize our node library.
-    for (var i = 0; i < wcPlay.NODE_LIBRARY.length; ++i) {
-      var data = wcPlay.NODE_LIBRARY[i];
-
-      // Skip categories we are not showing.
-      if (data.type !== wcPlay.NODE.COMPOSITE) {
-        var catIndex = this._options.category.items.indexOf(data.category);
-        if ((!this._options.category.isBlacklist && catIndex === -1) ||
-            (this._options.category.isBlacklist && catIndex > -1)) {
-          continue;
-        }
-      } else {
-        // Skip composite node special 'link' nodes if we are not inside a composite.
-        if (this._engine === this._parent) {
-          if (data.category === '__Hidden__') {
-            continue;
-          }
-        }
-      }
-
+    function __organize(data) {
       // Initialize the node category if it is new.
       if (!this._nodeLibrary.hasOwnProperty(data.category)) {
         this._nodeLibrary[data.category] = {};
       }
 
       // Further categorize the node by its type.
-      if (!this._nodeLibrary[data.category].hasOwnProperty(data.type)) {
+      if (!this._nodeLibrary[data.category].hasOwnProperty(data.nodeType)) {
         var typeData = {
           $category: $('<div class="wcPlayTypeCategory">'),
           $button: $('<button class="wcPlayCategoryButton" title="Toggle visibility of this category.">' + data.category + '</button>'),
@@ -829,7 +814,7 @@ wcPlayEditor.prototype = {
         typeData.context = typeData.$canvas[0].getContext('2d');
         typeData.$category.append(typeData.$button);
         typeData.$category.append(typeData.$canvas);
-        this.$typeArea[this.__typeIndex(data.type)].append(typeData.$category);
+        this.$typeArea[this.__typeIndex(data.nodeType)].append(typeData.$category);
 
         (function __setupCollapseHandler(d) {
           d.$button.click(function() {
@@ -843,16 +828,46 @@ wcPlayEditor.prototype = {
           });
         })(typeData);
 
-        this._nodeLibrary[data.category][data.type] = typeData;
+        this._nodeLibrary[data.category][data.nodeType] = typeData;
+      }
+    }
+
+    // Initialize our node library.
+    for (var i = 0; i < wcPlay.NODE_LIBRARY.length; ++i) {
+      var data = wcPlay.NODE_LIBRARY[i];
+
+      // Skip categories we are not showing.
+      if (data.nodeType !== wcPlay.NODE.COMPOSITE) {
+        var catIndex = this._options.category.items.indexOf(data.category);
+        if ((!this._options.category.isBlacklist && catIndex === -1) ||
+            (this._options.category.isBlacklist && catIndex > -1)) {
+          continue;
+        }
+      } else {
+        // Skip our internal script node.
+        if (data.className === 'wcNodeCompositeScript') {
+          continue;
+        }
       }
 
+      __organize.call(this, data);
+
       // Now create an instance of the node.
-      var node = new window[data.name](null);
+      var node = new window[data.className](null);
       node.collapsed(false);
-      if (node.decompile) {
-        node.decompile();
-      }
-      this._nodeLibrary[data.category][data.type].nodes.push(node);
+      this._nodeLibrary[data.category][data.nodeType].nodes.push(node);
+      this.__updateNode(node, 0);
+    }
+
+    // Load our imported composite nodes as well.
+    var composites = this._engine.importedComposites();
+    for (var i = 0; i < composites.length; ++i) {
+      var node = composites[i];
+      // TODO: Check the contents of each composite node and make sure it does not contain any categories we are hiding.
+      
+      __organize.call(this, node);
+
+      this._nodeLibrary[node.category][node.nodeType].nodes.push(node);
       this.__updateNode(node, 0);
     }
 
@@ -2467,9 +2482,8 @@ wcPlayEditor.prototype = {
    * Generates an undo event for a node that was created.
    * @function wcPlayEditor#__onCreateNode
    * @param {wcNode} node - The node that was created.
-   * @param {Boolean} [decompile] - If true, will also decompile the node if able.
    */
-  __onCreateNode: function(node, decompile) {
+  __onCreateNode: function(node) {
     this._undoManager && this._undoManager.addEvent('Created Node "' + node.category + '.' + node.type + '"',
     {
       id: node.id,
@@ -2478,7 +2492,6 @@ wcPlayEditor.prototype = {
         x: node.pos.x,
         y: node.pos.y,
       },
-      decompile: decompile,
       data: node.export(),
       editor: this,
       parent: this._parent,
@@ -2506,9 +2519,6 @@ wcPlayEditor.prototype = {
     function() {
       var myNode = new window[this.className](this.parent, this.pos);
       myNode.id = this.id;
-      if (this.decompile && myNode.decompile) {
-        myNode.decompile();
-      }
       myNode.import(this.data);
     });
   },
@@ -2641,7 +2651,12 @@ wcPlayEditor.prototype = {
           event.preventDefault();
           return false;
         }
-      case 'I'.charCodeAt(0): // O to step outside of a Composite Node.
+      case 'I'.charCodeAt(0):
+        if (event.ctrlKey) {
+          $('.wcPlayEditorMenuOptionImport').first().click();
+          break;
+        }
+        // O to step outside of a Composite Node.
         $('.wcPlayEditorMenuOptionCompositeEnter').first().click();
         break;
       case 'C'.charCodeAt(0):
@@ -2764,67 +2779,14 @@ wcPlayEditor.prototype = {
     });
     $body.on('click', '.wcPlayEditorMenuOptionOpen', function() {
       if (self._engine) {
-        if(document.createEvent) {
+        if (document.createEvent) {
           var evt = document.createEvent("MouseEvents");
           evt.initEvent("click", true, false);
-          self.$container.prepend(self.$hiddenFileInput);
-          self.$hiddenFileInput[0].dispatchEvent(evt);
+          self.$container.prepend(self.$hiddenFileLoader);
+          self.$hiddenFileLoader[0].dispatchEvent(evt);
         }
       }
     });
-
-    // Import the contents of a file.
-    function __importScriptFile(file) {
-      var reader = new FileReader();
-      reader.onload = function(e) {
-        if (self._engine) {
-          // Temporarily save the current script, just in case something goes wrong.
-          var saveData = self._engine.save();
-
-          self._parent = self._engine;
-          self._selectedNode = null;
-          self._selectedNodes = [];
-
-          try {
-            self._engine.restore(e.target.result);
-            self._undoManager && self._undoManager.clear();
-            self.center();
-          } catch (e) {
-            alert('Failed to open file "' + file.name + '"\nPlease check to ensure it is actually a wcPlay script file.');
-
-            // Something went wrong, restore the previous script.
-            self._engine.restore(saveData);
-          }
-        }
-      };
-
-      reader.readAsText(file);
-    }
-
-    // A hidden file input field that will handle opening the open file dialog for us.
-    $('body').on('change', '#wcPlayEditorFileOpener', function(event) {
-      if (event.target.files.length) {
-        __importScriptFile(event.target.files[0]);
-        $(this).val('');
-        $(this).remove();
-      }
-    });
-
-    // Support drag-drop over the entire window.
-    this.$container.on('dragover', function(event) {
-      event.stopPropagation();
-      event.preventDefault();
-      event.originalEvent.dataTransfer.dropEffect = 'copy';
-    });
-    this.$container.on('drop', function(event) {
-      event.stopPropagation();
-      event.preventDefault();
-
-      if (event.originalEvent.dataTransfer.files.length) {
-        __importScriptFile(event.originalEvent.dataTransfer.files[0]);
-      }
-    });
-
     $body.on('click', '.wcPlayEditorMenuOptionSave', function() {
       if (self._engine) {
         if (!saveAs) {
@@ -2833,7 +2795,6 @@ wcPlayEditor.prototype = {
         }
 
         var savedData = self._engine.save();
-
         var blob;
         try {
           blob = new Blob([savedData], {type: 'text/plain'});
@@ -2847,6 +2808,75 @@ wcPlayEditor.prototype = {
         saveAs(blob, 'script.wcplay');
       }
     });
+    $body.on('click', '.wcPlayEditorMenuOptionImport', function() {
+      if (self._engine) {
+        if (document.createEvent) {
+          var evt = document.createEvent("MouseEvents");
+          evt.initEvent("click", true, false);
+          self.$container.prepend(self.$hiddenFileImporter);
+          self.$hiddenFileImporter[0].dispatchEvent(evt);
+        }
+      }
+    });
+
+
+    // Import the contents of a file.
+    function __importScriptFile(file, importing) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        if (self._engine) {
+          if (importing) {
+            // Import the script as its own Composite node.
+            if (self._engine.importComposite(e.target.result, file.name)) {
+              self.__setupPalette();
+              self.$typeButton[3].click();
+            }
+          } else {
+            if (self._engine.restore(e.target.result)) {
+              self._parent = self._engine;
+              self._selectedNode = null;
+              self._selectedNodes = [];
+              self._undoManager && self._undoManager.clear();
+              self.center();
+            } else {
+              alert('Failed to open file "' + file.name + '"\nPlease check to ensure it is actually a wcPlay script file.');
+            }
+          }
+        }
+      };
+
+      reader.readAsText(file);
+    }
+    // A hidden file input field that will handle opening the open file dialog for us.
+    $('body').on('change', '#wcPlayEditorHiddenFileLoader', function(event) {
+      if (event.target.files.length) {
+        __importScriptFile(event.target.files[0]);
+        $(this).val('');
+        $(this).remove();
+      }
+    });
+    $('body').on('change', '#wcPlayEditorHiddenFileImporter', function(event) {
+      if (event.target.files.length) {
+        __importScriptFile(event.target.files[0], true);
+        $(this).val('');
+        $(this).remove();
+      }
+    });
+    // Support drag-drop over the entire window.
+    this.$container.on('dragover', function(event) {
+      event.stopPropagation();
+      event.preventDefault();
+      event.originalEvent.dataTransfer.dropEffect = 'copy';
+    });
+    this.$container.on('drop', function(event) {
+      event.stopPropagation();
+      event.preventDefault();
+
+      if (event.originalEvent.dataTransfer.files.length) {
+        __importScriptFile(event.originalEvent.dataTransfer.files[0], event.ctrlKey);
+      }
+    });
+
 
     // Edit menu
     $body.on('click', '.wcPlayEditorMenuOptionUndo', function() {
@@ -2948,22 +2978,6 @@ wcPlayEditor.prototype = {
 
     $body.on('click', '.wcPlayEditorMenuOptionComposite', function() {
       if (self._selectedNodes.length && self._parent) {
-        // Find a unique class name to use for this new composite node.
-        // var index = 0;
-        // var number = '';
-        // var className = 'wcNodeCompositeScript';
-        // do {
-        //   index++
-        //   number = '0000'.substr(0, 4-('' + index).length) + index;
-        //   className = 'wcNodeCompositeScript' + number;
-        // } while (window[className]);
-
-        // Dynamically extend a new composite node class.
-
-        // wcNodeCompositeScript.extend(className, 'Composite', '__Custom__', {
-        //   name: number,
-        // });
-
         self._undoManager && self._undoManager.beginGroup("Combined Nodes into Composite");
         // Create undo events for removing the selected nodes.
         for (var i = 0; i < self._selectedNodes.length; ++i) {
@@ -3129,8 +3143,7 @@ wcPlayEditor.prototype = {
         compNode.pos.y = bounds.top + bounds.height/2;
 
         // Compile the meta data for this node based on the nodes inside.
-        compNode.compile();
-        // window[className].prototype.compiledNodes = compNode.compiledNodes;
+        // compNode.compile();
 
         // Create undo event for creating the composite node.
         self.__onCreateNode(compNode);
@@ -3950,14 +3963,13 @@ wcPlayEditor.prototype = {
     if (this._draggingNodeData) {
       // Create an instance of the node and add it to the script.
       var mouse = this.__mouse(event, this.$viewport.offset(), this._viewportCamera);
-      var newNode = new window[this._draggingNodeData.node.className](this._parent, {
-        x: (mouse.x / this._viewportCamera.z) + (this._draggingNodeData.$canvas.width()/2 + this._draggingNodeData.offset.x),
-        y: (mouse.y / this._viewportCamera.z) + (this._draggingNodeData.offset.y + 5),
-      });
-      if (newNode.decompile) {
-        newNode.decompile();
-      }
-      this.__onCreateNode(newNode, true);
+      var newNode = new window[this._draggingNodeData.node.className](this._parent, {x: 0, y: 0});
+      var data = this._draggingNodeData.node.export();
+      data.pos.x = (mouse.x / this._viewportCamera.z) + (this._draggingNodeData.$canvas.width()/2 + this._draggingNodeData.offset.x);
+      data.pos.y = (mouse.y / this._viewportCamera.z) + (this._draggingNodeData.offset.y + 5);
+      newNode.import(data);
+
+      this.__onCreateNode(newNode);
 
       this._selectedNode = newNode;
       this._selectedNodes = [newNode];

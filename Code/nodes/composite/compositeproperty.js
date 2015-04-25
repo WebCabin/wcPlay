@@ -1,4 +1,4 @@
-wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'Link', {
+wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'External', {
   /**
    * @class
    * This node acts as a connection between exit links on a composite node and the script inside.<br>
@@ -35,6 +35,10 @@ wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'Link', {
    */
   onNameChanged: function(oldName, newName) {
     this._super(oldName, newName);
+
+    if (this._invalid) {
+      return;
+    }
 
     if (newName) {
       // Attempt to create a new property, if it does not exist, then synchronize our local property.
@@ -73,7 +77,7 @@ wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'Link', {
     this._super(name, oldValue, newValue);
 
     if (this._invalid) {
-      return 'error';
+      return '';
     }
 
     if (name === 'value') {
@@ -95,7 +99,7 @@ wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'Link', {
     this._super(name);
 
     if (this._invalid) {
-      return 'error';
+      return '';
     }
 
     if (name === 'value') {
@@ -119,7 +123,7 @@ wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'Link', {
     this._super(name, oldValue, newValue);
 
     if (this._invalid) {
-      return 'error';
+      return '';
     }
 
     if (name === 'value') {
@@ -141,7 +145,7 @@ wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'Link', {
     this._super(name);
 
     if (this._invalid) {
-      return 'error';
+      return '';
     }
 
     if (name === 'value') {

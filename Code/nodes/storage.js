@@ -26,6 +26,7 @@ wcNode.extend('wcNodeStorage', 'Storage', '', {
     if (category) {
       this.className = className;
       this.type = type;
+      this.nodeType = wcPlay.NODE.STORAGE;
       this.category = category;
       wcPlay.registerNodeType(className, type, category, wcPlay.NODE.STORAGE);
     }

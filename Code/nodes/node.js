@@ -98,10 +98,6 @@ Class.extend('wcNode', 'Node', '', {
   reset: function() {
     this.onReset();
 
-    for (var i = 0; i < this.properties.length; ++i) {
-      this.properties[i].value = this.properties[i].initialValue;
-    }
-
     for (var i = 0; i < this._meta.threads.length; ++i) {
       if (typeof this._meta.threads[i] === 'number') {
         clearTimeout(this._meta.threads[i]);
@@ -112,6 +108,10 @@ Class.extend('wcNode', 'Node', '', {
     }
     this._meta.threads = [];
     this._meta.awake = false;
+
+    for (var i = 0; i < this.properties.length; ++i) {
+      this.properties[i].value = this.properties[i].initialValue;
+    }
   },
 
   /**
@@ -176,7 +176,7 @@ Class.extend('wcNode', 'Node', '', {
       }
     }
 
-    this.onImported();
+    this.onImported(data, idMap);
   },
 
   /**
@@ -1732,9 +1732,11 @@ Class.extend('wcNode', 'Node', '', {
    * Event that is called after the node has imported.<br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onImported
+   * @param {Object} data - The data being imported.
+   * @param {Number[]} [idMap] - If supplied, identifies a mapping of old ID's to new ID's, any not found in this list will be unchanged.
    */
-  onImported: function() {
-    // this._super();
+  onImported: function(data, idMap) {
+    // this._super(data, idMap);
   },
 
   /**
