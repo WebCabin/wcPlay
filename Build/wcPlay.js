@@ -781,6 +781,16 @@ wcPlay.prototype = {
     }
   },
 };
+window['wcPlayEditorClipboard'] = {
+  bounds: {
+    top: 0,
+    left: 0,
+    width: 0,
+    height: 0,
+  },
+  nodes: []
+};
+
 /**
  * @class
  * Provides a visual interface for editing a Play script. Requires HTML5 canvas.
@@ -858,6 +868,7 @@ function wcPlayEditor(container, options) {
   this._paletteMoving = false;
 
   this._mouse = {x: 0, y: 0};
+  this._mouseInViewport = false;
   this._highlightRect = null;
   this._highlightNode = null;
   this._selectedNode = null;
@@ -1401,9 +1412,9 @@ wcPlayEditor.prototype = {
             <li><span class="wcPlayEditorMenuOptionUndo wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-backward fa-lg"/>Undo<span>Ctrl+Z</span></span></li>\
             <li><span class="wcPlayEditorMenuOptionRedo wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-forward fa-lg"/>Redo<span>Ctrl+Y</span></span></li>\
             <li><hr class="wcPlayMenuSeparator"></li>\
-            <li><span class="wcPlayEditorMenuOptionCut wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-cut fa-lg"/>Cut<span>Ctrl+X</span></span></li>\
-            <li><span class="wcPlayEditorMenuOptionCopy wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-copy fa-lg"/>Copy<span>Ctrl+C</span></span></li>\
-            <li><span class="wcPlayEditorMenuOptionPaste wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-paste fa-lg"/>Paste<span>Ctrl+P</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionCut wcPlayMenuItem"><i class="wcPlayEditorMenuIcon wcButton fa fa-cut fa-lg"/>Cut<span>Ctrl+X</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionCopy wcPlayMenuItem"><i class="wcPlayEditorMenuIcon wcButton fa fa-copy fa-lg"/>Copy<span>Ctrl+C</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionPaste wcPlayMenuItem"><i class="wcPlayEditorMenuIcon wcButton fa fa-paste fa-lg"/>Paste<span>Ctrl+P</span></span></li>\
             <li><span class="wcPlayEditorMenuOptionDelete wcPlayMenuItem"><i class="wcPlayEditorMenuIcon wcButton fa fa-trash-o fa-lg"/>Delete<span>Del</span></span></li>\
             <li><hr class="wcPlayMenuSeparator"></li>\
             <li><span class="wcPlayEditorMenuOptionComposite wcPlayMenuItem" title="Combine all selected nodes into a new \'Composite\' Node."><i class="wcPlayEditorMenuIcon wcButton fa fa-share-alt-square fa-lg"/>Create Composite<span>C</span></span></li>\
@@ -1447,9 +1458,9 @@ wcPlayEditor.prototype = {
         <div class="wcPlayEditorMenuOptionUndo"><span class="wcPlayEditorMenuIcon wcButton fa fa-backward fa-lg"/></div>\
         <div class="wcPlayEditorMenuOptionRedo"><span class="wcPlayEditorMenuIcon wcButton fa fa-forward fa-lg"/></div>\
         <div class="ARPG_Separator"></div>\
-        <div class="wcPlayEditorMenuOptionCut disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-cut fa-lg" title="Cut Selected Nodes. (Ctrl+X)"/></div>\
-        <div class="wcPlayEditorMenuOptionCopy disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-copy fa-lg" title="Copy Selected Nodes. (Ctrl+C)"/></div>\
-        <div class="wcPlayEditorMenuOptionPaste disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-paste fa-lg" title="Paste Copied Nodes. (Ctrl+V)"/></div>\
+        <div class="wcPlayEditorMenuOptionCut"><span class="wcPlayEditorMenuIcon wcButton fa fa-cut fa-lg" title="Cut Selected Nodes. (Ctrl+X)"/></div>\
+        <div class="wcPlayEditorMenuOptionCopy"><span class="wcPlayEditorMenuIcon wcButton fa fa-copy fa-lg" title="Copy Selected Nodes. (Ctrl+C)"/></div>\
+        <div class="wcPlayEditorMenuOptionPaste"><span class="wcPlayEditorMenuIcon wcButton fa fa-paste fa-lg" title="Paste Copied Nodes. (Ctrl+V)"/></div>\
         <div class="wcPlayEditorMenuOptionDelete"><span class="wcPlayEditorMenuIcon wcButton fa fa-trash-o fa-lg" title="Delete Selected Nodes. (Del)"/></div>\
         <div class="ARPG_Separator"></div>\
         <div class="wcPlayEditorMenuOptionComposite"><span class="wcPlayEditorMenuIcon wcButton fa fa-share-alt-square fa-lg" title="Combine all selected nodes into a new \'Composite\' Node. (C)"/></div>\
@@ -3300,10 +3311,11 @@ wcPlayEditor.prototype = {
     // Viewport
     this.$viewport.on('mousemove',  function(event){self.__onViewportMouseMove(event, this);});
     this.$viewport.on('mousedown',  function(event){self.__onViewportMouseDown(event, this);});
+    this.$viewport.on('mouseup',    function(event){self.__onViewportMouseUp(event, this);});
+    this.$viewport.on('mouseenter', function(event){self.__onViewportMouseEnter(event, this);});
+    this.$viewport.on('mouseleave', function(event){self.__onViewportMouseLeave(event, this);});
     this.$viewport.on('click',      function(event){self.__onViewportMouseClick(event, this);});
     this.$viewport.on('dblclick',   function(event){self.__onViewportMouseDoubleClick(event, this);});
-    this.$viewport.on('mouseup',    function(event){self.__onViewportMouseUp(event, this);});
-    // this.$viewport.on('mouseleave', function(event){self.__onViewportMouseUp(event, this);});
     this.$viewport.on('mousewheel DOMMouseScroll', function(event) {self.__onViewportMouseWheel(event, this);});
 
     $(window).keydown(function(event) {self.__onKey(event, this);});
@@ -3368,7 +3380,13 @@ wcPlayEditor.prototype = {
       case 'I'.charCodeAt(0): // O to step outside of a Composite Node.
         $('.wcPlayEditorMenuOptionCompositeEnter').first().click();
         break;
-      case 'C'.charCodeAt(0): // C to create a Composite node from the selected nodes.
+      case 'C'.charCodeAt(0):
+        if (event.ctrlKey) {
+          // Ctrl+C to Copy nodes.
+          $('.wcPlayEditorMenuOptionCopy').first().click();
+          break;
+        }
+        // C to create a Composite node from the selected nodes.
         $('.wcPlayEditorMenuOptionComposite').first().click();
         break;
       case 'N'.charCodeAt(0): // Alt+N to start a new script.
@@ -3377,6 +3395,24 @@ wcPlayEditor.prototype = {
           event.stopPropagation();
           event.preventDefault();
           return false;
+        }
+        break;
+      case 'X'.charCodeAt(0):
+        // Ctrl+X to Cut nodes.
+        if (event.ctrlKey) {
+          $('.wcPlayEditorMenuOptionCut').first().click();
+        }
+        break;
+      case 'X'.charCodeAt(0):
+        // Ctrl+X to Cut nodes.
+        if (event.ctrlKey) {
+          $('.wcPlayEditorMenuOptionCut').first().click();
+        }
+        break;
+      case 'V'.charCodeAt(0):
+        // Ctrl+V to Paste previously copied nodes.
+        if (event.ctrlKey) {
+          $('.wcPlayEditorMenuOptionPaste').first().click();
         }
         break;
     }
@@ -3554,6 +3590,83 @@ wcPlayEditor.prototype = {
     });
     $body.on('click', '.wcPlayEditorMenuOptionRedo', function() {
       self._undoManager && self._undoManager.redo();
+    });
+    $body.on('click', '.wcPlayEditorMenuOptionCut', function() {
+      if (self._selectedNodes.length === 0) {
+        return;
+      }
+
+      $('.wcPlayEditorMenuOptionCopy').first().click();
+
+      self._undoManager && self._undoManager.beginGroup('Cut Nodes to clipboard');
+      for (var i = 0; i < self._selectedNodes.length; ++i) {
+        self.__onDestroyNode(self._selectedNodes[i]);
+        self._selectedNodes[i].destroy();
+      }
+      self._selectedNodes = [];
+      self._undoManager && self._undoManager.endGroup();
+    });
+    $body.on('click', '.wcPlayEditorMenuOptionCopy', function() {
+      if (self._selectedNodes.length === 0) {
+        return;
+      }
+
+      window.wcPlayEditorClipboard.nodes = [];
+      var bounds = [];
+      for (var i = 0; i < self._selectedNodes.length; ++i) {
+        var node = self._selectedNodes[i];
+        var data = node.export();
+        bounds.push(node._meta.bounds.farRect);
+
+        window.wcPlayEditorClipboard.nodes.push(data);
+      }
+      window.wcPlayEditorClipboard.bounds = self.__expandRect(bounds);
+    });
+    $body.on('click', '.wcPlayEditorMenuOptionPaste', function() {
+      if (window.wcPlayEditorClipboard.nodes.length === 0) {
+        return;
+      }
+
+      var mouse = {
+        x: self._mouse.x,
+        y: self._mouse.y,
+      };
+      if (!self._mouseInViewport) {
+        mouse.x = self.$viewport.width()/2;
+        mouse.y = self.$viewport.height()/2;
+      }
+
+      self._selectedNode = null;
+      self._selectedNodes = [];
+
+      var idMap = [];
+      var nodes = [];
+      self._undoManager && self._undoManager.beginGroup('Paste Nodes from clipboard');
+      var bounds = window.wcPlayEditorClipboard.bounds;
+      for (var i = 0; i < window.wcPlayEditorClipboard.nodes.length; ++i) {
+        var data = window.wcPlayEditorClipboard.nodes[i];
+
+        var newNode = new window[data.className](self._parent, data.pos);
+
+        idMap[data.id] = newNode.id;
+        nodes.push(newNode);
+      }
+
+      for (var i = 0; i < window.wcPlayEditorClipboard.nodes.length; ++i) {
+        var data = window.wcPlayEditorClipboard.nodes[i];
+        var newNode = nodes[i];
+        self._selectedNodes.push(newNode);
+        if (!self._selectedNode) {
+          self._selectedNode = newNode;
+        }
+
+        newNode.import(data, idMap);
+        newNode.pos.x = (mouse.x - self._viewportCamera.x) / self._viewportCamera.z - bounds.width/2 + (data.pos.x - bounds.left);
+        newNode.pos.y = (mouse.y - self._viewportCamera.y) / self._viewportCamera.z - bounds.height/2 + (data.pos.y - bounds.top);
+
+        self.__onCreateNode(newNode);
+      }
+      self._undoManager && self._undoManager.endGroup();
     });
 
     $body.on('click', '.wcPlayEditorMenuOptionDelete', function() {
@@ -4018,9 +4131,11 @@ wcPlayEditor.prototype = {
       return;
     }
 
+    // Moving nodes
     if (this._viewportMovingNode) {
       var moveX = mouse.x - this._mouse.x;
       var moveY = mouse.y - this._mouse.y;
+
       for (var i = 0; i < this._selectedNodes.length; ++i) {
         var node = this._selectedNodes[i];
         var oldPos = {
@@ -4275,11 +4390,11 @@ wcPlayEditor.prototype = {
 
       this._expandedHighlightNode = this._highlightNode;
       var self = this;
-      setTimeout(function() {
-        if (self._expandedHighlightNode) {
+      // setTimeout(function() {
+      //   if (self._expandedHighlightNode) {
           self._expandedHighlightNode.collapsed(false);
-        }
-      }, 500);
+      //   }
+      // }, 500);
     }
   },
 
@@ -4586,6 +4701,8 @@ wcPlayEditor.prototype = {
 
     // Finished moving a node.
     if (this._selectedNodes.length && this._selectedNodeOrigins.length) {
+      this._undoManager && this._undoManager.beginGroup('Node(s) moved.');
+
       for (var i = 0; i < this._selectedNodes.length; ++i) {
         var node = this._selectedNodes[i];
         if (node.pos.x !== this._selectedNodeOrigins[i].x || node.pos.y !== this._selectedNodeOrigins[i].y) {
@@ -4620,6 +4737,8 @@ wcPlayEditor.prototype = {
           });
         }
       }
+
+      this._undoManager && this._undoManager.endGroup();
       this._selectedNodeOrigins = [];
     }
 
@@ -4842,6 +4961,28 @@ wcPlayEditor.prototype = {
         this.$viewport.removeClass('wcMoving');
       }
     }
+  },
+
+  /**
+   * Handle mouse entering the viewport canvas.
+   * @function wcPlayEditor#__onViewportMouseEnter
+   * @private
+   * @param {Object} event - The mouse event.
+   * @param {Object} elem - The target element.
+   */
+  __onViewportMouseEnter: function(event, elem) {
+    this._mouseInViewport = true;
+  },
+
+  /**
+   * Handle mouse leaving the viewport canvas.
+   * @function wcPlayEditor#__onViewportMouseLeave
+   * @private
+   * @param {Object} event - The mouse event.
+   * @param {Object} elem - The target element.
+   */
+  __onViewportMouseLeave: function(event, elem) {
+    this._mouseInViewport = false;
   },
 
   /**
@@ -7486,7 +7627,7 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '__Hidden__', {
    */
   onImporting: function(data, idMap) {
     this.compiledNodes = data.compiledNodes;
-    this.decompile(true);
+    this.decompile(idMap? false: true);
 
     this._super(data, idMap);
   },

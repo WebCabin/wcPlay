@@ -327,7 +327,7 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', '__Hidden__', {
    */
   onImporting: function(data, idMap) {
     this.compiledNodes = data.compiledNodes;
-    this.decompile(true);
+    this.decompile(idMap? false: true);
 
     this._super(data, idMap);
   },
