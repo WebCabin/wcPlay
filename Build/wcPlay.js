@@ -2261,7 +2261,7 @@ wcPlayEditor.prototype = {
     // Highlight title text.
     if (this._highlightTitle && this._highlightNode === node) {
       this.__drawRoundedRect(result.titleBounds, this._drawStyle.property.highlightColor, this._drawStyle.property.highlightBorder, this._font.title.size/2, context);
-    } else if (this._highlightNode === node) {
+    } else if (!hideCollapsible && this._highlightNode === node) {
       this.__drawRoundedRect(result.titleBounds, this._drawStyle.property.normalColor, this._drawStyle.property.normalBorder, this._font.title.size/2, context);
     }
 
@@ -2362,13 +2362,13 @@ wcPlayEditor.prototype = {
         // Highlight hovered values.
         if (this._highlightNode === node && this._highlightPropertyValue && this._highlightPropertyValue.name === props[i].name) {
           this.__drawRoundedRect(valueBound.rect, this._drawStyle.property.highlightColor, this._drawStyle.property.highlightBorder, this._font.property.size/2, context);
-        } else if (this._highlightNode === node) {
+        } else if (!hideCollapsible && this._highlightNode === node) {
           this.__drawRoundedRect(valueBound.rect, this._drawStyle.property.normalColor, this._drawStyle.property.normalBorder, this._font.property.size/2, context);
         }
 
         if (this._highlightNode === node && this._highlightPropertyInitialValue && this._highlightPropertyInitialValue.name === props[i].name) {
           this.__drawRoundedRect(initialBound.rect, this._drawStyle.property.highlightColor, this._drawStyle.property.highlightBorder, this._font.property.size/2, context);
-        } else if (this._highlightNode === node) {
+        } else if (!hideCollapsible && this._highlightNode === node) {
           this.__drawRoundedRect(initialBound.rect, this._drawStyle.property.normalColor, this._drawStyle.property.normalBorder, this._font.property.size/2, context);
         }
 
@@ -4734,8 +4734,8 @@ wcPlayEditor.prototype = {
       // Create an instance of the node and add it to the script.
       var mouse = this.__mouse(event, this.$viewport.offset(), this._viewportCamera);
       var newNode = new window[this._draggingNodeData.node.className](this._parent, {
-        x: (mouse.x + (this._draggingNodeData.$canvas.width()/2 + this._draggingNodeData.offset.x)) / this._viewportCamera.z,
-        y: (mouse.y + this._draggingNodeData.offset.y) / this._viewportCamera.z,
+        x: (mouse.x / this._viewportCamera.z) + (this._draggingNodeData.$canvas.width()/2 + this._draggingNodeData.offset.x),
+        y: (mouse.y / this._viewportCamera.z) + (this._draggingNodeData.offset.y + 5),
       });
       if (newNode.decompile) {
         newNode.decompile();
