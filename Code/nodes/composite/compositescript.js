@@ -64,12 +64,15 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
           }
           newNodes.push(newNode);
         } else {
-          console.log('ERROR: Attempted to load node "' + data.nodes[i].category + '.' + data.nodes[i].type + '", but the constructor could not be found!');
+          console.log('ERROR: Attempted to load node "' + this.compiledNodes[i].className + '", but the constructor could not be found!');
+          newNodes.push(null);
         }
       }
       for (var i = 0; i < this.compiledNodes.length; ++i) {
-        var data = this.compiledNodes[i];
-        newNodes[i].import(data, idMap);
+        if (newNodes[i]) {
+          var data = this.compiledNodes[i];
+          newNodes[i].import(data, idMap);
+        }
       }
     }
   },

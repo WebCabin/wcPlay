@@ -231,7 +231,7 @@ wcPlay.prototype = {
             data: data.nodes[i],
           });
         } else {
-          console.log('ERROR: Attempted to load node "' + data.nodes[i].category + '.' + data.nodes[i].type + '", but the constructor could not be found!');
+          console.log('ERROR: Attempted to load node "' + data.nodes[i].className + '", but the constructor could not be found!');
         }
       }
 
