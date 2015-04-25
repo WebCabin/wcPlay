@@ -1444,7 +1444,7 @@ wcPlayEditor.prototype = {
   __setupMenu: function() {
     var $fileMenu = $('\
       <ul class="wcPlayEditorMenu wcPlayNoHighlights">\
-        <span class="wcPlayVersionTag wcPlayNoHighlights"></span>\
+        <span class="wcPlayVersionTag wcPlayNoHighlights">0.0.0 Alpha</span>\
         <li><span>File</span>\
           <ul>\
             <li><span class="wcPlayEditorMenuOptionNew wcPlayMenuItem"><i class="wcPlayEditorMenuIcon wcButton fa fa-file-o fa-lg"/>New Script...<span>Alt+N</span></span></li>\
