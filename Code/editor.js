@@ -1032,21 +1032,14 @@ wcPlayEditor.prototype = {
     context.fillRect(data.debugLog.left, data.debugLog.top, data.debugLog.width, data.debugLog.height);
     context.strokeRect(data.debugLog.left, data.debugLog.top, data.debugLog.width, data.debugLog.height);
 
-    context.strokeStyle = (this._highlightDebugLog && this._highlightNode === node? "white": "black");
+    context.strokeStyle = (node.debugLog()? "red": (this._highlightDebugLog && this._highlightNode === node? "white": "black"));
     context.lineWidth = 2;
     context.beginPath();
-    if (!node.debugLog()) {
-      // context.moveTo(data.debugLog.left + 1, data.debugLog.top + data.debugLog.height/2);
-      // context.lineTo(data.debugLog.left + data.debugLog.width - 1, data.debugLog.top + data.debugLog.height/2);
-    }
-
-    if (node.debugLog()) {
-      context.moveTo(data.debugLog.left + 1, data.debugLog.top + 1);
-      context.lineTo(data.debugLog.left + data.debugLog.width/2, data.debugLog.top + data.debugLog.height/2);
-      context.lineTo(data.debugLog.left + 1, data.debugLog.top + data.debugLog.height - 1);
-      context.moveTo(data.debugLog.left + data.debugLog.width/2, data.debugLog.top + data.debugLog.height - 2);
-      context.lineTo(data.debugLog.left + data.debugLog.width, data.debugLog.top + data.debugLog.height - 2);
-    }
+    context.moveTo(data.debugLog.left + 1, data.debugLog.top + 1);
+    context.lineTo(data.debugLog.left + data.debugLog.width/2, data.debugLog.top + data.debugLog.height/2);
+    context.lineTo(data.debugLog.left + 1, data.debugLog.top + data.debugLog.height - 1);
+    context.moveTo(data.debugLog.left + data.debugLog.width/2, data.debugLog.top + data.debugLog.height - 2);
+    context.lineTo(data.debugLog.left + data.debugLog.width, data.debugLog.top + data.debugLog.height - 2);
     context.stroke();
     context.restore();
 
@@ -1062,8 +1055,8 @@ wcPlayEditor.prototype = {
     context.fillStyle = (this._highlightBreakpoint && this._highlightNode === node? "black": "white");
     context.fillRect(data.breakpoint.left, data.breakpoint.top, data.breakpoint.width, data.breakpoint.height);
 
-    context.strokeStyle = (node._break? "darkred": (this._highlightBreakpoint && this._highlightNode === node? "white": "black"));
-    context.fillStyle = "darkred";
+    context.strokeStyle = (node._break? "red": (this._highlightBreakpoint && this._highlightNode === node? "white": "black"));
+    context.fillStyle = "red";
     context.lineWidth = 2;
     context.beginPath();
     context.arc(data.breakpoint.left + data.breakpoint.width/2, data.breakpoint.top + data.breakpoint.height/2, Math.min(data.breakpoint.width/2-2, data.breakpoint.height/2-2), 0, 2 * Math.PI);
