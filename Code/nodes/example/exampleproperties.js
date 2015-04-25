@@ -1,10 +1,10 @@
-wcNodeProcess.extend('wcNodeProcessTutorialProperties', 'Example Properties', 'Tutorial', {
+wcNodeProcess.extend('wcNodeProcessExampleProperties', 'Example Properties', 'Example', {
   /**
    * @class
    * This node demonstrates an example of the different property types and how their values can be limited.
    * When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.
    *
-   * @constructor wcNodeProcessTutorialProperties
+   * @constructor wcNodeProcessExampleProperties
    * @param {String} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
    */
@@ -25,7 +25,7 @@ wcNodeProcess.extend('wcNodeProcessTutorialProperties', 'Example Properties', 'T
 
   /**
    * This function is used in the 'select' property to list a dynamic number of items that appear in edit combo box.
-   * @function wcNodeProcessTutorialProperties#selectItems
+   * @function wcNodeProcessExampleProperties#selectItems
    * @returns {wcNode~SelectItem[]} - A list of items to populate in the combo box.
    */
   selectItems: function() {

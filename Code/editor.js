@@ -21,7 +21,7 @@ function wcPlayEditor(container, options) {
   this.$viewport = null;
   this._viewportContext = null;
   this.$palette = null;
-  this._paletteSize = 0.25;
+  this._paletteSize = 300;
   this.$typeButton = [];
   this.$typeArea = [];
 
@@ -251,7 +251,7 @@ wcPlayEditor.prototype = {
       this._size.x = width;
       this._size.y = height;
 
-      var w = width * this._paletteSize;
+      var w = this._paletteSize;
       this.$palette.css('width', w).attr('width', w).attr('height', height);
       this.$viewport.css('width', width - w).attr('width', width - w).attr('height', height);
     }
@@ -780,6 +780,7 @@ wcPlayEditor.prototype = {
           nodes: [],
         };
         typeData.context = typeData.$canvas[0].getContext('2d');
+        typeData.context.scale(0.5, 0.5);
         typeData.$category.append(typeData.$button);
         typeData.$category.append(typeData.$canvas);
         this.$typeArea[this.__typeIndex(data.type)].append(typeData.$category);

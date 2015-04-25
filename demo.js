@@ -23,9 +23,9 @@ $(document).ready(function() {
   var numberNode = new wcNodeStorageNumber(myPlay, {x: 150, y: 600});
 
   // Tutorial nodes.
-  var tutViewportNode = new wcNodeProcessTutorialViewport(myPlay, {x: 800, y: 200});
-  var tutPropertyNode = new wcNodeProcessTutorialProperties(myPlay, {x: 800, y: 400});
-  var tutDynamicNode = new wcNodeProcessTutorialDynamic(myPlay, {x: 800, y: 600});
+  var exampleViewportNode = new wcNodeProcessExampleViewport(myPlay, {x: 800, y: 200});
+  var examplePropertyNode = new wcNodeProcessExampleProperties(myPlay, {x: 800, y: 400});
+  var exampleDynamicNode = new wcNodeProcessExampleDynamic(myPlay, {x: 800, y: 600});
   myPlayEditor.center();
 
   // Assign some property values.
@@ -38,7 +38,7 @@ $(document).ready(function() {
   logNode.connectExit('out', delayNode, 'in');
   delayNode.connectExit('out', operationNode, 'add');
   operationNode.connectExit('out', logNode, 'in');
-  delayNode.connectExit('out', tutDynamicNode, 'change color');
+  delayNode.connectExit('out', exampleDynamicNode, 'change color');
 
   // Lets collapse all the nodes so they take up less space.
   startNode.collapsed(true);

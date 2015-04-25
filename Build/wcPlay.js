@@ -804,7 +804,7 @@ function wcPlayEditor(container, options) {
   this.$viewport = null;
   this._viewportContext = null;
   this.$palette = null;
-  this._paletteSize = 0.25;
+  this._paletteSize = 300;
   this.$typeButton = [];
   this.$typeArea = [];
 
@@ -1034,7 +1034,7 @@ wcPlayEditor.prototype = {
       this._size.x = width;
       this._size.y = height;
 
-      var w = width * this._paletteSize;
+      var w = this._paletteSize;
       this.$palette.css('width', w).attr('width', w).attr('height', height);
       this.$viewport.css('width', width - w).attr('width', width - w).attr('height', height);
     }
@@ -1563,6 +1563,7 @@ wcPlayEditor.prototype = {
           nodes: [],
         };
         typeData.context = typeData.$canvas[0].getContext('2d');
+        typeData.context.scale(0.5, 0.5);
         typeData.$category.append(typeData.$button);
         typeData.$category.append(typeData.$canvas);
         this.$typeArea[this.__typeIndex(data.type)].append(typeData.$category);
@@ -5341,7 +5342,7 @@ Class.extend('wcNode', 'Node', '', {
     this._parent = parent;
 
     // Give the node its default properties.
-    this.createProperty(wcNode.PROPERTY_ENABLED, wcPlay.PROPERTY.TOGGLE, true, {collapsible: true, description: "Disabled nodes will be treated as if they were not there, all connections will be ignored."});
+    this.createProperty(wcNode.PROPERTY_ENABLED, wcPlay.PROPERTY.TOGGLE, true, {description: "Disabled nodes will be treated as if they were not there, all connections will be ignored."});
     // this.createProperty(wcNode.PROPERTY.DEBUG_LOG, wcPlay.PROPERTY.TOGGLE, false, {collapsible: true, description: "Output various debugging information about this node."});
 
     // Add this node to its parent.

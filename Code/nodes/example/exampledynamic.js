@@ -1,10 +1,10 @@
-wcNodeProcess.extend('wcNodeProcessTutorialDynamic', 'Example Dynamic', 'Tutorial', {
+wcNodeProcess.extend('wcNodeProcessExampleDynamic', 'Example Dynamic', 'Example', {
   /**
    * @class
    * This node demonstrates an example of a number of possible dynamic behaviors.
    * When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.
    *
-   * @constructor wcNodeProcessTutorialDynamic
+   * @constructor wcNodeProcessExampleDynamic
    * @param {String} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
    */
@@ -25,7 +25,7 @@ wcNodeProcess.extend('wcNodeProcessTutorialDynamic', 'Example Dynamic', 'Tutoria
   /**
    * Event that is called when an entry link has been triggered.<br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNodeProcessTutorialDynamic#onTriggered
+   * @function wcNodeProcessExampleDynamic#onTriggered
    * @param {String} name - The name of the entry link triggered.
    */
   onTriggered: function(name) {
@@ -47,7 +47,7 @@ wcNodeProcess.extend('wcNodeProcessTutorialDynamic', 'Example Dynamic', 'Tutoria
   /**
    * Event that is called when a property has changed.<br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNodeProcessTutorialDynamic#onPropertyChanged
+   * @function wcNodeProcessExampleDynamic#onPropertyChanged
    * @param {String} name - The name of the property.
    * @param {Object} oldValue - The old value of the property.
    * @param {Object} newValue - The new value of the property.

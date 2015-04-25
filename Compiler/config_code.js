@@ -81,14 +81,14 @@ concat({
   dest: '../Build/wcPlay.js',
 });
 
-// Combine the source files
+// Combine the example nodes.
 concat({
   src: [
-    '../Code/nodes/process/tutorialviewport.js',
-    '../Code/nodes/process/tutorialproperties.js',
-    '../Code/nodes/process/tutorialdynamic.js',
+    '../Code/nodes/example/exampleviewport.js',
+    '../Code/nodes/example/exampleproperties.js',
+    '../Code/nodes/example/exampledynamic.js',
   ],
-  dest: '../Build/wcPlayTutorialNodes.js',
+  dest: '../Build/wcPlayExampleNodes.js',
 });
 
 concat({
