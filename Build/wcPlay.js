@@ -1099,6 +1099,15 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
+   * Gets whether this node is paused, or any nodes inside if it is a composite.
+   * @function wcNode#paused
+   * @returns {Boolean} - Whether this, or inner nodes, are paused.
+   */
+  isPaused: function() {
+    return this._meta.paused;
+  },
+
+  /**
    * Sets, or Gets this node's debug log state.
    * @function wcNode#debugLog
    * @param {Boolean} [enabled] - If supplied, will assign a new debug log state.
@@ -2898,6 +2907,36 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
         nodes[i]._parent = this;
       }
     }
+  },
+
+  /**
+   * Gets whether this node is paused, or any nodes inside if it is a composite.
+   * @function wcNode#paused
+   * @returns {Boolean} - Whether this, or inner nodes, are paused.
+   */
+  isPaused: function() {
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      if (this._compositeNodes[i].isPaused()) {
+        return true;
+      }
+    }
+    for (var i = 0; i < this._entryNodes.length; ++i) {
+      if (this._entryNodes[i].isPaused()) {
+        return true;
+      }
+    }
+    for (var i = 0; i < this._processNodes.length; ++i) {
+      if (this._processNodes[i].isPaused()) {
+        return true;
+      }
+    }
+    for (var i = 0; i < this._storageNodes.length; ++i) {
+      if (this._storageNodes[i].isPaused()) {
+        return true;
+      }
+    }
+
+    return this._super();
   },
 
   /**

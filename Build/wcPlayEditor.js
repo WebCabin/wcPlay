@@ -1146,12 +1146,10 @@ wcPlayEditor.prototype = {
     // context.strokeRect(data.rect.left, data.rect.top, data.rect.width, data.rect.height);
 
     // Increase the nodes border thickness when flashing.
-    if (node._meta.flashDelta) {
-      if (node._meta.paused) {
-        this.__drawRoundedRect(data.inner, "#CC0000", 5, 10, context);
-      } else {
-        this.__drawRoundedRect(data.inner, "yellow", 2, 10, context);
-      }
+    if (node.isPaused()) {
+      this.__drawRoundedRect(data.inner, "#CC0000", 5, 10, context);
+    } else if (node._meta.flashDelta) {
+      this.__drawRoundedRect(data.inner, "yellow", 2, 10, context);
     }
 
     // this.__drawRoundedRect(data.farRect, "#000", 2, 10, context);

@@ -244,6 +244,15 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
+   * Gets whether this node is paused, or any nodes inside if it is a composite.
+   * @function wcNode#paused
+   * @returns {Boolean} - Whether this, or inner nodes, are paused.
+   */
+  isPaused: function() {
+    return this._meta.paused;
+  },
+
+  /**
    * Sets, or Gets this node's debug log state.
    * @function wcNode#debugLog
    * @param {Boolean} [enabled] - If supplied, will assign a new debug log state.
