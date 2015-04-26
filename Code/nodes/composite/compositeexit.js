@@ -129,4 +129,45 @@ wcNodeComposite.extend('wcNodeCompositeExit', 'Exit', 'External', {
 
     this._parent.sortExitLinks();
   },
+
+  /**
+   * Event that is called when the node is about to be imported. This is your chance to prepare the node for import, or possibly modify the import data.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeCompositeExit#onImporting
+   * @param {Object} data - The data being imported.
+   * @param {Number[]} [idMap] - If supplied, identifies a mapping of old ID's to new ID's, any not found in this list will be unchanged.
+   */
+  onImporting: function(data, idMap) {
+    this._super(data, idMap);
+
+    if (!this._invalid) {
+      if (data.name !== this.name) {
+        // Prevent duplicate link names.
+        var name = data.name;
+
+        this._parent.removeExit(this.name);
+        var index = 0;
+        while (true) {
+          if (this._parent.createExit(name)) {
+            break;
+          }
+          index++;
+          name = data.name + index;
+        }
+        data.name = name;
+      }
+    }
+  },
+
+  /**
+   * Event that is called after the node has imported.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeCompositeExit#onImported
+   * @param {Object} data - The data being imported.
+   * @param {Number[]} [idMap] - If supplied, identifies a mapping of old ID's to new ID's, any not found in this list will be unchanged.
+   */
+  onImported: function(data, idMap) {
+    this._super(data, idMap);
+    this._parent.sortExitLinks();
+  },
 });

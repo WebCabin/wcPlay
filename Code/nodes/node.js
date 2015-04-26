@@ -55,6 +55,15 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
+   * Inherits a new class from this node.
+   * @function wcNode#extend
+   * @param {String} className - The class name for your node, this should be unique between all global class names.
+   * @param {String} displayName - The display name of your node.
+   * @param {String} category - The category to display your node in the editor palette.
+   * @param {Object} classDef - An object that defines your class with all functions and variables.
+   */
+
+  /**
    * Destroys and removes the node.
    * @function wcNode#destroy
    */

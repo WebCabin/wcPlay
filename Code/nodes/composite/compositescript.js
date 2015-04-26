@@ -204,8 +204,8 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
     });
 
     var oldProperties = this.properties;
-    this.properties = [oldProperties[0], oldProperties[1]];
-    oldProperties.splice(0, 2);
+    this.properties = [oldProperties[0]];
+    oldProperties.splice(0, 1);
     for (var i = 0; i < order.length; ++i) {
       var name = order[i].name;
       for (var a = 0; a < oldProperties.length; ++a) {

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>wcPlay tutorialNode Anatomy</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.dark.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.superhero.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container-fluid">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html"><div style='font-size:15px;line-height:15px;margin-top:-5px;'>Web Cabin Play<br>v1.0.0</div></a>
+	</div>
+	<div class="navbar-collapse">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeComposite.html">wcNodeComposite</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageGlobal.html">wcNodeStorageGlobal</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="tutorials.list.html" class="dropdown-toggle" data-toggle="dropdown">Tutorials<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="tutorial-1.0.html">Getting Started</a></li><li><a href="tutorial-2.0.html">Node Anatomy</a></li><li><a href="tutorial-3.0.html">Debugging</a></li><li><a href="tutorial-4.0.html">Custom Nodes</a></li><li><a href="tutorial-5.0.html">FAQ</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+	</div>
+</div>
+</div>
+
+
+<div class="container-fluid">
+<div class="row">
+
+	
+	<div class="col-xs-8 col-sm-8 col-md-8 col-xs-offset-1">
+	
+		<div id="main">
+    		<section class="tutorial-section">
+
+<header>
+    
+
+    <h2>Node Anatomy</h2>
+</header>
+
+<article>
+    <p>The most important part of wcPlay's node based scripting system, is the node!  So let's dig into how they work, and how you will be interacting with them. Lets start with an extreme closeup of a node:</p>
+<p><img src="img/node.jpg" style="width:75%;margin-left:12%"/></p>
+<hr>
+<h3>Title Label</h3><p>The title label is the large bold text label near the top of the node. By clicking in the area between the parenthesis '(', ')' you can add your own custom name to the label.</p>
+<hr>
+<h3>Properties</h3><p>Properties make up the center area of the node. Each property takes up a row, and are made up of three columns; their name, their current value, and their initial value. The current value is what the script uses throughout execution, while the initial value is onlyh applied to the properties current value on script startup.</p>
+<hr>
+<h3>Chaining</h3><p>Chains determine the flow of your script as they connect nodes together into sequences. There are two types of chains, flow and property.</p>
+<h4>Flow Chains</h4><p>Flow chains make up the overall flow of your script, they are responsible for activating a new node and then continueing to the next node, or nodes, in a sequence. Conditions throughout the chain path will often cause it to split into alternate routes. A node connects to flow chains through their link connectors on their top and bottom. The <code>Entry links</code> on top will activate the node and cause it to perform its operation, while the <code>Exit links</code> on the bottom are activated when the node has finished a task.</p>
+<p>The example node above has four Entry links, 'add', 'sub', 'mul', and 'div'. It also has a single Exit link 'out'. The operation it does depends on which Entry link was activated, but only a single Exit link will activate once that operation is finished.</p>
+<h4>Property Chains</h4><p>Property chains handle all of the information traffic between nodes by passing data from one to another. Data always passes from the <code>Output link</code> on the right side of a node to the <code>Input link</code> on the left side.</p>
+<p>In the example above, an operation is done between property 'valueA' and property 'valueB', and then copied into the property 'result'. When the result has been assigned its new value, it will activate its output link to send that new value to all other properties attached to it, and so on.</p>
+<hr>
+<h3>Debugging</h3><p>For debugging, each node comes with two toggle buttons that appear as squares on the left and right side of the title label. The left side enables debug logging, which will output messages to the browsers console whenever various parts of the node are activated. This can be a very useful tool for solving problems you may be having with your script. The right side toggles a breakpoint on your node, which causes the execution of the script to pause whenever that node is activated. More information about the breakpoint system can be found later in the tutorial.</p>
+<p>Continue to the <a href="tutorial-3.0.html">Debugging</a> tutorial.</p>
+</article>
+
+</section>
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+		<div class="col-md-3">
+			<div id="toc" class="col-xs-3 col-sm-3 col-md-3 small"></div>
+		</div>
+	
+
+</div>
+
+<div class="row">
+	
+	<div class="col-xs-8 col-sm-8 col-md-8 col-xs-offset-1">
+	
+		<footer>
+		
+		
+		<span class="jsdoc-message">
+			Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a>
+			on 2015-04-26 using the <a
+			href="https://github.com/WebCabin/docstrap">Web Cabin DocStrap template</a>.
+		</span>
+		</footer>
+	</div>
+</div>
+<div style="height:1000px;"></div>
+
+<!--<script src="scripts/sunlight.js"></script>-->
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/bootstrap-dropdown.js"></script>
+<script src="scripts/toc.js"></script>
+
+<script>
+$( function () {
+	// $( "[id*='$']" ).each( function () {
+	// 	var $this = $( this );
+
+	// 	$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	// } );
+
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			// return $( heading ).attr( "id" ) || ( prefix + i );
+			return ( prefix + i );
+		},
+		selectors   : "h1,h2,h3,h4",
+		showAndHide : false,
+		scrollTo    : "100px"
+	} );
+
+	$( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+	// $( ".tutorial-section pre, .readme-section pre" ).addClass( "sunlight-highlight-javascript" ).addClass( "linenums" );
+
+	$( ".tutorial-section pre, .readme-section pre" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			lang = "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$("a[name^='sunlight-1-line-']").each(function() {
+		$(this).wrap('<div id="' + this.name + '" style="padding-top:40px;margin-top:-40px;display:inline-block;" class="sunlight-line-container"></div>');
+		this.name = '';
+	});
+
+  $("h1,h2,h3,h4").each(function() {
+  	$(this).css('padding-top', 50).css('margin-top', -50);
+  });
+} );
+</script>
+
+
+
+
+
+
+<!-- Piwik Analytics -->
+<script type="text/javascript">
+  var _paq = _paq || [];
+  
+  
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="https://analytics.webcabin.org/";
+    _paq.push(['setTrackerUrl', u+'piwik.php']);
+    _paq.push(['setSiteId', 8]);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<noscript><p><img src="https://analytics.webcabin.org/piwik.php?idsite=8" style="border:0;" alt="" /></p></noscript>
+<!-- End Piwik Code -->
+
+
+
+</body>
+</html>

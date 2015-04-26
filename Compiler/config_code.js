@@ -28,6 +28,9 @@ var header = '\
  * Dependancies:\n\
  *  JQuery 1.11.1\n\
  *  font-awesome 4.2.0\n\
+ * Optional Dependencies:\n\
+ *  FileSaver.js\n\
+ *  wcUndoManager\n\
  *\n\
  * Author: Jeff Houde (lochemage@webcabin.org)\n\
  * Web: https://play.webcabin.org/\n\
@@ -53,12 +56,11 @@ function uglifyCSS(srcPath, distPath) {
 
 
 
-// Combine the source files
+// Main script engine and core nodes.
 concat({
   src: [
     '../Code/class.js',
     '../Code/play.js',
-    '../Code/editor.js',
     '../Code/nodes/node.js',
     '../Code/nodes/entry.js',
     '../Code/nodes/process.js',
@@ -81,6 +83,20 @@ concat({
   dest: '../Build/wcPlay.js',
 });
 
+// Script editor tool.
+concat({
+  src: [
+    '../Code/editor.js',
+  ],
+  dest: '../Build/wcPlayEditor.js',
+});
+concat({
+  src: [
+    '../Code/editor.css',
+  ],
+  dest: '../Build/wcPlayEditor.css',
+});
+
 // Combine the example nodes.
 concat({
   src: [
@@ -91,13 +107,7 @@ concat({
   dest: '../Build/wcPlayExampleNodes.js',
 });
 
-concat({
-  src: [
-    '../Code/editor.css',
-  ],
-  dest: '../Build/wcPlay.css',
-});
-
 // Now minify them. 
 uglifyJS('../Build/wcPlay.js', '../Build/wcPlay.min.js');
-uglifyCSS('../Build/wcPlay.css', '../Build/wcPlay.min.css');
+uglifyJS('../Build/wcPlayEditor.js', '../Build/wcPlayEditor.min.js');
+uglifyCSS('../Build/wcPlayEditor.css', '../Build/wcPlayEditor.min.css');
