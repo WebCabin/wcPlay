@@ -117,6 +117,8 @@
 <hr>
 <h3>Latent Nodes</h3><p>In cases where your node may take time to perform an action, a threading system is provided for you. This allows the script to keep track of any timeout, or latent, events being processed on a node, so it may have a better sense of what nodes are active, as well as a method for cancelling node operations if necessary. Begin a thread using the <a href="wcNode.html#beginThread">wcNode#beginThread</a> function and passing in either the timeout ID, interval ID, or a function to call when it becomes necessary to cancel the operation. Once your timeout has triggered, you will also need to call the <a href="wcNode.html#finishThread">wcNode#finishThread</a> function to notify and close your active thread.</p>
 <p>The code snippet above shows a simple example of a latent node. Notice how the result of beginThread is caught and then later used to finish the thread.</p>
+<hr>
+<p>Return to the <a href="tutorial-3.0.html">Debugging</a> tutorial.<br>Continue to the <a href="tutorial-5.0.html">FAQ</a> tutorial.  </p>
 </article>
 
 </section>
