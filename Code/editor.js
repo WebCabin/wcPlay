@@ -714,7 +714,6 @@ wcPlayEditor.prototype = {
         <li><span>Help</span>\
           <ul>\
             <li><span class="wcPlayEditorMenuOptionDocs wcPlayMenuItem" title="Open the documentation for wcPlay in another window."><i class="wcPlayEditorMenuIcon wcButton fa fa-file-pdf-o fa-lg"/>Documentation...<span></span></span></li>\
-            <li><span class="wcPlayEditorMenuOptionAbout wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-question fa-lg"/>About...<span></span></span></li>\
           </ul>\
         </li>\
       </ul>\
@@ -3301,12 +3300,6 @@ wcPlayEditor.prototype = {
         return;
       }
       window.open('https://play.api.webcabin.org/', '_blank');
-    });
-    $body.on('click', '.wcPlayEditorMenuOptionAbout', function() {
-      if ($(this).hasClass('disabled')) {
-        return;
-      }
-      // TODO:
     });
   },
 
