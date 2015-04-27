@@ -142,7 +142,7 @@ wcNodeStorage.extend('wcNodeStorageGlobal', 'Global', 'Core', {
    */
   onGlobalPropertyChanged: function(name, oldValue, newValue) {
     if (this.name == name) {
-      this.property('value', this.property('value'), true);
+      this.property('value', this.property('value'), true, true);
     };
   },
 

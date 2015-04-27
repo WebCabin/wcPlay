@@ -50,6 +50,8 @@ wcPlay.PROPERTY = {
   STRING: 'string',
   /** Displays the property as a combo box control. [Select options]{@link wcNode~SelectOptions} are used. */
   SELECT: 'select',
+  /** Displays the property as a custom control. (This feature is not yet available.) */
+  CUSTOM: 'custom',
 };
 
 /**
@@ -326,7 +328,7 @@ wcPlay.prototype = {
       var item = this._queuedProperties.shift();
       item.node._meta.flash = true;
       item.node._meta.paused = false;
-      item.node.property(item.name, item.value);
+      item.node.property(item.name, item.value, (item.upstream? false: undefined), item.upstream);
     }
 
     // Update a queued node entry only if there are no more properties to update.
@@ -640,13 +642,15 @@ wcPlay.prototype = {
    * @param {wcNode} node - The node being queued.
    * @param {String} name - The property name.
    * @param {Object} value - The property value.
+   * @param {Boolean} [upstream] - If true, we are propagating the property change in reverse.
    */
-  queueNodeProperty: function(node, name, value) {
+  queueNodeProperty: function(node, name, value, upstream) {
     if (node.enabled()) {
       this._queuedProperties.push({
         node: node,
         name: name,
         value: value,
+        upstream: upstream,
       });
 
       if (node.debugBreak() || this._isStepping) {

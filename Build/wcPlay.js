@@ -126,6 +126,8 @@ wcPlay.PROPERTY = {
   STRING: 'string',
   /** Displays the property as a combo box control. [Select options]{@link wcNode~SelectOptions} are used. */
   SELECT: 'select',
+  /** Displays the property as a custom control. (This feature is not yet available.) */
+  CUSTOM: 'custom',
 };
 
 /**
@@ -402,7 +404,7 @@ wcPlay.prototype = {
       var item = this._queuedProperties.shift();
       item.node._meta.flash = true;
       item.node._meta.paused = false;
-      item.node.property(item.name, item.value);
+      item.node.property(item.name, item.value, (item.upstream? false: undefined), item.upstream);
     }
 
     // Update a queued node entry only if there are no more properties to update.
@@ -716,13 +718,15 @@ wcPlay.prototype = {
    * @param {wcNode} node - The node being queued.
    * @param {String} name - The property name.
    * @param {Object} value - The property value.
+   * @param {Boolean} [upstream] - If true, we are propagating the property change in reverse.
    */
-  queueNodeProperty: function(node, name, value) {
+  queueNodeProperty: function(node, name, value, upstream) {
     if (node.enabled()) {
       this._queuedProperties.push({
         node: node,
         name: name,
         value: value,
+        upstream: upstream,
       });
 
       if (node.debugBreak() || this._isStepping) {
@@ -1959,9 +1963,10 @@ Class.extend('wcNode', 'Node', '', {
    * @param {String} name - The name of the property.
    * @param {Object} [value] - If supplied, will assign a new value to the property.
    * @param {Boolean} [forceOrSilent] - If supplied, true will force the change event to be sent to all chained properties even if this value didn't change while false will force the change to not be chained.
+   * @param {Boolean} [forceUpstream] - Contrary to normal operation, if this is true then the property change will be sent backwards, from this property's input link to any outputs connected to it.
    * @returns {Object|undefined} - The value of the property, or undefined if not found.
    */
-  property: function(name, value, forceOrSilent) {
+  property: function(name, value, forceOrSilent, forceUpstream) {
     for (var i = 0; i < this.properties.length; ++i) {
       var prop = this.properties[i];
       if (prop.name === name) {
@@ -2036,7 +2041,14 @@ Class.extend('wcNode', 'Node', '', {
             // Now follow any output links and assign the new value to them as well.
             if (forceOrSilent === undefined || forceOrSilent) {
               for (a = 0; a < prop.outputs.length; ++a) {
-                prop.outputs[a].node && prop.outputs[a].node.triggerProperty(prop.outputs[a].name, value);
+                prop.outputs[a].node && prop.outputs[a].node.activateProperty(prop.outputs[a].name, value);
+              }
+            }
+
+            // Now propagate the change upstream if necessary.
+            if (forceUpstream) {
+              for (a = 0; a < prop.inputs.length; ++a) {
+                prop.inputs[a].node && prop.inputs[a].node.activateProperty(prop.inputs[a].name, value, true);
               }
             }
           }
@@ -2052,9 +2064,11 @@ Class.extend('wcNode', 'Node', '', {
    * @function wcNode#initialProperty
    * @param {String} name - The name of the property.
    * @param {Object} [value] - If supplied, will assign a new default value to the property.
+   * @param {Boolean} [forceOrSilent] - If supplied, true will force the change event to be sent to all chained properties even if this value didn't change while false will force the change to not be chained.
+   * @param {Boolean} [forceUpstream] - Contrary to normal operation, if this is true then the property change will be sent backwards, from this property's input link to any outputs connected to it.
    * @returns {Object|undefined} - The default value of the property, or undefined if not found.
    */
-  initialProperty: function(name, value) {
+  initialProperty: function(name, value, forceOrSilent, forceUpstream) {
     for (var i = 0; i < this.properties.length; ++i) {
       var prop = this.properties[i];
       if (prop.name === name) {
@@ -2064,8 +2078,27 @@ Class.extend('wcNode', 'Node', '', {
             this.property(name, value);
           }
           var oldValue = prop.initialValue;
-          prop.initialValue = value;
-          this.onInitialPropertyChanged(prop.name, oldValue, value);
+
+          if (forceOrSilent || prop.initialValue !== value) {
+            prop.initialValue = value;
+
+            // Notify that the property has changed.
+            this.onInitialPropertyChanged(prop.name, oldValue, value);
+
+            // Now follow any output links and assign the new value to them as well.
+            if (forceOrSilent === undefined || forceOrSilent) {
+              for (a = 0; a < prop.outputs.length; ++a) {
+                prop.outputs[a].node && prop.outputs[a].node.initialProperty(prop.outputs[a].name, value);
+              }
+            }
+
+            // Now propagate the change upstream if necessary.
+            if (forceUpstream) {
+              for (a = 0; a < prop.inputs.length; ++a) {
+                prop.inputs[a].node && prop.inputs[a].node.initialProperty(prop.inputs[a].name, value, undefined, true);
+              }
+            }
+          }
         }
 
         return this.onInitialPropertyGet(prop.name) || prop.initialValue;
@@ -2074,15 +2107,16 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
-   * Triggers a property that is about to be changed by the output of another property.
-   * @function wcNode#triggerProperty
+   * Activates a property that is about to be changed by the output of another property.
+   * @function wcNode#activateProperty
    * @param {String} name - The name of the property.
    * @param {Object} value - The new value of the property.
+   * @param {Boolean} [upstream] - If true, the activation was from a property in its output, and we are propagating in reverse.
    */
-  triggerProperty: function(name, value) {
+  activateProperty: function(name, value, upstream) {
     var engine = this.engine();
     if (engine) {
-      engine.queueNodeProperty(this, name, value);
+      engine.queueNodeProperty(this, name, value, upstream);
     }
 
     for (var i = 0; i < this.properties.length; ++i) {
@@ -2382,7 +2416,7 @@ Class.extend('wcNode', 'Node', '', {
     // this._super(isConnecting, name, type, targetNode, targetName, targetType);
     // If we are connecting one of our property outputs to another property, alert them and send your value to them.
     if (isConnecting && type === wcNode.LINK_TYPE.OUTPUT) {
-      targetNode.triggerProperty(targetName, this.property(name));
+      targetNode.activateProperty(targetName, this.property(name));
     }
   },
 
@@ -4311,7 +4345,7 @@ wcNodeStorage.extend('wcNodeStorageGlobal', 'Global', 'Core', {
    */
   onGlobalPropertyChanged: function(name, oldValue, newValue) {
     if (this.name == name) {
-      this.property('value', this.property('value'), true);
+      this.property('value', this.property('value'), true, true);
     };
   },
 

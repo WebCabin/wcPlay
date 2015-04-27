@@ -2378,12 +2378,12 @@ wcPlayEditor.prototype = {
       // Undo
       function() {
         var myNode = this.editor._engine.nodeById(this.id);
-        myNode[this.propFn](this.name, this.oldValue);
+        myNode[this.propFn](this.name, this.oldValue, true, true);
       },
       // Redo
       function() {
         var myNode = this.editor._engine.nodeById(this.id);
-        myNode[this.propFn](this.name, this.newValue);
+        myNode[this.propFn](this.name, this.newValue, true, true);
       });
     };
 
@@ -2393,7 +2393,7 @@ wcPlayEditor.prototype = {
         // Toggles do not show an editor, instead, they just toggle their state.
         var state = node[propFn](property.name);
         undoChange(node, property.name, state, !state);
-        node[propFn](property.name, !state);
+        node[propFn](property.name, !state, true, true);
         break;
       case wcPlay.PROPERTY.NUMBER:
         $control = $('<input type="number"' + (property.options.min? ' min="' + property.options.min + '"': '') + (property.options.max? ' max="' + property.options.max + '"': '') + (property.options.step? ' step="' + property.options.step + '"': '') + '>');
@@ -2404,7 +2404,7 @@ wcPlayEditor.prototype = {
             var max = $(this).attr('max') !== undefined? parseInt($(this).attr('max')):  Infinity;
             value = Math.min(max, Math.max(min, parseInt($control.val())));
             undoChange(node, property.name, node[propFn](property.name), value);
-            node[propFn](property.name, value);
+            node[propFn](property.name, value, true, true);
           }
         });
         break;
@@ -2420,7 +2420,7 @@ wcPlayEditor.prototype = {
         $control.change(function() {
           if (!cancelled) {
             undoChange(node, property.name, node[propFn](property.name), $control.val());
-            node[propFn](property.name, $control.val());
+            node[propFn](property.name, $control.val(), true, true);
           }
         });
         break;
@@ -2450,7 +2450,7 @@ wcPlayEditor.prototype = {
         $control.change(function() {
           if (!cancelled) {
             undoChange(node, property.name, node[propFn](property.name), $control.val());
-            node[propFn](property.name, $control.val());
+            node[propFn](property.name, $control.val(), true, true);
             $(this).blur();
           }
         });
