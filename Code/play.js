@@ -40,7 +40,7 @@ function wcPlay(options) {
  * @enum {String}
  */
 wcPlay.PROPERTY = {
-  /** Displays the property as a string, but does not enforce or convert its type. [Default options]{@link wcNode~PropertyOptions} are used. */
+  /** Displays the property as a string, but does not enforce or convert its type. [String options]{@link wcNode~StringOptions} are used. */
   DYNAMIC: 'dynamic',
   /** Displays the property as a checkbox. [Default options]{@link wcNode~PropertyOptions} are used. */
   TOGGLE: 'toggle',
