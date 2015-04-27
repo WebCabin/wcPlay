@@ -681,8 +681,8 @@ wcPlayEditor.prototype = {
         </li>\
         <li><span>Edit</span>\
           <ul>\
-            <li><span class="wcPlayEditorMenuOptionUndo wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-backward fa-lg"/>Undo<span>Ctrl+Z</span></span></li>\
-            <li><span class="wcPlayEditorMenuOptionRedo wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-forward fa-lg"/>Redo<span>Ctrl+Y</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionUndo wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-undo fa-lg"/>Undo<span>Ctrl+Z</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionRedo wcPlayMenuItem disabled"><i class="wcPlayEditorMenuIcon wcButton fa fa-undo fa-flip-horizontal fa-lg"/>Redo<span>Ctrl+Y</span></span></li>\
             <li><hr class="wcPlayMenuSeparator"></li>\
             <li><span class="wcPlayEditorMenuOptionCut wcPlayMenuItem"><i class="wcPlayEditorMenuIcon wcButton fa fa-cut fa-lg"/>Cut<span>Ctrl+X</span></span></li>\
             <li><span class="wcPlayEditorMenuOptionCopy wcPlayMenuItem"><i class="wcPlayEditorMenuIcon wcButton fa fa-copy fa-lg"/>Copy<span>Ctrl+C</span></span></li>\
@@ -727,8 +727,8 @@ wcPlayEditor.prototype = {
         <div class="wcPlayEditorMenuOptionSave wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-save fa-lg" title="Save Project. (Ctrl+S)"></div>\
         <div class="wcPlayEditorMenuOptionImport wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-plus-square-o fa-lg" title="Import..."></div>\
         <div class="ARPG_Separator"></div>\
-        <div class="wcPlayEditorMenuOptionUndo wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-backward fa-lg"/></div>\
-        <div class="wcPlayEditorMenuOptionRedo wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-forward fa-lg"/></div>\
+        <div class="wcPlayEditorMenuOptionUndo wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-undo fa-lg"/></div>\
+        <div class="wcPlayEditorMenuOptionRedo wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-undo fa-flip-horizontal fa-lg"/></div>\
         <div class="ARPG_Separator"></div>\
         <div class="wcPlayEditorMenuOptionCut wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-cut fa-lg" title="Cut Selected Nodes. (Ctrl+X)"/></div>\
         <div class="wcPlayEditorMenuOptionCopy wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-copy fa-lg" title="Copy Selected Nodes. (Ctrl+C)"/></div>\
