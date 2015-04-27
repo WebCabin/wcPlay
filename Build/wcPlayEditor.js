@@ -617,7 +617,7 @@ wcPlayEditor.prototype = {
         meta.flashDelta -= elapsed * 5.0;
         if (meta.flashDelta <= 0.0) {
           meta.flashDelta = 0;
-          meta.paused = keepPaused? meta.paused: false;
+          meta.paused = keepPaused? meta.paused: meta.paused - 1;
         }
       }
 
@@ -1861,7 +1861,7 @@ wcPlayEditor.prototype = {
           continue;
         }
 
-        var flash = (outputProp.outputMeta.flashDelta > 0 && inputProp.inputMeta.flashDelta > 0);
+        var flash = (outputProp.outputMeta.flashDelta > 0 || inputProp.inputMeta.flashDelta > 0);
         var highlight =
           (this._highlightNode === targetNode && this._highlightInputLink && this._highlightInputLink.name === inputProp.name) ||
           (this._highlightNode === node && this._highlightOutputLink && this._highlightOutputLink.name === outputProp.name);
@@ -2099,7 +2099,7 @@ wcPlayEditor.prototype = {
    */
   __drawPropertyChain: function(startPos, endPos, startRect, endRect, context, flash, highlight) {
     context.save();
-    context.strokeStyle = (highlight? 'cyan': (flash? '#AAFF33': '#33CC33'));
+    context.strokeStyle = (highlight? 'cyan': (flash? '#CCCC00': '#33CC33'));
     context.lineWidth = 2;
     context.lineCap = "round";
     context.lineJoin = "round";

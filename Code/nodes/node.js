@@ -35,7 +35,7 @@ Class.extend('wcNode', 'Node', '', {
       flash: false,
       flashDelta: 0,
       color: null,
-      paused: false,
+      paused: 0,
       awake: false,
       threads: [],
       description: '',
@@ -249,7 +249,7 @@ Class.extend('wcNode', 'Node', '', {
    * @returns {Boolean} - Whether this, or inner nodes, are paused.
    */
   isPaused: function() {
-    return this._meta.paused;
+    return this._meta.paused > 0;
   },
 
   /**
@@ -397,6 +397,7 @@ Class.extend('wcNode', 'Node', '', {
       meta: {
         flash: false,
         flashDelta: 0,
+        paused: 0,
         color: "#000000",
         description: description,
       },
@@ -424,6 +425,7 @@ Class.extend('wcNode', 'Node', '', {
       meta: {
         flash: false,
         flashDelta: 0,
+        paused: 0,
         color: "#000000",
         description: description,
       },
@@ -463,11 +465,13 @@ Class.extend('wcNode', 'Node', '', {
       inputMeta: {
         flash: false,
         flashDelta: 0,
+        paused: 0,
         color: "#000000",
       },
       outputMeta: {
         flash: false,
         flashDelta: 0,
+        paused: 0,
         color: "#000000",
       },
     });
@@ -1051,7 +1055,7 @@ Class.extend('wcNode', 'Node', '', {
         var engine = this.engine();
         this.chain.entry[i].meta.flash = true;
         if (this.debugBreak() || (engine && engine.stepping())) {
-          this.chain.entry[i].meta.paused = true;
+          this.chain.entry[i].meta.paused++;
         }
         engine && engine.queueNodeEntry(this, this.chain.entry[i].name);
         return true;
@@ -1087,7 +1091,7 @@ Class.extend('wcNode', 'Node', '', {
           if (exitLink.links[a].node) {
             exitLink.links[a].node.activateEntry(exitLink.links[a].name);
             if (exitLink.links[a].node.debugBreak() || (engine && engine.stepping())) {
-              this.chain.exit[i].meta.paused = true;
+              this.chain.exit[i].meta.paused++;
             }
           }
         }
@@ -1165,7 +1169,7 @@ Class.extend('wcNode', 'Node', '', {
           var engine = this.engine();
           prop.outputMeta.flash = true;
           if (this.debugBreak() || (engine && engine.stepping())) {
-            prop.outputMeta.paused = true;
+            prop.outputMeta.paused++;
           }
 
           // Notify about to change event.
@@ -1226,6 +1230,12 @@ Class.extend('wcNode', 'Node', '', {
             // Notify that the property has changed.
             this.onInitialPropertyChanged(prop.name, oldValue, value);
 
+            prop.outputMeta.flash = true;
+            var engine = this.engine();
+            if (this.debugBreak() || (engine && engine.stepping())) {
+              prop.outputMeta.paused++;
+            }
+
             // Now follow any output links and assign the new value to them as well.
             if (forceOrSilent === undefined || forceOrSilent) {
               for (a = 0; a < prop.outputs.length; ++a) {
@@ -1265,7 +1275,7 @@ Class.extend('wcNode', 'Node', '', {
       if (prop.name === name) {
         prop.inputMeta.flash = true;
         if (this.debugBreak() || (engine && engine.stepping())) {
-          prop.inputMeta.paused = true;
+          prop.inputMeta.paused++;
         }
       }
     }

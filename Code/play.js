@@ -327,7 +327,9 @@ wcPlay.prototype = {
       index--;
       var item = this._queuedProperties.shift();
       item.node._meta.flash = true;
-      item.node._meta.paused = false;
+      if (item.node._meta.paused > 0) {
+        item.node._meta.paused--;
+      }
       item.node.property(item.name, item.value, (item.upstream? false: undefined), item.upstream);
     }
 
@@ -339,7 +341,9 @@ wcPlay.prototype = {
         index--;
         var item = this._queuedChain.shift();
         item.node._meta.flash = true;
-        item.node._meta.paused = false;
+        if (item.node._meta.paused) {
+          item.node._meta.paused--;
+        }
         item.node.onTriggered(item.name);
       }
     }
@@ -630,7 +634,7 @@ wcPlay.prototype = {
 
       if (node.debugBreak() || this._isStepping) {
         node._meta.flash = true;
-        node._meta.paused = true;
+        node._meta.paused++;
         this._isPaused = true;
       }
     }
@@ -655,7 +659,7 @@ wcPlay.prototype = {
 
       if (node.debugBreak() || this._isStepping) {
         node._meta.flash = true;
-        node._meta.paused = true;
+        node._meta.paused++;
         this._isPaused = true;
       }
     }

@@ -27,7 +27,7 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeComposite.html">wcNodeComposite</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeEntryUpdate.html">wcNodeEntryUpdate</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageGlobal.html">wcNodeStorageGlobal</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
+					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeComposite.html">wcNodeComposite</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeEntryUpdate.html">wcNodeEntryUpdate</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeProcessTemplateString.html">wcNodeProcessTemplateString</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageGlobal.html">wcNodeStorageGlobal</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
 				</ul>
 			</li>
 			
@@ -95,7 +95,7 @@ Class.extend('wcNode', 'Node', '', {
       flash: false,
       flashDelta: 0,
       color: null,
-      paused: false,
+      paused: 0,
       awake: false,
       threads: [],
       description: '',
@@ -309,7 +309,7 @@ Class.extend('wcNode', 'Node', '', {
    * @returns {Boolean} - Whether this, or inner nodes, are paused.
    */
   isPaused: function() {
-    return this._meta.paused;
+    return this._meta.paused > 0;
   },
 
   /**
@@ -457,6 +457,7 @@ Class.extend('wcNode', 'Node', '', {
       meta: {
         flash: false,
         flashDelta: 0,
+        paused: 0,
         color: "#000000",
         description: description,
       },
@@ -484,6 +485,7 @@ Class.extend('wcNode', 'Node', '', {
       meta: {
         flash: false,
         flashDelta: 0,
+        paused: 0,
         color: "#000000",
         description: description,
       },
@@ -523,11 +525,13 @@ Class.extend('wcNode', 'Node', '', {
       inputMeta: {
         flash: false,
         flashDelta: 0,
+        paused: 0,
         color: "#000000",
       },
       outputMeta: {
         flash: false,
         flashDelta: 0,
+        paused: 0,
         color: "#000000",
       },
     });
@@ -1111,7 +1115,7 @@ Class.extend('wcNode', 'Node', '', {
         var engine = this.engine();
         this.chain.entry[i].meta.flash = true;
         if (this.debugBreak() || (engine &amp;&amp; engine.stepping())) {
-          this.chain.entry[i].meta.paused = true;
+          this.chain.entry[i].meta.paused++;
         }
         engine &amp;&amp; engine.queueNodeEntry(this, this.chain.entry[i].name);
         return true;
@@ -1147,7 +1151,7 @@ Class.extend('wcNode', 'Node', '', {
           if (exitLink.links[a].node) {
             exitLink.links[a].node.activateEntry(exitLink.links[a].name);
             if (exitLink.links[a].node.debugBreak() || (engine &amp;&amp; engine.stepping())) {
-              this.chain.exit[i].meta.paused = true;
+              this.chain.exit[i].meta.paused++;
             }
           }
         }
@@ -1225,7 +1229,7 @@ Class.extend('wcNode', 'Node', '', {
           var engine = this.engine();
           prop.outputMeta.flash = true;
           if (this.debugBreak() || (engine &amp;&amp; engine.stepping())) {
-            prop.outputMeta.paused = true;
+            prop.outputMeta.paused++;
           }
 
           // Notify about to change event.
@@ -1286,6 +1290,12 @@ Class.extend('wcNode', 'Node', '', {
             // Notify that the property has changed.
             this.onInitialPropertyChanged(prop.name, oldValue, value);
 
+            prop.outputMeta.flash = true;
+            var engine = this.engine();
+            if (this.debugBreak() || (engine &amp;&amp; engine.stepping())) {
+              prop.outputMeta.paused++;
+            }
+
             // Now follow any output links and assign the new value to them as well.
             if (forceOrSilent === undefined || forceOrSilent) {
               for (a = 0; a &lt; prop.outputs.length; ++a) {
@@ -1325,7 +1335,7 @@ Class.extend('wcNode', 'Node', '', {
       if (prop.name === name) {
         prop.inputMeta.flash = true;
         if (this.debugBreak() || (engine &amp;&amp; engine.stepping())) {
-          prop.inputMeta.paused = true;
+          prop.inputMeta.paused++;
         }
       }
     }
@@ -1949,7 +1959,7 @@ wcNode.PROPERTY_ENABLED = 'enabled';
 		
 		<span class="jsdoc-message">
 			Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a>
-			on 2015-04-26 using the <a
+			on 2015-04-27 using the <a
 			href="https://github.com/WebCabin/docstrap">Web Cabin DocStrap template</a>.
 		</span>
 		</footer>
