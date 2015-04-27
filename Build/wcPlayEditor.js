@@ -183,6 +183,7 @@ wcPlayEditor.prototype = {
       this._engine = engine;
       this._parent = engine;
       this.__setupPalette();
+      this.center();
 
       if (this._engine) {
         this._engine._editors.push(this);
@@ -236,16 +237,16 @@ wcPlayEditor.prototype = {
    * @param {wcPlayEditor~Rect} rect - The rectangle to focus on.
    */
   focusRect: function(rect) {
-    var scaleX = (this.$viewport.width() / rect.width);
-    var scaleY = (this.$viewport.height() / rect.height);
+    var scaleX = (this.$viewport.width() / (rect.width + 100));
+    var scaleY = (this.$viewport.height() / (rect.height + 100));
     this._viewportCamera.z = Math.min(scaleX, scaleY);
     if (scaleX > scaleY) {
-      rect.left -= ((this.$viewport.width() / scaleY - rect.width)) / 2;
+      rect.left -= ((this.$viewport.width() / scaleY - (rect.width + 100))) / 2;
     } else {
-      rect.top -= ((this.$viewport.height() / scaleX - rect.height)) / 2;
+      rect.top -= ((this.$viewport.height() / scaleX - (rect.height + 100))) / 2;
     }
-    this._viewportCamera.x = -rect.left * this._viewportCamera.z;
-    this._viewportCamera.y = -rect.top * this._viewportCamera.z;
+    this._viewportCamera.x = -(rect.left - 50) * this._viewportCamera.z;
+    this._viewportCamera.y = -(rect.top - 50) * this._viewportCamera.z;
   },
 
   /**

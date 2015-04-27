@@ -27,7 +27,7 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeComposite.html">wcNodeComposite</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeEntryUpdate.html">wcNodeEntryUpdate</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeProcessTemplateString.html">wcNodeProcessTemplateString</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageGlobal.html">wcNodeStorageGlobal</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
+					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeComposite.html">wcNodeComposite</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeEntryUpdate.html">wcNodeEntryUpdate</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeProcessStrCat.html">wcNodeProcessStrCat</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageGlobal.html">wcNodeStorageGlobal</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
 				</ul>
 			</li>
 			
@@ -8970,6 +8970,171 @@
 <dt>
     <h4 class="name" id="onMoving"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onMoving</b>(oldPos, newPos)</toc>
         
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p style="margin-left: 20px;">Event that is called after the node has changed its position.Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
+    </div>
+    
+
+    
+
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>oldPos</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="wcPlay.html#~Coordinates">wcPlay~Coordinates</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The old position of the node.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>newPos</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="wcPlay.html#~Coordinates">wcPlay~Coordinates</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The new position of the node.</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="nodes_node.js.html">nodes/node.js</a>,
+     <a href="nodes_node.js.html#sunlight-1-line-1620">line 1620</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="nodes_node.js.html">nodes/node.js</a>,
+				 <a href="nodes_node.js.html#sunlight-1-line-1620">line 1620</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="onMoving"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onMoving</b>(oldPos, newPos)</toc>
+        
         >
         
         <i><small>
@@ -9140,171 +9305,6 @@
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
 				 <a href="nodes_node.js.html#sunlight-1-line-1608">line 1608</a>
-			</li>
-		</ul>
-	</dd> -->
-	
-
-	
-
-	
-
-	
-</dl>
-
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="onMoving"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onMoving</b>(oldPos, newPos)</toc>
-        
-    </h4>
-
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p style="margin-left: 20px;">Event that is called after the node has changed its position.Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
-    </div>
-    
-
-    
-
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-
-		<th>Type</th>
-
-		
-
-		
-
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-
-	<tbody>
-	
-
-        <tr>
-            
-                <td class="name"><code>oldPos</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="wcPlay.html#~Coordinates">wcPlay~Coordinates</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The old position of the node.</td>
-        </tr>
-
-	
-
-        <tr>
-            
-                <td class="name"><code>newPos</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="wcPlay.html#~Coordinates">wcPlay~Coordinates</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The new position of the node.</td>
-        </tr>
-
-	
-	</tbody>
-</table>
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
-    
-
-    
-<dl class="details">
-	
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1620">line 1620</a>
-  </dt>
-<!-- 	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1620">line 1620</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -12644,194 +12644,6 @@
 <dt>
     <h4 class="name" id="~onViewportMouseClick"><toc class="small"><i>inner</i></toc><toc> </toc>function <toc><b>onViewportMouseClick</b>(event, pos, readOnly)</toc>
         
-    </h4>
-
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p style="margin-left: 20px;">Event that is called when the mouse button is pressed and released in the same spot over your viewport area.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
-    </div>
-    
-
-    
-
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-
-		<th>Type</th>
-
-		
-
-		
-
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-
-	<tbody>
-	
-
-        <tr>
-            
-                <td class="name"><code>event</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The original jquery mouse event.</td>
-        </tr>
-
-	
-
-        <tr>
-            
-                <td class="name"><code>pos</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="wcPlay.html#~Coordinates">wcPlay~Coordinates</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The position of the mouse relative to the viewport area (top left corner is 0,0).</td>
-        </tr>
-
-	
-
-        <tr>
-            
-                <td class="name"><code>readOnly</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The editors readonly status, when true, you should not allow changes to the node.</td>
-        </tr>
-
-	
-	</tbody>
-</table>
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
-    
-
-    
-<dl class="details">
-	
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="nodes_node.js.html">nodes/node.js</a>,
-     <a href="nodes_node.js.html#sunlight-1-line-1530">line 1530</a>
-  </dt>
-<!-- 	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1530">line 1530</a>
-			</li>
-		</ul>
-	</dd> -->
-	
-
-	
-
-	
-
-	
-</dl>
-
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="~onViewportMouseClick"><toc class="small"><i>inner</i></toc><toc> </toc>function <toc><b>onViewportMouseClick</b>(event, pos, readOnly)</toc>
-        
         >
         
         <i><small>
@@ -13025,6 +12837,194 @@
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
 				 <a href="nodes_node.js.html#sunlight-1-line-1542">line 1542</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="~onViewportMouseClick"><toc class="small"><i>inner</i></toc><toc> </toc>function <toc><b>onViewportMouseClick</b>(event, pos, readOnly)</toc>
+        
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p style="margin-left: 20px;">Event that is called when the mouse button is pressed and released in the same spot over your viewport area.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
+    </div>
+    
+
+    
+
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>event</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The original jquery mouse event.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>pos</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="wcPlay.html#~Coordinates">wcPlay~Coordinates</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The position of the mouse relative to the viewport area (top left corner is 0,0).</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>readOnly</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The editors readonly status, when true, you should not allow changes to the node.</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="nodes_node.js.html">nodes/node.js</a>,
+     <a href="nodes_node.js.html#sunlight-1-line-1530">line 1530</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="nodes_node.js.html">nodes/node.js</a>,
+				 <a href="nodes_node.js.html#sunlight-1-line-1530">line 1530</a>
 			</li>
 		</ul>
 	</dd> -->
