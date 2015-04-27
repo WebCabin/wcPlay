@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>wcPlay Source: nodes/entry.js</title>
+	<title>wcPlay Source: nodes/entry/update.js</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -53,62 +53,58 @@
 		<div id="main">
     		
 
-		<h1 class="page-title">Source: nodes/entry.js</h1>
+		<h1 class="page-title">Source: nodes/entry/update.js</h1>
     
 <section>
 	<article>
 		<pre
-			class="sunlight-highlight-javascript linenums">wcNode.extend('wcNodeEntry', 'Entry Node', '', {
+			class="sunlight-highlight-javascript linenums">wcNodeEntry.extend('wcNodeEntryUpdate', 'Update', 'Core', {
   /**
    * @class
-   * The base class for all entry nodes. These are nodes that start script chains.&lt;br>
+   * An entry node that fires continuously on a regular update.&lt;br>
    * When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.
    *
-   * @constructor wcNodeEntry
-   * @description
-   * &lt;b>Should be inherited and never constructed directly.&lt;/b>
+   * @constructor wcNodeEntryUpdate
    * @param {String} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
    */
   init: function(parent, pos) {
     this._super(parent, pos);
-    this.color = '#CCCC00';
 
-    // Create a default exit link.
-    this.createExit('out');
+    this.description("Event that fires continuously.");
+
+    this.createProperty("milliseconds", wcPlay.PROPERTY.NUMBER, 1000, {description: "The time, in milliseconds, per update."});
   },
 
   /**
-   * Magic function that is called whenever any new class type is extended from this one.&lt;br>
-   * Handles initializing of the class as well as registering the new node type.
-   * @function wcNodeEntry#classInit
-   * @param {String} className - The name of the class constructor.
-   * @param {String} type - The type name for the node.
-   * @param {String} category - A category where this node will be grouped.
-   */
-  classInit: function(className, type, category) {
-    if (category) {
-      this.className = className;
-      this.type = type;
-      this.nodeType = wcPlay.NODE.ENTRY;
-      this.category = category;
-      wcPlay.registerNodeType(className, type, category, wcPlay.NODE.ENTRY);
-    }
-  },
-
-  /**
-   * Overloading the default onTriggered event handler so we can make it immediately trigger our Exit link.
+   * Overloading the default onTriggered event handler so we can make it immediately trigger our exit link if our conditions are met.
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNodeEntry#onTriggered
+   * @function wcNodeEntryUpdate#onTriggered
    * @param {String} name - The name of the entry link triggered.
    */
   onTriggered: function(name) {
-    this._super(name);
-    this.activateExit('out');
-  },
-});
+    var self = this;
+    this.reset();
+    function __update() {
+      self.activateExit('out');
+      self.finishThread(threadID);
+      threadID = self.beginThread(setTimeout(__update, self.property('milliseconds')));
+    };
 
-</pre>
+    var threadID = this.beginThread(setTimeout(__update, this.property('milliseconds')));
+  },
+
+  /**
+   * Event that is called as soon as the Play script has started.&lt;br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeEntryUpdate#onStart
+   */
+  onStart: function() {
+    this._super();
+
+    this.onTriggered();
+  },
+});</pre>
 	</article>
 </section>
 

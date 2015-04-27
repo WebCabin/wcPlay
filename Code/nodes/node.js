@@ -1079,9 +1079,10 @@ Class.extend('wcNode', 'Node', '', {
       var exitLink = this.chain.exit[i];
       if (exitLink.name == name) {
         this.chain.exit[i].meta.flash = true;
+        this._meta.flash = true;
+
         // Activate all entry links chained to this exit.
         var engine = this.engine();
-
         for (var a = 0; a < exitLink.links.length; ++a) {
           if (exitLink.links[a].node) {
             exitLink.links[a].node.activateEntry(exitLink.links[a].name);

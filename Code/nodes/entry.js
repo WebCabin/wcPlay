@@ -43,7 +43,7 @@ wcNode.extend('wcNodeEntry', 'Entry Node', '', {
    * @param {String} name - The name of the entry link triggered.
    */
   onTriggered: function(name) {
-    this._meta.flash = true;
+    this._super(name);
     this.activateExit('out');
   },
 });
