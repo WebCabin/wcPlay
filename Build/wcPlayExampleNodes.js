@@ -261,7 +261,7 @@ wcNodeProcess.extend('wcNodeProcessExampleDynamic', 'Example Dynamic', 'Example'
         break;
     }
 
-    this.triggerExit('out');
+    this.activateExit('out');
   },
 
   /**

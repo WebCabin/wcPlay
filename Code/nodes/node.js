@@ -322,7 +322,7 @@ Class.extend('wcNode', 'Node', '', {
    *    this._super(name);
    *
    *    // Always fire the 'out' link immediately.
-   *    this.triggerExit('out');
+   *    this.activateExit('out');
    *
    *    // Now set a timeout to wait for 'Milliseconds' amount of time.
    *    var self = this;
@@ -331,7 +331,7 @@ Class.extend('wcNode', 'Node', '', {
    *    // Start a new thread that will keep the node alive until we are finished.
    *    var thread = this.beginThread(setTimeout(function() {
    *      // Once the time has completed, fire the 'Finished' link and finish our thread.
-   *      self.triggerExit('finished');
+   *      self.activateExit('finished');
    *      self.finishThread(thread);
    *    }, delay));
    *  },
@@ -339,6 +339,7 @@ Class.extend('wcNode', 'Node', '', {
    */
   beginThread: function(id) {
     this._meta.threads.push(id);
+    this._meta.flash = true;
     this._meta.awake = true;
     return id;
   },
@@ -1038,12 +1039,12 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
-   * Triggers an entry link and activates this node.
-   * @function wcNode#triggerEntry
+   * Activates an entry link and activates this node.
+   * @function wcNode#activateEntry
    * @param {String} name - The name of the entry link to trigger.
    * @returns {Boolean} - Fails if the entry link does not exist.
    */
-  triggerEntry: function(name) {
+  activateEntry: function(name) {
     for (var i = 0; i < this.chain.entry.length; ++i) {
       if (this.chain.entry[i].name == name) {
         // Always queue the trigger so execution is not immediate.
@@ -1061,12 +1062,12 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
-   * Triggers an exit link.
-   * @function wcNode#triggerExit
+   * Activates an exit link.
+   * @function wcNode#activateExit
    * @param {String} name - The name of the exit link to trigger.
    * @returns {Boolean} - Fails if the exit link does not exist.
    */
-  triggerExit: function(name) {
+  activateExit: function(name) {
     if (!this.enabled()) {
       return false;
     }
@@ -1083,7 +1084,7 @@ Class.extend('wcNode', 'Node', '', {
 
         for (var a = 0; a < exitLink.links.length; ++a) {
           if (exitLink.links[a].node) {
-            exitLink.links[a].node.triggerEntry(exitLink.links[a].name);
+            exitLink.links[a].node.activateEntry(exitLink.links[a].name);
             if (exitLink.links[a].node.debugBreak() || (engine && engine.stepping())) {
               this.chain.exit[i].meta.paused = true;
             }

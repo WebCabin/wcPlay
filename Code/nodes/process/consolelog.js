@@ -27,7 +27,7 @@ wcNodeProcess.extend('wcNodeProcessConsoleLog', 'Console Log', 'Debugging', {
     this._super(name);
 
     // Always trigger the out immediately.
-    this.triggerExit('out');
+    this.activateExit('out');
 
     // Cancel the log in silent mode.
     var engine = this.engine();

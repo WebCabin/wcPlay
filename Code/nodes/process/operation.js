@@ -49,6 +49,6 @@ wcNodeProcess.extend('wcNodeProcessOperation', 'Operation', 'Core', {
     }
 
     this.property('result', result, true);
-    this.triggerExit('out');
+    this.activateExit('out');
   },
 });

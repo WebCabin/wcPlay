@@ -27,7 +27,7 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeComposite.html">wcNodeComposite</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageGlobal.html">wcNodeStorageGlobal</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
+					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeComposite.html">wcNodeComposite</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeEntryUpdate.html">wcNodeEntryUpdate</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageGlobal.html">wcNodeStorageGlobal</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
 				</ul>
 			</li>
 			
@@ -445,7 +445,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="onTriggered"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onTriggered</b>(<span class="optional">data</span>)</toc>
+    <h4 class="name" id="onTriggered"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onTriggered</b>(name)</toc>
         
     </h4>
 
@@ -455,7 +455,7 @@
     
     
     <div class="description">
-        <p style="margin-left: 20px;">Overloading the default onTriggered event handler so we can make it immediately trigger our exit link if our conditions are met.</p>
+        <p style="margin-left: 20px;">Overloading the default onTriggered event handler so we can make it immediately trigger our Exit link.Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
     </div>
     
 
@@ -478,8 +478,6 @@
 		<th>Type</th>
 
 		
-		<th>Argument</th>
-		
 
 		
 
@@ -492,33 +490,23 @@
 
         <tr>
             
-                <td class="name"><code>data</code></td>
+                <td class="name"><code>name</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Object</span>
+<span class="param-type">String</span>
 
 
             
             </td>
 
             
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
 
             
 
-            <td class="description last">A custom data object passed in from the triggerer.</td>
+            <td class="description last">The name of the entry link triggered.</td>
         </tr>
 
 	
@@ -581,186 +569,6 @@
 			<li>
 				<a href="nodes_entry.js.html">nodes/entry.js</a>,
 				 <a href="nodes_entry.js.html#sunlight-1-line-39">line 39</a>
-			</li>
-		</ul>
-	</dd> -->
-	
-
-	
-
-	
-	<dt class="tag-see method-doc-label method-doc-details-label">See:</dt>
-	<dd class="tag-see">
-		<ul>
-			<li><a href="wcNodeEntry.html#triggerCondition">wcNodeEntry#triggerCondition</a></li>
-			</ul>
-	</dd>
-	
-
-	
-</dl>
-
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="triggerCondition"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>triggerCondition</b>(<span class="optional">data</span>)</toc>
-        
-        >
-        
-        <i><small>
-<span class="param-type">Boolean</span>
-
-</small></i>
-        
-    </h4>
-
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p style="margin-left: 20px;">Overload this in inherited nodes if you want to apply a condition when this entry node is triggered.</p>
-    </div>
-    
-
-    
-
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-
-		<th>Type</th>
-
-		
-		<th>Argument</th>
-		
-
-		
-
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-
-	<tbody>
-	
-
-        <tr>
-            
-                <td class="name"><code>data</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">A custom data object passed in from the triggerer.</td>
-        </tr>
-
-	
-	</tbody>
-</table>
-
-    
-    
-    
-    
-<h5>Returns: 
-<span class="param-type">Boolean</span>
-
-</h5>
-    
-            <p class="param-desc" style="margin-left: 20px;">
-    
-		 Whether the condition passes and the entry node should trigger (true by default).
-	</p>
-
-        
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
-    
-
-    
-<dl class="details">
-	
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="nodes_entry.js.html">nodes/entry.js</a>,
-     <a href="nodes_entry.js.html#sunlight-1-line-51">line 51</a>
-  </dt>
-<!-- 	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="nodes_entry.js.html">nodes/entry.js</a>,
-				 <a href="nodes_entry.js.html#sunlight-1-line-51">line 51</a>
 			</li>
 		</ul>
 	</dd> -->

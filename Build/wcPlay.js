@@ -1177,7 +1177,7 @@ Class.extend('wcNode', 'Node', '', {
    *    this._super(name);
    *
    *    // Always fire the 'out' link immediately.
-   *    this.triggerExit('out');
+   *    this.activateExit('out');
    *
    *    // Now set a timeout to wait for 'Milliseconds' amount of time.
    *    var self = this;
@@ -1186,7 +1186,7 @@ Class.extend('wcNode', 'Node', '', {
    *    // Start a new thread that will keep the node alive until we are finished.
    *    var thread = this.beginThread(setTimeout(function() {
    *      // Once the time has completed, fire the 'Finished' link and finish our thread.
-   *      self.triggerExit('finished');
+   *      self.activateExit('finished');
    *      self.finishThread(thread);
    *    }, delay));
    *  },
@@ -1194,6 +1194,7 @@ Class.extend('wcNode', 'Node', '', {
    */
   beginThread: function(id) {
     this._meta.threads.push(id);
+    this._meta.flash = true;
     this._meta.awake = true;
     return id;
   },
@@ -1893,12 +1894,12 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
-   * Triggers an entry link and activates this node.
-   * @function wcNode#triggerEntry
+   * Activates an entry link and activates this node.
+   * @function wcNode#activateEntry
    * @param {String} name - The name of the entry link to trigger.
    * @returns {Boolean} - Fails if the entry link does not exist.
    */
-  triggerEntry: function(name) {
+  activateEntry: function(name) {
     for (var i = 0; i < this.chain.entry.length; ++i) {
       if (this.chain.entry[i].name == name) {
         // Always queue the trigger so execution is not immediate.
@@ -1916,12 +1917,12 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
-   * Triggers an exit link.
-   * @function wcNode#triggerExit
+   * Activates an exit link.
+   * @function wcNode#activateExit
    * @param {String} name - The name of the exit link to trigger.
    * @returns {Boolean} - Fails if the exit link does not exist.
    */
-  triggerExit: function(name) {
+  activateExit: function(name) {
     if (!this.enabled()) {
       return false;
     }
@@ -1938,7 +1939,7 @@ Class.extend('wcNode', 'Node', '', {
 
         for (var a = 0; a < exitLink.links.length; ++a) {
           if (exitLink.links[a].node) {
-            exitLink.links[a].node.triggerEntry(exitLink.links[a].name);
+            exitLink.links[a].node.activateEntry(exitLink.links[a].name);
             if (exitLink.links[a].node.debugBreak() || (engine && engine.stepping())) {
               this.chain.exit[i].meta.paused = true;
             }
@@ -2726,46 +2727,15 @@ wcNode.extend('wcNodeEntry', 'Entry Node', '', {
   },
 
   /**
-   * Overloading the default onTriggered event handler so we can make it immediately trigger our exit link if our conditions are met.
+   * Overloading the default onTriggered event handler so we can make it immediately trigger our Exit link.
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNodeEntry#onTriggered
-   * @see wcNodeEntry#triggerCondition
-   * @param {Object} [data] - A custom data object passed in from the triggerer.
+   * @param {String} name - The name of the entry link triggered.
    */
-  onTriggered: function(data) {
-    if (this.triggerCondition(data)) {
-      this.triggerExit('out');
-    }
+  onTriggered: function(name) {
+    this._meta.flash = true;
+    this.activateExit('out');
   },
-
-  /**
-   * Overload this in inherited nodes if you want to apply a condition when this entry node is triggered.
-   * @function wcNodeEntry#triggerCondition
-   * @returns {Boolean} - Whether the condition passes and the entry node should trigger (true by default).
-   * @param {Object} [data] - A custom data object passed in from the triggerer.
-   */
-  triggerCondition: function(data) {
-    return true;
-  },
-
-  // *
-  //  * Event that is called when a property has changed.<br>
-  //  * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-  //  * @function wcNode#onPropertyChanged
-  //  * @param {String} name - The name of the property.
-  //  * @param {Object} oldValue - The old value of the property.
-  //  * @param {Object} newValue - The new value of the property.
-   
-  // onPropertyChanged: function(name, oldValue, newValue) {
-  //   this._super(name, oldValue, newValue);
-
-  //   // Manually trigger the event.
-  //   // if (name === wcNode.PROPERTY.TRIGGER && newValue) {
-  //   //   this.triggerExit('out');
-
-  //   //   // Turn the toggle back off so it can be used again.
-  //   //   this.property(wcNode.PROPERTY.TRIGGER, false);
-  //   // }
-  // },
 });
 
 
@@ -3200,7 +3170,7 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
       var node = this._compositeNodes[i];
       if (node instanceof wcNodeCompositeEntry) {
         if (node.name === name) {
-          node.triggerExit('out');
+          node.activateExit('out');
           break;
         }
       }
@@ -3636,7 +3606,7 @@ wcNodeComposite.extend('wcNodeCompositeExit', 'Exit', 'External', {
     }
 
     // Trigger the corresponding exit link on the parent Composite node.
-    this._parent.triggerExit(this.name);
+    this._parent.activateExit(this.name);
   },
 
   /**
@@ -3969,6 +3939,53 @@ wcNodeEntry.extend('wcNodeEntryStart', 'Start', 'Core', {
     this.onTriggered();
   },
 });
+wcNodeEntry.extend('wcNodeEntryUpdate', 'Update', 'Core', {
+  /**
+   * @class
+   * An entry node that fires continuously on a regular update.<br>
+   * When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.
+   *
+   * @constructor wcNodeEntryUpdate
+   * @param {String} parent - The parent object of this node.
+   * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
+   */
+  init: function(parent, pos) {
+    this._super(parent, pos);
+
+    this.description("Event that fires continuously.");
+
+    this.createProperty("milliseconds", wcPlay.PROPERTY.NUMBER, 1000, {description: "The time, in milliseconds, per update."});
+  },
+
+  /**
+   * Overloading the default onTriggered event handler so we can make it immediately trigger our exit link if our conditions are met.
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeEntryUpdate#onTriggered
+   * @param {String} name - The name of the entry link triggered.
+   */
+  onTriggered: function(name) {
+    var self = this;
+    this.reset();
+    function __update() {
+      self.activateExit('out');
+      self.finishThread(threadID);
+      threadID = self.beginThread(setTimeout(__update, self.property('milliseconds')));
+    };
+
+    var threadID = this.beginThread(setTimeout(__update, this.property('milliseconds')));
+  },
+
+  /**
+   * Event that is called as soon as the Play script has started.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeEntryUpdate#onStart
+   */
+  onStart: function() {
+    this._super();
+
+    this.onTriggered();
+  },
+});
 wcNodeProcess.extend('wcNodeProcessDelay', 'Delay', 'Core', {
   /**
    * @class
@@ -4004,7 +4021,7 @@ wcNodeProcess.extend('wcNodeProcessDelay', 'Delay', 'Core', {
     // Start a new thread that will keep the node alive until we are finished.
     var thread = this.beginThread(setTimeout(function() {
       // Once the time has completed, fire the 'out' link and finish our thread.
-      self.triggerExit('out');
+      self.activateExit('out');
       self.finishThread(thread);
     }, delay));
   },
@@ -4039,7 +4056,7 @@ wcNodeProcess.extend('wcNodeProcessConsoleLog', 'Console Log', 'Debugging', {
     this._super(name);
 
     // Always trigger the out immediately.
-    this.triggerExit('out');
+    this.activateExit('out');
 
     // Cancel the log in silent mode.
     var engine = this.engine();
@@ -4081,7 +4098,7 @@ wcNodeProcess.extend('wcNodeProcessAlert', 'Alert', 'Debugging', {
     this._super(name);
 
     // Always trigger the out immediately.
-    this.triggerExit('out');
+    this.activateExit('out');
 
     // Cancel the log in silent mode.
     var engine = this.engine();
@@ -4145,7 +4162,7 @@ wcNodeProcess.extend('wcNodeProcessOperation', 'Operation', 'Core', {
     }
 
     this.property('result', result, true);
-    this.triggerExit('out');
+    this.activateExit('out');
   },
 });
 

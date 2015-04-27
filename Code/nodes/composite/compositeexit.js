@@ -53,7 +53,7 @@ wcNodeComposite.extend('wcNodeCompositeExit', 'Exit', 'External', {
     }
 
     // Trigger the corresponding exit link on the parent Composite node.
-    this._parent.triggerExit(this.name);
+    this._parent.activateExit(this.name);
   },
 
   /**

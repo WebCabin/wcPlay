@@ -3891,7 +3891,7 @@ wcPlayEditor.prototype = {
             } 
             // Shift click to manually fire this exit chain.
             else if (event.shiftKey) {
-              node.triggerExit(node._meta.bounds.exitBounds[i].name);
+              node.activateExit(node._meta.bounds.exitBounds[i].name);
               break;
             }
             this._selectedNode = node;
@@ -4530,7 +4530,7 @@ wcPlayEditor.prototype = {
           if (this.__inRect(this._mouse, node._meta.bounds.entryBounds[i].rect, this._viewportCamera)) {
             hasTarget = true;
             // Double click to manually fire this entry chain.
-            node.triggerEntry(node._meta.bounds.entryBounds[i].name);
+            node.activateEntry(node._meta.bounds.entryBounds[i].name);
             break;
           }
         }
@@ -4542,7 +4542,7 @@ wcPlayEditor.prototype = {
           if (this.__inRect(this._mouse, node._meta.bounds.exitBounds[i].rect, this._viewportCamera)) {
             hasTarget = true;
             // Double click to manually fire this exit chain.
-            node.triggerExit(node._meta.bounds.exitBounds[i].name);
+            node.activateExit(node._meta.bounds.exitBounds[i].name);
             break;
           }
         }
@@ -4589,6 +4589,8 @@ wcPlayEditor.prototype = {
           this._selectedNode = focusNode;
           this._selectedNodes = [focusNode];
           this.focus(this._selectedNodes);
+        } else if (node instanceof wcNodeEntry) {
+          node.onTriggered();
         }
       }
     }

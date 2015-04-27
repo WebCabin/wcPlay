@@ -306,7 +306,7 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
       var node = this._compositeNodes[i];
       if (node instanceof wcNodeCompositeEntry) {
         if (node.name === name) {
-          node.triggerExit('out');
+          node.activateExit('out');
           break;
         }
       }
