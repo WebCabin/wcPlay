@@ -256,13 +256,13 @@ wcPlayEditor.prototype = {
     var width = this.$main.width();
     var height= this.$main.height();
 
-    if (this._size.x !== width || this._size.y !== height) {
+    if (this._size.x !== width || this._size.y !== height || this._size.z !== this._paletteSize) {
       this._size.x = width;
       this._size.y = height;
+      this._size.z = this._paletteSize;
 
-      var w = this._paletteSize;
-      this.$palette.css('width', w).attr('width', w).attr('height', height);
-      this.$viewport.css('width', width - w).attr('width', width - w).attr('height', height);
+      this.$palette.css('width', this._size.z).attr('width', this._size.z).attr('height', height);
+      this.$viewport.css('width', width - this._size.z).attr('width', width - this._size.z).attr('height', height);
     }
   },
 
@@ -471,6 +471,9 @@ wcPlayEditor.prototype = {
 
     // Update undo/redo menu.
     var self = this;
+    $('.wcPlayEditorMenuOptionNew').toggleClass('disabled', this._options.readOnly);
+    $('.wcPlayEditorMenuOptionOpen').toggleClass('disabled', this._options.readOnly);
+    $('.wcPlayEditorMenuOptionImport').toggleClass('disabled', this._options.readOnly);
     $('.wcPlayEditorMenuOptionUndo').each(function() {
       $(this).toggleClass('disabled', !self._undoManager.canUndo()).find('.wcButton').toggleClass('disabled', !self._undoManager.canUndo());
       $(this).attr('title', 'Undo ' + self._undoManager.undoInfo() + ' (Ctrl+Z)');
@@ -482,13 +485,14 @@ wcPlayEditor.prototype = {
     $('.wcPlayEditorMenuOptionDebugging').children('i:first-child, span:first-child').toggleClass('fa-dot-circle-o', this._engine.debugging()).toggleClass('fa-circle-o', !this._engine.debugging());
     $('.wcPlayEditorMenuOptionSilence').children(':first-child, span:first-child').toggleClass('fa-volume-off', this._engine.silent()).toggleClass('fa-volume-up', !this._engine.silent());
     $('.wcPlayEditorMenuOptionPausePlay').children('i:first-child, span:first-child').toggleClass('fa-play', this._engine.paused()).toggleClass('fa-pause', !this._engine.paused());
-    $('.wcPlayEditorMenuOptionCut').toggleClass('disabled', this._selectedNodes.length === 0);
-    $('.wcPlayEditorMenuOptionCopy').toggleClass('disabled', this._selectedNodes.length === 0);
-    $('.wcPlayEditorMenuOptionPaste').toggleClass('disabled', window.wcPlayEditorClipboard.nodes.length === 0);
-    $('.wcPlayEditorMenuOptionDelete').toggleClass('disabled', this._selectedNodes.length === 0);
-    $('.wcPlayEditorMenuOptionComposite').toggleClass('disabled', this._selectedNodes.length === 0);
+    $('.wcPlayEditorMenuOptionCut').toggleClass('disabled', this._selectedNodes.length === 0 || this._options.readOnly);
+    $('.wcPlayEditorMenuOptionCopy').toggleClass('disabled', this._selectedNodes.length === 0 || this._options.readOnly);
+    $('.wcPlayEditorMenuOptionPaste').toggleClass('disabled', window.wcPlayEditorClipboard.nodes.length === 0 || this._options.readOnly);
+    $('.wcPlayEditorMenuOptionDelete').toggleClass('disabled', this._selectedNodes.length === 0 || this._options.readOnly);
+    $('.wcPlayEditorMenuOptionComposite').toggleClass('disabled', this._selectedNodes.length === 0 || this._options.readOnly);
     $('.wcPlayEditorMenuOptionCompositeExit').toggleClass('disabled', this._parent instanceof wcPlay);
     $('.wcPlayEditorMenuOptionCompositeEnter').toggleClass('disabled', this._selectedNodes.length !== 1 || !(this._selectedNodes[0] instanceof wcNodeCompositeScript));
+    $('.wcPlayEditorMenuOptionRestart').toggleClass('disabled', this._options.readOnly);
 
 
     this.onResized();
@@ -718,33 +722,33 @@ wcPlayEditor.prototype = {
 
     var $toolbar = $('\
       <div class="wcPlayEditorToolbar wcPlayNoHighlights">\
-        <div class="wcPlayEditorMenuOptionNew"><span class="wcPlayEditorMenuIcon wcButton fa fa-file-o fa-lg" title="New Project. (Alt+N)"/></div>\
-        <div class="wcPlayEditorMenuOptionOpen"><span class="wcPlayEditorMenuIcon wcButton fa fa-folder-open-o fa-lg" title="Open Project. (Ctrl+O)"></div>\
-        <div class="wcPlayEditorMenuOptionSave"><span class="wcPlayEditorMenuIcon wcButton fa fa-save fa-lg" title="Save Project. (Ctrl+S)"></div>\
-        <div class="wcPlayEditorMenuOptionImport"><span class="wcPlayEditorMenuIcon wcButton fa fa-plus-square-o fa-lg" title="Import..."></div>\
+        <div class="wcPlayEditorMenuOptionNew wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-file-o fa-lg" title="New Project. (Alt+N)"/></div>\
+        <div class="wcPlayEditorMenuOptionOpen wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-folder-open-o fa-lg" title="Open Project. (Ctrl+O)"></div>\
+        <div class="wcPlayEditorMenuOptionSave wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-save fa-lg" title="Save Project. (Ctrl+S)"></div>\
+        <div class="wcPlayEditorMenuOptionImport wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-plus-square-o fa-lg" title="Import..."></div>\
         <div class="ARPG_Separator"></div>\
-        <div class="wcPlayEditorMenuOptionUndo"><span class="wcPlayEditorMenuIcon wcButton fa fa-backward fa-lg"/></div>\
-        <div class="wcPlayEditorMenuOptionRedo"><span class="wcPlayEditorMenuIcon wcButton fa fa-forward fa-lg"/></div>\
+        <div class="wcPlayEditorMenuOptionUndo wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-backward fa-lg"/></div>\
+        <div class="wcPlayEditorMenuOptionRedo wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-forward fa-lg"/></div>\
         <div class="ARPG_Separator"></div>\
-        <div class="wcPlayEditorMenuOptionCut"><span class="wcPlayEditorMenuIcon wcButton fa fa-cut fa-lg" title="Cut Selected Nodes. (Ctrl+X)"/></div>\
-        <div class="wcPlayEditorMenuOptionCopy"><span class="wcPlayEditorMenuIcon wcButton fa fa-copy fa-lg" title="Copy Selected Nodes. (Ctrl+C)"/></div>\
-        <div class="wcPlayEditorMenuOptionPaste"><span class="wcPlayEditorMenuIcon wcButton fa fa-paste fa-lg" title="Paste Copied Nodes. (Ctrl+V)"/></div>\
-        <div class="wcPlayEditorMenuOptionDelete"><span class="wcPlayEditorMenuIcon wcButton fa fa-trash-o fa-lg" title="Delete Selected Nodes. (Del)"/></div>\
+        <div class="wcPlayEditorMenuOptionCut wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-cut fa-lg" title="Cut Selected Nodes. (Ctrl+X)"/></div>\
+        <div class="wcPlayEditorMenuOptionCopy wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-copy fa-lg" title="Copy Selected Nodes. (Ctrl+C)"/></div>\
+        <div class="wcPlayEditorMenuOptionPaste wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-paste fa-lg" title="Paste Copied Nodes. (Ctrl+V)"/></div>\
+        <div class="wcPlayEditorMenuOptionDelete wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-trash-o fa-lg" title="Delete Selected Nodes. (Del)"/></div>\
         <div class="ARPG_Separator"></div>\
-        <div class="wcPlayEditorMenuOptionComposite"><span class="wcPlayEditorMenuIcon wcButton fa fa-share-alt-square fa-lg" title="Combine all selected nodes into a new \'Composite\' Node. (C)"/></div>\
+        <div class="wcPlayEditorMenuOptionComposite wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-share-alt-square fa-lg" title="Combine all selected nodes into a new \'Composite\' Node. (C)"/></div>\
         <div class="ARPG_Separator"></div>\
-        <div class="wcPlayEditorMenuOptionDebugging"><span class="wcPlayEditorMenuIcon wcButton fa fa-dot-circle-o fa-lg" title="Toggle debugging mode for the entire script."/></div>\
-        <div class="wcPlayEditorMenuOptionSilence"><span class="wcPlayEditorMenuIcon wcButton fa fa-volume-up fa-lg" title="Toggle silent mode for the entire script (Nodes with debug log enabled will not log when this is active)."/></div>\
+        <div class="wcPlayEditorMenuOptionDebugging wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-dot-circle-o fa-lg" title="Toggle debugging mode for the entire script."/></div>\
+        <div class="wcPlayEditorMenuOptionSilence wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-volume-up fa-lg" title="Toggle silent mode for the entire script (Nodes with debug log enabled will not log when this is active)."/></div>\
         <div class="ARPG_Separator"></div>\
-        <div class="wcPlayEditorMenuOptionRestart"><span class="wcPlayEditorMenuIcon wcButton fa fa-play-circle fa-lg" title="Runs or restarts the script."/></div>\
-        <div class="wcPlayEditorMenuOptionPausePlay"><span class="wcPlayEditorMenuIcon wcButton fa fa-pause fa-lg" title="Pause or Continue script. (Enter)"/></div>\
-        <div class="wcPlayEditorMenuOptionStep"><span class="wcPlayEditorMenuIcon wcButton fa fa-fast-forward fa-lg" title="Perform a single script update. (Spacebar)"/></div>\
+        <div class="wcPlayEditorMenuOptionRestart wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-play-circle fa-lg" title="Runs or restarts the script."/></div>\
+        <div class="wcPlayEditorMenuOptionPausePlay wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-pause fa-lg" title="Pause or Continue script. (Enter)"/></div>\
+        <div class="wcPlayEditorMenuOptionStep wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-fast-forward fa-lg" title="Perform a single script update. (Spacebar)"/></div>\
         <div class="ARPG_Separator"></div>\
-        <div class="wcPlayEditorMenuOptionCenter"><span class="wcPlayEditorMenuIcon wcButton fa fa-crosshairs fa-lg" title="Fit selected nodes into view. (F)"/></div>\
-        <div class="wcPlayEditorMenuOptionCompositeExit"><span class="wcPlayEditorMenuIcon wcButton fa fa-level-up fa-lg" title="Step out of Composite node. (O)"/></div>\
-        <div class="wcPlayEditorMenuOptionCompositeEnter"><span class="wcPlayEditorMenuIcon wcButton fa fa-level-down fa-lg" title="Step in to selected Composite node. (I)"/></div>\
+        <div class="wcPlayEditorMenuOptionCenter wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-crosshairs fa-lg" title="Fit selected nodes into view. (F)"/></div>\
+        <div class="wcPlayEditorMenuOptionCompositeExit wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-level-up fa-lg" title="Step out of Composite node. (O)"/></div>\
+        <div class="wcPlayEditorMenuOptionCompositeEnter wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-level-down fa-lg" title="Step in to selected Composite node. (I)"/></div>\
         <div class="ARPG_Separator"></div>\
-        <div class="wcPlayEditorMenuOptionCompositeSearch disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-search fa-lg" title="Search for nodes in your script. (Ctrl+F)"/></div>\
+        <div class="wcPlayEditorMenuOptionCompositeSearch wcPlayMenuItem disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-search fa-lg" title="Search for nodes in your script. (Ctrl+F)"/></div>\
       </div>\
     ');
 
@@ -761,6 +765,10 @@ wcPlayEditor.prototype = {
     if (!this._engine) {
       return;
     }
+
+    this._paletteSize = this._options.readOnly? 0: 300;
+    this.onResized();
+
     if (this.$typeButton.length == 0) {
       // Create our top bar with buttons for each node type.
       this.$typeButton.push($('<button class="wcPlayEditorButton" title="Show Entry Nodes.">Entry</button>'));
@@ -1492,10 +1500,12 @@ wcPlayEditor.prototype = {
     };
 
     // Highlight title text.
-    if (this._highlightTitle && this._highlightNode === node) {
-      this.__drawRoundedRect(result.titleBounds, this._drawStyle.property.highlightColor, this._drawStyle.property.highlightBorder, this._font.title.size/2, context);
-    } else if (!hideCollapsible && this._highlightNode === node) {
-      this.__drawRoundedRect(result.titleBounds, this._drawStyle.property.normalColor, this._drawStyle.property.normalBorder, this._font.title.size/2, context);
+    if (!this._options.readOnly) {
+      if (this._highlightTitle && this._highlightNode === node) {
+        this.__drawRoundedRect(result.titleBounds, this._drawStyle.property.highlightColor, this._drawStyle.property.highlightBorder, this._font.title.size/2, context);
+      } else if (!hideCollapsible && this._highlightNode === node) {
+        this.__drawRoundedRect(result.titleBounds, this._drawStyle.property.normalColor, this._drawStyle.property.normalBorder, this._font.title.size/2, context);
+      }
     }
 
     // Title Text
@@ -1538,7 +1548,7 @@ wcPlayEditor.prototype = {
       context.translate(result.viewportBounds.left, result.viewportBounds.top);
 
       // Draw the viewport.
-      node.onViewportDraw(context);
+      node.onViewportDraw(context, this._options.readOnly);
 
       // Now revert the translation.
       context.translate(-result.viewportBounds.left, -result.viewportBounds.top);
@@ -1593,16 +1603,18 @@ wcPlayEditor.prototype = {
         result.valueBounds.push(valueBound);
 
         // Highlight hovered values.
-        if (this._highlightNode === node && this._highlightPropertyValue && this._highlightPropertyValue.name === props[i].name) {
-          this.__drawRoundedRect(valueBound.rect, this._drawStyle.property.highlightColor, this._drawStyle.property.highlightBorder, this._font.property.size/2, context);
-        } else if (!hideCollapsible && this._highlightNode === node) {
-          this.__drawRoundedRect(valueBound.rect, this._drawStyle.property.normalColor, this._drawStyle.property.normalBorder, this._font.property.size/2, context);
-        }
+        if (!this._options.readOnly) {
+          if (this._highlightNode === node && this._highlightPropertyValue && this._highlightPropertyValue.name === props[i].name) {
+            this.__drawRoundedRect(valueBound.rect, this._drawStyle.property.highlightColor, this._drawStyle.property.highlightBorder, this._font.property.size/2, context);
+          } else if (!hideCollapsible && this._highlightNode === node) {
+            this.__drawRoundedRect(valueBound.rect, this._drawStyle.property.normalColor, this._drawStyle.property.normalBorder, this._font.property.size/2, context);
+          }
 
-        if (this._highlightNode === node && this._highlightPropertyInitialValue && this._highlightPropertyInitialValue.name === props[i].name) {
-          this.__drawRoundedRect(initialBound.rect, this._drawStyle.property.highlightColor, this._drawStyle.property.highlightBorder, this._font.property.size/2, context);
-        } else if (!hideCollapsible && this._highlightNode === node) {
-          this.__drawRoundedRect(initialBound.rect, this._drawStyle.property.normalColor, this._drawStyle.property.normalBorder, this._font.property.size/2, context);
+          if (this._highlightNode === node && this._highlightPropertyInitialValue && this._highlightPropertyInitialValue.name === props[i].name) {
+            this.__drawRoundedRect(initialBound.rect, this._drawStyle.property.highlightColor, this._drawStyle.property.highlightBorder, this._font.property.size/2, context);
+          } else if (!hideCollapsible && this._highlightNode === node) {
+            this.__drawRoundedRect(initialBound.rect, this._drawStyle.property.normalColor, this._drawStyle.property.normalBorder, this._font.property.size/2, context);
+          }
         }
 
         context.fillStyle = "black";
@@ -2232,6 +2244,10 @@ wcPlayEditor.prototype = {
    * @param {wcPlayEditor~BoundingData} bounds - The bounding data for the title.
    */
   __drawTitleEditor: function(node, bounds) {
+    if (this._options.readOnly) {
+      return;
+    }
+
     var self = this;
     var cancelled = false;
 
@@ -2327,6 +2343,10 @@ wcPlayEditor.prototype = {
    * @param {Boolean} [initial] - Set true if the property being changed is the initial value.
    */
   __drawPropertyEditor: function(node, property, bounds, initial) {
+    if (this._options.readOnly) {
+      return;
+    }
+
     var $control = null;
     var cancelled = false;
     var enterConfirms = true;
@@ -2764,15 +2784,11 @@ wcPlayEditor.prototype = {
 
     var $body = $('body');
 
-    // Catch any disabled menu clicks and stop them from executing.
-    $body.on('click', '.wcPlayMenuItem.disabled', function(event) {
-      event.stopPropagation();
-      event.preventDefault();
-      return false;
-    });
-
     // File menu
     $body.on('click', '.wcPlayEditorMenuOptionNew', function() {
+      if ($(this).hasClass('disabled')) {
+        return;
+      }
       if (self._engine) {
         self._engine.clear();
         self._undoManager && self._undoManager.clear();
@@ -2780,6 +2796,9 @@ wcPlayEditor.prototype = {
       }
     });
     $body.on('click', '.wcPlayEditorMenuOptionOpen', function() {
+      if ($(this).hasClass('disabled')) {
+        return;
+      }
       if (self._engine) {
         if (document.createEvent) {
           var evt = document.createEvent("MouseEvents");
@@ -2790,6 +2809,9 @@ wcPlayEditor.prototype = {
       }
     });
     $body.on('click', '.wcPlayEditorMenuOptionSave', function() {
+      if ($(this).hasClass('disabled')) {
+        return;
+      }
       if (self._engine) {
         if (!saveAs) {
           console.log("ERROR: Attempted to save the script when external dependency 'FileSaver' was not included.");
@@ -2811,6 +2833,9 @@ wcPlayEditor.prototype = {
       }
     });
     $body.on('click', '.wcPlayEditorMenuOptionImport', function() {
+      if ($(this).hasClass('disabled')) {
+        return;
+      }
       if (self._engine) {
         if (document.createEvent) {
           var evt = document.createEvent("MouseEvents");
@@ -2851,6 +2876,9 @@ wcPlayEditor.prototype = {
     }
     // A hidden file input field that will handle opening the open file dialog for us.
     $('body').on('change', '#wcPlayEditorHiddenFileLoader', function(event) {
+      if ($(this).hasClass('disabled')) {
+        return;
+      }
       if (event.target.files.length) {
         __importScriptFile(event.target.files[0]);
         $(this).val('');
@@ -2858,6 +2886,9 @@ wcPlayEditor.prototype = {
       }
     });
     $('body').on('change', '#wcPlayEditorHiddenFileImporter', function(event) {
+      if ($(this).hasClass('disabled')) {
+        return;
+      }
       if (event.target.files.length) {
         __importScriptFile(event.target.files[0], true);
         $(this).val('');
@@ -2882,12 +2913,21 @@ wcPlayEditor.prototype = {
 
     // Edit menu
     $body.on('click', '.wcPlayEditorMenuOptionUndo', function() {
+      if ($(this).hasClass('disabled')) {
+        return;
+      }
       self._undoManager && self._undoManager.undo();
     });
     $body.on('click', '.wcPlayEditorMenuOptionRedo', function() {
+      if ($(this).hasClass('disabled')) {
+        return;
+      }
       self._undoManager && self._undoManager.redo();
     });
     $body.on('click', '.wcPlayEditorMenuOptionCut', function() {
+      if ($(this).hasClass('disabled')) {
+        return;
+      }
       if (self._selectedNodes.length === 0) {
         return;
       }
@@ -2903,6 +2943,9 @@ wcPlayEditor.prototype = {
       self._undoManager && self._undoManager.endGroup();
     });
     $body.on('click', '.wcPlayEditorMenuOptionCopy', function() {
+      if ($(this).hasClass('disabled')) {
+        return;
+      }
       if (self._selectedNodes.length === 0) {
         return;
       }
@@ -2919,6 +2962,9 @@ wcPlayEditor.prototype = {
       window.wcPlayEditorClipboard.bounds = self.__expandRect(bounds);
     });
     $body.on('click', '.wcPlayEditorMenuOptionPaste', function() {
+      if ($(this).hasClass('disabled')) {
+        return;
+      }
       if (window.wcPlayEditorClipboard.nodes.length === 0) {
         return;
       }
@@ -2966,6 +3012,9 @@ wcPlayEditor.prototype = {
     });
 
     $body.on('click', '.wcPlayEditorMenuOptionDelete', function() {
+      if ($(this).hasClass('disabled')) {
+        return;
+      }
       if (self._selectedNodes.length) {
         self._undoManager && self._undoManager.beginGroup('Removed Nodes');
         for (var i = 0; i < self._selectedNodes.length; ++i) {
@@ -2979,6 +3028,9 @@ wcPlayEditor.prototype = {
     });
 
     $body.on('click', '.wcPlayEditorMenuOptionComposite', function() {
+      if ($(this).hasClass('disabled')) {
+        return;
+      }
       if (self._selectedNodes.length && self._parent) {
         self._undoManager && self._undoManager.beginGroup("Combined Nodes into Composite");
         // Create undo events for removing the selected nodes.
@@ -3159,6 +3211,9 @@ wcPlayEditor.prototype = {
 
     // View
     $body.on('click', '.wcPlayEditorMenuOptionCenter', function() {
+      if ($(this).hasClass('disabled')) {
+        return;
+      }
       if (self._selectedNodes.length) {
         self.focus(self._selectedNodes);
       } else {
@@ -3166,6 +3221,9 @@ wcPlayEditor.prototype = {
       }
     });
     $body.on('click', '.wcPlayEditorMenuOptionCompositeExit', function() {
+      if ($(this).hasClass('disabled')) {
+        return;
+      }
       if (self._parent instanceof wcNodeCompositeScript) {
         var focusNode = self._parent;
         self._parent = self._parent._parent;
@@ -3176,6 +3234,9 @@ wcPlayEditor.prototype = {
       }
     });
     $body.on('click', '.wcPlayEditorMenuOptionCompositeEnter', function() {
+      if ($(this).hasClass('disabled')) {
+        return;
+      }
       if (self._selectedNodes.length && self._selectedNodes[0] instanceof wcNodeCompositeScript) {
         self._parent = self._selectedNodes[0];
         self._selectedNode = null;
@@ -3187,22 +3248,34 @@ wcPlayEditor.prototype = {
 
     // Debugger
     $body.on('click', '.wcPlayEditorMenuOptionDebugging', function() {
+      if ($(this).hasClass('disabled')) {
+        return;
+      }
       if (self._engine) {
         self._engine.debugging(!self._engine.debugging());
         self._engine.paused(false);
       }
     });
     $body.on('click', '.wcPlayEditorMenuOptionSilence', function() {
+      if ($(this).hasClass('disabled')) {
+        return;
+      }
       if (self._engine) {
         self._engine.silent(!self._engine.silent());
       }
     });
     $body.on('click', '.wcPlayEditorMenuOptionRestart', function() {
+      if ($(this).hasClass('disabled')) {
+        return;
+      }
       if (self._engine) {
         self._engine.start();
       }
     });
     $body.on('click', '.wcPlayEditorMenuOptionPausePlay', function() {
+      if ($(this).hasClass('disabled')) {
+        return;
+      }
       if (self._engine) {
         if (self._engine.paused() || self._engine.stepping()) {
           self._engine.paused(false);
@@ -3213,6 +3286,9 @@ wcPlayEditor.prototype = {
       }
     });
     $body.on('click', '.wcPlayEditorMenuOptionStep', function() {
+      if ($(this).hasClass('disabled')) {
+        return;
+      }
       if (self._engine) {
         self._engine.paused(false);
         self._engine.stepping(true);
@@ -3221,9 +3297,15 @@ wcPlayEditor.prototype = {
 
     // Help menu
     $body.on('click', '.wcPlayEditorMenuOptionDocs', function() {
+      if ($(this).hasClass('disabled')) {
+        return;
+      }
       window.open('https://play.api.webcabin.org/', '_blank');
     });
     $body.on('click', '.wcPlayEditorMenuOptionAbout', function() {
+      if ($(this).hasClass('disabled')) {
+        return;
+      }
       // TODO:
     });
   },
@@ -3473,7 +3555,7 @@ wcPlayEditor.prototype = {
 
     if (node) {
       // Check for main node collision.
-      if (this.__inRect(mouse, node._meta.bounds.farRect, this._viewportCamera)) {
+      if (!this._options.readOnly && this.__inRect(mouse, node._meta.bounds.farRect, this._viewportCamera)) {
         this._highlightNode = node;
         if (this.__inRect(mouse, node._meta.bounds.inner, this._viewportCamera)) {
           this.$viewport.attr('title', (node._meta.description? node._meta.description + '\n': '') + 'Click and drag to move this node. Double click to collapse/expand this node.');
@@ -3485,6 +3567,7 @@ wcPlayEditor.prototype = {
         // Debug Log button.
         if (this.__inRect(mouse, node._meta.bounds.debugLog, this._viewportCamera)) {
           this._highlightDebugLog = true;
+          this._highlightNode = node;
           this.$viewport.addClass('wcClickable');
           if (node._log) {
             this.$viewport.attr('title', 'Disable debug logging for this node.');
@@ -3496,13 +3579,14 @@ wcPlayEditor.prototype = {
         // Breakpoint button.
         if (this.__inRect(mouse, node._meta.bounds.breakpoint, this._viewportCamera)) {
           this._highlightBreakpoint = true;
+          this._highlightNode = node;
           this.$viewport.addClass('wcClickable');
           this.$viewport.attr('title', 'Toggle debug breakpoint on this node.');
         }
       }
 
       // Entry links.
-      if (!this._selectedEntryLink && !this._selectedInputLink && !this._selectedOutputLink) {
+      if (!this._options.readOnly && !this._selectedEntryLink && !this._selectedInputLink && !this._selectedOutputLink) {
         for (var i = 0; i < node._meta.bounds.entryBounds.length; ++i) {
           if (this.__inRect(mouse, node._meta.bounds.entryBounds[i].rect, this._viewportCamera)) {
             this._highlightNode = node;
@@ -3524,7 +3608,7 @@ wcPlayEditor.prototype = {
       }
 
       // Exit links.
-      if (!this._selectedExitLink && !this._selectedInputLink && !this._selectedOutputLink) {
+      if (!this._options.readOnly && !this._selectedExitLink && !this._selectedInputLink && !this._selectedOutputLink) {
         for (var i = 0; i < node._meta.bounds.exitBounds.length; ++i) {
           if (this.__inRect(mouse, node._meta.bounds.exitBounds[i].rect, this._viewportCamera)) {
             this._highlightNode = node;
@@ -3546,7 +3630,7 @@ wcPlayEditor.prototype = {
       }
 
       // Input links.
-      if (!this._selectedEntryLink && !this._selectedExitLink && !this._selectedInputLink) {
+      if (!this._options.readOnly && !this._selectedEntryLink && !this._selectedExitLink && !this._selectedInputLink) {
         for (var i = 0; i < node._meta.bounds.inputBounds.length; ++i) {
           if (this.__inRect(mouse, node._meta.bounds.inputBounds[i].rect, this._viewportCamera)) {
             this._highlightNode = node;
@@ -3559,7 +3643,7 @@ wcPlayEditor.prototype = {
       }
 
         // Output links.
-      if (!this._selectedEntryLink && !this._selectedExitLink && !this._selectedOutputLink) {
+      if (!this._options.readOnly && !this._selectedEntryLink && !this._selectedExitLink && !this._selectedOutputLink) {
         for (var i = 0; i < node._meta.bounds.outputBounds.length; ++i) {
           if (this.__inRect(mouse, node._meta.bounds.outputBounds[i].rect, this._viewportCamera)) {
             this._highlightNode = node;
@@ -3572,71 +3656,73 @@ wcPlayEditor.prototype = {
       }
 
       if (!this._selectedEntryLink && !this._selectedExitLink && !this._selectedInputLink && !this._selectedOutputLink) {
-        // Title label.
-        if (this.__inRect(this._mouse, node._meta.bounds.titleBounds, this._viewportCamera)) {
-          this._highlightNode = node;
-          this._highlightTitle = true;
-          this.$viewport.attr('title', 'Click to add or modify an additional label for this title.');
-          this.$viewport.addClass('wcClickable');
-        }
-
-        // Property labels.
-        var propBounds;
-        for (var i = 0; i < node._meta.bounds.propertyBounds.length; ++i) {
-          if (this.__inRect(this._mouse, node._meta.bounds.propertyBounds[i].rect, this._viewportCamera)) {
-            propBounds = node._meta.bounds.propertyBounds[i];
-            break;
+        if (!this._options.readOnly) {
+          // Title label.
+          if (this.__inRect(this._mouse, node._meta.bounds.titleBounds, this._viewportCamera)) {
+            this._highlightNode = node;
+            this._highlightTitle = true;
+            this.$viewport.attr('title', 'Click to add or modify an additional label for this title.');
+            this.$viewport.addClass('wcClickable');
           }
-        }
 
-        if (propBounds) {
-          for (var i = 0; i < node.properties.length; ++i) {
-            if (node.properties[i].name === propBounds.name) {
-              this.$viewport.attr('title', (node.properties[i].options.description? node.properties[i].options.description + '\n': ''));
-              this.$viewport.addClass('wcClickable');
+          // Property labels.
+          var propBounds;
+          for (var i = 0; i < node._meta.bounds.propertyBounds.length; ++i) {
+            if (this.__inRect(this._mouse, node._meta.bounds.propertyBounds[i].rect, this._viewportCamera)) {
+              propBounds = node._meta.bounds.propertyBounds[i];
               break;
             }
           }
-        }
 
-        // Property values.
-        var valueBounds;
-        for (var i = 0; i < node._meta.bounds.valueBounds.length; ++i) {
-          if (this.__inRect(this._mouse, node._meta.bounds.valueBounds[i].rect, this._viewportCamera)) {
-            valueBounds = node._meta.bounds.valueBounds[i];
-            break;
+          if (propBounds) {
+            for (var i = 0; i < node.properties.length; ++i) {
+              if (node.properties[i].name === propBounds.name) {
+                this.$viewport.attr('title', (node.properties[i].options.description? node.properties[i].options.description + '\n': ''));
+                this.$viewport.addClass('wcClickable');
+                break;
+              }
+            }
           }
-        }
 
-        if (valueBounds) {
-          for (var i = 0; i < node.properties.length; ++i) {
-            if (node.properties[i].name === valueBounds.name) {
-              this._highlightNode = node;
-              this._highlightPropertyValue = valueBounds;
-              this.$viewport.attr('title', (node.properties[i].options.description? node.properties[i].options.description + '\n': '') + 'Click to change the current value of this property.');
-              this.$viewport.addClass('wcClickable');
+          // Property values.
+          var valueBounds;
+          for (var i = 0; i < node._meta.bounds.valueBounds.length; ++i) {
+            if (this.__inRect(this._mouse, node._meta.bounds.valueBounds[i].rect, this._viewportCamera)) {
+              valueBounds = node._meta.bounds.valueBounds[i];
               break;
             }
           }
-        }
 
-        // Property initial values.
-        var initialBounds;
-        for (var i = 0; i < node._meta.bounds.initialBounds.length; ++i) {
-          if (this.__inRect(this._mouse, node._meta.bounds.initialBounds[i].rect, this._viewportCamera)) {
-            initialBounds = node._meta.bounds.initialBounds[i];
-            break;
+          if (valueBounds) {
+            for (var i = 0; i < node.properties.length; ++i) {
+              if (node.properties[i].name === valueBounds.name) {
+                this._highlightNode = node;
+                this._highlightPropertyValue = valueBounds;
+                this.$viewport.attr('title', (node.properties[i].options.description? node.properties[i].options.description + '\n': '') + 'Click to change the current value of this property.');
+                this.$viewport.addClass('wcClickable');
+                break;
+              }
+            }
           }
-        }
 
-        if (initialBounds) {
-          for (var i = 0; i < node.properties.length; ++i) {
-            if (node.properties[i].name === initialBounds.name) {
-              this._highlightNode = node;
-              this._highlightPropertyInitialValue = initialBounds;
-              this.$viewport.attr('title', (node.properties[i].options.description? node.properties[i].options.description + '\n': '') + 'Click to change the initial value of this property.');
-              this.$viewport.addClass('wcClickable');
+          // Property initial values.
+          var initialBounds;
+          for (var i = 0; i < node._meta.bounds.initialBounds.length; ++i) {
+            if (this.__inRect(this._mouse, node._meta.bounds.initialBounds[i].rect, this._viewportCamera)) {
+              initialBounds = node._meta.bounds.initialBounds[i];
               break;
+            }
+          }
+
+          if (initialBounds) {
+            for (var i = 0; i < node.properties.length; ++i) {
+              if (node.properties[i].name === initialBounds.name) {
+                this._highlightNode = node;
+                this._highlightPropertyInitialValue = initialBounds;
+                this.$viewport.attr('title', (node.properties[i].options.description? node.properties[i].options.description + '\n': '') + 'Click to change the initial value of this property.');
+                this.$viewport.addClass('wcClickable');
+                break;
+              }
             }
           }
         }
@@ -3654,12 +3740,12 @@ wcPlayEditor.prototype = {
             this.$viewport.addClass('wcClickable');
 
             if (!wasOverViewport) {
-              node.onViewportMouseEnter(event, pos);
+              node.onViewportMouseEnter(event, pos, this._options.readOnly);
             }
 
-            node.onViewportMouseMove(event, pos);
+            node.onViewportMouseMove(event, pos, this._options.readOnly);
           } else if (wasOverViewport) {
-            node.onViewportMouseLeave(event, pos);
+            node.onViewportMouseLeave(event, pos, this._options.readOnly);
           }
         }
       }
@@ -3725,7 +3811,7 @@ wcPlayEditor.prototype = {
     var node = this.__findNodeAtPos(this._mouse, this._viewportCamera);
     if (node) {
       // Entry links.
-      if (!hasTarget) {
+      if (!hasTarget && !this._options.readOnly) {
         for (var i = 0; i < node._meta.bounds.entryBounds.length; ++i) {
           if (this.__inRect(this._mouse, node._meta.bounds.entryBounds[i].rect, this._viewportCamera)) {
             hasTarget = true;
@@ -3770,7 +3856,7 @@ wcPlayEditor.prototype = {
       }
 
       // Exit links.
-      if (!hasTarget) {
+      if (!hasTarget && !this._options.readOnly) {
         for (var i = 0; i < node._meta.bounds.exitBounds.length; ++i) {
           if (this.__inRect(this._mouse, node._meta.bounds.exitBounds[i].rect, this._viewportCamera)) {
             hasTarget = true;
@@ -3820,7 +3906,7 @@ wcPlayEditor.prototype = {
       }
 
       // Input links.
-      if (!hasTarget) {
+      if (!hasTarget && !this._options.readOnly) {
         for (var i = 0; i < node._meta.bounds.inputBounds.length; ++i) {
           if (this.__inRect(this._mouse, node._meta.bounds.inputBounds[i].rect, this._viewportCamera)) {
             hasTarget = true;
@@ -3865,7 +3951,7 @@ wcPlayEditor.prototype = {
       }
 
       // Output links.
-      if (!hasTarget) {
+      if (!hasTarget && !this._options.readOnly) {
         for (var i = 0; i < node._meta.bounds.outputBounds.length; ++i) {
           if (this.__inRect(this._mouse, node._meta.bounds.outputBounds[i].rect, this._viewportCamera)) {
             hasTarget = true;
@@ -3920,7 +4006,7 @@ wcPlayEditor.prototype = {
           this._selectedNode = node;
           this._selectedNodes = [node];
 
-          if (node.onViewportMouseDown(event, pos)) {
+          if (node.onViewportMouseDown(event, pos, this._options.readOnly)) {
             hasTarget = true;
           }
         }
@@ -3933,7 +4019,7 @@ wcPlayEditor.prototype = {
           this._selectedNode = node;
           this._selectedNodes = [node];
         }
-        this._viewportMovingNode = true;
+        this._viewportMovingNode = !this._options.readOnly;
         this._selectedNodeOrigins = [];
         for (var i = 0; i < this._selectedNodes.length; ++i) {
           var myNode = this._selectedNodes[i];
@@ -3954,7 +4040,7 @@ wcPlayEditor.prototype = {
 
   /**
    * Handle mouse release events over the viewport canvas.
-   * @function wcPlayEditor#__onViewportMouseDown
+   * @function wcPlayEditor#__onViewportMouseUp
    * @private
    * @param {Object} event - The mouse event.
    * @param {Object} elem - The target element.
@@ -4233,7 +4319,7 @@ wcPlayEditor.prototype = {
         y: (mouse.y - this._viewportCamera.y) / this._viewportCamera.z - this._selectedNode._meta.bounds.viewportBounds.top,
       };
 
-      this._selectedNode.onViewportMouseUp(event, pos);
+      this._selectedNode.onViewportMouseUp(event, pos, this._options.readOnly);
     }
 
     if (this._expandedSelectedNode && this._expandedSelectedNode !== this._expandedHighlightNode) {
@@ -4400,7 +4486,7 @@ wcPlayEditor.prototype = {
           };
 
           if (this.__inRect(this._mouse, node._meta.bounds.viewportBounds, this._viewportCamera)) {
-            node.onViewportMouseClick(event, pos);
+            node.onViewportMouseClick(event, pos, this._options.readOnly);
           }
         }
       }
@@ -4439,7 +4525,7 @@ wcPlayEditor.prototype = {
       }
 
       // Entry links.
-      if (!hasTarget) {
+      if (!this._options.readOnly && !hasTarget) {
         for (var i = 0; i < node._meta.bounds.entryBounds.length; ++i) {
           if (this.__inRect(this._mouse, node._meta.bounds.entryBounds[i].rect, this._viewportCamera)) {
             hasTarget = true;
@@ -4451,7 +4537,7 @@ wcPlayEditor.prototype = {
       }
 
       // Exit links.
-      if (!hasTarget) {
+      if (!this._options.readOnly && !hasTarget) {
         for (var i = 0; i < node._meta.bounds.exitBounds.length; ++i) {
           if (this.__inRect(this._mouse, node._meta.bounds.exitBounds[i].rect, this._viewportCamera)) {
             hasTarget = true;
@@ -4463,7 +4549,7 @@ wcPlayEditor.prototype = {
       }
 
       // Output links.
-      if (!hasTarget) {
+      if (!this._options.readOnly && !hasTarget) {
         for (var i = 0; i < node._meta.bounds.outputBounds.length; ++i) {
           if (this.__inRect(this._mouse, node._meta.bounds.outputBounds[i].rect, this._viewportCamera)) {
             hasTarget = true;
@@ -4482,7 +4568,7 @@ wcPlayEditor.prototype = {
         };
 
         if (this.__inRect(this._mouse, node._meta.bounds.viewportBounds, this._viewportCamera)) {
-          hasTarget = node.onViewportMouseDoubleClick(event, pos);
+          hasTarget = node.onViewportMouseDoubleClick(event, pos, this._options.readOnly);
         }
       }
 
@@ -4519,7 +4605,7 @@ wcPlayEditor.prototype = {
       };
 
       if (this.__inRect(this._mouse, this._highlightNode._meta.bounds.viewportBounds, this._viewportCamera) &&
-          this._highlightNode.onViewportMouseWheel(event, pos, (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0))) {
+          this._highlightNode.onViewportMouseWheel(event, pos, (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0), this._options.readOnly)) {
         return;
       }
     }

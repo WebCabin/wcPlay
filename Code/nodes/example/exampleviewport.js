@@ -31,9 +31,10 @@ wcNodeProcess.extend('wcNodeProcessExampleViewport', 'Example Viewport', 'Exampl
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNodeProcessExampleViewport#onViewportDraw
    * @param {external:Canvas~Context} context - The canvas context to draw on, coordinates 0,0 will be the top left corner of your viewport. It is up to you to stay within the [viewport bounds]{@link wcNode#viewportSize} you have assigned.
+   * @param {Boolean} readOnly - The editors readonly status, when true, you should not allow changes to the node.
    * @see wcNode#viewportSize
    */
-  onViewportDraw: function(context) {
+  onViewportDraw: function(context, readOnly) {
     this._super(context);
 
     if (this.mouseClicked) {
@@ -68,9 +69,10 @@ wcNodeProcess.extend('wcNodeProcessExampleViewport', 'Example Viewport', 'Exampl
    * @function wcNodeProcessExampleViewport~onViewportMouseEnter
    * @param {Object} event - The original jquery mouse event.
    * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   * @param {Boolean} readOnly - The editors readonly status, when true, you should not allow changes to the node.
    */
-  onViewportMouseEnter: function(event, pos) {
-    this._super(event, pos);
+  onViewportMouseEnter: function(event, pos, readOnly) {
+    this._super(event, pos, readOnly);
     this.hoverPos = pos;
   },
 
@@ -79,9 +81,10 @@ wcNodeProcess.extend('wcNodeProcessExampleViewport', 'Example Viewport', 'Exampl
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNodeProcessExampleViewport~onViewportMouseLeave
    * @param {Object} event - The original jquery mouse event.
+   * @param {Boolean} readOnly - The editors readonly status, when true, you should not allow changes to the node.
    */
-  onViewportMouseLeave: function(event) {
-    this._super(event);
+  onViewportMouseLeave: function(event, readOnly) {
+    this._super(event, readOnly);
     this.hoverPos = null;
     this.mousePressed = false;
   },
@@ -92,10 +95,11 @@ wcNodeProcess.extend('wcNodeProcessExampleViewport', 'Example Viewport', 'Exampl
    * @function wcNodeProcessExampleViewport~onViewportMouseDown
    * @param {Object} event - The original jquery mouse event.
    * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   * @param {Boolean} readOnly - The editors readonly status, when true, you should not allow changes to the node.
    * @returns {Boolean|undefined} - Return true if you want to disable node dragging during mouse down within your viewport.
    */
-  onViewportMouseDown: function(event, pos) {
-    this._super(event, pos);
+  onViewportMouseDown: function(event, pos, readOnly) {
+    this._super(event, pos, readOnly);
     this.mousePressed = true;
     return this.property('lock viewport');
   },
@@ -106,9 +110,10 @@ wcNodeProcess.extend('wcNodeProcessExampleViewport', 'Example Viewport', 'Exampl
    * @function wcNodeProcessExampleViewport~onViewportMouseUp
    * @param {Object} event - The original jquery mouse event.
    * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   * @param {Boolean} readOnly - The editors readonly status, when true, you should not allow changes to the node.
    */
-  onViewportMouseUp: function(event, pos) {
-    this._super(event, pos);
+  onViewportMouseUp: function(event, pos, readOnly) {
+    this._super(event, pos, readOnly);
     this.mousePressed = false;
   },
 
@@ -118,9 +123,10 @@ wcNodeProcess.extend('wcNodeProcessExampleViewport', 'Example Viewport', 'Exampl
    * @function wcNodeProcessExampleViewport~onViewportMouseMove
    * @param {Object} event - The original jquery mouse event.
    * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   * @param {Boolean} readOnly - The editors readonly status, when true, you should not allow changes to the node.
    */
-  onViewportMouseMove: function(event, pos) {
-    this._super(event, pos);
+  onViewportMouseMove: function(event, pos, readOnly) {
+    this._super(event, pos, readOnly);
     this.hoverPos = pos;
   },
 
@@ -131,9 +137,10 @@ wcNodeProcess.extend('wcNodeProcessExampleViewport', 'Example Viewport', 'Exampl
    * @param {Object} event - The original jquery mouse event.
    * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
    * @param {Number} scroll - The scroll amount and direction.
+   * @param {Boolean} readOnly - The editors readonly status, when true, you should not allow changes to the node.
    */
-  onViewportMouseWheel: function(event, pos, scroll) {
-    this._super(event, pos, scroll);
+  onViewportMouseWheel: function(event, pos, scroll, readOnly) {
+    this._super(event, pos, scroll, readOnly);
     return this.property('lock viewport');
   },
 
@@ -143,9 +150,10 @@ wcNodeProcess.extend('wcNodeProcessExampleViewport', 'Example Viewport', 'Exampl
    * @function wcNodeProcessExampleViewport~onViewportMouseClick
    * @param {Object} event - The original jquery mouse event.
    * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   * @param {Boolean} readOnly - The editors readonly status, when true, you should not allow changes to the node.
    */
-  onViewportMouseClick: function(event, pos) {
-    this._super(event, pos);
+  onViewportMouseClick: function(event, pos, readOnly) {
+    this._super(event, pos, readOnly);
     this.mouseClicked = !this.mouseClicked;
   },
 
@@ -155,10 +163,11 @@ wcNodeProcess.extend('wcNodeProcessExampleViewport', 'Example Viewport', 'Exampl
    * @function wcNodeProcessExampleViewport~onViewportMouseClick
    * @param {Object} event - The original jquery mouse event.
    * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   * @param {Boolean} readOnly - The editors readonly status, when true, you should not allow changes to the node.
    * @returns {Boolean|undefined} - Return true if you want to disable node auto-collapse when double clicking.
    */
-  onViewportMouseDoubleClick: function(event, pos) {
-    this._super(event, pos);
+  onViewportMouseDoubleClick: function(event, pos, readOnly) {
+    this._super(event, pos, readOnly);
     this.mouseDoubleClicked = !this.mouseDoubleClicked;
     return true;
   },

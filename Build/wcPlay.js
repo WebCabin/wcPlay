@@ -2254,10 +2254,11 @@ Class.extend('wcNode', 'Node', '', {
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onViewportDraw
    * @param {external:Canvas~Context} context - The canvas context to draw on, coordinates 0,0 will be the top left corner of your viewport. It is up to you to stay within the [viewport bounds]{@link wcNode#viewportSize} you have assigned.
+   * @param {Boolean} readOnly - The editors readonly status, when true, you should not allow changes to the node.
    * @see wcNode#viewportSize
    */
-  onViewportDraw: function(context) {
-    // this._super(context);
+  onViewportDraw: function(context, readOnly) {
+    // this._super(context, readOnly);
   },
 
   /**
@@ -2266,9 +2267,10 @@ Class.extend('wcNode', 'Node', '', {
    * @function wcNode~onViewportMouseEnter
    * @param {Object} event - The original jquery mouse event.
    * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   * @param {Boolean} readOnly - The editors readonly status, when true, you should not allow changes to the node.
    */
-  onViewportMouseEnter: function(event, pos) {
-    // this._super(event, pos);
+  onViewportMouseEnter: function(event, pos, readOnly) {
+    // this._super(event, pos, readOnly);
     if (this.debugLog()) {
       console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" mouse entered custom viewport!');
     }
@@ -2279,9 +2281,10 @@ Class.extend('wcNode', 'Node', '', {
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode~onViewportMouseLeave
    * @param {Object} event - The original jquery mouse event.
+   * @param {Boolean} readOnly - The editors readonly status, when true, you should not allow changes to the node.
    */
-  onViewportMouseLeave: function(event) {
-    // this._super(event);
+  onViewportMouseLeave: function(event, readOnly) {
+    // this._super(event, readOnly);
     if (this.debugLog()) {
       console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" mouse left custom viewport!');
     }
@@ -2293,10 +2296,11 @@ Class.extend('wcNode', 'Node', '', {
    * @function wcNode~onViewportMouseDown
    * @param {Object} event - The original jquery mouse event.
    * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   * @param {Boolean} readOnly - The editors readonly status, when true, you should not allow changes to the node.
    * @returns {Boolean|undefined} - Return true if you want to disable node dragging during mouse down within your viewport.
    */
-  onViewportMouseDown: function(event, pos) {
-    // this._super(event, pos);
+  onViewportMouseDown: function(event, pos, readOnly) {
+    // this._super(event, pos, readOnly);
   },
 
   /**
@@ -2305,9 +2309,10 @@ Class.extend('wcNode', 'Node', '', {
    * @function wcNode~onViewportMouseUp
    * @param {Object} event - The original jquery mouse event.
    * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   * @param {Boolean} readOnly - The editors readonly status, when true, you should not allow changes to the node.
    */
-  onViewportMouseUp: function(event, pos) {
-    // this._super(event, pos);
+  onViewportMouseUp: function(event, pos, readOnly) {
+    // this._super(event, pos, readOnly);
   },
 
   /**
@@ -2316,9 +2321,10 @@ Class.extend('wcNode', 'Node', '', {
    * @function wcNode~onViewportMouseMove
    * @param {Object} event - The original jquery mouse event.
    * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   * @param {Boolean} readOnly - The editors readonly status, when true, you should not allow changes to the node.
    */
-  onViewportMouseMove: function(event, pos) {
-    // this._super(event, pos);
+  onViewportMouseMove: function(event, pos, readOnly) {
+    // this._super(event, pos, readOnly);
   },
 
   /**
@@ -2328,9 +2334,10 @@ Class.extend('wcNode', 'Node', '', {
    * @param {Object} event - The original jquery mouse event.
    * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
    * @param {Number} scrollDelta - The scroll amount and direction.
+   * @param {Boolean} readOnly - The editors readonly status, when true, you should not allow changes to the node.
    */
-  onViewportMouseWheel: function(event, pos, scrollDelta) {
-    // this._super(event, pos, scrollDelta);
+  onViewportMouseWheel: function(event, pos, scrollDelta, readOnly) {
+    // this._super(event, pos, scrollDelta, readOnly);
   },
 
   /**
@@ -2339,9 +2346,10 @@ Class.extend('wcNode', 'Node', '', {
    * @function wcNode~onViewportMouseClick
    * @param {Object} event - The original jquery mouse event.
    * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   * @param {Boolean} readOnly - The editors readonly status, when true, you should not allow changes to the node.
    */
-  onViewportMouseClick: function(event, pos) {
-    // this._super(event, pos);
+  onViewportMouseClick: function(event, pos, readOnly) {
+    // this._super(event, pos, readOnly);
   },
 
   /**
@@ -2350,10 +2358,11 @@ Class.extend('wcNode', 'Node', '', {
    * @function wcNode~onViewportMouseClick
    * @param {Object} event - The original jquery mouse event.
    * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
+   * @param {Boolean} readOnly - The editors readonly status, when true, you should not allow changes to the node.
    * @returns {Boolean|undefined} - Return true if you want to disable node auto-collapse when double clicking.
    */
-  onViewportMouseDoubleClick: function(event, pos) {
-    // this._super(event, pos);
+  onViewportMouseDoubleClick: function(event, pos, readOnly) {
+    // this._super(event, pos, readOnly);
   },
 
   /**
