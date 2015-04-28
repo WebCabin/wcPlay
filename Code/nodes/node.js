@@ -1586,6 +1586,7 @@ Class.extend('wcNode', 'Node', '', {
     // If we are connecting one of our property outputs to another property, alert them and send your value to them.
     if (isConnecting && type === wcNode.LINK_TYPE.OUTPUT) {
       targetNode.activateProperty(targetName, this.property(name));
+      targetNode.initialProperty(targetName, this.initialProperty(name));
     }
   },
 
