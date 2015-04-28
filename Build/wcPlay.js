@@ -900,6 +900,7 @@ Class.extend('wcNode', 'Node', '', {
       color: null,
       paused: 0,
       awake: false,
+      dirty: true,
       threads: [],
       description: '',
     };
@@ -980,6 +981,7 @@ Class.extend('wcNode', 'Node', '', {
     }
     this._meta.threads = [];
     this._meta.awake = false;
+    this._meta.dirty = true;
 
     for (var i = 0; i < this.properties.length; ++i) {
       this.properties[i].value = this.properties[i].initialValue;
@@ -1047,6 +1049,7 @@ Class.extend('wcNode', 'Node', '', {
         this.connectOutput(chain.outName, targetNode, chain.inName);
       }
     }
+    this._meta.dirty = true;
 
     this.onImported(data, idMap);
   },
@@ -1101,6 +1104,7 @@ Class.extend('wcNode', 'Node', '', {
   enabled: function(enabled) {
     if (enabled !== undefined) {
       this.property(wcNode.PROPERTY_ENABLED, enabled? true: false);
+      this._meta.dirty = true;
     }
 
     return this.property(wcNode.PROPERTY_ENABLED);
@@ -1154,6 +1158,7 @@ Class.extend('wcNode', 'Node', '', {
   collapsed: function(enabled) {
     if (enabled !== undefined) {
       this._collapsed = enabled;
+      this._meta.dirty = true;
     }
 
     return this._collapsed;
@@ -1234,6 +1239,7 @@ Class.extend('wcNode', 'Node', '', {
     if (pos !== undefined) {
       this.pos.x = pos.x;
       this.pos.y = pos.y;
+      this._meta.dirty = true;
     }
 
     return {x: this.pos.x, y: this.pos.y};
@@ -1265,6 +1271,7 @@ Class.extend('wcNode', 'Node', '', {
         description: description,
       },
     });
+    this._meta.dirty = true;
     return true;
   },
 
@@ -1293,6 +1300,7 @@ Class.extend('wcNode', 'Node', '', {
         description: description,
       },
     });
+    this._meta.dirty = true;
     return true;
   },
 
@@ -1338,6 +1346,7 @@ Class.extend('wcNode', 'Node', '', {
         color: "#000000",
       },
     });
+    this._meta.dirty = true;
     return true;
   },
 
@@ -1352,6 +1361,7 @@ Class.extend('wcNode', 'Node', '', {
       if (this.chain.entry[i].name === name) {
         if (this.disconnectEntry(name) === wcNode.CONNECT_RESULT.SUCCESS) {
           this.chain.entry.splice(i, 1);
+          this._meta.dirty = true;
           return true;
         }
       }
@@ -1370,6 +1380,7 @@ Class.extend('wcNode', 'Node', '', {
       if (this.chain.exit[i].name === name) {
         if (this.disconnectExit(name) === wcNode.CONNECT_RESULT.SUCCESS) {
           this.chain.exit.splice(i, 1);
+          this._meta.dirty = true;
           return true;
         }
       }
@@ -1389,6 +1400,7 @@ Class.extend('wcNode', 'Node', '', {
         if (this.disconnectInput(name) === wcNode.CONNECT_RESULT.SUCCESS &&
             this.disconnectOutput(name) === wcNode.CONNECT_RESULT.SUCCESS) {
           this.properties.splice(i, 1);
+          this._meta.dirty = true;
           return true;
         }
       }
@@ -1423,6 +1435,7 @@ Class.extend('wcNode', 'Node', '', {
         this.connectEntry(newName, engine.nodeById(chains[i].outNodeId), chains[i].outName);
       }
     }
+    this._meta.dirty = true;
     return true;
   },
 
@@ -1453,6 +1466,7 @@ Class.extend('wcNode', 'Node', '', {
         this.connectExit(newName, engine.nodeById(chains[i].inNodeId), chains[i].inName);
       }
     }
+    this._meta.dirty = true;
     return true;
   },
 
@@ -1494,6 +1508,7 @@ Class.extend('wcNode', 'Node', '', {
         this.connectOutput(newName, engine.nodeById(outputChains[i].inNodeId), outputChains[i].inName);
       }
     }
+    this._meta.dirty = true;
     return true;
   },
 
@@ -2041,6 +2056,7 @@ Class.extend('wcNode', 'Node', '', {
           }
 
           if (forceOrSilent || prop.value !== value) {
+            this._meta.dirty = true;
             prop.value = value;
 
             // Notify that the property has changed.
@@ -2088,6 +2104,7 @@ Class.extend('wcNode', 'Node', '', {
           var oldValue = prop.initialValue;
 
           if (forceOrSilent || prop.initialValue !== value) {
+            this._meta.dirty = true;
             prop.initialValue = value;
 
             // Notify that the property has changed.
@@ -2286,6 +2303,7 @@ Class.extend('wcNode', 'Node', '', {
    */
   viewportSize: function(width, height) {
     if (width !== undefined && height !== undefined) {
+      this._meta.dirty = true;
       if (!width || !height) {
         this._viewportSize = null;
       } else {

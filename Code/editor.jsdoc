@@ -41,12 +41,3 @@
  * @property {wcPlayEditor~BoundingData[]} valueBounds - Bounding data of property value text.
  * @property {wcPlayEditor~BoundingData[]} initialBounds - Bounding data of property initial value text.
  */
-
-/**
- * This object contains bounding data for property values, property input links, and property output links.
- * @typedef {Object} wcPlayEditor~DrawPropertyData
- * @property {wcPlayEditor~BoundingData[]} inputBounds - Bounding data of property input links.
- * @property {wcPlayEditor~BoundingData[]} outputBounds - Bounding data of property output links.
- * @property {wcPlayEditor~BoundingData[]} valueBounds - Bounding data of property value text.
- * @property {wcPlayEditor~BoundingData[]} initialBounds - Bounding data of property initial value text.
- */

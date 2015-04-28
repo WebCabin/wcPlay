@@ -8,7 +8,6 @@
 /**
  * @typedef {Object} wcNode~PropertyOptions
  * @property {String} [description] - An optional description to display as a tooltip for this property.
- * @property {Boolean} [collapsible] - If true, this property will be hidden on a collapsed node (unless links are connected to it).
  * @property {wcNode~PropertyDisplay} [display] - An optional function that will be called to retrieve the display string for the value/initial value for this property.
  */
 
