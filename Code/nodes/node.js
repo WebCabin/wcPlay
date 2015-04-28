@@ -1644,7 +1644,6 @@ Class.extend('wcNode', 'Node', '', {
    */
   onMoved: function(oldPos, newPos) {
     // this._super(oldPos, newPos);
-    this._meta.dirty = true;
   },
 
   /**
