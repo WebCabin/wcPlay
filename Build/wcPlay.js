@@ -2507,6 +2507,7 @@ Class.extend('wcNode', 'Node', '', {
    */
   onMoved: function(oldPos, newPos) {
     // this._super(oldPos, newPos);
+    this._meta.dirty = true;
   },
 
   /**
@@ -2530,6 +2531,7 @@ Class.extend('wcNode', 'Node', '', {
    */
   onNameChanged: function(oldName, newName) {
     // this._super(oldName, newName);
+    this._meta.dirty = true;
   },
 
   /**

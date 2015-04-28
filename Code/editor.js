@@ -1585,11 +1585,11 @@ wcPlayEditor.prototype = {
     context.fillText(this._drawStyle.title.wrapL + node.type + ': ', node._meta.bounds.titleBounds.left - node._meta.bounds.titleBounds.typeWidth, node._meta.bounds.titleBounds.top + upper);
 
     this.__setCanvasFont(this._font.titleDesc, context);
-    context.fillText(this._drawStyle.title.nameWrapL + (node.name || this._drawStyle.title.placeholder) + this._drawStyle.title.nameWrapR, node._meta.bounds.center.left + node._meta.bounds.titleBounds.typeWidth + (node._meta.bounds.center.width - (node._meta.bounds.titleBounds.typeWidth + node._meta.bounds.titleBounds.wrapRWidth + node._meta.bounds.titleBounds.textWidth))/2, node._meta.bounds.center.top + upper);
+    context.fillText(this._drawStyle.title.nameWrapL + (node.name || this._drawStyle.title.placeholder) + this._drawStyle.title.nameWrapR, node._meta.bounds.titleBounds.left, node._meta.bounds.titleBounds.top + upper);
 
     context.textAlign = "right";
     this.__setCanvasFont(this._font.title, context);
-    context.fillText(this._drawStyle.title.wrapR, node._meta.bounds.center.left + node._meta.bounds.center.width - (node._meta.bounds.center.width - (node._meta.bounds.titleBounds.typeWidth + node._meta.bounds.titleBounds.wrapRWidth + node._meta.bounds.titleBounds.textWidth)) / 2, node._meta.bounds.center.top + upper);
+    context.fillText(this._drawStyle.title.wrapR, node._meta.bounds.titleBounds.left, node._meta.bounds.titleBounds.top + upper);
     context.restore();
 
     // Title Lower Bar
@@ -3628,7 +3628,6 @@ wcPlayEditor.prototype = {
         if (oldPos.x !== newPos.x || oldPos.y !== newPos.y) {
           node.pos.x = newPos.x;
           node.pos.y = newPos.y;
-          node._meta.dirty = true;
           node.onMoved(oldPos, newPos);
         }
       }
