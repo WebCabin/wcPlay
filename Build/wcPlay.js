@@ -89,6 +89,7 @@ function wcPlay(options) {
 
   this._properties = [];
 
+  this._waitingChain = [];
   this._queuedChain = [];
   this._queuedProperties = [];
   this._importedScripts = [];
@@ -399,8 +400,20 @@ wcPlay.prototype = {
       return;
     }
 
-    // Update a queued property if any
     var count = Math.min(this._queuedProperties.length, this._options.updateLimit);
+    if (!count && this._waitingChain.length) {
+      // If no properties are queued, but we have waiting flow nodes, add them to the queue for next update.
+      for (var i = 0; i < this._waitingChain.length; ++i) {
+        var item = this._waitingChain[i];
+
+        this.queueNodeEntry(item.node, item.name, item.fromNode, item.fromName, true);
+      }
+
+      this._waitingChain = [];
+      return;
+    }
+
+    // Update a queued properties if any
     var index = count;
     while (index) {
       index--;
@@ -420,7 +433,7 @@ wcPlay.prototype = {
         index--;
         var item = this._queuedChain.shift();
         item.node._meta.flash = true;
-        if (item.node._meta.broken) {
+        if (item.node._meta.broken > 0) {
           item.node._meta.broken--;
         }
         item.node.onTriggered(item.name);
@@ -721,8 +734,23 @@ wcPlay.prototype = {
    * @function wcPlay#queueNodeEntry
    * @param {wcNode} node - The node being queued.
    * @param {String} name - The entry link name.
+   * @param {wcNode} fromNode - The node causing the queue.
+   * @param {String} fromName - The exit link name.
+   * @param {Boolean} [forceQueue] - If true, will force the event into the queue rather than the waiting list.
    */
-  queueNodeEntry: function(node, name) {
+  queueNodeEntry: function(node, name, fromNode, fromName, forceQueue) {
+    if (!forceQueue && this._isStepping && this._isPaused) {
+      if (node.enabled()) {
+        this._waitingChain.push({
+          node: node,
+          name: name,
+          fromNode: fromNode,
+          fromName: fromName,
+        });
+      }
+      return;
+    }
+
     if (node.enabled()) {
       this._queuedChain.push({
         node: node,
@@ -733,6 +761,33 @@ wcPlay.prototype = {
         node._meta.flash = true;
         node._meta.broken++;
         this._isPausing = true;
+      }
+
+      // Flash the entry link.
+      for (var i = 0; i < node.chain.entry.length; ++i) {
+        if (node.chain.entry[i].name == name) {
+          node.chain.entry[i].meta.flash = true;
+          if (node.debugBreak() || this._isStepping) {
+            node.chain.entry[i].meta.broken++;
+          }
+          break;
+        }
+      }
+
+      // Flash the exit link.
+      if (fromNode && fromName) {
+        for (var i = 0; i < fromNode.chain.exit.length; ++i) {
+          var exitLink = fromNode.chain.exit[i];
+          if (exitLink.name == fromName) {
+            fromNode.chain.exit[i].meta.flash = true;
+            fromNode._meta.flash = true;
+
+            if (node.debugBreak() || this._isStepping) {
+              fromNode.chain.exit[i].meta.broken++;
+            }
+            break;
+          }
+        }
       }
 
       if (this._isPausing) {
@@ -758,6 +813,11 @@ wcPlay.prototype = {
         value: value,
         upstream: upstream,
       });
+
+      // if (this._queuedChain.length > 0) {
+      //   this._waitingChain = this._queuedChain;
+      //   this._queuedChain = [];
+      // }
 
       if (node.debugBreak() || this._isStepping) {
         node._meta.flash = true;
@@ -2162,18 +2222,16 @@ Class.extend('wcNode', 'Node', '', {
    * Activates an entry link and activates this node.
    * @function wcNode#activateEntry
    * @param {String} name - The name of the entry link to trigger.
+   * @param {wcNode} fromNode - The node triggering the entry.
+   * @param {String} fromName - The Exit link name.
    * @returns {Boolean} - Fails if the entry link does not exist.
    */
-  activateEntry: function(name) {
+  activateEntry: function(name, fromNode, fromName) {
     for (var i = 0; i < this.chain.entry.length; ++i) {
       if (this.chain.entry[i].name == name) {
         // Always queue the trigger so execution is not immediate.
         var engine = this.engine();
-        this.chain.entry[i].meta.flash = true;
-        if (this.debugBreak() || (engine && engine.stepping())) {
-          this.chain.entry[i].meta.broken++;
-        }
-        engine && engine.queueNodeEntry(this, this.chain.entry[i].name);
+        engine && engine.queueNodeEntry(this, this.chain.entry[i].name, fromNode, fromName);
         return true;
       }
     }
@@ -2198,17 +2256,11 @@ Class.extend('wcNode', 'Node', '', {
     for (var i = 0; i < this.chain.exit.length; ++i) {
       var exitLink = this.chain.exit[i];
       if (exitLink.name == name) {
-        this.chain.exit[i].meta.flash = true;
-        this._meta.flash = true;
-
         // Activate all entry links chained to this exit.
         var engine = this.engine();
         for (var a = 0; a < exitLink.links.length; ++a) {
           if (exitLink.links[a].node) {
-            exitLink.links[a].node.activateEntry(exitLink.links[a].name);
-            if (exitLink.links[a].node.debugBreak() || (engine && engine.stepping())) {
-              this.chain.exit[i].meta.broken++;
-            }
+            exitLink.links[a].node.activateEntry(exitLink.links[a].name, this, name);
           }
         }
         return true;
@@ -4240,7 +4292,7 @@ wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'External', {
     this._parent.sortPropertyLinks();
   },
 });
-wcNodeEntry.extend('wcNodeEntryStart', 'Start', 'Flow Control', {
+wcNodeEntry.extend('wcNodeEntryStart', 'Start', 'Automatic', {
   /**
    * @class
    * An entry node that fires as soon as the script [starts]{@link wcPlay#start}.<br>
@@ -4266,7 +4318,7 @@ wcNodeEntry.extend('wcNodeEntryStart', 'Start', 'Flow Control', {
     this.onTriggered();
   },
 });
-wcNodeEntry.extend('wcNodeEntryUpdate', 'Update', 'Flow Control', {
+wcNodeEntry.extend('wcNodeEntryUpdate', 'Update', 'Automatic', {
   /**
    * @class
    * An entry node that fires continuously on a regular update.<br>
@@ -4451,9 +4503,8 @@ wcNodeProcess.extend('wcNodeProcessStrCat', 'String Concat', 'Data Manipulation'
   onTriggered: function(name) {
     this._super(name);
 
-    // Immediately activate the 'out' Exit link.
-    this.activateExit('out');
     this.property('result', this.property('valueA').toString() + this.property('valueB'));
+    this.activateExit('out');
   },
 });
 

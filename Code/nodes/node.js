@@ -1233,18 +1233,16 @@ Class.extend('wcNode', 'Node', '', {
    * Activates an entry link and activates this node.
    * @function wcNode#activateEntry
    * @param {String} name - The name of the entry link to trigger.
+   * @param {wcNode} fromNode - The node triggering the entry.
+   * @param {String} fromName - The Exit link name.
    * @returns {Boolean} - Fails if the entry link does not exist.
    */
-  activateEntry: function(name) {
+  activateEntry: function(name, fromNode, fromName) {
     for (var i = 0; i < this.chain.entry.length; ++i) {
       if (this.chain.entry[i].name == name) {
         // Always queue the trigger so execution is not immediate.
         var engine = this.engine();
-        this.chain.entry[i].meta.flash = true;
-        if (this.debugBreak() || (engine && engine.stepping())) {
-          this.chain.entry[i].meta.broken++;
-        }
-        engine && engine.queueNodeEntry(this, this.chain.entry[i].name);
+        engine && engine.queueNodeEntry(this, this.chain.entry[i].name, fromNode, fromName);
         return true;
       }
     }
@@ -1269,17 +1267,11 @@ Class.extend('wcNode', 'Node', '', {
     for (var i = 0; i < this.chain.exit.length; ++i) {
       var exitLink = this.chain.exit[i];
       if (exitLink.name == name) {
-        this.chain.exit[i].meta.flash = true;
-        this._meta.flash = true;
-
         // Activate all entry links chained to this exit.
         var engine = this.engine();
         for (var a = 0; a < exitLink.links.length; ++a) {
           if (exitLink.links[a].node) {
-            exitLink.links[a].node.activateEntry(exitLink.links[a].name);
-            if (exitLink.links[a].node.debugBreak() || (engine && engine.stepping())) {
-              this.chain.exit[i].meta.broken++;
-            }
+            exitLink.links[a].node.activateEntry(exitLink.links[a].name, this, name);
           }
         }
         return true;

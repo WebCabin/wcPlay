@@ -29,8 +29,7 @@ wcNodeProcess.extend('wcNodeProcessStrCat', 'String Concat', 'Data Manipulation'
   onTriggered: function(name) {
     this._super(name);
 
-    // Immediately activate the 'out' Exit link.
-    this.activateExit('out');
     this.property('result', this.property('valueA').toString() + this.property('valueB'));
+    this.activateExit('out');
   },
 });

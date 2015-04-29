@@ -1,4 +1,4 @@
-wcNodeEntry.extend('wcNodeEntryStart', 'Start', 'Flow Control', {
+wcNodeEntry.extend('wcNodeEntryStart', 'Start', 'Automatic', {
   /**
    * @class
    * An entry node that fires as soon as the script [starts]{@link wcPlay#start}.<br>

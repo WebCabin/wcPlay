@@ -35,7 +35,7 @@ function wcPlayEditor(container, options) {
     breadcrumbs: {size: 15, family: 'Arial', weight: 'bold'},
     title: {size: 15, family: 'Arial', weight: 'bold'},
     titleDesc: {size: 15, family: 'Arial', weight: 'italic'},
-    details: {size: 15, family: 'Arial', weight: 'italic'},
+    details: {size: 13, family: 'Arial', weight: 'bold'},
     links: {size: 10, family: 'Arial'},
     property: {size: 10, family: 'Arial', weight: 'italic'},
     value: {size: 10, family: 'Arial', weight: 'bold'},
@@ -676,15 +676,18 @@ wcPlayEditor.prototype = {
     var blackColor = "#000000";
     var propColor  = "#117711";
     var flashColor = "#FFFF00";
-    for (var i = 0; i < node.chain.entry.length; ++i) {
-      __updateFlash(node.chain.entry[i].meta, blackColor, flashColor, flashColor, false, 0.9);
-    }
-    for (var i = 0; i < node.chain.exit.length; ++i) {
-      __updateFlash(node.chain.exit[i].meta, blackColor, flashColor, flashColor, false, 0.9);
-    }
     for (var i = 0; i < node.properties.length; ++i) {
       __updateFlash(node.properties[i].inputMeta, propColor, flashColor, flashColor, false, 0.9);
       __updateFlash(node.properties[i].outputMeta, propColor, flashColor, flashColor, false, 0.9);
+    }
+
+    if (this._engine._queuedProperties.length === 0) {
+      for (var i = 0; i < node.chain.entry.length; ++i) {
+        __updateFlash(node.chain.entry[i].meta, blackColor, flashColor, flashColor, false, 0.9);
+      }
+      for (var i = 0; i < node.chain.exit.length; ++i) {
+        __updateFlash(node.chain.exit[i].meta, blackColor, flashColor, flashColor, false, 0.9);
+      }
     }
 
     // Measure bounding areas for node, if it is dirty.
@@ -1358,9 +1361,9 @@ wcPlayEditor.prototype = {
 
     node._meta.bounds.detailsBounds = {
       top: rect.top,
-      left: node._meta.bounds.titleBounds.left + titleTextWidth,
+      left: rect.left + rect.width - this._drawStyle.node.margin - titleDetailsWidth,
       width: titleDetailsWidth,
-      height: this._font.title.size + this._drawStyle.title.spacing - 1,
+      height: this._font.details.size + this._drawStyle.title.spacing - 1,
     };
 
     // Title Lower Bar
@@ -1656,7 +1659,7 @@ wcPlayEditor.prototype = {
 
     if (node.description() || node.details()) {
       this.__setCanvasFont(this._font.details, context);
-      context.fillText(this._drawStyle.title.details, node.pos.x + node._meta.bounds.detailsBounds.left + node._meta.bounds.detailsBounds.width, node.pos.y + node._meta.bounds.detailsBounds.top + upper);
+      context.fillText(this._drawStyle.title.details, node.pos.x + node._meta.bounds.detailsBounds.left + node._meta.bounds.detailsBounds.width, node.pos.y + node._meta.bounds.detailsBounds.top + this._font.details.size);
     }
     context.restore();
 

@@ -1,4 +1,4 @@
-wcNodeEntry.extend('wcNodeEntryUpdate', 'Update', 'Flow Control', {
+wcNodeEntry.extend('wcNodeEntryUpdate', 'Update', 'Automatic', {
   /**
    * @class
    * An entry node that fires continuously on a regular update.<br>
