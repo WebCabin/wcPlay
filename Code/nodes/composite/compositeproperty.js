@@ -17,6 +17,7 @@ wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'External', {
     }
 
     this.description("References a property from its parent Composite Node.");
+    this.details("The title name for this node becomes the name of the Property on the parent Composite Node. Multiple Property Nodes can reference the same property value name.\n\nAlthough this node does nothing while it is outside of a Composite Node, it can be placed within the Root level of the script. Doing so is useful if you intend to 'File->Import' this script into another.");
     this.name = linkName || 'value';
 
     if (!this._invalid) {

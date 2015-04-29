@@ -11,7 +11,7 @@ wcNodeProcess.extend('wcNodeProcessExampleDynamic', 'Example Dynamic', 'Example'
   init: function(parent, pos) {
     this._super(parent, pos);
 
-    this.description("This node demonstrates an example of using different flow links to determine how this node behaves.");
+    this.description("This node demonstrates an example of using different flow links to determine how the node behaves.");
 
     // Remove the default 'in' entry link.
     this.removeEntry('in');

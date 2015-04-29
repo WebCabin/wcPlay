@@ -11,7 +11,7 @@ wcNodeProcess.extend('wcNodeProcessAlert', 'Alert', 'Debugging', {
   init: function(parent, pos) {
     this._super(parent, pos);
 
-    this.description("For debugging purposes, will popup an alert box with a message the moment it is activated (only if silent mode is not on).");
+    this.description("For debugging purposes, will popup an alert box with a message when activated (only if silent mode is not on).");
 
     // Create the message property so we know what to output in the log.
     this.createProperty('message', wcPlay.PROPERTY.STRING, 'Alert message.', {multiline: true, description: "The message that will appear in the alert box."});

@@ -97,6 +97,40 @@
   height: 100%;
 }
 
+.wcPlayDetailsPopupBlocker {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  background-color: rgba(0,0,0,0.2);
+}
+
+.wcPlayDetailsPopup {
+  position: absolute;
+  top: 25%;
+  left: 25%;
+  right: 25%;
+  bottom: 25%;
+  background-color: white;
+  border: 5px outset gray;
+}
+
+.wcPlayDetailsPopupText {
+  position: absolute;
+  top: 50px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
 .wcPlayHoverCanvas {
   position: fixed;
   pointer-events: none;

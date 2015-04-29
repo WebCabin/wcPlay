@@ -11,6 +11,9 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
   init: function(parent, pos, nodes) {
     this._super(parent, pos);
 
+    this.description("A node that contains its own set of nodes. Double click to view and edit its contents.");
+    this.details("Composite nodes can also be generated from an external script file using the 'File->Import' option. Doing so will allow you to load the entire script into a single Composite Node that appears in the Palette on the left side.");
+
     this._entryNodes = [];
     this._processNodes = [];
     this._storageNodes = [];

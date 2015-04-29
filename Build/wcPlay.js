@@ -969,6 +969,7 @@ Class.extend('wcNode', 'Node', '', {
       dirty: true,
       threads: [],
       description: '',
+      details: '',
     };
     this._collapsed = true;
     this._break = false;
@@ -1283,7 +1284,7 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
-   * Gets, or Sets the description for this node.
+   * Gets, or Sets the description for this node. This is usually shown as a tooltip for the node within the editor tool.
    * @function wcNode#description
    * @param {String} [description] - If supplied, will assign a new description for this node.
    * @returns {String} - The current description of this node.
@@ -1294,6 +1295,20 @@ Class.extend('wcNode', 'Node', '', {
     }
 
     return this._meta.description;
+  },
+
+  /**
+   * Gets, or Sets the very verbose description details for this node. This is usually shown as a popup dialog to further explain the user of the node.
+   * @function wcNode#details
+   * @param {String} [details] - If supplied, will assign a new description details for this node.
+   * @returns {String} - The current description details of this node.
+   */
+  details: function(details) {
+    if (details !== undefined) {
+      this._meta.details = details;
+    }
+
+    return this._meta.details;
   },
 
   /**
@@ -3174,6 +3189,9 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
   init: function(parent, pos, nodes) {
     this._super(parent, pos);
 
+    this.description("A node that contains its own set of nodes. Double click to view and edit its contents.");
+    this.details("Composite nodes can also be generated from an external script file using the 'File->Import' option. Doing so will allow you to load the entire script into a single Composite Node that appears in the Palette on the left side.");
+
     this._entryNodes = [];
     this._processNodes = [];
     this._storageNodes = [];
@@ -3710,6 +3728,7 @@ wcNodeComposite.extend('wcNodeCompositeEntry', 'Entry', 'External', {
     }
 
     this.description("Activates when the corresponding Entry link of the parent Composite node has been activated.");
+    this.details("The title name for this node becomes the name of the Entry link in the parent Composite Node.\n\nAlthough this node does nothing while it is outside of a Composite Node, it can be placed within the Root level of the script. Doing so is useful if you intend to 'File->Import' this script into another.");
 
     // Prevent duplicate link names.
     linkName = linkName || 'in'
@@ -3844,6 +3863,11 @@ wcNodeComposite.extend('wcNodeCompositeEntry', 'Entry', 'External', {
    */
   onImported: function(data, idMap) {
     this._super(data, idMap);
+
+    if (this._invalid) {
+      return;
+    }
+
     this._parent.sortEntryLinks();
   },
 });
@@ -3866,6 +3890,7 @@ wcNodeComposite.extend('wcNodeCompositeExit', 'Exit', 'External', {
     }
 
     this.description("Activates the corresponding Exit link of the parent Composite node when it has been activated.");
+    this.details("The title name for this node becomes the name of the Exit link in the parent Composite Node.\n\nAlthough this node does nothing while it is outside of a Composite Node, it can be placed within the Root level of the script. Doing so is useful if you intend to 'File->Import' this script into another.");
 
     // Prevent duplicate link names.
     linkName = linkName || 'out'
@@ -4017,6 +4042,11 @@ wcNodeComposite.extend('wcNodeCompositeExit', 'Exit', 'External', {
    */
   onImported: function(data, idMap) {
     this._super(data, idMap);
+
+    if (this._invalid) {
+      return;
+    }
+
     this._parent.sortExitLinks();
   },
 });
@@ -4039,6 +4069,7 @@ wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'External', {
     }
 
     this.description("References a property from its parent Composite Node.");
+    this.details("The title name for this node becomes the name of the Property on the parent Composite Node. Multiple Property Nodes can reference the same property value name.\n\nAlthough this node does nothing while it is outside of a Composite Node, it can be placed within the Root level of the script. Doing so is useful if you intend to 'File->Import' this script into another.");
     this.name = linkName || 'value';
 
     if (!this._invalid) {
@@ -4222,7 +4253,7 @@ wcNodeEntry.extend('wcNodeEntryStart', 'Start', 'Flow Control', {
   init: function(parent, pos) {
     this._super(parent, pos);
 
-    this.description("Event that fires once on script execution.");
+    this.description("When the script starts, this will activate immediately and only once.");
   },
 
   /**
@@ -4248,7 +4279,7 @@ wcNodeEntry.extend('wcNodeEntryUpdate', 'Update', 'Flow Control', {
   init: function(parent, pos) {
     this._super(parent, pos);
 
-    this.description("Fires on a constant interval time.");
+    this.description("Once the script starts, this will activate continuously on a time interval defined by the milliseconds property.");
 
     this.createProperty("milliseconds", wcPlay.PROPERTY.NUMBER, 1000, {description: "The time, in milliseconds, per update."});
   },
@@ -4347,6 +4378,7 @@ wcNodeProcess.extend('wcNodeProcessOperation', 'Operation', 'Data Manipulation',
     this._super(parent, pos);
 
     this.description("Performs a simple math operation on two values.");
+    this.details("Activate the entry link of the operation you want to perform, either an addition, subtraction, multiplication, or division. The operation will then be performed using valueA and valueB, the result will be output to the result property.");
 
     // Remove our default entry.
     this.removeEntry('in');
@@ -4402,6 +4434,7 @@ wcNodeProcess.extend('wcNodeProcessStrCat', 'String Concat', 'Data Manipulation'
     this._super(parent, pos);
 
     this.description("Concatenates two string values.");
+    this.details("This takes the string of valueA and appends valueB to it, the result is stored in the result property.");
 
     // Create our two operator values.
     this.createProperty('valueA', wcPlay.PROPERTY.STRING, '', {description: "The left side string to join."});
@@ -4438,6 +4471,7 @@ wcNodeProcess.extend('wcNodeProcessAJAX', 'AJAX', 'Data Retrieval', {
     this._super(parent, pos);
 
     this.description("Performs an AJAX request.");
+    this.details("Once activated, a request will be sent to the given URL.  Either the success or failure exit links will activate once the operation is completed and the result will be assigned to the result property.");
 
     this.removeExit('out');
     this.createExit('success');
@@ -4496,7 +4530,7 @@ wcNodeProcess.extend('wcNodeProcessConsoleLog', 'Console Log', 'Debugging', {
   init: function(parent, pos) {
     this._super(parent, pos);
 
-    this.description("For debugging purposes, will print out a message into the console log the moment it is activated (only if silent mode is not on).");
+    this.description("For debugging purposes, will print out a message into the console log when activated (only if silent mode is not on).");
 
     // Create the message property so we know what to output in the log.
     this.createProperty('message', wcPlay.PROPERTY.STRING, 'msg', {description: "The message that will appear in the console log."});
@@ -4538,7 +4572,7 @@ wcNodeProcess.extend('wcNodeProcessAlert', 'Alert', 'Debugging', {
   init: function(parent, pos) {
     this._super(parent, pos);
 
-    this.description("For debugging purposes, will popup an alert box with a message the moment it is activated (only if silent mode is not on).");
+    this.description("For debugging purposes, will popup an alert box with a message when activated (only if silent mode is not on).");
 
     // Create the message property so we know what to output in the log.
     this.createProperty('message', wcPlay.PROPERTY.STRING, 'Alert message.', {multiline: true, description: "The message that will appear in the alert box."});
@@ -4582,6 +4616,7 @@ wcNodeStorage.extend('wcNodeStorageGlobal', 'Global', 'Global', {
     this.color = '#77CC77';
 
     this.description("References a global property on the script.");
+    this.details("The title name for this node becomes the name of the global property it references. Duplicate Global Nodes with the same name will all reference the same value.");
 
     this.createProperty('value', wcPlay.PROPERTY.STRING, '', {description: "The current value of the global property (Use the title to identify the property)."});
   },

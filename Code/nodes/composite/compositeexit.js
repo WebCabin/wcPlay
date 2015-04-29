@@ -17,6 +17,7 @@ wcNodeComposite.extend('wcNodeCompositeExit', 'Exit', 'External', {
     }
 
     this.description("Activates the corresponding Exit link of the parent Composite node when it has been activated.");
+    this.details("The title name for this node becomes the name of the Exit link in the parent Composite Node.\n\nAlthough this node does nothing while it is outside of a Composite Node, it can be placed within the Root level of the script. Doing so is useful if you intend to 'File->Import' this script into another.");
 
     // Prevent duplicate link names.
     linkName = linkName || 'out'
@@ -168,6 +169,11 @@ wcNodeComposite.extend('wcNodeCompositeExit', 'Exit', 'External', {
    */
   onImported: function(data, idMap) {
     this._super(data, idMap);
+
+    if (this._invalid) {
+      return;
+    }
+
     this._parent.sortExitLinks();
   },
 });

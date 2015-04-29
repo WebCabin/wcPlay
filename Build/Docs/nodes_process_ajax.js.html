@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>wcPlay Source: nodes/composite.js</title>
+	<title>wcPlay Source: nodes/process/ajax.js</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -53,44 +53,68 @@
 		<div id="main">
     		
 
-		<h1 class="page-title">Source: nodes/composite.js</h1>
+		<h1 class="page-title">Source: nodes/process/ajax.js</h1>
     
 <section>
 	<article>
 		<pre
-			class="sunlight-highlight-javascript linenums">wcNode.extend('wcNodeComposite', 'Composite', '', {
+			class="sunlight-highlight-javascript linenums">wcNodeProcess.extend('wcNodeProcessAJAX', 'AJAX', 'Data Retrieval', {
   /**
    * @class
-   * The base class for all composite nodes.&lt;br>
+   * Performs an AJAX request.&lt;br>
+   * When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.
    *
-   * @constructor wcNodeComposite
+   * @constructor wcNodeProcessAJAX
    * @param {String} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
    */
   init: function(parent, pos) {
     this._super(parent, pos);
-    this.color = '#990099';
 
-    this.removeEntry('in');
+    this.description("Performs an AJAX request.");
+    this.details("Once activated, a request will be sent to the given URL.  Either the success or failure exit links will activate once the operation is completed and the result will be assigned to the result property.");
+
     this.removeExit('out');
+    this.createExit('success');
+    this.createExit('failure');
+
+    this.createProperty('type', wcPlay.PROPERTY.SELECT, 'GET', {items: ['GET', 'POST'], description:"The AJAX method to perform."});
+    this.createProperty('url', wcPlay.PROPERTY.STRING, 'example.com', {description: "The URL to send the request."});
+    this.createProperty('data', wcPlay.PROPERTY.STRING, 'foo=bar&amp;bar=foo', {description: "The data to send with the request. This can be in query string form, or any object that $.ajax supports as the data parameter."});
+    this.createProperty('result', wcPlay.PROPERTY.STRING, '', {description: "The result of the ajax request, if successful."});
   },
 
   /**
-   * Magic function that is called whenever any new class type is extended from this one.&lt;br>
-   * Handles initializing of the class as well as registering the new node type.
-   * @function wcNodeComposite#classInit
-   * @param {String} className - The name of the class constructor.
-   * @param {String} type - The type name for the node.
-   * @param {String} category - A category where this node will be grouped.
+   * Event that is called when an entry link has been triggered.&lt;br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeProcessAJAX#onTriggered
+   * @param {String} name - The name of the entry link triggered.
    */
-  classInit: function(className, type, category) {
-    if (category) {
-      this.className = className;
-      this.type = type;
-      this.nodeType = wcPlay.NODE.COMPOSITE;
-      this.category = category;
-      wcPlay.registerNodeType(className, type, category, wcPlay.NODE.COMPOSITE);
+  onTriggered: function(name) {
+    this._super(name);
+
+    var type = this.property('type');
+    var url  = this.property('url');
+    var data = this.property('data');
+
+    if (!url) {
+      this.activateExit('failure');
+      return;
     }
+
+    this.ajax({
+      type: type,
+      url: url,
+      data: data,
+      success: function(result) {
+        this.property('result', result);
+        this.activateExit('success');
+      },
+      error: function(XHR, status, msg) {
+        this.property('result', msg);
+        this.activateExit('failure');
+      },
+    });
   },
 });
 </pre>

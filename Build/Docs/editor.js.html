@@ -27,7 +27,7 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeComposite.html">wcNodeComposite</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeEntryUpdate.html">wcNodeEntryUpdate</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeProcessStrCat.html">wcNodeProcessStrCat</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageGlobal.html">wcNodeStorageGlobal</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
+					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeComposite.html">wcNodeComposite</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeEntryUpdate.html">wcNodeEntryUpdate</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAJAX.html">wcNodeProcessAJAX</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeProcessStrCat.html">wcNodeProcessStrCat</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageGlobal.html">wcNodeStorageGlobal</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
 				</ul>
 			</li>
 			
@@ -95,6 +95,7 @@ function wcPlayEditor(container, options) {
     breadcrumbs: {size: 15, family: 'Arial', weight: 'bold'},
     title: {size: 15, family: 'Arial', weight: 'bold'},
     titleDesc: {size: 15, family: 'Arial', weight: 'italic'},
+    details: {size: 15, family: 'Arial', weight: 'italic'},
     links: {size: 10, family: 'Arial'},
     property: {size: 10, family: 'Arial', weight: 'italic'},
     value: {size: 10, family: 'Arial', weight: 'bold'},
@@ -116,6 +117,7 @@ function wcPlayEditor(container, options) {
       placeholder: '  ',    // A placeholder label if there is no title name.
       nameWrapL: ' (',      // The left string to wrap around the name portion of the title text.
       nameWrapR: ') ',      // The right string to wrap around the name portion of the title text.
+      details: ' [?] ',     // The text to display for the detail popup button for the node.
     },
     links: {
       length: 15,           // Length of each link 'nub'
@@ -159,6 +161,7 @@ function wcPlayEditor(container, options) {
   this._expandedSelectedNode = null;
 
   this._highlightTitle = false;
+  this._highlightDetails = false;
   this._highlightDebugLog = false;
   this._highlightBreakpoint = false;
   this._highlightEntryLink = false;
@@ -1328,6 +1331,10 @@ wcPlayEditor.prototype = {
     bounds.width = context.measureText(this._drawStyle.title.wrapL + node.type + ': ' + this._drawStyle.title.wrapR).width;
     this.__setCanvasFont(this._font.titleDesc, context);
     bounds.width += context.measureText(this._drawStyle.title.nameWrapL + (node.name || this._drawStyle.title.placeholder) + this._drawStyle.title.nameWrapR).width;
+    if (node.description() || node.details()) {
+      this.__setCanvasFont(this._font.details, context);
+      bounds.width += context.measureText(this._drawStyle.title.details).width;
+    }
 
     // Measure the node's viewport.
     if (node._viewportSize) {
@@ -1392,16 +1399,28 @@ wcPlayEditor.prototype = {
     var titleWrapRWidth = context.measureText(this._drawStyle.title.wrapR).width;
     this.__setCanvasFont(this._font.titleDesc, context);
     var titleTextWidth = context.measureText(this._drawStyle.title.nameWrapL + (node.name || this._drawStyle.title.placeholder) + this._drawStyle.title.nameWrapR).width;
+    var titleDetailsWidth = 0;
+    if (node.description() || node.details()) {
+      this.__setCanvasFont(this._font.details, context);
+      titleDetailsWidth = context.measureText(this._drawStyle.title.details).width;
+    }
 
     node._meta.bounds.titleBounds = {
       top: rect.top,
-      left: rect.left + titleTypeWidth + (rect.width - (titleTypeWidth + titleWrapRWidth + titleTextWidth))/2,
+      left: rect.left + titleTypeWidth + (rect.width - (titleTypeWidth + titleWrapRWidth + titleTextWidth + titleDetailsWidth))/2,
       width: titleTextWidth,
       height: this._font.title.size + this._drawStyle.title.spacing - 1,
 
       typeWidth: titleTypeWidth,
       wrapRWidth: titleWrapRWidth,
       textWidth: titleTextWidth,
+    };
+
+    node._meta.bounds.detailsBounds = {
+      top: rect.top,
+      left: node._meta.bounds.titleBounds.left + titleTextWidth,
+      width: titleDetailsWidth,
+      height: this._font.title.size + this._drawStyle.title.spacing - 1,
     };
 
     // Title Lower Bar
@@ -1670,6 +1689,15 @@ wcPlayEditor.prototype = {
       }
     }
 
+    // Highlight details button.
+    if (!this._options.readOnly &amp;&amp; node._meta.bounds.detailsBounds.width > 0) {
+      if (this._highlightDetails &amp;&amp; this._highlightNode === node) {
+        this.__drawRoundedRect(node._meta.bounds.detailsBounds, this._drawStyle.property.highlightColor, this._drawStyle.property.highlightBorder, this._font.title.size/2, context, node.pos);
+      } else if (!isPalette &amp;&amp; this._highlightNode === node) {
+        this.__drawRoundedRect(node._meta.bounds.detailsBounds, this._drawStyle.property.normalColor, this._drawStyle.property.normalBorder, this._font.title.size/2, context, node.pos);
+      }
+    }
+
     // Title Text
     context.save();
     upper += this._font.title.size;
@@ -1685,6 +1713,11 @@ wcPlayEditor.prototype = {
     context.textAlign = "right";
     this.__setCanvasFont(this._font.title, context);
     context.fillText(this._drawStyle.title.wrapR, node.pos.x + node._meta.bounds.titleBounds.left, node.pos.y + node._meta.bounds.titleBounds.top + upper);
+
+    if (node.description() || node.details()) {
+      this.__setCanvasFont(this._font.details, context);
+      context.fillText(this._drawStyle.title.details, node.pos.x + node._meta.bounds.detailsBounds.left + node._meta.bounds.detailsBounds.width, node.pos.y + node._meta.bounds.detailsBounds.top + upper);
+    }
     context.restore();
 
     // Title Lower Bar
@@ -2465,6 +2498,35 @@ wcPlayEditor.prototype = {
     }
 
     return this.__clampString(value.toString(), this._drawStyle.property.strLen)
+  },
+
+  /**
+   * Draws the detail popup box for the node.
+   * @function wcPlayEditor#__drawDetailsPopup
+   * @param {wcNode} node - The node to draw for.
+   */
+  __drawDetailsPopup: function(node) {
+    var displayTitle = node.type + ' Node';
+
+    var displayInfo = node.description();
+    if (displayInfo) {
+      displayInfo += '\n\n';
+    }
+    displayInfo += node.details();
+
+    var $blocker = $('&lt;div class="wcPlayDetailsPopupBlocker">');
+    var $popup = $('&lt;div class="wcPlayDetailsPopup">');
+    var $title = $('&lt;h3>' + displayTitle + '&lt;/h3>');
+    var $info = $('&lt;pre class="wcPlayDetailsPopupText">' + displayInfo + '&lt;/pre>');
+
+    $popup.append($title);
+    $popup.append($info);
+    $blocker.append($popup);
+    $('body').append($blocker);
+
+    $blocker.click(function() {
+      $(this).remove();
+    });
   },
 
   /**
@@ -3550,6 +3612,7 @@ wcPlayEditor.prototype = {
     var mouse = this.__mouse(event);
 
     this._highlightTitle = false;
+    this._highlightDetails = false;
     this._highlightDebugLog = false;
     this._highlightBreakpoint = false;
     this._highlightEntryLink = false;
@@ -3755,6 +3818,7 @@ wcPlayEditor.prototype = {
     this._highlightNode = null;
     this._highlightCrumb = -1;
     this._highlightTitle = false;
+    this._highlightDetails = false;
     this._highlightDebugLog = false;
     this._highlightBreakpoint = false;
     this._highlightEntryLink = false;
@@ -3789,7 +3853,7 @@ wcPlayEditor.prototype = {
       if (!this._options.readOnly &amp;&amp; this.__inRect(mouse, node._meta.bounds.farRect, node.pos, this._viewportCamera)) {
         this._highlightNode = node;
         if (this.__inRect(mouse, node._meta.bounds.inner, node.pos, this._viewportCamera)) {
-          this.$viewport.attr('title', (node._meta.description? node._meta.description + '\n': '') + 'Click and drag to move this node. Double click to collapse/expand this node.');
+          this.$viewport.attr('title', (node._meta.description? node._meta.description + '\n': ''));
           this.$viewport.addClass('wcMoving');
         }
       }
@@ -3893,6 +3957,14 @@ wcPlayEditor.prototype = {
             this._highlightNode = node;
             this._highlightTitle = true;
             this.$viewport.attr('title', 'Click to add or modify an additional label for this title.');
+            this.$viewport.addClass('wcClickable');
+          }
+
+          // Details button.
+          if (this.__inRect(this._mouse, node._meta.bounds.detailsBounds, node.pos, this._viewportCamera)) {
+            this._highlightNode = node;
+            this._highlightDetails = true;
+            this.$viewport.attr('title', 'Click to see futher details for this node.');
             this.$viewport.addClass('wcClickable');
           }
 
@@ -4677,6 +4749,11 @@ wcPlayEditor.prototype = {
           this.__drawTitleEditor(node, node._meta.bounds.titleBounds);
         }
 
+        // Details button.
+        if (this.__inRect(this._mouse, node._meta.bounds.detailsBounds, node.pos, this._viewportCamera)) {
+          this.__drawDetailsPopup(node);
+        }
+
         // Property values.
         var propBounds;
         for (var i = 0; i &lt; node._meta.bounds.valueBounds.length; ++i) {
@@ -4946,7 +5023,7 @@ wcPlayEditor.prototype = {
 		
 		<span class="jsdoc-message">
 			Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a>
-			on 2015-04-28 using the <a
+			on 2015-04-29 using the <a
 			href="https://github.com/WebCabin/docstrap">Web Cabin DocStrap template</a>.
 		</span>
 		</footer>

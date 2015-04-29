@@ -12,6 +12,7 @@ wcNodeProcess.extend('wcNodeProcessOperation', 'Operation', 'Data Manipulation',
     this._super(parent, pos);
 
     this.description("Performs a simple math operation on two values.");
+    this.details("Activate the entry link of the operation you want to perform, either an addition, subtraction, multiplication, or division. The operation will then be performed using valueA and valueB, the result will be output to the result property.");
 
     // Remove our default entry.
     this.removeEntry('in');

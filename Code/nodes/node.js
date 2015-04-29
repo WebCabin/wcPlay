@@ -40,6 +40,7 @@ Class.extend('wcNode', 'Node', '', {
       dirty: true,
       threads: [],
       description: '',
+      details: '',
     };
     this._collapsed = true;
     this._break = false;
@@ -354,7 +355,7 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
-   * Gets, or Sets the description for this node.
+   * Gets, or Sets the description for this node. This is usually shown as a tooltip for the node within the editor tool.
    * @function wcNode#description
    * @param {String} [description] - If supplied, will assign a new description for this node.
    * @returns {String} - The current description of this node.
@@ -365,6 +366,20 @@ Class.extend('wcNode', 'Node', '', {
     }
 
     return this._meta.description;
+  },
+
+  /**
+   * Gets, or Sets the very verbose description details for this node. This is usually shown as a popup dialog to further explain the user of the node.
+   * @function wcNode#details
+   * @param {String} [details] - If supplied, will assign a new description details for this node.
+   * @returns {String} - The current description details of this node.
+   */
+  details: function(details) {
+    if (details !== undefined) {
+      this._meta.details = details;
+    }
+
+    return this._meta.details;
   },
 
   /**

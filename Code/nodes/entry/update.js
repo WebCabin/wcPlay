@@ -11,7 +11,7 @@ wcNodeEntry.extend('wcNodeEntryUpdate', 'Update', 'Flow Control', {
   init: function(parent, pos) {
     this._super(parent, pos);
 
-    this.description("Fires on a constant interval time.");
+    this.description("Once the script starts, this will activate continuously on a time interval defined by the milliseconds property.");
 
     this.createProperty("milliseconds", wcPlay.PROPERTY.NUMBER, 1000, {description: "The time, in milliseconds, per update."});
   },

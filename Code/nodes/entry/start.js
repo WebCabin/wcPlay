@@ -11,7 +11,7 @@ wcNodeEntry.extend('wcNodeEntryStart', 'Start', 'Flow Control', {
   init: function(parent, pos) {
     this._super(parent, pos);
 
-    this.description("Event that fires once on script execution.");
+    this.description("When the script starts, this will activate immediately and only once.");
   },
 
   /**

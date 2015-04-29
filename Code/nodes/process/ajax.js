@@ -12,6 +12,7 @@ wcNodeProcess.extend('wcNodeProcessAJAX', 'AJAX', 'Data Retrieval', {
     this._super(parent, pos);
 
     this.description("Performs an AJAX request.");
+    this.details("Once activated, a request will be sent to the given URL.  Either the success or failure exit links will activate once the operation is completed and the result will be assigned to the result property.");
 
     this.removeExit('out');
     this.createExit('success');

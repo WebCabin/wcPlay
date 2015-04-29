@@ -27,7 +27,7 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeComposite.html">wcNodeComposite</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeEntryUpdate.html">wcNodeEntryUpdate</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeProcessStrCat.html">wcNodeProcessStrCat</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageGlobal.html">wcNodeStorageGlobal</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
+					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeComposite.html">wcNodeComposite</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeEntryUpdate.html">wcNodeEntryUpdate</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAJAX.html">wcNodeProcessAJAX</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeProcessStrCat.html">wcNodeProcessStrCat</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageGlobal.html">wcNodeStorageGlobal</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
 				</ul>
 			</li>
 			
@@ -100,6 +100,7 @@ Class.extend('wcNode', 'Node', '', {
       dirty: true,
       threads: [],
       description: '',
+      details: '',
     };
     this._collapsed = true;
     this._break = false;
@@ -190,6 +191,8 @@ Class.extend('wcNode', 'Node', '', {
         clearInterval(this._meta.threads[i]);
       } else if (this._meta.threads[i] instanceof wcNodeTimeoutEvent) {
         this._meta.threads[i].__clear();
+      } else if (this._meta.threads[i] instanceof jqXHR) {
+        this._meta.threads[i].abort();
       } else if (typeof this._meta.threads[i] === 'function') {
         this._meta.threads[i]();
       }
@@ -266,9 +269,10 @@ Class.extend('wcNode', 'Node', '', {
   /**
    * Exports information about this node as well as all connected chain data so it can be [imported]{@link wcNode#import} later.
    * @function wcNode#export
+   * @param {Boolean} [minimal] - If true, only the most important data should be exported, this means current values and redundant link connections are omitted.
    * @returns {Object} - The exported data for this node.
    */
-  export: function() {
+  export: function(minimal) {
     var data = {
       className: this.className,
       id: this.id,
@@ -280,14 +284,21 @@ Class.extend('wcNode', 'Node', '', {
       },
       collapsed: this.collapsed(),
       breakpoint: this._break,
-      properties: this.listProperties(),
-      entryChains: this.listEntryChains(),
+      properties: this.listProperties(minimal),
       exitChains: this.listExitChains(),
-      inputChains: this.listInputChains(),
       outputChains: this.listOutputChains(),
     };
 
-    this.onExport(data);
+    // Include additional info if we aren't minimal
+    if (!minimal) {
+      data.entryChains = this.listEntryChains();
+      data.inputChains = this.listInputChains();
+    } else {
+      data.entryChains = [];
+      data.inputChains = [];
+    }
+
+    this.onExport(data, minimal);
     return data;
   },
 
@@ -404,7 +415,7 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
-   * Gets, or Sets the description for this node.
+   * Gets, or Sets the description for this node. This is usually shown as a tooltip for the node within the editor tool.
    * @function wcNode#description
    * @param {String} [description] - If supplied, will assign a new description for this node.
    * @returns {String} - The current description of this node.
@@ -415,6 +426,20 @@ Class.extend('wcNode', 'Node', '', {
     }
 
     return this._meta.description;
+  },
+
+  /**
+   * Gets, or Sets the very verbose description details for this node. This is usually shown as a popup dialog to further explain the user of the node.
+   * @function wcNode#details
+   * @param {String} [details] - If supplied, will assign a new description details for this node.
+   * @returns {String} - The current description details of this node.
+   */
+  details: function(details) {
+    if (details !== undefined) {
+      this._meta.details = details;
+    }
+
+    return this._meta.details;
   },
 
   /**
@@ -444,10 +469,20 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
-   * Utility function for setting an interval update in a way that is compatible with live debugging in the editor tool.
+   * Utility function for setting an interval update in a way that is compatible with live debugging in the editor tool.&lt;br>
+   * &lt;b>Note:&lt;/b> You can call {@link wcNode#resetThreads} if you want to cancel any existing intervals running on your node.
    * @function wcNode#setInterval
    * @param {Function} callback - A callback function to call each time the time interval has elapsed. As an added convenience, 'this' will be the node instance.
    * @param {Number} interval - The time interval, in milliseconds, between each call to callback.
+   * @example
+   * onTriggered: function(name) {
+   *   var interval = this.property('milliseconds');
+   *   this.resetThreads();
+   *
+   *   this.setInterval(function() {
+   *     this.activateExit('out');
+   *   }, interval);
+   * }
    */
   setInterval: function(callback, interval) {
     function __onInterval() {
@@ -458,6 +493,58 @@ Class.extend('wcNode', 'Node', '', {
     };
 
     this.setTimeout(__onInterval, interval);
+  },
+
+  /**
+   * Utility function for performing an AJAX request in a way that is compatible with live debugging in the editor tool.&lt;br>
+   * The success, error, and complete callback functions are changed so that the 'this' object is the node instance, or the custom context if you provided a context in your options.
+   * @function wcNode#ajax
+   * @param {String} [url] - Option URL to send the request, if not supplied, it should be provided in the options parameter.
+   * @param {Object} [options] - The options for the request, as described here: {@link http://api.jquery.com/jquery.ajax/}.
+   * @returns {jqXHR} - The jQuery XHR object generated by the ajax request.
+   */
+  ajax: function(url, options) {
+    if (typeof url === 'object') {
+      options = url;
+    }
+
+    if (!options) {
+      options = {};
+    }
+
+    if (typeof url === 'string') {
+      options.url = url;
+    }
+
+    var cancelled = false;
+    var self = this;
+    var context = options.context || this;
+    function __wrapCallback(cb, isComplete) {
+      return function() {
+        if (isComplete) {
+          setTimeout(function() {
+            self.finishThread(xhr);
+          }, 0);
+        }
+        if (!cancelled) {
+          cb &amp;&amp; cb.apply(context, arguments);
+        }
+      };
+    };
+
+    options.success  = __wrapCallback(options.success);
+    options.error    = __wrapCallback(options.error);
+    options.complete = __wrapCallback(options.complete, true);
+
+    var xhr = $.ajax(options);
+
+    // Failsafe in case we are running an older version of jQuery which does not yet return the jqXHR object.
+    if (xhr === undefined) {
+      xhr = function() {
+        cancelled = true;
+      }
+    }
+    this.beginThread(xhr);
   },
 
   /**
@@ -1558,17 +1645,23 @@ Class.extend('wcNode', 'Node', '', {
   /**
    * Retrieves a list of all properties and their values for this node.
    * @function wcNode#listProperties
+   * @param {Boolean} [minimal] - If true, only the minimal data is listed, this means current values will be omitted.
    * @returns {wcNode~PropertyData[]} - A list of all property data.
    */
-  listProperties: function() {
+  listProperties: function(minimal) {
     var result = [];
     for (var i = 0; i &lt; this.properties.length; ++i) {
       var myProp = this.properties[i];
-      result.push({
+      var data = {
         name: myProp.name,
-        value: myProp.value,
         initialValue: myProp.initialValue,
-      });
+      };
+
+      if (!minimal) {
+        data.value = myProp.value;
+      }
+
+      result.push(data);
     }
 
     return result;
@@ -1978,9 +2071,10 @@ Class.extend('wcNode', 'Node', '', {
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onExport
    * @param {Object} data - The export data for this node.
+   * @param {Boolean} [minimal] - If true, only the most important data should be exported, this means current values and redundant link connections are omitted.
    */
-  onExport: function(data) {
-    // this._super(data);
+  onExport: function(data, minimal) {
+    // this._super(data, minimal);
   },
 
   /**
@@ -2064,7 +2158,7 @@ wcNode.PROPERTY_ENABLED = 'enabled';
 		
 		<span class="jsdoc-message">
 			Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a>
-			on 2015-04-28 using the <a
+			on 2015-04-29 using the <a
 			href="https://github.com/WebCabin/docstrap">Web Cabin DocStrap template</a>.
 		</span>
 		</footer>
