@@ -1,4 +1,4 @@
-wcNodeProcess.extend('wcNodeProcessOperation', 'Operation', 'Core', {
+wcNodeProcess.extend('wcNodeProcessOperation', 'Operation', 'Data Manipulation', {
   /**
    * @class
    * Performs a simple math operation on two values.

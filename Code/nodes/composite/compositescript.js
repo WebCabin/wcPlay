@@ -52,13 +52,14 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
   /**
    * Compiles all nodes inside this composite into meta-data.
    * @function wcNodeCompositeScript#compile
+   * @param {Boolean} [minimal] - If true, only the most important data should be exported, this means current values and redundant link connections are omitted.
    */
-  compile: function() {
+  compile: function(minimal) {
     this.compiledNodes = [];
 
     function __compileNodes(nodes) {
       for (var i = 0; i < nodes.length; ++i) {
-        this.compiledNodes.push(nodes[i].export());
+        this.compiledNodes.push(nodes[i].export(minimal));
       }
     };
 
@@ -365,12 +366,13 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNodeCompositeScript#onExport
    * @param {Object} data - The export data for this node.
+   * @param {Boolean} [minimal] - If true, only the most important data should be exported, this means current values and redundant link connections are omitted.
    */
-  onExport: function(data) {
-    this._super(data);
+  onExport: function(data, minimal) {
+    this._super(data, minimal);
 
     // Export the current set of nodes into our data.
-    this.compile();
+    this.compile(minimal);
     data.nodes = this.compiledNodes;
   },
 

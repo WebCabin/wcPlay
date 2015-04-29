@@ -182,16 +182,16 @@ wcPlay.prototype = {
 
     data.nodes = [];
     for (var i = 0; i < this._entryNodes.length; ++i) {
-      data.nodes.push(this._entryNodes[i].export());
+      data.nodes.push(this._entryNodes[i].export(true));
     }
     for (var i = 0; i < this._processNodes.length; ++i) {
-      data.nodes.push(this._processNodes[i].export());
+      data.nodes.push(this._processNodes[i].export(true));
     }
     for (var i = 0; i < this._storageNodes.length; ++i) {
-      data.nodes.push(this._storageNodes[i].export());
+      data.nodes.push(this._storageNodes[i].export(true));
     }
     for (var i = 0; i < this._compositeNodes.length; ++i) {
-      data.nodes.push(this._compositeNodes[i].export());
+      data.nodes.push(this._compositeNodes[i].export(true));
     }
 
     return JSON.stringify(data, function(key, value) {
@@ -230,6 +230,7 @@ wcPlay.prototype = {
       for (var i = 0; i < data.nodes.length; ++i) {
         if (window[data.nodes[i].className]) {
           var newNode = new window[data.nodes[i].className](this, data.nodes[i].pos, data.nodes[i].name);
+          newNode.id = data.nodes[i].id;
           nodes.push({
             node: newNode,
             data: data.nodes[i],

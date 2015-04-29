@@ -15,7 +15,6 @@
  * Options for a [NUMBER]{@link wcPlay.PROPERTY} value.
  * @typedef {Object} wcNode~NumberOptions
  * @property {String} [description] - An optional description to display as a tooltip for this property.
- * @property {Boolean} [collapsible] - If true, this property will be hidden on a collapsed node (unless links are connected to it).
  * @property {wcNode~PropertyDisplay} [display] - An optional function that will be called to retrieve the display string for the value/initial value for this property.
  * @property {Number} [min=-Infinity] - The minimum value of the number range.
  * @property {Number} [max=Infinity] - The maximum value of the number range.
@@ -26,7 +25,6 @@
  * Options for a [STRING]{@link wcPlay.PROPERTY} value.
  * @typedef {Object} wcNode~StringOptions
  * @property {String} [description] - An optional description to display as a tooltip for this property.
- * @property {Boolean} [collapsible] - If true, this property will be hidden on a collapsed node (unless links are connected to it).
  * @property {wcNode~PropertyDisplay} [display] - An optional function that will be called to retrieve the display string for the value/initial value for this property.
  * @property {Number} [maxlength=Infinity] - The maximum number of characters allowed.
  * @property {Boolean} [multiline=false] - Whether to use a multi-line text editor for this property.
@@ -36,7 +34,6 @@
  * Options for a [SELECT]{@link wcPlay.PROPERTY} value.
  * @typedef {Object} wcNode~SelectOptions
  * @property {String} [description] - An optional description to display as a tooltip for this property.
- * @property {Boolean} [collapsible] - If true, this property will be hidden on a collapsed node (unless links are connected to it).
  * @property {wcNode~PropertyDisplay} [display] - An optional function that will be called to retrieve the display string for the value/initial value for this property.
  * @property {wcNode~SelectItem[]|String[]|wcNode~SelectItemFunc} items - A list of items to display in the combo box, or a callback function that can dynamically retrieve a list.
  */

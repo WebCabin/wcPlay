@@ -1,4 +1,4 @@
-wcNodeEntry.extend('wcNodeEntryUpdate', 'Update', 'Core', {
+wcNodeEntry.extend('wcNodeEntryUpdate', 'Update', 'Flow Control', {
   /**
    * @class
    * An entry node that fires continuously on a regular update.<br>
@@ -11,7 +11,7 @@ wcNodeEntry.extend('wcNodeEntryUpdate', 'Update', 'Core', {
   init: function(parent, pos) {
     this._super(parent, pos);
 
-    this.description("Event that fires continuously.");
+    this.description("Fires on a constant interval time.");
 
     this.createProperty("milliseconds", wcPlay.PROPERTY.NUMBER, 1000, {description: "The time, in milliseconds, per update."});
   },

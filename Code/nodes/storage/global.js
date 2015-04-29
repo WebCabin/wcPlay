@@ -1,4 +1,4 @@
-wcNodeStorage.extend('wcNodeStorageGlobal', 'Global', 'Core', {
+wcNodeStorage.extend('wcNodeStorageGlobal', 'Global', 'Global', {
   /**
    * @class
    * References a global property on the script.
@@ -40,7 +40,7 @@ wcNodeStorage.extend('wcNodeStorageGlobal', 'Global', 'Core', {
         if (window.wcNodeInstances.wcNodeStorageGlobal[i].engine() !== engine) {
           continue;
         }
-        
+
         var name = window.wcNodeInstances.wcNodeStorageGlobal[i].name;
         for (var a = 0; a < propList.length; ++a) {
           if (propList[a].name === name) {
