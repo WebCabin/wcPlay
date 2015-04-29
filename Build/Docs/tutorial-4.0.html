@@ -90,15 +90,12 @@
     this._super(name);
 
     // Now set a timeout to wait for 'Milliseconds' amount of time.    
-    var self = this;
     var delay = this.property('milliseconds');
 
-    // Start a new thread that will keep the node alive until we are finished.
-    var thread = this.beginThread(setTimeout(function() {
-      // Once the time has completed, fire the 'out' link and finish our thread.
-      self.activateExit('out');
-      self.finishThread(thread);
-    }, delay));
+    // Start a timeout event using the node's built in timeout handler.
+    this.setTimeout(function() {
+      this.activateExit('out');
+    }, delay);
   },
 });</code></pre><hr>
 <h3>Extending a Node Class</h3><p>To program your own node, use the <code>extend</code> function on any base node class. Base node classes are either <code>wcNodeEntry</code>, <code>wcNodeProcess</code>, or <code>wcNodeStorage</code> depending on what type of node you want to make.</p>
@@ -115,8 +112,13 @@
 <hr>
 <h3>Overloading Event Functions</h3><p>In many cases, you will need to catch events as they happen on your node. For this, <a href="wcNode.html">wcNode</a> provides many event functions that you can overload. All event functions begin with 'on' in their name, such as <a href="wcNode.html#onTriggered">onTriggered</a>. There are many more event hooks to use, to see a listing, view the <a href="wcNode.html">documentation</a>.</p>
 <hr>
-<h3>Latent Nodes</h3><p>In cases where your node may take time to perform an action, a threading system is provided for you. This allows the script to keep track of any timeout, or latent, events being processed on a node, so it may have a better sense of what nodes are active, as well as a method for cancelling node operations if necessary. Begin a thread using the <a href="wcNode.html#beginThread">wcNode#beginThread</a> function and passing in either the timeout ID, interval ID, or a function to call when it becomes necessary to cancel the operation. Once your timeout has triggered, you will also need to call the <a href="wcNode.html#finishThread">wcNode#finishThread</a> function to notify and close your active thread.</p>
-<p>The code snippet above shows a simple example of a latent node. Notice how the result of beginThread is caught and then later used to finish the thread.</p>
+<h3>Latent Nodes</h3><p>In cases where your node may take time to perform an action, a threading system is provided for you. This allows the script to keep track of any timeout, or latent, events being processed on a node so it may have a better sense of what nodes are active, as well as a method for cancelling node operations if necessary.</p>
+<p>There are a few ways to implement a latent node:</p>
+<ul>
+<li>The recommended method is shown in the example code above, it uses a special <a href="wcNode.html#setTimeout">wcNode#setTimeout</a> function in place of the global window.setTimeout. The reason this is recommended, is the actual timeout is handled internally so it can be paused, resumed, and even canceled by the script if necessary. This allows the live debugger to more accurately step a node by only a specified amount of time.</li>
+<li>Alternatively, you can use the global <code>window.setTimeout</code> and <code>window.setInterval</code> functions, with a slight alteration. The resulting ID of the time event should be sent to <a href="wcNode.html#beginThread">wcNode#beginThread</a> when started, and again to <a href="wcNode.html#finishThread">wcNode#finishThread</a> when the timer has finished. Although the system supports these, it is not recommended as the live debugger has limited control which will cause a less accurate debugging experience.</li>
+<li>The final method for implementing a latent node is through a custom cancellation function. This is the worst and most complicated way to do it, but is provided in those cases where it becomes necessary, such as through an AJAX request or when using Promise events. To do this, perform your AJAX or Promise as normal, except you also need to provide a callback function that can be called to cancel, or ignore, the resulting event when it comes in. <code>In the future, I plan to do the same as I do with <a href="wcNode.html#setTimeout">wcNode#setTimeout</a> and provide you with a custom promise object that is better handled.</code></li>
+</ul>
 <hr>
 <p>Return to the <a href="tutorial-3.0.html">Debugging</a> tutorial.<br>Continue to the <a href="tutorial-5.0.html">FAQ</a> tutorial.  </p>
 </article>

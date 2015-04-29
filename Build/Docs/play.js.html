@@ -889,11 +889,11 @@ function wcNodeTimeoutEvent(node, callback, delay) {
 wcNodeTimeoutEvent.prototype = {
   pause: function() {
     window.clearTimeout(this._timerId);
-    this._remaining -= new Date() - this._marker;
+    this._remaining -= new Date().getTime() - this._marker;
   },
 
   resume: function() {
-    this._marker = new Date();
+    this._marker = new Date().getTime();
     window.clearTimeout(this._timerId);
     var self = this;
     this._timerId = window.setTimeout(function() {
