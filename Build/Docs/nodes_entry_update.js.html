@@ -83,15 +83,12 @@
    * @param {String} name - The name of the entry link triggered.
    */
   onTriggered: function(name) {
-    var self = this;
-    this.reset();
-    function __update() {
-      self.activateExit('out');
-      self.finishThread(threadID);
-      threadID = self.beginThread(setTimeout(__update, self.property('milliseconds')));
-    };
+    var interval = this.property('milliseconds');
+    this.resetThreads();
 
-    var threadID = this.beginThread(setTimeout(__update, this.property('milliseconds')));
+    this.setInterval(function() {
+      this.activateExit('out');
+    }, interval);
   },
 
   /**
@@ -103,6 +100,23 @@
     this._super();
 
     this.onTriggered();
+  },
+
+  /**
+   * Event that is called when a property has changed.&lt;br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeEntryUpdate#onPropertyChanged
+   * @param {String} name - The name of the property.
+   * @param {Object} oldValue - The old value of the property.
+   * @param {Object} newValue - The new value of the property.
+   */
+  onPropertyChanged: function(name, oldValue, newValue) {
+    this._super(name, oldValue, newValue);
+
+    if (name === 'milliseconds') {
+      this.resetThreads();
+      this.onTriggered();
+    }
   },
 });</pre>
 	</article>

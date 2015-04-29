@@ -1036,6 +1036,22 @@ Class.extend('wcNode', 'Node', '', {
   reset: function() {
     this.onReset();
 
+    this.resetThreads();
+    this._meta.awake = false;
+    this._meta.dirty = true;
+    this._meta.broken = 0;
+    this._meta.paused = false;
+
+    for (var i = 0; i < this.properties.length; ++i) {
+      this.properties[i].value = this.properties[i].initialValue;
+    }
+  },
+
+  /**
+   * Resets only latent running threads.
+   * @function wcNode#resetThreads
+   */
+  resetThreads: function() {
     for (var i = 0; i < this._meta.threads.length; ++i) {
       if (typeof this._meta.threads[i] === 'number') {
         clearTimeout(this._meta.threads[i]);
@@ -1047,14 +1063,6 @@ Class.extend('wcNode', 'Node', '', {
       }
     }
     this._meta.threads = [];
-    this._meta.awake = false;
-    this._meta.dirty = true;
-    this._meta.broken = 0;
-    this._meta.paused = false;
-
-    for (var i = 0; i < this.properties.length; ++i) {
-      this.properties[i].value = this.properties[i].initialValue;
-    }
   },
 
   /**
@@ -1280,9 +1288,8 @@ Class.extend('wcNode', 'Node', '', {
   /**
    * Utility function for setting a timed event in a way that is compatible with live debugging in the editor tool.
    * @function wcNode#setTimeout
-   * @param {Function} callback - A callback function to call when the time has elapsed. As an added convenience, the 'this' value will be the node instance.
+   * @param {Function} callback - A callback function to call when the time has elapsed. As an added convenience, 'this' will be the node instance.
    * @param {Number} delay - The time delay, in milliseconds, to wait before calling the callback function.
-   * @returns {Object} - A timer object to control the timer.
    * @example
    * onTriggered: function(name) {
    *   this._super(name);
@@ -1299,7 +1306,26 @@ Class.extend('wcNode', 'Node', '', {
   setTimeout: function(callback, delay) {
     var timer = new wcNodeTimeoutEvent(this, callback, delay);
     this.beginThread(timer);
-    timer.resume();
+    if (!this._meta.paused) {
+      timer.resume();
+    }
+  },
+
+  /**
+   * Utility function for setting an interval update in a way that is compatible with live debugging in the editor tool.
+   * @function wcNode#setInterval
+   * @param {Function} callback - A callback function to call each time the time interval has elapsed. As an added convenience, 'this' will be the node instance.
+   * @param {Number} interval - The time interval, in milliseconds, between each call to callback.
+   */
+  setInterval: function(callback, interval) {
+    function __onInterval() {
+      callback && callback.call(this);
+
+      // Really just call the set timeout, over and over.
+      this.setTimeout(__onInterval, interval);
+    };
+
+    this.setTimeout(__onInterval, interval);
   },
 
   /**
@@ -4152,15 +4178,12 @@ wcNodeEntry.extend('wcNodeEntryUpdate', 'Update', 'Core', {
    * @param {String} name - The name of the entry link triggered.
    */
   onTriggered: function(name) {
-    var self = this;
-    this.reset();
-    function __update() {
-      self.activateExit('out');
-      self.finishThread(threadID);
-      threadID = self.beginThread(setTimeout(__update, self.property('milliseconds')));
-    };
+    var interval = this.property('milliseconds');
+    this.resetThreads();
 
-    var threadID = this.beginThread(setTimeout(__update, this.property('milliseconds')));
+    this.setInterval(function() {
+      this.activateExit('out');
+    }, interval);
   },
 
   /**
@@ -4172,6 +4195,23 @@ wcNodeEntry.extend('wcNodeEntryUpdate', 'Update', 'Core', {
     this._super();
 
     this.onTriggered();
+  },
+
+  /**
+   * Event that is called when a property has changed.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeEntryUpdate#onPropertyChanged
+   * @param {String} name - The name of the property.
+   * @param {Object} oldValue - The old value of the property.
+   * @param {Object} newValue - The new value of the property.
+   */
+  onPropertyChanged: function(name, oldValue, newValue) {
+    this._super(name, oldValue, newValue);
+
+    if (name === 'milliseconds') {
+      this.resetThreads();
+      this.onTriggered();
+    }
   },
 });
 wcNodeProcess.extend('wcNodeProcessDelay', 'Delay', 'Core', {
