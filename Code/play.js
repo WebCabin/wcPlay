@@ -19,6 +19,7 @@ function wcPlay(options) {
 
   this._updateID = 0;
   this._isPaused = false;
+  this._isPausing = false;
   this._isStepping = false;
 
   this._editors = [];
@@ -107,6 +108,7 @@ wcPlay.prototype = {
   start: function() {
     this.reset();
     this._isPaused = false;
+    this._isPausing = false;
     this._isStepping = false;
 
     if (!this._updateId) {
@@ -327,8 +329,8 @@ wcPlay.prototype = {
       index--;
       var item = this._queuedProperties.shift();
       item.node._meta.flash = true;
-      if (item.node._meta.paused > 0) {
-        item.node._meta.paused--;
+      if (item.node._meta.broken > 0) {
+        item.node._meta.broken--;
       }
       item.node.property(item.name, item.value, (item.upstream? false: undefined), item.upstream);
     }
@@ -341,8 +343,8 @@ wcPlay.prototype = {
         index--;
         var item = this._queuedChain.shift();
         item.node._meta.flash = true;
-        if (item.node._meta.paused) {
-          item.node._meta.paused--;
+        if (item.node._meta.broken) {
+          item.node._meta.broken--;
         }
         item.node.onTriggered(item.name);
       }
@@ -350,7 +352,7 @@ wcPlay.prototype = {
 
     // If we are step debugging, pause the script here.
     if (this._isStepping) {
-      this._isPaused = true;
+      this._isPausing = true;
     }
   },
 
@@ -429,7 +431,25 @@ wcPlay.prototype = {
    */
   paused: function(paused) {
     if (paused !== undefined) {
-      this._isPaused = paused? true: false;
+      paused = paused? true: false;
+
+      if (this._isPaused !== paused) {
+        for (var i = 0; i < this._compositeNodes.length; ++i) {
+          this._compositeNodes[i].paused(paused);
+        }
+        for (var i = 0; i < this._entryNodes.length; ++i) {
+          this._entryNodes[i].paused(paused);
+        }
+        for (var i = 0; i < this._processNodes.length; ++i) {
+          this._processNodes[i].paused(paused);
+        }
+        for (var i = 0; i < this._storageNodes.length; ++i) {
+          this._storageNodes[i].paused(paused);
+        }
+
+        this._isPaused = paused;
+        this._isPausing = false;
+      }
     }
 
     return this._isPaused;
@@ -634,8 +654,13 @@ wcPlay.prototype = {
 
       if (node.debugBreak() || this._isStepping) {
         node._meta.flash = true;
-        node._meta.paused++;
-        this._isPaused = true;
+        node._meta.broken++;
+        this._isPausing = true;
+      }
+
+      if (this._isPausing) {
+        this.paused(true);
+        this._isPausing = false;
       }
     }
   },
@@ -649,7 +674,7 @@ wcPlay.prototype = {
    * @param {Boolean} [upstream] - If true, we are propagating the property change in reverse.
    */
   queueNodeProperty: function(node, name, value, upstream) {
-    if (node.enabled()) {
+    if (node.enabled() || name === 'enabled') {
       this._queuedProperties.push({
         node: node,
         name: name,
@@ -659,8 +684,13 @@ wcPlay.prototype = {
 
       if (node.debugBreak() || this._isStepping) {
         node._meta.flash = true;
-        node._meta.paused++;
-        this._isPaused = true;
+        node._meta.broken++;
+        this._isPausing = true;
+      }
+
+      if (this._isPausing) {
+        this.paused(true);
+        this._isPausing = false;
       }
     }
   },
@@ -783,5 +813,39 @@ wcPlay.prototype = {
         self[func].apply(self, args);
       }
     }
+  },
+};
+
+
+
+function wcNodeTimeoutEvent(node, callback, delay) {
+  this._node = node;
+  this._timerId = 0;
+  this._callback = callback;
+  this._remaining = delay;
+  this._marker = 0;
+};
+
+wcNodeTimeoutEvent.prototype = {
+  pause: function() {
+    window.clearTimeout(this._timerId);
+    this._remaining -= new Date() - this._marker;
+  },
+
+  resume: function() {
+    this._marker = new Date();
+    window.clearTimeout(this._timerId);
+    var self = this;
+    this._timerId = window.setTimeout(function() {
+      self._node.finishThread(self);
+      self._callback && self._callback.call(self._node);
+      self.__clear();
+    }, this._remaining);
+  },
+
+  __clear: function() {
+    this._node = null;
+    this._callback = null;
+    window.clearTimeout(this._timerId);
   },
 };

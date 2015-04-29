@@ -25,33 +25,28 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
   },
 
   /**
-   * Gets whether this node is paused, or any nodes inside if it is a composite.
+   * Gets, or Sets whether this node is paused, or any nodes inside if it is a composite.<br>
+   * When pausing, all {@link wcNode#setTimeout} events are also paused so they don't jump ahead of the debugger.
    * @function wcNode#paused
+   * @param {Boolean} paused - If supplied, will assign a new paused state.
    * @returns {Boolean} - Whether this, or inner nodes, are paused.
    */
-  isPaused: function() {
+  paused: function(paused) {
+    var result = false;
     for (var i = 0; i < this._compositeNodes.length; ++i) {
-      if (this._compositeNodes[i].isPaused()) {
-        return true;
-      }
+      result |= this._compositeNodes[i].paused(paused);
     }
     for (var i = 0; i < this._entryNodes.length; ++i) {
-      if (this._entryNodes[i].isPaused()) {
-        return true;
-      }
+      result |= this._entryNodes[i].paused(paused);
     }
     for (var i = 0; i < this._processNodes.length; ++i) {
-      if (this._processNodes[i].isPaused()) {
-        return true;
-      }
+      result |= this._processNodes[i].paused(paused);
     }
     for (var i = 0; i < this._storageNodes.length; ++i) {
-      if (this._storageNodes[i].isPaused()) {
-        return true;
-      }
+      result |= this._storageNodes[i].paused(paused);
     }
 
-    return this._super();
+    return this._super(paused) || result;
   },
 
   /**

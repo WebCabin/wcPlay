@@ -27,14 +27,11 @@ wcNodeProcess.extend('wcNodeProcessDelay', 'Delay', 'Core', {
     this._super(name);
 
     // Now set a timeout to wait for 'Milliseconds' amount of time.    
-    var self = this;
     var delay = this.property('milliseconds');
 
-    // Start a new thread that will keep the node alive until we are finished.
-    var thread = this.beginThread(setTimeout(function() {
-      // Once the time has completed, fire the 'out' link and finish our thread.
-      self.activateExit('out');
-      self.finishThread(thread);
-    }, delay));
+    // Start a timeout event using the node's built in timeout handler.
+    this.setTimeout(function() {
+      this.activateExit('out');
+    }, delay);
   },
 });

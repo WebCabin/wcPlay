@@ -95,6 +95,7 @@ function wcPlay(options) {
 
   this._updateID = 0;
   this._isPaused = false;
+  this._isPausing = false;
   this._isStepping = false;
 
   this._editors = [];
@@ -183,6 +184,7 @@ wcPlay.prototype = {
   start: function() {
     this.reset();
     this._isPaused = false;
+    this._isPausing = false;
     this._isStepping = false;
 
     if (!this._updateId) {
@@ -403,8 +405,8 @@ wcPlay.prototype = {
       index--;
       var item = this._queuedProperties.shift();
       item.node._meta.flash = true;
-      if (item.node._meta.paused > 0) {
-        item.node._meta.paused--;
+      if (item.node._meta.broken > 0) {
+        item.node._meta.broken--;
       }
       item.node.property(item.name, item.value, (item.upstream? false: undefined), item.upstream);
     }
@@ -417,8 +419,8 @@ wcPlay.prototype = {
         index--;
         var item = this._queuedChain.shift();
         item.node._meta.flash = true;
-        if (item.node._meta.paused) {
-          item.node._meta.paused--;
+        if (item.node._meta.broken) {
+          item.node._meta.broken--;
         }
         item.node.onTriggered(item.name);
       }
@@ -426,7 +428,7 @@ wcPlay.prototype = {
 
     // If we are step debugging, pause the script here.
     if (this._isStepping) {
-      this._isPaused = true;
+      this._isPausing = true;
     }
   },
 
@@ -505,7 +507,25 @@ wcPlay.prototype = {
    */
   paused: function(paused) {
     if (paused !== undefined) {
-      this._isPaused = paused? true: false;
+      paused = paused? true: false;
+
+      if (this._isPaused !== paused) {
+        for (var i = 0; i < this._compositeNodes.length; ++i) {
+          this._compositeNodes[i].paused(paused);
+        }
+        for (var i = 0; i < this._entryNodes.length; ++i) {
+          this._entryNodes[i].paused(paused);
+        }
+        for (var i = 0; i < this._processNodes.length; ++i) {
+          this._processNodes[i].paused(paused);
+        }
+        for (var i = 0; i < this._storageNodes.length; ++i) {
+          this._storageNodes[i].paused(paused);
+        }
+
+        this._isPaused = paused;
+        this._isPausing = false;
+      }
     }
 
     return this._isPaused;
@@ -710,8 +730,13 @@ wcPlay.prototype = {
 
       if (node.debugBreak() || this._isStepping) {
         node._meta.flash = true;
-        node._meta.paused++;
-        this._isPaused = true;
+        node._meta.broken++;
+        this._isPausing = true;
+      }
+
+      if (this._isPausing) {
+        this.paused(true);
+        this._isPausing = false;
       }
     }
   },
@@ -725,7 +750,7 @@ wcPlay.prototype = {
    * @param {Boolean} [upstream] - If true, we are propagating the property change in reverse.
    */
   queueNodeProperty: function(node, name, value, upstream) {
-    if (node.enabled()) {
+    if (node.enabled() || name === 'enabled') {
       this._queuedProperties.push({
         node: node,
         name: name,
@@ -735,8 +760,13 @@ wcPlay.prototype = {
 
       if (node.debugBreak() || this._isStepping) {
         node._meta.flash = true;
-        node._meta.paused++;
-        this._isPaused = true;
+        node._meta.broken++;
+        this._isPausing = true;
+      }
+
+      if (this._isPausing) {
+        this.paused(true);
+        this._isPausing = false;
       }
     }
   },
@@ -861,6 +891,41 @@ wcPlay.prototype = {
     }
   },
 };
+
+
+
+function wcNodeTimeoutEvent(node, callback, delay) {
+  this._node = node;
+  this._timerId = 0;
+  this._callback = callback;
+  this._remaining = delay;
+  this._marker = 0;
+};
+
+wcNodeTimeoutEvent.prototype = {
+  pause: function() {
+    window.clearTimeout(this._timerId);
+    this._remaining -= new Date() - this._marker;
+  },
+
+  resume: function() {
+    this._marker = new Date();
+    window.clearTimeout(this._timerId);
+    var self = this;
+    this._timerId = window.setTimeout(function() {
+      self._node.finishThread(self);
+      self._callback && self._callback.call(self._node);
+      self.__clear();
+    }, this._remaining);
+  },
+
+  __clear: function() {
+    this._node = null;
+    this._callback = null;
+    window.clearTimeout(this._timerId);
+  },
+};
+
 var wcNodeNextID = 0;
 Class.extend('wcNode', 'Node', '', {
   /**
@@ -898,7 +963,7 @@ Class.extend('wcNode', 'Node', '', {
       flash: false,
       flashDelta: 0,
       color: null,
-      paused: 0,
+      broken: 0,
       awake: false,
       dirty: true,
       threads: [],
@@ -975,6 +1040,8 @@ Class.extend('wcNode', 'Node', '', {
       if (typeof this._meta.threads[i] === 'number') {
         clearTimeout(this._meta.threads[i]);
         clearInterval(this._meta.threads[i]);
+      } else if (this._meta.threads[i] instanceof wcNodeTimeoutEvent) {
+        this._meta.threads[i].__clear();
       } else if (typeof this._meta.threads[i] === 'function') {
         this._meta.threads[i]();
       }
@@ -982,6 +1049,8 @@ Class.extend('wcNode', 'Node', '', {
     this._meta.threads = [];
     this._meta.awake = false;
     this._meta.dirty = true;
+    this._meta.broken = 0;
+    this._meta.paused = false;
 
     for (var i = 0; i < this.properties.length; ++i) {
       this.properties[i].value = this.properties[i].initialValue;
@@ -1111,12 +1180,42 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
-   * Gets whether this node is paused, or any nodes inside if it is a composite.
+   * Gets, or Sets whether this node is paused, or any nodes inside if it is a composite.<br>
+   * When pausing, all {@link wcNode#setTimeout} events are also paused so they don't jump ahead of the debugger.
    * @function wcNode#paused
+   * @param {Boolean} paused - If supplied, will assign a new paused state.
    * @returns {Boolean} - Whether this, or inner nodes, are paused.
    */
-  isPaused: function() {
-    return this._meta.paused > 0;
+  paused: function(paused) {
+    if (paused !== undefined) {
+      // Pausing the node.
+      if (paused) {
+        for (var i = 0; i < this._meta.threads.length; ++i) {
+          if (this._meta.threads[i] instanceof wcNodeTimeoutEvent) {
+            this._meta.threads[i].pause();
+          }
+        }
+        this._meta.paused = true;
+      } else {
+        for (var i = 0; i < this._meta.threads.length; ++i) {
+          if (this._meta.threads[i] instanceof wcNodeTimeoutEvent) {
+            this._meta.threads[i].resume();
+          }
+        }
+
+        this._meta.paused = false;
+      }
+    }
+    return this._meta.paused;
+  },
+
+  /**
+   * Retrieves whether the node has been broken via breakpoint in the debugger tool.
+   * @function wcNode#isBroken
+   * @returns {Boolean}
+   */
+  isBroken: function() {
+    return this._meta.broken > 0;
   },
 
   /**
@@ -1179,11 +1278,24 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
+   * Utility function for setting a timed event in a way that is compatible with live debugging in the editor tool.
+   * @function wcNode#setTimeout
+   * @param {Function} callback - A callback function to call when the time has elapsed. As an added convenience, the 'this' value will be the node instance.
+   * @param {Number} delay - The time delay, in milliseconds, to wait before calling the callback function.
+   * @returns {Object} - A timer object to control the timer.
+   */
+  setTimeout: function(callback, delay) {
+    var timer = new wcNodeTimeoutEvent(this, callback, delay);
+    this.beginThread(timer);
+    timer.resume();
+  },
+
+  /**
    * If your node takes time to process, call this to begin a thread that will keep the node 'active' until you close the thread with {@link wcNode#finishThread}.<br>
    * This ensures that, even if a node is executed more than once at the same time, each 'thread' is kept track of individually.<br>
    * <b>Note:</b> This is not necessary if your node executes immediately without a timeout.
    * @function wcNode#beginThread
-   * @params {Number|Function} id - The thread ID, generated by a call to setTimeout, setInterval, or a function to call when we want to force cancel the job.
+   * @param {Number|Function} id - The thread ID, generated by a call to setTimeout, setInterval, or a function to call when we want to force cancel the job.
    * @returns {Number} - The id that was given {@link wcNode#finishThread}.
    * @example
    *  onTriggered: function(name) {
@@ -1266,7 +1378,7 @@ Class.extend('wcNode', 'Node', '', {
       meta: {
         flash: false,
         flashDelta: 0,
-        paused: 0,
+        broken: 0,
         color: "#000000",
         description: description,
       },
@@ -1295,7 +1407,7 @@ Class.extend('wcNode', 'Node', '', {
       meta: {
         flash: false,
         flashDelta: 0,
-        paused: 0,
+        broken: 0,
         color: "#000000",
         description: description,
       },
@@ -1336,13 +1448,13 @@ Class.extend('wcNode', 'Node', '', {
       inputMeta: {
         flash: false,
         flashDelta: 0,
-        paused: 0,
+        broken: 0,
         color: "#000000",
       },
       outputMeta: {
         flash: false,
         flashDelta: 0,
-        paused: 0,
+        broken: 0,
         color: "#000000",
       },
     });
@@ -1933,7 +2045,7 @@ Class.extend('wcNode', 'Node', '', {
         var engine = this.engine();
         this.chain.entry[i].meta.flash = true;
         if (this.debugBreak() || (engine && engine.stepping())) {
-          this.chain.entry[i].meta.paused++;
+          this.chain.entry[i].meta.broken++;
         }
         engine && engine.queueNodeEntry(this, this.chain.entry[i].name);
         return true;
@@ -1969,7 +2081,7 @@ Class.extend('wcNode', 'Node', '', {
           if (exitLink.links[a].node) {
             exitLink.links[a].node.activateEntry(exitLink.links[a].name);
             if (exitLink.links[a].node.debugBreak() || (engine && engine.stepping())) {
-              this.chain.exit[i].meta.paused++;
+              this.chain.exit[i].meta.broken++;
             }
           }
         }
@@ -2047,7 +2159,7 @@ Class.extend('wcNode', 'Node', '', {
           var engine = this.engine();
           prop.outputMeta.flash = true;
           if (this.debugBreak() || (engine && engine.stepping())) {
-            prop.outputMeta.paused++;
+            prop.outputMeta.broken++;
           }
 
           // Notify about to change event.
@@ -2113,7 +2225,7 @@ Class.extend('wcNode', 'Node', '', {
             prop.outputMeta.flash = true;
             var engine = this.engine();
             if (this.debugBreak() || (engine && engine.stepping())) {
-              prop.outputMeta.paused++;
+              prop.outputMeta.broken++;
             }
 
             // Now follow any output links and assign the new value to them as well.
@@ -2155,7 +2267,7 @@ Class.extend('wcNode', 'Node', '', {
       if (prop.name === name) {
         prop.inputMeta.flash = true;
         if (this.debugBreak() || (engine && engine.stepping())) {
-          prop.inputMeta.paused++;
+          prop.inputMeta.broken++;
         }
       }
     }
@@ -2958,33 +3070,28 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
   },
 
   /**
-   * Gets whether this node is paused, or any nodes inside if it is a composite.
+   * Gets, or Sets whether this node is paused, or any nodes inside if it is a composite.<br>
+   * When pausing, all {@link wcNode#setTimeout} events are also paused so they don't jump ahead of the debugger.
    * @function wcNode#paused
+   * @param {Boolean} paused - If supplied, will assign a new paused state.
    * @returns {Boolean} - Whether this, or inner nodes, are paused.
    */
-  isPaused: function() {
+  paused: function(paused) {
+    var result = false;
     for (var i = 0; i < this._compositeNodes.length; ++i) {
-      if (this._compositeNodes[i].isPaused()) {
-        return true;
-      }
+      result |= this._compositeNodes[i].paused(paused);
     }
     for (var i = 0; i < this._entryNodes.length; ++i) {
-      if (this._entryNodes[i].isPaused()) {
-        return true;
-      }
+      result |= this._entryNodes[i].paused(paused);
     }
     for (var i = 0; i < this._processNodes.length; ++i) {
-      if (this._processNodes[i].isPaused()) {
-        return true;
-      }
+      result |= this._processNodes[i].paused(paused);
     }
     for (var i = 0; i < this._storageNodes.length; ++i) {
-      if (this._storageNodes[i].isPaused()) {
-        return true;
-      }
+      result |= this._storageNodes[i].paused(paused);
     }
 
-    return this._super();
+    return this._super(paused) || result;
   },
 
   /**
@@ -4084,15 +4191,12 @@ wcNodeProcess.extend('wcNodeProcessDelay', 'Delay', 'Core', {
     this._super(name);
 
     // Now set a timeout to wait for 'Milliseconds' amount of time.    
-    var self = this;
     var delay = this.property('milliseconds');
 
-    // Start a new thread that will keep the node alive until we are finished.
-    var thread = this.beginThread(setTimeout(function() {
-      // Once the time has completed, fire the 'out' link and finish our thread.
-      self.activateExit('out');
-      self.finishThread(thread);
-    }, delay));
+    // Start a timeout event using the node's built in timeout handler.
+    this.setTimeout(function() {
+      this.activateExit('out');
+    }, delay);
   },
 });
 

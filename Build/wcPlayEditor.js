@@ -643,13 +643,13 @@ wcPlayEditor.prototype = {
 
     // Update flash state.
     var self = this;
-    function __updateFlash(meta, darkColor, lightColor, pauseColor, keepPaused, colorMul) {
+    function __updateFlash(meta, darkColor, lightColor, pauseColor, keepBroken, colorMul) {
       if (meta.flash) {
         meta.flashDelta += elapsed * 10.0;
         if (meta.flashDelta >= 1.0) {
           meta.flashDelta = 1.0;
 
-          if (!meta.awake && (!meta.paused || (!keepPaused && !self._engine.paused()))) {
+          if (!meta.awake && (!meta.broken || (!keepBroken && !self._engine.paused()))) {
             meta.flash = false;
           }
         }
@@ -657,11 +657,11 @@ wcPlayEditor.prototype = {
         meta.flashDelta -= elapsed * 5.0;
         if (meta.flashDelta <= 0.0) {
           meta.flashDelta = 0;
-          meta.paused = keepPaused? meta.paused: meta.paused - 1;
+          meta.broken = keepBroken? meta.broken: meta.broken - 1;
         }
       }
 
-      meta.color = self.__blendColors(darkColor, meta.paused? pauseColor: lightColor, meta.flashDelta * colorMul);
+      meta.color = self.__blendColors(darkColor, meta.broken? pauseColor: lightColor, meta.flashDelta * colorMul);
     }
 
     var color = node.color;
@@ -1176,7 +1176,7 @@ wcPlayEditor.prototype = {
     context.restore();
 
     // Increase the nodes border thickness when flashing.
-    if (node.isPaused()) {
+    if (node.isBroken()) {
       this.__drawRoundedRect(node._meta.bounds.inner, "#CC0000", 5, 10, context, node.pos);
     } else if (node._meta.flashDelta) {
       this.__drawRoundedRect(node._meta.bounds.inner, "yellow", 2, 10, context, node.pos);
