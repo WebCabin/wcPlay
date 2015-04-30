@@ -3795,10 +3795,10 @@ wcPlayEditor.prototype = {
       // Check for main node collision.
       if (!this._options.readOnly && this.__inRect(mouse, node._meta.bounds.farRect, node.pos, this._viewportCamera)) {
         this._highlightNode = node;
-        if (this.__inRect(mouse, node._meta.bounds.inner, node.pos, this._viewportCamera)) {
+        // if (this.__inRect(mouse, node._meta.bounds.inner, node.pos, this._viewportCamera)) {
           this.$viewport.attr('title', (node._meta.description? node._meta.description + '\n': ''));
           this.$viewport.addClass('wcMoving');
-        }
+        // }
       }
 
       if (!this._selectedEntryLink && !this._selectedExitLink && !this._selectedInputLink && !this._selectedOutputLink) {
@@ -4259,7 +4259,7 @@ wcPlayEditor.prototype = {
       }
 
       // Center area.
-      if (!hasTarget && this.__inRect(this._mouse, node._meta.bounds.inner, node.pos, this._viewportCamera)) {
+      if (!hasTarget && this.__inRect(this._mouse, node._meta.bounds.farRect, node.pos, this._viewportCamera)) {
         hasTarget = true;
         if (!this._selectedNodes.length || this._selectedNodes.indexOf(node) === -1) {
           this._selectedNode = node;
