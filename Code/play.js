@@ -360,7 +360,7 @@ wcPlay.prototype = {
         if (item.node._meta.broken > 0) {
           item.node._meta.broken--;
         }
-        item.node.onTriggered(item.name);
+        item.node.onActivated(item.name);
       }
     }
 
@@ -407,6 +407,46 @@ wcPlay.prototype = {
       }
     }
     return null;
+  },
+
+  /**
+   * Retrieves a list of nodes that match a given class name, if they exists in this script.
+   * @function wcPlay#nodesByClassName
+   * @param {String} className - The className of the nodes to retrieve.
+   * @returns {wcNode[]} - A list of all found nodes.
+   */
+  nodesByClassName: function(className) {
+    var result = [];
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      if (this._compositeNodes[i].className === className) {
+        result.push(this._compositeNodes[i]);
+      }
+    }
+    for (var i = 0; i < this._entryNodes.length; ++i) {
+      if (this._entryNodes[i].className === className) {
+        result.push(this._entryNodes[i]);
+      }
+    }
+    for (var i = 0; i < this._processNodes.length; ++i) {
+      if (this._processNodes[i].className === className) {
+        result.push(this._processNodes[i]);
+      }
+    }
+    for (var i = 0; i < this._storageNodes.length; ++i) {
+      if (this._storageNodes[i].className === className) {
+        result.push(this._storageNodes[i]);
+      }
+    }
+
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      if (this._compositeNodes[i] instanceof wcNodeCompositeScript) {
+        var found = this._compositeNodes[i].nodesByClassName(className);
+        if (found.length) {
+          result.concat(found);
+        }
+      }
+    }
+    return result;
   },
 
   /**
@@ -648,7 +688,7 @@ wcPlay.prototype = {
   triggerEvent: function(name, data) {
     for (var i = 0; i < this._entryNodes.length; ++i) {
       if (this._entryNodes[i].name === name) {
-        this._entryNodes[i].onTriggered(data);
+        this._entryNodes[i].onActivated(data);
       }
     }
   },

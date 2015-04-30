@@ -17,12 +17,12 @@ wcNodeProcess.extend('wcNodeProcessDelay', 'Delay', 'Flow Control', {
   },
 
   /**
-   * Event that is called when an entry link has been triggered.<br>
+   * Event that is called when an entry link has been activated.<br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNodeProcessDelay#onTriggered
+   * @function wcNodeProcessDelay#onActivated
    * @param {String} name - The name of the entry link triggered.
    */
-  onTriggered: function(name) {
+  onActivated: function(name) {
     this._super(name);
 
     // Now set a timeout to wait for 'Milliseconds' amount of time.    

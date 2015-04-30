@@ -36,13 +36,9 @@ wcNodeStorage.extend('wcNodeStorageGlobal', 'Global', 'Global', {
       // Perform a search and remove all global properties no longer being referenced.
       var propList = engine.listProperties();
 
-      for (var i = 0; i < window.wcNodeInstances.wcNodeStorageGlobal.length; ++i) {
-        // Skip global storage nodes that are not in the same script.
-        if (window.wcNodeInstances.wcNodeStorageGlobal[i].engine() !== engine) {
-          continue;
-        }
-
-        var name = window.wcNodeInstances.wcNodeStorageGlobal[i].name;
+      var globalNodes = engine.nodesByClassName(this.className);
+      for (var i = 0; i < globalNodes.length; ++i) {
+        var name = globalNodes[i].name;
         for (var a = 0; a < propList.length; ++a) {
           if (propList[a].name === name) {
             propList.splice(a, 1);
@@ -54,6 +50,9 @@ wcNodeStorage.extend('wcNodeStorageGlobal', 'Global', 'Global', {
       for (var i = 0; i < propList.length; ++i) {
         engine.removeProperty(propList[i].name);
       }
+
+      this.property('value', engine.property(newName));
+      this.initialProperty('value', engine.initialProperty(newName));
     }
   },
 

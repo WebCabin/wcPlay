@@ -27,7 +27,7 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeComposite.html">wcNodeComposite</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeEntryUpdate.html">wcNodeEntryUpdate</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAJAX.html">wcNodeProcessAJAX</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeProcessStrCat.html">wcNodeProcessStrCat</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageGlobal.html">wcNodeStorageGlobal</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
+					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeComposite.html">wcNodeComposite</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryCallRemote.html">wcNodeEntryCallRemote</a></li><li><a href="wcNodeEntryRemote.html">wcNodeEntryRemote</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeEntryUpdate.html">wcNodeEntryUpdate</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAJAX.html">wcNodeProcessAJAX</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeProcessStrCat.html">wcNodeProcessStrCat</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageGlobal.html">wcNodeStorageGlobal</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
 				</ul>
 			</li>
 			
@@ -78,12 +78,12 @@
   },
 
   /**
-   * Event that is called when an entry link has been triggered.&lt;br>
+   * Event that is called when an entry link has been activated.&lt;br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNodeProcessAlert#onTriggered
+   * @function wcNodeProcessAlert#onActivated
    * @param {String} name - The name of the entry link triggered.
    */
-  onTriggered: function(name) {
+  onActivated: function(name) {
     this._super(name);
 
     // Always trigger the out immediately.

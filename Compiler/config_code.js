@@ -70,8 +70,17 @@ concat({
     '../Code/nodes/composite/compositeentry.js',
     '../Code/nodes/composite/compositeexit.js',
     '../Code/nodes/composite/compositeproperty.js',
+  ],
+  dest: '../Build/wcPlay.js',
+});
+
+// Common Nodes.
+concat({
+  src: [
     '../Code/nodes/entry/start.js',
     '../Code/nodes/entry/update.js',
+    '../Code/nodes/entry/remote.js',
+    '../Code/nodes/entry/callremote.js',
     '../Code/nodes/process/delay.js',
     '../Code/nodes/process/operation.js',
     '../Code/nodes/process/strcat.js',
@@ -83,7 +92,7 @@ concat({
     '../Code/nodes/storage/number.js',
     '../Code/nodes/storage/toggle.js',
   ],
-  dest: '../Build/wcPlay.js',
+  dest: '../Build/wcPlayNodes.js',
 });
 
 // Script editor tool.
@@ -112,5 +121,6 @@ concat({
 
 // Now minify them. 
 uglifyJS('../Build/wcPlay.js', '../Build/wcPlay.min.js');
+uglifyJS('../Build/wcPlayNodes.js', '../Build/wcPlayNodes.min.js');
 uglifyJS('../Build/wcPlayEditor.js', '../Build/wcPlayEditor.min.js');
 uglifyCSS('../Build/wcPlayEditor.css', '../Build/wcPlayEditor.min.css');

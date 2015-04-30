@@ -146,6 +146,46 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
   },
 
   /**
+   * Retrieves a list of nodes that match a given class name, if they exists in this script.
+   * @function wcPlay#nodesByClassName
+   * @param {String} className - The className of the nodes to retrieve.
+   * @returns {wcNode[]} - A list of all found nodes.
+   */
+  nodesByClassName: function(className) {
+    var result = [];
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      if (this._compositeNodes[i].className === className) {
+        result.push(this._compositeNodes[i]);
+      }
+    }
+    for (var i = 0; i < this._entryNodes.length; ++i) {
+      if (this._entryNodes[i].className === className) {
+        result.push(this._entryNodes[i]);
+      }
+    }
+    for (var i = 0; i < this._processNodes.length; ++i) {
+      if (this._processNodes[i].className === className) {
+        result.push(this._processNodes[i]);
+      }
+    }
+    for (var i = 0; i < this._storageNodes.length; ++i) {
+      if (this._storageNodes[i].className === className) {
+        result.push(this._storageNodes[i]);
+      }
+    }
+
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      if (this._compositeNodes[i] instanceof wcNodeCompositeScript) {
+        var found = this._compositeNodes[i].nodesByClassName(className);
+        if (found.length) {
+          result.concat(found);
+        }
+      }
+    }
+    return result;
+  },
+
+  /**
    * Called by a child composite link node to notify and sort entry links based on position.
    * @function wcNodeCompositeScript#sortEntryLinks
    */
@@ -292,12 +332,12 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
   },
 
   /**
-   * Event that is called when an entry link has been triggered.<br>
+   * Event that is called when an entry link has been activated.<br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNodeCompositeScript#onTriggered
+   * @function wcNodeCompositeScript#onActivated
    * @param {String} name - The name of the entry link triggered.
    */
-  onTriggered: function(name) {
+  onActivated: function(name) {
     this._super(name);
 
     // Find the Composite Entry node that matches the triggered entry.
@@ -310,22 +350,6 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
         }
       }
     }
-  },
-
-  /**
-   * Event that is called when the name of this node has changed.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNodeCompositeScript#onNameChanged
-   * @param {String} oldName - The current name.
-   * @param {String} newName - The new name.
-   */
-  onNameChanged: function(oldName, newName) {
-    this._super(oldName, newName);
-    // window[this.className].prototype.name = newName;
-
-    // for (var i = 0; i < window.wcNodeInstances[this.className].length; ++i) {
-    //   window.wcNodeInstances[this.className][i].name = newName;
-    // }
   },
 
   /**

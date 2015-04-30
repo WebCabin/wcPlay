@@ -27,7 +27,7 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeComposite.html">wcNodeComposite</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeEntryUpdate.html">wcNodeEntryUpdate</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAJAX.html">wcNodeProcessAJAX</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeProcessStrCat.html">wcNodeProcessStrCat</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageGlobal.html">wcNodeStorageGlobal</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
+					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeComposite.html">wcNodeComposite</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryCallRemote.html">wcNodeEntryCallRemote</a></li><li><a href="wcNodeEntryRemote.html">wcNodeEntryRemote</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeEntryUpdate.html">wcNodeEntryUpdate</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAJAX.html">wcNodeProcessAJAX</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeProcessStrCat.html">wcNodeProcessStrCat</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageGlobal.html">wcNodeStorageGlobal</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
 				</ul>
 			</li>
 			
@@ -96,13 +96,9 @@
       // Perform a search and remove all global properties no longer being referenced.
       var propList = engine.listProperties();
 
-      for (var i = 0; i &lt; window.wcNodeInstances.wcNodeStorageGlobal.length; ++i) {
-        // Skip global storage nodes that are not in the same script.
-        if (window.wcNodeInstances.wcNodeStorageGlobal[i].engine() !== engine) {
-          continue;
-        }
-
-        var name = window.wcNodeInstances.wcNodeStorageGlobal[i].name;
+      var globalNodes = engine.nodesByClassName(this.className);
+      for (var i = 0; i &lt; globalNodes.length; ++i) {
+        var name = globalNodes[i].name;
         for (var a = 0; a &lt; propList.length; ++a) {
           if (propList[a].name === name) {
             propList.splice(a, 1);
@@ -114,6 +110,9 @@
       for (var i = 0; i &lt; propList.length; ++i) {
         engine.removeProperty(propList[i].name);
       }
+
+      this.property('value', engine.property(newName));
+      this.initialProperty('value', engine.initialProperty(newName));
     }
   },
 

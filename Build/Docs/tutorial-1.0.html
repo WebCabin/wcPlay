@@ -27,7 +27,7 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeComposite.html">wcNodeComposite</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeEntryUpdate.html">wcNodeEntryUpdate</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAJAX.html">wcNodeProcessAJAX</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeProcessStrCat.html">wcNodeProcessStrCat</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageGlobal.html">wcNodeStorageGlobal</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
+					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeComposite.html">wcNodeComposite</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryCallRemote.html">wcNodeEntryCallRemote</a></li><li><a href="wcNodeEntryRemote.html">wcNodeEntryRemote</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeEntryUpdate.html">wcNodeEntryUpdate</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAJAX.html">wcNodeProcessAJAX</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeProcessStrCat.html">wcNodeProcessStrCat</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageGlobal.html">wcNodeStorageGlobal</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
 				</ul>
 			</li>
 			
@@ -90,6 +90,9 @@ bower install wcplay</code></pre><p>Once installed, all of the source files will
 &lt;!-- Include the Core wcPlay Engine -->
 &lt;script src=&quot;Build/wcPlay.min.js&quot;>&lt;/script>
 
+&lt;!-- Include the optional set of common generic node types -->
+&lt;script src=&quot;Build/wcPlayNodes.min.js&quot;>&lt;/script>
+
 &lt;!-- Include wcPlay editor tools -->
 &lt;script src=&quot;Build/wcPlayEditor.min.js&quot;>&lt;/script>
 &lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;Build/wcPlayEditor.min.css&quot;/></code></pre><p><br></p>
@@ -99,9 +102,9 @@ bower install wcplay</code></pre><p>Once installed, all of the source files will
 var myScriptFileData = '...'; // Fill this with the string contents of a previously saved script.
 myScript.load(myScriptFileData);
 
-myScript.start();</code></pre><p>By itself, the wcPlay engine has no visual component for the user to see. To open a wcPlay script in the editor tool, simply create an instance of the editor tool and attach it to a DOM element container and the script:</p>
-<pre class="prettyprint source"><code>var myEditor = new wcPlayEditor(domElem);
-myEditor.engine(myScript);</code></pre><p><br></p>
+myScript.start();</code></pre><p>By itself, the wcPlay engine has no visual component for the user to view or edit the script with. To open a wcPlay script in the editor tool, simply create an instance of the editor tool and attach it to the DOM element container where your editor will be shown:</p>
+<pre class="prettyprint source"><code>var myEditor = new wcPlayEditor(domElem);</code></pre><p>Once you have an editor, you will need to tie it to an instance of wcPlay so you can edit its script:</p>
+<pre class="prettyprint source"><code>myEditor.engine(myScript);</code></pre><p><br></p>
 <hr>
 <p>Continue to the <a href="tutorial-2.0.html">Node Anatomy</a> tutorial.  </p>
 </article>

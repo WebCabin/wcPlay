@@ -18,12 +18,11 @@ window['wcPlayEditorClipboard'] = {
  */
 function wcPlayEditor(container, options) {
   this.$container = $(container);
-  this.$viewport = null;
-  this._viewportContext = null;
-  this.$palette = null;
   this._paletteSize = 300;
   this.$typeButton = [];
   this.$typeArea = [];
+  this._chainStyle = 1;
+  this._chainStyleMax = 1;
 
   this._size = {x: 0, y: 0};
 
@@ -138,12 +137,12 @@ function wcPlayEditor(container, options) {
     this._options[prop] = options[prop];
   }
 
-  this.$top = $('<div class="wcPlayEditorTop">');
-  this.$main = $('<div class="wcPlayEditorMain">');
-  this.$palette = $('<div class="wcPlayPalette wcPlayNoHighlights">');
-  this.$paletteScroller = $('<div class="wcPlayPaletteScroller">');
-  this.$paletteInner = $('<div class="wcPlayPaletteInner">');
-  this.$viewport = $('<canvas class="wcPlayViewport">');
+  this.$top = $('<div class="wcPlayEditorTop" tabindex="1">');
+  this.$main = $('<div class="wcPlayEditorMain" tabindex="1">');
+  this.$palette = $('<div class="wcPlayPalette wcPlayNoHighlights" tabindex="1">');
+  this.$paletteScroller = $('<div class="wcPlayPaletteScroller" tabindex="1">');
+  this.$paletteInner = $('<div class="wcPlayPaletteInner" tabindex="1">');
+  this.$viewport = $('<canvas class="wcPlayViewport" tabindex="1">');
   this._viewportContext = this.$viewport[0].getContext('2d');
 
   this.$palette.append(this.$paletteScroller);
@@ -161,6 +160,7 @@ function wcPlayEditor(container, options) {
 
   this.__setupMenu();
   this.__setupControls();
+  this.$top.focus();
 
   window.requestAnimationFrame(this.__update.bind(this));
 }
@@ -499,30 +499,30 @@ wcPlayEditor.prototype = {
 
     // Update undo/redo menu.
     var self = this;
-    $('.wcPlayEditorMenuOptionNew').toggleClass('disabled', this._options.readOnly);
-    $('.wcPlayEditorMenuOptionOpen').toggleClass('disabled', this._options.readOnly);
-    $('.wcPlayEditorMenuOptionImport').toggleClass('disabled', this._options.readOnly);
+    this.$top.find('.wcPlayEditorMenuOptionNew').toggleClass('disabled', this._options.readOnly);
+    this.$top.find('.wcPlayEditorMenuOptionOpen').toggleClass('disabled', this._options.readOnly);
+    this.$top.find('.wcPlayEditorMenuOptionImport').toggleClass('disabled', this._options.readOnly);
     if (self._undoManager) {
-      $('.wcPlayEditorMenuOptionUndo').each(function() {
+      this.$top.find('.wcPlayEditorMenuOptionUndo').each(function() {
         $(this).toggleClass('disabled', !self._undoManager.canUndo()).find('.wcButton').toggleClass('disabled', !self._undoManager.canUndo());
         $(this).attr('title', 'Undo ' + self._undoManager.undoInfo() + ' (Ctrl+Z)');
       });
-      $('.wcPlayEditorMenuOptionRedo').each(function() {
+      this.$top.find('.wcPlayEditorMenuOptionRedo').each(function() {
         $(this).toggleClass('disabled', !self._undoManager.canRedo()).find('.wcButton').toggleClass('disabled', !self._undoManager.canRedo());
         $(this).attr('title', 'Redo ' + self._undoManager.redoInfo() + ' (Ctrl+Y)');
       });
     }
-    $('.wcPlayEditorMenuOptionDebugging').children('i:first-child, span:first-child').toggleClass('fa-dot-circle-o', this._engine.debugging()).toggleClass('fa-circle-o', !this._engine.debugging());
-    $('.wcPlayEditorMenuOptionSilence').children(':first-child, span:first-child').toggleClass('fa-volume-off', this._engine.silent()).toggleClass('fa-volume-up', !this._engine.silent());
-    $('.wcPlayEditorMenuOptionPausePlay').children('i:first-child, span:first-child').toggleClass('fa-play', this._engine.paused()).toggleClass('fa-pause', !this._engine.paused());
-    $('.wcPlayEditorMenuOptionCut').toggleClass('disabled', this._selectedNodes.length === 0 || this._options.readOnly);
-    $('.wcPlayEditorMenuOptionCopy').toggleClass('disabled', this._selectedNodes.length === 0 || this._options.readOnly);
-    $('.wcPlayEditorMenuOptionPaste').toggleClass('disabled', window.wcPlayEditorClipboard.nodes.length === 0 || this._options.readOnly);
-    $('.wcPlayEditorMenuOptionDelete').toggleClass('disabled', this._selectedNodes.length === 0 || this._options.readOnly);
-    $('.wcPlayEditorMenuOptionComposite').toggleClass('disabled', this._selectedNodes.length === 0 || this._options.readOnly);
-    $('.wcPlayEditorMenuOptionCompositeExit').toggleClass('disabled', this._parent instanceof wcPlay);
-    $('.wcPlayEditorMenuOptionCompositeEnter').toggleClass('disabled', this._selectedNodes.length !== 1 || !(this._selectedNodes[0] instanceof wcNodeCompositeScript));
-    $('.wcPlayEditorMenuOptionRestart').toggleClass('disabled', this._options.readOnly);
+    this.$top.find('.wcPlayEditorMenuOptionDebugging').children('i:first-child, span:first-child').toggleClass('fa-dot-circle-o', this._engine.debugging()).toggleClass('fa-circle-o', !this._engine.debugging());
+    this.$top.find('.wcPlayEditorMenuOptionSilence').children(':first-child, span:first-child').toggleClass('fa-volume-off', this._engine.silent()).toggleClass('fa-volume-up', !this._engine.silent());
+    this.$top.find('.wcPlayEditorMenuOptionPausePlay').children('i:first-child, span:first-child').toggleClass('fa-play', this._engine.paused()).toggleClass('fa-pause', !this._engine.paused());
+    this.$top.find('.wcPlayEditorMenuOptionCut').toggleClass('disabled', this._selectedNodes.length === 0 || this._options.readOnly);
+    this.$top.find('.wcPlayEditorMenuOptionCopy').toggleClass('disabled', this._selectedNodes.length === 0 || this._options.readOnly);
+    this.$top.find('.wcPlayEditorMenuOptionPaste').toggleClass('disabled', window.wcPlayEditorClipboard.nodes.length === 0 || this._options.readOnly);
+    this.$top.find('.wcPlayEditorMenuOptionDelete').toggleClass('disabled', this._selectedNodes.length === 0 || this._options.readOnly);
+    this.$top.find('.wcPlayEditorMenuOptionComposite').toggleClass('disabled', this._selectedNodes.length === 0 || this._options.readOnly);
+    this.$top.find('.wcPlayEditorMenuOptionCompositeExit').toggleClass('disabled', this._parent instanceof wcPlay);
+    this.$top.find('.wcPlayEditorMenuOptionCompositeEnter').toggleClass('disabled', this._selectedNodes.length !== 1 || !(this._selectedNodes[0] instanceof wcNodeCompositeScript));
+    this.$top.find('.wcPlayEditorMenuOptionRestart').toggleClass('disabled', this._options.readOnly);
 
 
     this.onResized();
@@ -815,7 +815,7 @@ wcPlayEditor.prototype = {
             <li><span class="wcPlayEditorMenuOptionPaste wcPlayMenuItem"><i class="wcPlayEditorMenuIcon wcButton fa fa-paste fa-lg"/>Paste<span>Ctrl+P</span></span></li>\
             <li><span class="wcPlayEditorMenuOptionDelete wcPlayMenuItem"><i class="wcPlayEditorMenuIcon wcButton fa fa-trash-o fa-lg"/>Delete<span>Del</span></span></li>\
             <li><hr class="wcPlayMenuSeparator"></li>\
-            <li><span class="wcPlayEditorMenuOptionComposite wcPlayMenuItem" title="Combine all selected nodes into a new \'Composite\' Node."><i class="wcPlayEditorMenuIcon wcButton fa fa-share-alt-square fa-lg"/>Create Composite<span>C</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionComposite wcPlayMenuItem" title="Combine all selected nodes into a new \'Composite\' Node."><i class="wcPlayEditorMenuIcon wcButton fa fa-suitcase fa-lg"/>Create Composite<span>C</span></span></li>\
           </ul>\
         </li>\
         <li><span>View</span>\
@@ -824,7 +824,9 @@ wcPlayEditor.prototype = {
             <li><span class="wcPlayEditorMenuOptionCompositeExit wcPlayMenuItem" title="Step out of Composite Node."><i class="wcPlayEditorMenuIcon wcButton fa fa-level-up fa-lg"/>Exit Composite<span>O</span></span></li>\
             <li><span class="wcPlayEditorMenuOptionCompositeEnter wcPlayMenuItem" title="Step in to selected Composite Node."><i class="wcPlayEditorMenuIcon wcButton fa fa-level-down fa-lg"/>Enter Composite<span>I</span></span></li>\
             <li><hr class="wcPlayMenuSeparator"></li>\
-            <li><span class="wcPlayEditorMenuOptionCompositeSearch wcPlayMenuItem disabled" title="Search for nodes in your script."><i class="wcPlayEditorMenuIcon wcButton fa fa-search fa-lg"/>Search Nodes<span>Ctrl+F</span></span></li>\
+            <li><span class="wcPlayEditorMenuOptionChainStyle wcPlayMenuItem" title="Toggle between the different ways of rendering chain curves."><i class="wcPlayEditorMenuIcon wcButton fa fa-sitemap fa-lg"/>Search Nodes<span></span></span></li>\
+            <li><hr class="wcPlayMenuSeparator"></li>\
+            <li><span class="wcPlayEditorMenuOptionSearch wcPlayMenuItem disabled" title="Search for nodes in your script."><i class="wcPlayEditorMenuIcon wcButton fa fa-search fa-lg"/>Search Nodes<span>Ctrl+F</span></span></li>\
           </ul>\
         </li>\
         <li><span>Debugging</span>\
@@ -860,7 +862,7 @@ wcPlayEditor.prototype = {
         <div class="wcPlayEditorMenuOptionPaste wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-paste fa-lg" title="Paste Copied Nodes. (Ctrl+V)"/></div>\
         <div class="wcPlayEditorMenuOptionDelete wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-trash-o fa-lg" title="Delete Selected Nodes. (Del)"/></div>\
         <div class="ARPG_Separator"></div>\
-        <div class="wcPlayEditorMenuOptionComposite wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-share-alt-square fa-lg" title="Combine all selected nodes into a new \'Composite\' Node. (C)"/></div>\
+        <div class="wcPlayEditorMenuOptionComposite wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-suitcase fa-lg" title="Combine all selected nodes into a new \'Composite\' Node. (C)"/></div>\
         <div class="ARPG_Separator"></div>\
         <div class="wcPlayEditorMenuOptionDebugging wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-dot-circle-o fa-lg" title="Toggle debugging mode for the entire script."/></div>\
         <div class="wcPlayEditorMenuOptionSilence wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-volume-up fa-lg" title="Toggle silent mode for the entire script (Nodes with debug log enabled will not log when this is active)."/></div>\
@@ -873,7 +875,9 @@ wcPlayEditor.prototype = {
         <div class="wcPlayEditorMenuOptionCompositeExit wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-level-up fa-lg" title="Step out of Composite node. (O)"/></div>\
         <div class="wcPlayEditorMenuOptionCompositeEnter wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-level-down fa-lg" title="Step in to selected Composite node. (I)"/></div>\
         <div class="ARPG_Separator"></div>\
-        <div class="wcPlayEditorMenuOptionCompositeSearch wcPlayMenuItem disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-search fa-lg" title="Search for nodes in your script. (Ctrl+F)"/></div>\
+        <div class="wcPlayEditorMenuOptionChainStyle wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton fa fa-sitemap fa-lg" title="Toggle between the different ways of rendering chain curves."/></div>\
+        <div class="ARPG_Separator"></div>\
+        <div class="wcPlayEditorMenuOptionSearch wcPlayMenuItem disabled"><span class="wcPlayEditorMenuIcon wcButton fa fa-search fa-lg" title="Search for nodes in your script. (Ctrl+F)"/></div>\
       </div>\
     ');
 
@@ -1993,7 +1997,7 @@ wcPlayEditor.prototype = {
           (this._highlightNode === node && this._highlightExitLink && this._highlightExitLink.name === exitLink.name);
 
         // Now we have both our links, lets chain them together!
-        this.__drawFlowChain(node.pos, targetNode.pos, exitPoint, entryPoint, node._meta.bounds.rect, targetNode._meta.bounds.rect, context, flash, highlight);
+        this.__drawChain(node.pos, targetNode.pos, exitPoint, entryPoint, node._meta.bounds.rect, targetNode._meta.bounds.rect, context, flash, highlight);
       }
     }
 
@@ -2059,7 +2063,7 @@ wcPlayEditor.prototype = {
           (this._highlightNode === node && this._highlightOutputLink && this._highlightOutputLink.name === outputProp.name);
 
         // Now we have both our links, lets chain them together!
-        this.__drawPropertyChain(node.pos, targetNode.pos, outputPoint, inputPoint, node._meta.bounds.rect, targetNode._meta.bounds.rect, context, flash, highlight);
+        this.__drawChain(node.pos, targetNode.pos, outputPoint, inputPoint, node._meta.bounds.rect, targetNode._meta.bounds.rect, context, flash, highlight, true);
       }
     }
 
@@ -2096,7 +2100,7 @@ wcPlayEditor.prototype = {
         }
       }
 
-      this.__drawFlowChain(targetOffset, node.pos, targetPos, point, targetRect, node._meta.bounds.rect, context, highlight);
+      this.__drawChain(targetOffset, node.pos, targetPos, point, targetRect, node._meta.bounds.rect, context, highlight);
     }
 
     if (this._selectedNode === node && this._selectedExitLink) {
@@ -2131,7 +2135,7 @@ wcPlayEditor.prototype = {
         }
       }
 
-      this.__drawFlowChain(node.pos, targetOffset, point, targetPos, node._meta.bounds.rect, targetRect, context, highlight);
+      this.__drawChain(node.pos, targetOffset, point, targetPos, node._meta.bounds.rect, targetRect, context, highlight);
     }
 
     if (this._selectedNode === node && this._selectedInputLink) {
@@ -2166,7 +2170,7 @@ wcPlayEditor.prototype = {
         }
       }
 
-      this.__drawPropertyChain(targetOffset, node.pos, targetPos, point, targetRect, node._meta.bounds.rect, context, highlight);
+      this.__drawChain(targetOffset, node.pos, targetPos, point, targetRect, node._meta.bounds.rect, context, highlight, false, true);
     }
 
     if (this._selectedNode === node && this._selectedOutputLink) {
@@ -2201,13 +2205,13 @@ wcPlayEditor.prototype = {
         }
       }
 
-      this.__drawPropertyChain(node.pos, targetOffset, point, targetPos, node._meta.bounds.rect, targetRect, context, highlight);
+      this.__drawChain(node.pos, targetOffset, point, targetPos, node._meta.bounds.rect, targetRect, context, highlight, false, true);
     }
   },
 
   /**
-   * Draws a connection chain between an exit link and an entry link.
-   * @function wcPlayEditor#__drawFlowChain
+   * Generic draw chain function, you can flip the x and y axes to achieve either a flow or property chain orientation.
+   * @function wcPlayEditor#__drawChain
    * @private
    * @param {wcPlay~Coordinates} startOffset - The offset for the start position and rect.
    * @param {wcPlay~Coordinates} endOffset - The offset for the end position and rect.
@@ -2216,163 +2220,192 @@ wcPlayEditor.prototype = {
    * @param {wcPlayEditor~Rect} startRect - The start node's bounding rect to avoid.
    * @param {wcPlayEditor~Rect} endPos - The end node's bounding rect to avoid.
    * @param {Boolean} [flash] - If true, will flash the link.
+   * @param {Boolean} [isProperty] - If true, will render property chain orientation.
    * @param {external:Canvas~Context} context - The canvas context.
    */
-  __drawFlowChain: function(startOffset, endOffset, startPos, endPos, startRect, endRect, context, flash, highlight) {
+  __drawChain: function(startOffset, endOffset, startPos, endPos, startRect, endRect, context, flash, highlight, isProperty) {
     context.save();
-    context.strokeStyle = (highlight? 'cyan': (flash? '#CCCC00': '#000000'));
     context.lineWidth = 2;
     context.lineCap = "round";
     context.lineJoin = "round";
     context.beginPath();
     context.moveTo((startOffset.x + startPos.x), (startOffset.y + startPos.y));
 
-    var coreRadius = 15;
-
-    // If the exit link is above the entry link
-    if ((startOffset.y + startPos.y) < (endOffset.y + endPos.y)) {
-      var midx = ((endOffset.x + endPos.x) + (startOffset.x + startPos.x)) / 2;
-      var midy = ((endOffset.y + endPos.y) + (startOffset.y + startPos.y)) / 2;
-      var radius = Math.min(coreRadius, Math.abs((endOffset.x + endPos.x) - (startOffset.x + startPos.x))/2, Math.abs((endOffset.y + endPos.y) - (startOffset.y + startPos.y))/2);
-      context.arcTo((startOffset.x + startPos.x), midy, midx, midy, radius);
-      context.arcTo((endOffset.x + endPos.x), midy, (endOffset.x + endPos.x), (endOffset.y + endPos.y), radius);
-    }
-    // If the start rect is to the left side of the end rect.
-    else if (startOffset.x + startRect.left + startRect.width < endOffset.x + endRect.left) {
-      var midx = (endOffset.x + endRect.left + startOffset.x + startRect.left + startRect.width) / 2 - 2;
-      var midy = ((endOffset.y + endPos.y) + (startOffset.y + startPos.y)) / 2;
-      var leftx = (midx + (startOffset.x + startPos.x)) / 2;
-      var rightx = ((endOffset.x + endPos.x) + midx) / 2;
-      var radius = Math.min(coreRadius, Math.abs((endOffset.y + endPos.y) - (startOffset.y + startPos.y))/4, Math.abs(midx - leftx), Math.abs(midx - rightx));
-      context.arcTo((startOffset.x + startPos.x), (startOffset.y + startPos.y) + radius, leftx, (startOffset.y + startPos.y) + radius, radius);
-      context.arcTo(midx, (startOffset.y + startPos.y) + radius, midx, midy, radius);
-      context.arcTo(midx, (endOffset.y + endPos.y) - radius, rightx, (endOffset.y + endPos.y) - radius, radius);
-      context.arcTo((endOffset.x + endPos.x), (endOffset.y + endPos.y) - radius, (endOffset.x + endPos.x), (endOffset.y + endPos.y), radius);
-    }
-    // If the start rect is to the right side of the end rect.
-    else if (startOffset.x + startRect.left > endOffset.x + endRect.left + endRect.width) {
-      var midx = (startOffset.x + startRect.left + endOffset.x + endRect.left + endRect.width) / 2 + 2;
-      var midy = ((endOffset.y + endPos.y) + (startOffset.y + startPos.y)) / 2;
-      var leftx = (midx + (endOffset.x + endPos.x)) / 2;
-      var rightx = ((startOffset.x + startPos.x) + midx) / 2;
-      var radius = Math.min(coreRadius, Math.abs((endOffset.y + endPos.y) - (startOffset.y + startPos.y))/4, Math.abs(midx - leftx), Math.abs(midx - rightx));
-      context.arcTo((startOffset.x + startPos.x), (startOffset.y + startPos.y) + radius, rightx, (startOffset.y + startPos.y) + radius, radius);
-      context.arcTo(midx, (startOffset.y + startPos.y) + radius, midx, midy, radius);
-      context.arcTo(midx, (endOffset.y + endPos.y) - radius, leftx, (endOffset.y + endPos.y) - radius, radius);
-      context.arcTo((endOffset.x + endPos.x), (endOffset.y + endPos.y) - radius, (endOffset.x + endPos.x), (endOffset.y + endPos.y), radius);
-    }
-    // If the start link is below the end link. Makes a loop around the nodes.
-    else if ((startOffset.y + startPos.y) > (endOffset.y + endPos.y) && Math.abs((startOffset.y + startPos.y) - (endOffset.y + endPos.y)) > this._drawStyle.links.length) {
-      var x = (startOffset.x + startPos.x);
-      var top = Math.min(startOffset.y + startRect.top - coreRadius, endOffset.y + endRect.top - coreRadius);
-      var bottom = Math.max(startOffset.y + startRect.top + startRect.height + coreRadius, endOffset.y + endRect.top + endRect.height + coreRadius);
-      var midy = ((startOffset.y + startPos.y) + (endOffset.y + endPos.y)) / 2;
-      // Choose left or right.
-      if (Math.abs(Math.min(startOffset.x + startRect.left, endOffset.x + endRect.left) - (startOffset.x + startPos.x)) <= Math.abs(Math.max(startOffset.x + startRect.left + startRect.width, endOffset.x + endRect.left + endRect.width) - (endOffset.x + endPos.x))) {
-        // Left
-        x = Math.min(startOffset.x + startRect.left - coreRadius, endOffset.x + endRect.left - coreRadius);
-        bottom -= 2;
+    // Do some preparation to make the orientation invisible.
+    function __lineTo(x, y) {
+      if (isProperty) {
+        context.lineTo(y, x);
       } else {
-        // Right
-        x = Math.max(startOffset.x + startRect.left + startRect.width + coreRadius, endOffset.x + endRect.left + endRect.width + coreRadius);
-        bottom += 2;
+        context.lineTo(x, y);
       }
-      var midx = ((startOffset.x + startPos.x) + x) / 2;
-      var radius = Math.min(coreRadius, Math.abs(x - ((startOffset.x + startPos.x)))/2, Math.abs(x - ((endOffset.x + endPos.x)))/2);
+    };
 
-      context.arcTo((startOffset.x + startPos.x), bottom, midx, bottom, radius);
-      context.arcTo(x, bottom, x, midy, radius);
-      context.arcTo(x, top, midx, top, radius);
-      context.arcTo((endOffset.x + endPos.x), top, (endOffset.x + endPos.x), (endOffset.y + endPos.y), radius);
+    function __arcTo(x1, y1, x2, y2, radius) {
+      if (isProperty) {
+        context.arcTo(y1, x1, y2, x2, radius);
+      } else {
+        context.arcTo(x1, y1, x2, y2, radius);
+      }
+    };
+
+    function __curveTo(x1, y1, x2, y2, x3, y3) {
+      if (isProperty) {
+        context.bezierCurveTo(y1, x1, y2, x2, y3, x3);
+      } else {
+        context.bezierCurveTo(x1, y1, x2, y2, x3, y3);
+      }
+    };
+
+    var start, end, startBounds, endBounds;
+    if (isProperty) {
+      start = {
+        x: startOffset.y + startPos.y,
+        y: startOffset.x + startPos.x,
+      };
+      end = {
+        x: endOffset.y + endPos.y,
+        y: endOffset.x + endPos.x,
+      };
+      startBounds = {
+        top: startRect.left + startOffset.x,
+        left: startRect.top + startOffset.y,
+        width: startRect.height,
+        height: startRect.width,
+      };
+      endBounds = {
+        top: endRect.left + endOffset.x,
+        left: endRect.top + endOffset.y,
+        width: endRect.height,
+        height: endRect.width,
+      };
+      context.strokeStyle = (highlight? 'cyan': (flash? '#CCCC00': '#33CC33'));
+    } else {
+      start = {
+        x: startOffset.x + startPos.x,
+        y: startOffset.y + startPos.y,
+      };
+      end = {
+        x: endOffset.x + endPos.x,
+        y: endOffset.y + endPos.y,
+      };
+      startBounds = {
+        top: startRect.top + startOffset.y,
+        left: startRect.left + startOffset.x,
+        width: startRect.width,
+        height: startRect.height,
+      };
+      endBounds = {
+        top: endRect.top + endOffset.y,
+        left: endRect.left + endOffset.x,
+        width: endRect.width,
+        height: endRect.height,
+      };
+      context.strokeStyle = (highlight? 'cyan': (flash? '#CCCC00': '#000000'));
+    }
+
+    switch (this._chainStyle) {
+      // Squared chains
+      case 0:
+        var coreRadius = 15;
+        // If the exit link is above the entry link
+        if (start.y < end.y) {
+          var midx = (end.x + start.x) / 2;
+          var midy = (end.y + start.y) / 2;
+          var radius = Math.min(coreRadius, Math.abs(end.x - start.x)/2, Math.abs(end.y - start.y)/2);
+          __arcTo(start.x, midy, midx, midy, radius);
+          __arcTo(end.x, midy, end.x, end.y, radius);
+        }
+        // If the start rect is to the left side of the end rect.
+        else if (startBounds.left + startBounds.width < endBounds.left) {
+          var midx = (endBounds.left + startBounds.left + startBounds.width) / 2 - 2;
+          var midy = (end.y + start.y) / 2;
+          var leftx = (midx + start.x) / 2;
+          var rightx = (end.x + midx) / 2;
+          var radius = Math.min(coreRadius, Math.abs(end.y - start.y)/4, Math.abs(midx - leftx), Math.abs(midx - rightx));
+          __arcTo(start.x, start.y + radius, leftx, start.y + radius, radius);
+          __arcTo(midx, start.y + radius, midx, midy, radius);
+          __arcTo(midx, end.y - radius, rightx, end.y - radius, radius);
+          __arcTo(end.x, end.y - radius, end.x, end.y, radius);
+        }
+        // If the start rect is to the right side of the end rect.
+        else if (startBounds.left > endBounds.left + endBounds.width) {
+          var midx = (startBounds.left + endBounds.left + endBounds.width) / 2 + 2;
+          var midy = (end.y + start.y) / 2;
+          var leftx = (midx + end.x) / 2;
+          var rightx = (start.x + midx) / 2;
+          var radius = Math.min(coreRadius, Math.abs(end.y - start.y)/4, Math.abs(midx - leftx), Math.abs(midx - rightx));
+          __arcTo(start.x, start.y + radius, rightx, start.y + radius, radius);
+          __arcTo(midx, start.y + radius, midx, midy, radius);
+          __arcTo(midx, end.y - radius, leftx, end.y - radius, radius);
+          __arcTo(end.x, end.y - radius, end.x, end.y, radius);
+        }
+        // If the start link is below the end link. Makes a loop around the nodes.
+        else if (start.y > end.y && Math.abs(start.y - end.y) > this._drawStyle.links.length) {
+          var a = start.x;
+          var top = Math.min(startBounds.top - coreRadius, endBounds.top - coreRadius);
+          var bottom = Math.max(startBounds.top + startBounds.height + coreRadius, endBounds.top + endBounds.height + coreRadius);
+          var midy = (start.y + end.y) / 2;
+          // Choose left or right.
+          if (Math.abs(Math.min(startBounds.left, endBounds.left) - start.x) <= Math.abs(Math.max(startBounds.left + startBounds.width, endBounds.left + endBounds.width) - end.x)) {
+            // Left
+            a = Math.min(startBounds.left - coreRadius, endBounds.left - coreRadius);
+            bottom -= 2;
+          } else {
+            // Right
+            a = Math.max(startBounds.left + startBounds.width + coreRadius, endBounds.left + endBounds.width + coreRadius);
+            bottom += 2;
+          }
+          var midx = (start.x + a) / 2;
+          var radius = Math.min(coreRadius, Math.abs(a - (start.x))/2, Math.abs(a - (end.x))/2);
+
+          __arcTo(start.x, bottom, midx, bottom, radius);
+          __arcTo(a, bottom, a, midy, radius);
+          __arcTo(a, top, midx, top, radius);
+          __arcTo(end.x, top, end.x, end.y, radius);
+        }
+        break;
+      // Splined chains.
+      case 1:
+        // If the Exit link is right above the Entry link target.
+        if (start.y < end.y) {
+          var midy = (start.y + end.y) / 2;
+          var midx = (start.x + end.x) / 2;
+          __curveTo(start.x, midy, end.x, midy, end.x, end.y);
+        }
+        // If the start rect is to the left or right side of the end rect.
+        else if (startBounds.left + startBounds.width < endBounds.left || startBounds.left > endBounds.left + endBounds.width) {
+          var radius = Math.abs(start.y - end.y) / 2;
+          var top = endBounds.top - radius;
+          var bottom = startBounds.top + startBounds.height + radius;
+          __curveTo(start.x, bottom, end.x, top, end.x, end.y);
+        }
+        // If the start link is below the end link. Makes a loop around the nodes.
+        else if (start.y > end.y && Math.abs(start.y - end.y) > this._drawStyle.links.length) {
+          var sidex = start.x;
+          // Choose left or right.
+          if (Math.abs(Math.min(startBounds.left, endBounds.left) - start.x) <= Math.abs(Math.max(startBounds.left + startBounds.width, endBounds.left + endBounds.width) - end.x)) {
+            // Left
+            sidex = Math.min(startBounds.left, endBounds.left) - 15;
+          } else {
+            // Right
+            sidex = Math.max(startBounds.left + startBounds.width, endBounds.left + endBounds.width) + 15;
+          }
+          var top = endBounds.top - 30;
+          var bottom = Math.max(startBounds.top + startBounds.height + 30, endBounds.top + endBounds.height + 30);
+          var midy = (start.y + end.y)/2;
+          __curveTo(start.x, bottom, sidex, bottom, sidex, midy);
+          __curveTo(sidex, top, end.x, top, end.x, end.y);
+
+          // var top = endBounds.top - Math.abs(end.x - sidex)/2;
+          // var bottom = Math.max(startBounds.top + startBounds.height + Math.abs(start.x - sidex)/2, endBounds.top + endBounds.height + Math.abs(end.x - sidex)/2);
+          // __curveTo(start.x, bottom, sidex, bottom, sidex, start.y);
+          // __lineTo(sidex, end.y);
+          // __curveTo(sidex, top, end.x, top, end.x, end.y);
+        }
+        break;
     }
 
     // Finish our line to the end position.
-    context.lineTo((endOffset.x + endPos.x), (endOffset.y + endPos.y));
-    context.stroke();
-    context.restore();
-  },
-
-  /**
-   * Draws a connection chain between an input link and an output link of properties.
-   * @function wcPlayEditor#__drawPropertyChain
-   * @private
-   * @param {wcPlay~Coordinates} startOffset - The offset for the start position and rect.
-   * @param {wcPlay~Coordinates} endOffset - The offset for the end position and rect.
-   * @param {wcPlay~Coordinates} startPos - The start position (the exit link).
-   * @param {wcPlay~Coordinates} endPos - The end position (the entry link).
-   * @param {wcPlayEditor~Rect} startRect - The start node's bounding rect to avoid.
-   * @param {wcPlayEditor~Rect} endPos - The end node's bounding rect to avoid.
-   * @param {Boolean} [flash] - If true, will flash the link.
-   * @param {external:Canvas~Context} context - The canvas context.
-   */
-  __drawPropertyChain: function(startOffset, endOffset, startPos, endPos, startRect, endRect, context, flash, highlight) {
-    context.save();
-    context.strokeStyle = (highlight? 'cyan': (flash? '#CCCC00': '#33CC33'));
-    context.lineWidth = 2;
-    context.lineCap = "round";
-    context.lineJoin = "round";
-    context.beginPath();
-    context.moveTo((startOffset.x + startPos.x), (startOffset.y + startPos.y));
-
-    var coreRadius = 15;
-
-    // If the output link is to the right the input link
-    if ((startOffset.x + startPos.x) < (endOffset.x + endPos.x)) {
-      var midx = ((endOffset.x + endPos.x) + (startOffset.x + startPos.x)) / 2;
-      var midy = ((endOffset.y + endPos.y) + (startOffset.y + startPos.y)) / 2;
-      var radius = Math.min(coreRadius, Math.abs((endOffset.x + endPos.x) - (startOffset.x + startPos.x))/2, Math.abs((endOffset.y + endPos.y) - (startOffset.y + startPos.y))/2);
-      context.arcTo(midx, (startOffset.y + startPos.y), midx, midy, radius);
-      context.arcTo(midx, (endOffset.y + endPos.y), (endOffset.x + endPos.x), (endOffset.y + endPos.y), radius);
-    }
-    // If the start rect is below the end rect.
-    else if (startOffset.y + startRect.top + startRect.height < endOffset.y + endRect.top) {
-      var midx = ((endOffset.x + endPos.x) + (startOffset.x + startPos.x)) / 2;
-      var midy = (endOffset.y + endRect.top + startOffset.y + startRect.top + startRect.height) / 2 - 2;
-      var topy = (midy + (startOffset.y + startPos.y)) / 2;
-      var bottomy = ((endOffset.y + endPos.y) + midy) / 2;
-      var radius = Math.min(coreRadius, Math.abs((endOffset.x + endPos.x) - (startOffset.x + startPos.x))/4, Math.abs(midy - topy), Math.abs(midy - bottomy));
-      context.arcTo((startOffset.x + startPos.x) + radius, (startOffset.y + startPos.y), (startOffset.x + startPos.x) + radius, topy, radius);
-      context.arcTo((startOffset.x + startPos.x) + radius, midy, midx, midy, radius);
-      context.arcTo((endOffset.x + endPos.x) - radius, midy, (endOffset.x + endPos.x) - radius, bottomy, radius);
-      context.arcTo((endOffset.x + endPos.x) - radius, (endOffset.y + endPos.y), (endOffset.x + endPos.x), (endOffset.y + endPos.y), radius);
-    }
-    // If the start rect above the end rect.
-    else if (startOffset.y + startRect.top > endOffset.y + endRect.top + endRect.height) {
-      var midx = ((endOffset.x + endPos.x) + (startOffset.x + startPos.x)) / 2;
-      var midy = (startOffset.y + startRect.top + endOffset.y + endRect.top + endRect.height) / 2 + 2;
-      var topy = (midy + (endOffset.y + endPos.y)) / 2;
-      var bottomy = ((startOffset.y + startPos.y) + midy) / 2;
-      var radius = Math.min(coreRadius, Math.abs((endOffset.x + endPos.x) - (startOffset.x + startPos.x))/4, Math.abs(midy - topy), Math.abs(midy - bottomy));
-      context.arcTo((startOffset.x + startPos.x) + radius, (startOffset.y + startPos.y), (startOffset.x + startPos.x) + radius, bottomy, radius);
-      context.arcTo((startOffset.x + startPos.x) + radius, midy, midx, midy, radius);
-      context.arcTo((endOffset.x + endPos.x) - radius, midy, (endOffset.x + endPos.x) - radius, topy, radius);
-      context.arcTo((endOffset.x + endPos.x) - radius, (endOffset.y + endPos.y), (endOffset.x + endPos.x), (endOffset.y + endPos.y), radius);
-    }
-    // If the start link is to the right of the end link.
-    else if ((startOffset.x + startPos.x) > (endOffset.x + endPos.x) && Math.abs((startOffset.x + startPos.x) - (endOffset.x + endPos.x)) > this._drawStyle.links.length) {
-      var y = (startOffset.y + startPos.y);
-      var right = Math.max(startOffset.x + startRect.left + startRect.width + coreRadius, endOffset.x + endRect.left + endRect.width + coreRadius);
-      var left = Math.min(startOffset.x + startRect.left - coreRadius, endOffset.x + endRect.left - coreRadius);
-      var midx = ((startOffset.x + startPos.x) + (endOffset.x + endPos.x)) / 2;
-      // Choose top or bottom.
-      if (Math.abs(Math.min(startOffset.y + startRect.top, endOffset.y + endRect.top) - (startOffset.y + startPos.y)) <= Math.abs(Math.max(startOffset.y + startRect.top + startRect.height, endOffset.y + endRect.top + endRect.height) - (endOffset.y + endPos.y))) {
-        // Top
-        y = Math.min(startOffset.y + startRect.top - coreRadius, endOffset.y + endRect.top - coreRadius);
-        right -= 2;
-      } else {
-        // Bottom
-        y = Math.max(startOffset.y + startRect.top + startRect.height + coreRadius, endOffset.y + endRect.top + endRect.height + coreRadius);
-        right += 2;
-      }
-      var midy = ((startOffset.y + startPos.y) + y) / 2;
-      var radius = Math.min(coreRadius, Math.abs(y - ((startOffset.y + startPos.y)))/2, Math.abs(y - ((endOffset.y + endPos.y)))/2);
-
-      context.arcTo(right, (startOffset.y + startPos.y), right, midy, radius);
-      context.arcTo(right, y, midx, y, radius);
-      context.arcTo(left, y, left, midy, radius);
-      context.arcTo(left, (endOffset.y + endPos.y), (endOffset.x + endPos.x), (endOffset.y + endPos.y), radius);
-    }
-
     context.lineTo((endOffset.x + endPos.x), (endOffset.y + endPos.y));
     context.stroke();
     context.restore();
@@ -2849,7 +2882,7 @@ wcPlayEditor.prototype = {
     this.$viewport.on('dblclick',   function(event){self.__onViewportMouseDoubleClick(event, this);});
     this.$viewport.on('mousewheel DOMMouseScroll', function(event) {self.__onViewportMouseWheel(event, this);});
 
-    $(window).keydown(function(event) {self.__onKey(event, this);});
+    $(this.$container, this.$main, this.$top, this.$palette, this.$viewport).bind('keydown', function(event) {self.__onKey(event, this);});
   },
 
   /**
@@ -2862,25 +2895,25 @@ wcPlayEditor.prototype = {
   __onKey: function(event, elem) {
     switch (event.keyCode) {
       case 46: // Delete key to delete selected nodes.
-        $('.wcPlayEditorMenuOptionDelete').first().click();
+        this.$top.find('.wcPlayEditorMenuOptionDelete').first().click();
         break;
       case 'Z'.charCodeAt(0): // Ctrl+Z to undo last action.
         if (event.ctrlKey && !event.shiftKey) {
-          $('.wcPlayEditorMenuOptionUndo').first().click();
+          this.$top.find('.wcPlayEditorMenuOptionUndo').first().click();
         }
         if (!event.shiftKey) {
           break;
         }
       case 'Y'.charCodeAt(0): // Alt+Shift+Z or Ctrl+Y to redo action.
         if (event.ctrlKey) {
-          $('.wcPlayEditorMenuOptionRedo').first().click();
+          this.$top.find('.wcPlayEditorMenuOptionRedo').first().click();
         }
         break;
       case 32: // Space to step
-        $('.wcPlayEditorMenuOptionStep').first().click();
+        this.$top.find('.wcPlayEditorMenuOptionStep').first().click();
         break;
       case 13: // Enter to continue;
-        $('.wcPlayEditorMenuOptionPausePlay').first().click();
+        this.$top.find('.wcPlayEditorMenuOptionPausePlay').first().click();
         break;
       case 'F'.charCodeAt(0): // F to focus on selected nodes, or entire view.
         if (this._selectedNodes.length) {
@@ -2892,42 +2925,42 @@ wcPlayEditor.prototype = {
       case 'O'.charCodeAt(0):
         // Ctrl+O to open a file. Does not work with FireFox, they do not allow opening a file from a key event.
         if (event.ctrlKey) {
-          $('.wcPlayEditorMenuOptionOpen').first().click();
+          this.$top.find('.wcPlayEditorMenuOptionOpen').first().click();
           event.stopPropagation();
           event.preventDefault();
           return false;
         }
         // O to step outside of a Composite Node.
-        $('.wcPlayEditorMenuOptionCompositeExit').first().click();
+        this.$top.find('.wcPlayEditorMenuOptionCompositeExit').first().click();
         break;
       case 'S'.charCodeAt(0):
         // Ctrl+S to save the script.
         if (event.ctrlKey) {
-          $('.wcPlayEditorMenuOptionSave').first().click();
+          this.$top.find('.wcPlayEditorMenuOptionSave').first().click();
           event.stopPropagation();
           event.preventDefault();
           return false;
         }
       case 'I'.charCodeAt(0):
         if (event.ctrlKey) {
-          $('.wcPlayEditorMenuOptionImport').first().click();
+          this.$top.find('.wcPlayEditorMenuOptionImport').first().click();
           break;
         }
         // O to step outside of a Composite Node.
-        $('.wcPlayEditorMenuOptionCompositeEnter').first().click();
+        this.$top.find('.wcPlayEditorMenuOptionCompositeEnter').first().click();
         break;
       case 'C'.charCodeAt(0):
         if (event.ctrlKey) {
           // Ctrl+C to Copy nodes.
-          $('.wcPlayEditorMenuOptionCopy').first().click();
+          this.$top.find('.wcPlayEditorMenuOptionCopy').first().click();
           break;
         }
         // C to create a Composite node from the selected nodes.
-        $('.wcPlayEditorMenuOptionComposite').first().click();
+        this.$top.find('.wcPlayEditorMenuOptionComposite').first().click();
         break;
       case 'N'.charCodeAt(0): // Alt+N to start a new script.
         if (event.altKey) {
-          $('.wcPlayEditorMenuOptionNew').first().click();
+          this.$top.find('.wcPlayEditorMenuOptionNew').first().click();
           event.stopPropagation();
           event.preventDefault();
           return false;
@@ -2936,19 +2969,19 @@ wcPlayEditor.prototype = {
       case 'X'.charCodeAt(0):
         // Ctrl+X to Cut nodes.
         if (event.ctrlKey) {
-          $('.wcPlayEditorMenuOptionCut').first().click();
+          this.$top.find('.wcPlayEditorMenuOptionCut').first().click();
         }
         break;
       case 'X'.charCodeAt(0):
         // Ctrl+X to Cut nodes.
         if (event.ctrlKey) {
-          $('.wcPlayEditorMenuOptionCut').first().click();
+          this.$top.find('.wcPlayEditorMenuOptionCut').first().click();
         }
         break;
       case 'V'.charCodeAt(0):
         // Ctrl+V to Paste previously copied nodes.
         if (event.ctrlKey) {
-          $('.wcPlayEditorMenuOptionPaste').first().click();
+          this.$top.find('.wcPlayEditorMenuOptionPaste').first().click();
         }
         break;
     }
@@ -3021,7 +3054,7 @@ wcPlayEditor.prototype = {
     var $body = $('body');
 
     // File menu
-    $body.on('click', '.wcPlayEditorMenuOptionNew', function() {
+    this.$top.on('click', '.wcPlayEditorMenuOptionNew', function() {
       if ($(this).hasClass('disabled')) {
         return;
       }
@@ -3031,7 +3064,7 @@ wcPlayEditor.prototype = {
         self._parent = self._engine;
       }
     });
-    $body.on('click', '.wcPlayEditorMenuOptionOpen', function() {
+    this.$top.on('click', '.wcPlayEditorMenuOptionOpen', function() {
       if ($(this).hasClass('disabled')) {
         return;
       }
@@ -3044,7 +3077,7 @@ wcPlayEditor.prototype = {
         }
       }
     });
-    $body.on('click', '.wcPlayEditorMenuOptionSave', function() {
+    this.$top.on('click', '.wcPlayEditorMenuOptionSave', function() {
       if ($(this).hasClass('disabled')) {
         return;
       }
@@ -3068,7 +3101,7 @@ wcPlayEditor.prototype = {
         saveAs(blob, 'script.wcplay');
       }
     });
-    $body.on('click', '.wcPlayEditorMenuOptionImport', function() {
+    this.$top.on('click', '.wcPlayEditorMenuOptionImport', function() {
       if ($(this).hasClass('disabled')) {
         return;
       }
@@ -3148,19 +3181,19 @@ wcPlayEditor.prototype = {
 
 
     // Edit menu
-    $body.on('click', '.wcPlayEditorMenuOptionUndo', function() {
+    this.$top.on('click', '.wcPlayEditorMenuOptionUndo', function() {
       if ($(this).hasClass('disabled')) {
         return;
       }
       self._undoManager && self._undoManager.undo();
     });
-    $body.on('click', '.wcPlayEditorMenuOptionRedo', function() {
+    this.$top.on('click', '.wcPlayEditorMenuOptionRedo', function() {
       if ($(this).hasClass('disabled')) {
         return;
       }
       self._undoManager && self._undoManager.redo();
     });
-    $body.on('click', '.wcPlayEditorMenuOptionCut', function() {
+    this.$top.on('click', '.wcPlayEditorMenuOptionCut', function() {
       if ($(this).hasClass('disabled')) {
         return;
       }
@@ -3178,7 +3211,7 @@ wcPlayEditor.prototype = {
       self._selectedNodes = [];
       self._undoManager && self._undoManager.endGroup();
     });
-    $body.on('click', '.wcPlayEditorMenuOptionCopy', function() {
+    this.$top.on('click', '.wcPlayEditorMenuOptionCopy', function() {
       if ($(this).hasClass('disabled')) {
         return;
       }
@@ -3199,7 +3232,7 @@ wcPlayEditor.prototype = {
       }
       window.wcPlayEditorClipboard.bounds = self.__expandRect(bounds, offsets);
     });
-    $body.on('click', '.wcPlayEditorMenuOptionPaste', function() {
+    this.$top.on('click', '.wcPlayEditorMenuOptionPaste', function() {
       if ($(this).hasClass('disabled')) {
         return;
       }
@@ -3249,7 +3282,7 @@ wcPlayEditor.prototype = {
       self._undoManager && self._undoManager.endGroup();
     });
 
-    $body.on('click', '.wcPlayEditorMenuOptionDelete', function() {
+    this.$top.on('click', '.wcPlayEditorMenuOptionDelete', function() {
       if ($(this).hasClass('disabled')) {
         return;
       }
@@ -3265,7 +3298,7 @@ wcPlayEditor.prototype = {
       }
     });
 
-    $body.on('click', '.wcPlayEditorMenuOptionComposite', function() {
+    this.$top.on('click', '.wcPlayEditorMenuOptionComposite', function() {
       if ($(this).hasClass('disabled')) {
         return;
       }
@@ -3450,7 +3483,7 @@ wcPlayEditor.prototype = {
 
 
     // View
-    $body.on('click', '.wcPlayEditorMenuOptionCenter', function() {
+    this.$top.on('click', '.wcPlayEditorMenuOptionCenter', function() {
       if ($(this).hasClass('disabled')) {
         return;
       }
@@ -3460,7 +3493,7 @@ wcPlayEditor.prototype = {
         self.center();
       }
     });
-    $body.on('click', '.wcPlayEditorMenuOptionCompositeExit', function() {
+    this.$top.on('click', '.wcPlayEditorMenuOptionCompositeExit', function() {
       if ($(this).hasClass('disabled')) {
         return;
       }
@@ -3473,7 +3506,7 @@ wcPlayEditor.prototype = {
         self.focus(self._selectedNodes);
       }
     });
-    $body.on('click', '.wcPlayEditorMenuOptionCompositeEnter', function() {
+    this.$top.on('click', '.wcPlayEditorMenuOptionCompositeEnter', function() {
       if ($(this).hasClass('disabled')) {
         return;
       }
@@ -3485,9 +3518,18 @@ wcPlayEditor.prototype = {
         self.center();
       }
     });
+    this.$top.on('click', '.wcPlayEditorMenuOptionChainStyle', function() {
+      if ($(this).hasClass('disabled')) {
+        return;
+      }
+      self._chainStyle += 1;
+      if (self._chainStyle > self._chainStyleMax) {
+        self._chainStyle = 0;
+      }
+    });
 
     // Debugger
-    $body.on('click', '.wcPlayEditorMenuOptionDebugging', function() {
+    this.$top.on('click', '.wcPlayEditorMenuOptionDebugging', function() {
       if ($(this).hasClass('disabled')) {
         return;
       }
@@ -3496,7 +3538,7 @@ wcPlayEditor.prototype = {
         self._engine.paused(false);
       }
     });
-    $body.on('click', '.wcPlayEditorMenuOptionSilence', function() {
+    this.$top.on('click', '.wcPlayEditorMenuOptionSilence', function() {
       if ($(this).hasClass('disabled')) {
         return;
       }
@@ -3504,7 +3546,7 @@ wcPlayEditor.prototype = {
         self._engine.silent(!self._engine.silent());
       }
     });
-    $body.on('click', '.wcPlayEditorMenuOptionRestart', function() {
+    this.$top.on('click', '.wcPlayEditorMenuOptionRestart', function() {
       if ($(this).hasClass('disabled')) {
         return;
       }
@@ -3512,7 +3554,7 @@ wcPlayEditor.prototype = {
         self._engine.start();
       }
     });
-    $body.on('click', '.wcPlayEditorMenuOptionPausePlay', function() {
+    this.$top.on('click', '.wcPlayEditorMenuOptionPausePlay', function() {
       if ($(this).hasClass('disabled')) {
         return;
       }
@@ -3525,7 +3567,7 @@ wcPlayEditor.prototype = {
         }
       }
     });
-    $body.on('click', '.wcPlayEditorMenuOptionStep', function() {
+    this.$top.on('click', '.wcPlayEditorMenuOptionStep', function() {
       if ($(this).hasClass('disabled')) {
         return;
       }
@@ -3536,7 +3578,7 @@ wcPlayEditor.prototype = {
     });
 
     // Help menu
-    $body.on('click', '.wcPlayEditorMenuOptionDocs', function() {
+    this.$top.on('click', '.wcPlayEditorMenuOptionDocs', function() {
       if ($(this).hasClass('disabled')) {
         return;
       }
@@ -4300,10 +4342,10 @@ wcPlayEditor.prototype = {
       var newNode = new window[this._draggingNodeData.node.className](this._parent, {x: 0, y: 0});
       var data = this._draggingNodeData.node.export();
       data.id = newNode.id;
-      data.pos.x = (mouse.x / this._viewportCamera.z) + (this._draggingNodeData.$canvas.width()/2 + this._draggingNodeData.offset.x);
-      data.pos.y = (mouse.y / this._viewportCamera.z) + (this._draggingNodeData.offset.y + 5);
+      data.x = (mouse.x / this._viewportCamera.z) + (this._draggingNodeData.$canvas.width()/2 + this._draggingNodeData.offset.x);
+      data.y = (mouse.y / this._viewportCamera.z) + (this._draggingNodeData.offset.y + 5);
       if (!newNode.chain.entry.length) {
-        data.pos.y += this._drawStyle.links.length;
+        data.y += this._drawStyle.links.length;
       }
       newNode.import(data);
 
@@ -4844,7 +4886,7 @@ wcPlayEditor.prototype = {
           this._selectedNodes = [focusNode];
           this.focus(this._selectedNodes);
         } else if (node instanceof wcNodeEntry) {
-          node.onTriggered();
+          node.onActivated();
         }
       }
     }

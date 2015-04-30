@@ -17,12 +17,12 @@ wcNodeEntry.extend('wcNodeEntryUpdate', 'Update', 'Automatic', {
   },
 
   /**
-   * Overloading the default onTriggered event handler so we can make it immediately trigger our exit link if our conditions are met.
+   * Overloading the default onActivated event handler so we can make it immediately trigger our exit link if our conditions are met.
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNodeEntryUpdate#onTriggered
+   * @function wcNodeEntryUpdate#onActivated
    * @param {String} name - The name of the entry link triggered.
    */
-  onTriggered: function(name) {
+  onActivated: function(name) {
     var interval = this.property('milliseconds');
     this.resetThreads();
 
@@ -39,7 +39,7 @@ wcNodeEntry.extend('wcNodeEntryUpdate', 'Update', 'Automatic', {
   onStart: function() {
     this._super();
 
-    this.onTriggered();
+    this.onActivated();
   },
 
   /**
@@ -55,7 +55,7 @@ wcNodeEntry.extend('wcNodeEntryUpdate', 'Update', 'Automatic', {
 
     if (name === 'milliseconds') {
       this.resetThreads();
-      this.onTriggered();
+      this.onActivated();
     }
   },
 });

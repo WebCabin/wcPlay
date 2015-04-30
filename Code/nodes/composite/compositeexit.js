@@ -41,12 +41,12 @@ wcNodeComposite.extend('wcNodeCompositeExit', 'Exit', 'External', {
   },
 
   /**
-   * Event that is called when an entry link has been triggered.<br>
+   * Event that is called when an entry link has been activated.<br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNodeCompositeExit#onTriggered
+   * @function wcNodeCompositeExit#onActivated
    * @param {String} name - The name of the entry link triggered.
    */
-  onTriggered: function(name) {
+  onActivated: function(name) {
     this._super(name);
 
     if (this._invalid) {

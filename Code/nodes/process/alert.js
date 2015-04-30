@@ -18,12 +18,12 @@ wcNodeProcess.extend('wcNodeProcessAlert', 'Alert', 'Debugging', {
   },
 
   /**
-   * Event that is called when an entry link has been triggered.<br>
+   * Event that is called when an entry link has been activated.<br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNodeProcessAlert#onTriggered
+   * @function wcNodeProcessAlert#onActivated
    * @param {String} name - The name of the entry link triggered.
    */
-  onTriggered: function(name) {
+  onActivated: function(name) {
     this._super(name);
 
     // Always trigger the out immediately.

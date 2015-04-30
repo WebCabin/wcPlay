@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>wcPlay Source: nodes/process/ajax.js</title>
+	<title>wcPlay Source: nodes/entry/callremote.js</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -53,71 +53,56 @@
 		<div id="main">
     		
 
-		<h1 class="page-title">Source: nodes/process/ajax.js</h1>
+		<h1 class="page-title">Source: nodes/entry/callremote.js</h1>
     
 <section>
 	<article>
 		<pre
-			class="sunlight-highlight-javascript linenums">wcNodeProcess.extend('wcNodeProcessAJAX', 'AJAX', 'Data Retrieval', {
+			class="sunlight-highlight-javascript linenums">wcNodeEntry.extend('wcNodeEntryCallRemote', 'Call Remote Event', 'Flow Control', {
   /**
    * @class
-   * Performs an AJAX request.&lt;br>
+   * An entry node that fires when a [Call Remote Event Node]{@link wcNodeEntryCallRemote} of the same name is activated.&lt;br>
    * When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.
    *
-   * @constructor wcNodeProcessAJAX
+   * @constructor wcNodeEntryCallRemote
    * @param {String} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
    */
   init: function(parent, pos) {
     this._super(parent, pos);
 
-    this.description("Performs an AJAX request.");
-    this.details("Once activated, a request will be sent to the given URL.  Either the success or failure exit links will activate once the operation is completed and the result will be assigned to the result property.");
+    this.description("An entry node that activates all Remote Event Nodes of the same name.");
+    this.details("This node uses it's Title Name value as an identifier that links it with any Remote Event Nodes of the same name. Whenever this Node is activated, All Remote Event Nodes of the same name will also become active as well.");
 
+    this.createEntry('in');
     this.removeExit('out');
-    this.createExit('success');
-    this.createExit('failure');
 
-    this.createProperty('type', wcPlay.PROPERTY.SELECT, 'GET', {items: ['GET', 'POST'], description:"The AJAX method to perform."});
-    this.createProperty('url', wcPlay.PROPERTY.STRING, 'example.com', {description: "The URL to send the request."});
-    this.createProperty('data', wcPlay.PROPERTY.STRING, 'foo=bar&amp;bar=foo', {description: "The data to send with the request. This can be in query string form, or any object that $.ajax supports as the data parameter."});
-    this.createProperty('result', wcPlay.PROPERTY.STRING, '', {description: "The result of the ajax request, if successful."});
+    this.createProperty('local', wcPlay.PROPERTY.TOGGLE, true, {description: "If true, only matching Remote Event Nodes that are within, or nested within, the same Composite Node or scope will be activated."});
   },
 
   /**
    * Event that is called when an entry link has been activated.&lt;br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNodeProcessAJAX#onActivated
+   * @function wcNodeEntryCallRemote#onActivated
    * @param {String} name - The name of the entry link triggered.
    */
   onActivated: function(name) {
     this._super(name);
 
-    var type = this.property('type');
-    var url  = this.property('url');
-    var data = this.property('data');
-
-    if (!url) {
-      this.activateExit('failure');
-      return;
+    var engine = this.engine();
+    var scope = engine;
+    if (this.property('local')) {
+      scope = this._parent;
     }
 
-    this.ajax({
-      type: type,
-      url: url,
-      data: data,
-      success: function(result) {
-        this.property('result', result);
-        this.activateExit('success');
-      },
-      error: function(XHR, status, msg) {
-        this.property('result', msg);
-        this.activateExit('failure');
-      },
-    });
+    var remoteNodes = scope.nodesByClassName('wcNodeEntryRemote');
+    for (var i = 0; i &lt; remoteNodes.length; ++i) {
+      if (remoteNodes[i].name === this.name) {
+        engine.queueNodeEntry(remoteNodes[i], 'in', this, 'out');
+      }
+    }
   },
-});
-</pre>
+});</pre>
 	</article>
 </section>
 

@@ -27,7 +27,7 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeComposite.html">wcNodeComposite</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeEntryUpdate.html">wcNodeEntryUpdate</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAJAX.html">wcNodeProcessAJAX</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeProcessStrCat.html">wcNodeProcessStrCat</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageGlobal.html">wcNodeStorageGlobal</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
+					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeComposite.html">wcNodeComposite</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryCallRemote.html">wcNodeEntryCallRemote</a></li><li><a href="wcNodeEntryRemote.html">wcNodeEntryRemote</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeEntryUpdate.html">wcNodeEntryUpdate</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAJAX.html">wcNodeProcessAJAX</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeProcessStrCat.html">wcNodeProcessStrCat</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageGlobal.html">wcNodeStorageGlobal</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
 				</ul>
 			</li>
 			
@@ -81,12 +81,12 @@
   },
 
   /**
-   * Event that is called when an entry link has been triggered.&lt;br>
+   * Event that is called when an entry link has been activated.&lt;br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNodeProcessDelay#onTriggered
+   * @function wcNodeProcessDelay#onActivated
    * @param {String} name - The name of the entry link triggered.
    */
-  onTriggered: function(name) {
+  onActivated: function(name) {
     this._super(name);
 
     // Now set a timeout to wait for 'Milliseconds' amount of time.    
@@ -110,7 +110,7 @@
 <p>By default, all nodes have an 'enabled' property, all <code>Entry</code> nodes have an 'out' Exit link, and all <code>Process</code> nodes have an 'in' Entry link and an 'out' Exit link.</p>
 <p>You should never remove the 'enabled' property, as doing so will permenently disable your node. However, the default Entry and Exit links can be removed via the <a href="wcNode.html#removeEntry">wcNode.removeEntry</a> and <a href="wcNode.html#removeExit">wcNode.removeExit</a> functions.</p>
 <hr>
-<h3>Overloading Event Functions</h3><p>In many cases, you will need to catch events as they happen on your node. For this, <a href="wcNode.html">wcNode</a> provides many event functions that you can overload. All event functions are prefixed with <code>'on'</code> in their names, such as <a href="wcNode.html#onTriggered">wcNode.onTriggered</a>. There are many more event hooks to use, to see a listing, view the <a href="wcNode.html">documentation</a>.</p>
+<h3>Overloading Event Functions</h3><p>In many cases, you will need to catch events as they happen on your node. For this, <a href="wcNode.html">wcNode</a> provides many event functions that you can overload. All event functions are prefixed with <code>'on'</code> in their names, such as <a href="wcNode.html#onActivated">wcNode.onActivated</a>. There are many more event hooks to use, to see a listing, view the <a href="wcNode.html">documentation</a>.</p>
 <hr>
 <h3>Latent Nodes</h3><p>In cases where your node may take time to perform an action, a threading system is provided for you. This allows the script to keep track of any timeout, or latent, events being processed on a node so it may have a better sense of what nodes are active, as well as a method for cancelling node operations if necessary.</p>
 <p>There are a few ways to implement a latent node:</p>

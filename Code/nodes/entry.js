@@ -37,12 +37,12 @@ wcNode.extend('wcNodeEntry', 'Entry Node', '', {
   },
 
   /**
-   * Overloading the default onTriggered event handler so we can make it immediately trigger our Exit link.
+   * Overloading the default onActivated event handler so we can make it immediately trigger our Exit link.
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNodeEntry#onTriggered
+   * @function wcNodeEntry#onActivated
    * @param {String} name - The name of the entry link triggered.
    */
-  onTriggered: function(name) {
+  onActivated: function(name) {
     this._super(name);
     this.activateExit('out');
   },

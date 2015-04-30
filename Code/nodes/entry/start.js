@@ -21,6 +21,6 @@ wcNodeEntry.extend('wcNodeEntryStart', 'Start', 'Automatic', {
    */
   onStart: function() {
     this._super();
-    this.onTriggered();
+    this.onActivated();
   },
 });
