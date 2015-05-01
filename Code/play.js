@@ -178,10 +178,15 @@ wcPlay.prototype = {
    * @returns {String} - A serialized string with the entire script.
    */
   save: function() {
-    var data = {};
+    var data = {
+      version: '1.0.0'
+    };
     data.properties = this.listProperties();
 
     data.nodes = [];
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      data.nodes.push(this._compositeNodes[i].export(true));
+    }
     for (var i = 0; i < this._entryNodes.length; ++i) {
       data.nodes.push(this._entryNodes[i].export(true));
     }
@@ -190,9 +195,6 @@ wcPlay.prototype = {
     }
     for (var i = 0; i < this._storageNodes.length; ++i) {
       data.nodes.push(this._storageNodes[i].export(true));
-    }
-    for (var i = 0; i < this._compositeNodes.length; ++i) {
-      data.nodes.push(this._compositeNodes[i].export(true));
     }
 
     return JSON.stringify(data, function(key, value) {
@@ -234,7 +236,7 @@ wcPlay.prototype = {
           newNode.id = data.nodes[i].id;
           nodes.push({
             node: newNode,
-            data: data.nodes[i],
+            data: data.nodes[i]
           });
         } else {
           console.log('ERROR: Attempted to load node "' + data.nodes[i].className + '", but the constructor could not be found!');

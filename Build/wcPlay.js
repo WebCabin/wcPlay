@@ -251,10 +251,15 @@ wcPlay.prototype = {
    * @returns {String} - A serialized string with the entire script.
    */
   save: function() {
-    var data = {};
+    var data = {
+      version: '1.0.0'
+    };
     data.properties = this.listProperties();
 
     data.nodes = [];
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      data.nodes.push(this._compositeNodes[i].export(true));
+    }
     for (var i = 0; i < this._entryNodes.length; ++i) {
       data.nodes.push(this._entryNodes[i].export(true));
     }
@@ -263,9 +268,6 @@ wcPlay.prototype = {
     }
     for (var i = 0; i < this._storageNodes.length; ++i) {
       data.nodes.push(this._storageNodes[i].export(true));
-    }
-    for (var i = 0; i < this._compositeNodes.length; ++i) {
-      data.nodes.push(this._compositeNodes[i].export(true));
     }
 
     return JSON.stringify(data, function(key, value) {
@@ -307,7 +309,7 @@ wcPlay.prototype = {
           newNode.id = data.nodes[i].id;
           nodes.push({
             node: newNode,
-            data: data.nodes[i],
+            data: data.nodes[i]
           });
         } else {
           console.log('ERROR: Attempted to load node "' + data.nodes[i].className + '", but the constructor could not be found!');
@@ -1172,8 +1174,8 @@ Class.extend('wcNode', 'Node', '', {
     this.id = idMap && idMap[data.id] || data.id;
     this.name = data.name,
     this.color = data.color,
-    this.pos.x = data.x,
-    this.pos.y = data.y,
+    this.pos.x = data.pos.x,
+    this.pos.y = data.pos.y,
     this.collapsed(data.collapsed);
     this.debugBreak(data.breakpoint);
 
@@ -1238,8 +1240,10 @@ Class.extend('wcNode', 'Node', '', {
       id: this.id,
       name: this.name,
       color: this.color,
-      x: this.pos.x,
-      y: this.pos.y,
+      pos: {
+        x: this.pos.x,
+        y: this.pos.y
+      },
       collapsed: this.collapsed(),
       breakpoint: this._break,
       properties: this.listProperties(minimal),
@@ -3325,10 +3329,10 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
       }
     };
 
+    __compileNodes.call(this, this._compositeNodes);
     __compileNodes.call(this, this._entryNodes);
     __compileNodes.call(this, this._storageNodes);
     __compileNodes.call(this, this._processNodes);
-    __compileNodes.call(this, this._compositeNodes);
   },
 
   /**
@@ -3336,10 +3340,9 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
    * @function wcNodeCompositeScript#decompile
    * @param {Boolean} [restoreIds] - If true, nodes created will be restored to their original ID's rather than assigned new ones.
    */
-  decompile: function(restoreIds) {
+  decompile: function(idMap) {
     this.onDestroying();
 
-    var idMap = [];
     var newNodes = [];
 
     if (this.compiledNodes) {
@@ -3347,8 +3350,10 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
         var data = this.compiledNodes[i];
         if (window[data.className]) {
           var newNode = new window[data.className](this, data.pos, data.name);
-          if (!restoreIds) {
+          if (idMap) {
             idMap[data.id] = newNode.id;
+          } else {
+            newNode.id = data.id;
           }
           newNodes.push(newNode);
         } else {
@@ -3642,7 +3647,7 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
    */
   onImporting: function(data, idMap) {
     this.compiledNodes = data.nodes;
-    this.decompile(idMap? false: false);
+    this.decompile(idMap);
 
     this._super(data, idMap);
   },

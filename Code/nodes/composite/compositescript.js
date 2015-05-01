@@ -66,10 +66,10 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
       }
     };
 
+    __compileNodes.call(this, this._compositeNodes);
     __compileNodes.call(this, this._entryNodes);
     __compileNodes.call(this, this._storageNodes);
     __compileNodes.call(this, this._processNodes);
-    __compileNodes.call(this, this._compositeNodes);
   },
 
   /**
@@ -77,10 +77,9 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
    * @function wcNodeCompositeScript#decompile
    * @param {Boolean} [restoreIds] - If true, nodes created will be restored to their original ID's rather than assigned new ones.
    */
-  decompile: function(restoreIds) {
+  decompile: function(idMap) {
     this.onDestroying();
 
-    var idMap = [];
     var newNodes = [];
 
     if (this.compiledNodes) {
@@ -88,8 +87,10 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
         var data = this.compiledNodes[i];
         if (window[data.className]) {
           var newNode = new window[data.className](this, data.pos, data.name);
-          if (!restoreIds) {
+          if (idMap) {
             idMap[data.id] = newNode.id;
+          } else {
+            newNode.id = data.id;
           }
           newNodes.push(newNode);
         } else {
@@ -383,7 +384,7 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
    */
   onImporting: function(data, idMap) {
     this.compiledNodes = data.nodes;
-    this.decompile(idMap? false: false);
+    this.decompile(idMap);
 
     this._super(data, idMap);
   },

@@ -2778,10 +2778,6 @@ wcPlayEditor.prototype = {
     {
       id: node.id,
       className: node.className,
-      pos: {
-        x: node.pos.x,
-        y: node.pos.y,
-      },
       data: node.export(),
       engine: this._engine,
       parent: this._parent,
@@ -2809,7 +2805,7 @@ wcPlayEditor.prototype = {
     },
     // Redo
     function() {
-      var myNode = new window[this.className](this.parent, this.pos);
+      var myNode = new window[this.className](this.parent, this.data.pos);
       myNode.id = this.id;
       myNode.import(this.data);
     });
@@ -2886,7 +2882,7 @@ wcPlayEditor.prototype = {
     this.$viewport.on('dblclick',   function(event){self.__onViewportMouseDoubleClick(event, this);});
     this.$viewport.on('mousewheel DOMMouseScroll', function(event) {self.__onViewportMouseWheel(event, this);});
 
-    $(this.$container, this.$main, this.$top, this.$palette, this.$viewport).bind('keydown', function(event) {self.__onKey(event, this);});
+    this.$main.keydown(function(event) {self.__onKey(event, this);});
   },
 
   /**
@@ -4346,8 +4342,8 @@ wcPlayEditor.prototype = {
       var newNode = new window[this._draggingNodeData.node.className](this._parent, {x: 0, y: 0});
       var data = this._draggingNodeData.node.export();
       data.id = newNode.id;
-      data.x = (mouse.x / this._viewportCamera.z) + (this._draggingNodeData.$canvas.width()/2 + this._draggingNodeData.offset.x);
-      data.y = (mouse.y / this._viewportCamera.z) + (this._draggingNodeData.offset.y + 5);
+      data.pos.x = (mouse.x / this._viewportCamera.z) + (this._draggingNodeData.$canvas.width()/2 + this._draggingNodeData.offset.x);
+      data.pos.y = (mouse.y / this._viewportCamera.z) + (this._draggingNodeData.offset.y + 5);
       if (!newNode.chain.entry.length) {
         data.y += this._drawStyle.links.length;
       }

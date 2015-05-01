@@ -146,8 +146,8 @@ Class.extend('wcNode', 'Node', '', {
     this.id = idMap && idMap[data.id] || data.id;
     this.name = data.name,
     this.color = data.color,
-    this.pos.x = data.x,
-    this.pos.y = data.y,
+    this.pos.x = data.pos.x,
+    this.pos.y = data.pos.y,
     this.collapsed(data.collapsed);
     this.debugBreak(data.breakpoint);
 
@@ -212,8 +212,10 @@ Class.extend('wcNode', 'Node', '', {
       id: this.id,
       name: this.name,
       color: this.color,
-      x: this.pos.x,
-      y: this.pos.y,
+      pos: {
+        x: this.pos.x,
+        y: this.pos.y
+      },
       collapsed: this.collapsed(),
       breakpoint: this._break,
       properties: this.listProperties(minimal),
