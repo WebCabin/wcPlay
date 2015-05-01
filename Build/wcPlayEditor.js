@@ -2529,11 +2529,11 @@ wcPlayEditor.prototype = {
           id: node.id,
           oldValue: node.name,
           newValue: $control.val(),
-          editor: self,
+          engine: self._engine,
         },
         // Undo
         function() {
-          var myNode = this.editor._engine.nodeById(this.id);
+          var myNode = this.engine.nodeById(this.id);
           var oldName = myNode.name;
           var newName = myNode.onNameChanging(oldName, this.oldValue);
           if (newName === undefined) {
@@ -2544,7 +2544,7 @@ wcPlayEditor.prototype = {
         },
         // Redo
         function() {
-          var myNode = this.editor._engine.nodeById(this.id);
+          var myNode = this.engine.nodeById(this.id);
           var oldName = myNode.name;
           var newName = myNode.onNameChanging(oldName, this.newValue);
           if (newName === undefined) {
@@ -2642,16 +2642,16 @@ wcPlayEditor.prototype = {
         propFn: propFn,
         oldValue: oldValue,
         newValue: newValue,
-        editor: self,
+        engine: self._engine,
       },
       // Undo
       function() {
-        var myNode = this.editor._engine.nodeById(this.id);
+        var myNode = this.engine.nodeById(this.id);
         myNode[this.propFn](this.name, this.oldValue, true, true);
       },
       // Redo
       function() {
-        var myNode = this.editor._engine.nodeById(this.id);
+        var myNode = this.engine.nodeById(this.id);
         myNode[this.propFn](this.name, this.newValue, true, true);
       });
     };
@@ -2783,23 +2783,25 @@ wcPlayEditor.prototype = {
         y: node.pos.y,
       },
       data: node.export(),
-      editor: this,
+      engine: this._engine,
       parent: this._parent,
     },
     // Undo
     function() {
-      var myNode = this.editor._engine.nodeById(this.id);
+      var myNode = this.engine.nodeById(this.id);
 
       // If we are viewing a script inside the node that is being removed, re-direct our view to its parents.
-      var parent = this.editor._parent;
-      while (!(parent instanceof wcPlay)) {
-        if (parent == myNode) {
-          this.editor._parent = myNode._parent;
-          this.editor.center();
-          break;
-        }
+      for (var i = 0; i < this.engine._editors.length; ++i) {
+        var parent = this.engine._editors[i]._parent;
+        while (!(parent instanceof wcPlay)) {
+          if (parent == myNode) {
+            this.engine._editors[i]._parent = myNode._parent;
+            this.engine._editors[i].center();
+            break;
+          }
 
-        parent = parent._parent;
+          parent = parent._parent;
+        }
       }
 
       // Now destroy this node.
@@ -2823,7 +2825,7 @@ wcPlayEditor.prototype = {
     {
       data: node.export(),
       parent: this._parent,
-      editor: this,
+      engine: this._engine,
     },
     // Undo
     function() {
@@ -2832,18 +2834,20 @@ wcPlayEditor.prototype = {
     },
     // Redo
     function() {
-      var myNode = this.editor._engine.nodeById(this.data.id);
+      var myNode = this.engine.nodeById(this.data.id);
 
       // If we are viewing a script inside the node that is being removed, re-direct our view to its parents.
-      var parent = this.editor._parent;
-      while (!(parent instanceof wcPlay)) {
-        if (parent == myNode) {
-          this.editor._parent = myNode._parent;
-          this.editor.center();
-          break;
-        }
+      for (var i = 0; i < this.engine._editors.length; ++i) {
+        var parent = this.engine._editors[i]._parent;
+        while (!(parent instanceof wcPlay)) {
+          if (parent == myNode) {
+            this.engine._editors[i]._parent = myNode._parent;
+            this.engine._editors[i].center();
+            break;
+          }
 
-        parent = parent._parent;
+          parent = parent._parent;
+        }
       }
 
       // Now destroy this node.
@@ -4112,20 +4116,20 @@ wcPlayEditor.prototype = {
                     id: node.id,
                     name: node._meta.bounds.entryBounds[i].name,
                     chains: chains,
-                    editor: this,
+                    engine: this._engine,
                   },
                   // Undo
                   function() {
-                    var myNode = this.editor._engine.nodeById(this.id);
+                    var myNode = this.engine.nodeById(this.id);
                     for (var i = 0; i < this.chains.length; ++i) {
-                      var targetNode = this.editor._engine.nodeById(this.chains[i].outNodeId);
+                      var targetNode = this.engine.nodeById(this.chains[i].outNodeId);
                       var targetName = this.chains[i].outName;
                       myNode.connectEntry(this.name, targetNode, targetName);
                     }
                   },
                   // Redo
                   function() {
-                    var myNode = this.editor._engine.nodeById(this.id);
+                    var myNode = this.engine.nodeById(this.id);
                     myNode.disconnectEntry(this.name);
                   });
               }
@@ -4157,20 +4161,20 @@ wcPlayEditor.prototype = {
                     id: node.id,
                     name: node._meta.bounds.exitBounds[i].name,
                     chains: chains,
-                    editor: this,
+                    engine: this._engine,
                   },
                   // Undo
                   function() {
-                    var myNode = this.editor._engine.nodeById(this.id);
+                    var myNode = this.engine.nodeById(this.id);
                     for (var i = 0; i < this.chains.length; ++i) {
-                      var targetNode = this.editor._engine.nodeById(this.chains[i].inNodeId);
+                      var targetNode = this.engine.nodeById(this.chains[i].inNodeId);
                       var targetName = this.chains[i].inName;
                       myNode.connectExit(this.name, targetNode, targetName);
                     }
                   },
                   // Redo
                   function() {
-                    var myNode = this.editor._engine.nodeById(this.id);
+                    var myNode = this.engine.nodeById(this.id);
                     myNode.disconnectExit(this.name);
                   });
               }
@@ -4207,20 +4211,20 @@ wcPlayEditor.prototype = {
                     id: node.id,
                     name: node._meta.bounds.inputBounds[i].name,
                     chains: chains,
-                    editor: this,
+                    engine: this._engine,
                   },
                   // Undo
                   function() {
-                    var myNode = this.editor._engine.nodeById(this.id);
+                    var myNode = this.engine.nodeById(this.id);
                     for (var i = 0; i < this.chains.length; ++i) {
-                      var targetNode = this.editor._engine.nodeById(this.chains[i].outNodeId);
+                      var targetNode = this.engine.nodeById(this.chains[i].outNodeId);
                       var targetName = this.chains[i].outName;
                       myNode.connectInput(this.name, targetNode, targetName);
                     }
                   },
                   // Redo
                   function() {
-                    var myNode = this.editor._engine.nodeById(this.id);
+                    var myNode = this.engine.nodeById(this.id);
                     myNode.disconnectInput(this.name);
                   });
               }
@@ -4252,20 +4256,20 @@ wcPlayEditor.prototype = {
                     id: node.id,
                     name: node._meta.bounds.outputBounds[i].name,
                     chains: chains,
-                    editor: this,
+                    engine: this._engine,
                   },
                   // Undo
                   function() {
-                    var myNode = this.editor._engine.nodeById(this.id);
+                    var myNode = this.engine.nodeById(this.id);
                     for (var i = 0; i < this.chains.length; ++i) {
-                      var targetNode = this.editor._engine.nodeById(this.chains[i].inNodeId);
+                      var targetNode = this.engine.nodeById(this.chains[i].inNodeId);
                       var targetName = this.chains[i].inName;
                       myNode.connectOutput(this.name, targetNode, targetName);
                     }
                   },
                   // Redo
                   function() {
-                    var myNode = this.editor._engine.nodeById(this.id);
+                    var myNode = this.engine.nodeById(this.id);
                     myNode.disconnectOutput(this.name);
                   });
               }
@@ -4391,11 +4395,11 @@ wcPlayEditor.prototype = {
               x: node.pos.x,
               y: node.pos.y,
             },
-            editor: this,
+            engine: this._engine,
           },
           // Undo
           function() {
-            var myNode = this.editor._engine.nodeById(this.id);
+            var myNode = this.engine.nodeById(this.id);
             var pos = myNode.onMoving({x: this.end.x, y: this.end.y}, {x: this.start.x, y: this.start.y}) || this.start;
             myNode.pos.x = this.start.x;
             myNode.pos.y = this.start.y;
@@ -4403,7 +4407,7 @@ wcPlayEditor.prototype = {
           },
           // Redo
           function() {
-            var myNode = this.editor._engine.nodeById(this.id);
+            var myNode = this.engine.nodeById(this.id);
             var pos = myNode.onMoving({x: this.start.x, y: this.start.y}, {x: this.end.x, y: this.end.y}) || this.end;
             myNode.pos.x = this.end.x;
             myNode.pos.y = this.end.y;
@@ -4426,18 +4430,18 @@ wcPlayEditor.prototype = {
           name: this._selectedEntryLink.name,
           targetId: this._highlightNode.id,
           targetName: this._highlightExitLink.name,
-          editor: this,
+          engine: this._engine,
         },
         // Undo
         function() {
-          var myNode = this.editor._engine.nodeById(this.id);
-          var targetNode = this.editor._engine.nodeById(this.targetId);
+          var myNode = this.engine.nodeById(this.id);
+          var targetNode = this.engine.nodeById(this.targetId);
           myNode.connectEntry(this.name, targetNode, this.targetName);
         },
         // Redo
         function() {
-          var myNode = this.editor._engine.nodeById(this.id);
-          var targetNode = this.editor._engine.nodeById(this.targetId);
+          var myNode = this.engine.nodeById(this.id);
+          var targetNode = this.engine.nodeById(this.targetId);
           myNode.disconnectEntry(this.name, targetNode, this.targetName);
         });
       } else {
@@ -4447,18 +4451,18 @@ wcPlayEditor.prototype = {
           name: this._selectedEntryLink.name,
           targetId: this._highlightNode.id,
           targetName: this._highlightExitLink.name,
-          editor: this,
+          engine: this._engine,
         },
         // Undo
         function() {
-          var myNode = this.editor._engine.nodeById(this.id);
-          var targetNode = this.editor._engine.nodeById(this.targetId);
+          var myNode = this.engine.nodeById(this.id);
+          var targetNode = this.engine.nodeById(this.targetId);
           myNode.disconnectEntry(this.name, targetNode, this.targetName);
         },
         // Redo
         function() {
-          var myNode = this.editor._engine.nodeById(this.id);
-          var targetNode = this.editor._engine.nodeById(this.targetId);
+          var myNode = this.engine.nodeById(this.id);
+          var targetNode = this.engine.nodeById(this.targetId);
           myNode.connectEntry(this.name, targetNode, this.targetName);
         });
       }
@@ -4472,18 +4476,18 @@ wcPlayEditor.prototype = {
           name: this._selectedExitLink.name,
           targetId: this._highlightNode.id,
           targetName: this._highlightEntryLink.name,
-          editor: this,
+          engine: this._engine,
         },
         // Undo
         function() {
-          var myNode = this.editor._engine.nodeById(this.id);
-          var targetNode = this.editor._engine.nodeById(this.targetId);
+          var myNode = this.engine.nodeById(this.id);
+          var targetNode = this.engine.nodeById(this.targetId);
           myNode.connectExit(this.name, targetNode, this.targetName);
         },
         // Redo
         function() {
-          var myNode = this.editor._engine.nodeById(this.id);
-          var targetNode = this.editor._engine.nodeById(this.targetId);
+          var myNode = this.engine.nodeById(this.id);
+          var targetNode = this.engine.nodeById(this.targetId);
           myNode.disconnectExit(this.name, targetNode, this.targetName);
         });
       } else {
@@ -4493,18 +4497,18 @@ wcPlayEditor.prototype = {
           name: this._selectedExitLink.name,
           targetId: this._highlightNode.id,
           targetName: this._highlightEntryLink.name,
-          editor: this,
+          engine: this._engine,
         },
         // Undo
         function() {
-          var myNode = this.editor._engine.nodeById(this.id);
-          var targetNode = this.editor._engine.nodeById(this.targetId);
+          var myNode = this.engine.nodeById(this.id);
+          var targetNode = this.engine.nodeById(this.targetId);
           myNode.disconnectExit(this.name, targetNode, this.targetName);
         },
         // Redo
         function() {
-          var myNode = this.editor._engine.nodeById(this.id);
-          var targetNode = this.editor._engine.nodeById(this.targetId);
+          var myNode = this.engine.nodeById(this.id);
+          var targetNode = this.engine.nodeById(this.targetId);
           myNode.connectExit(this.name, targetNode, this.targetName);
         });
       }
@@ -4518,18 +4522,18 @@ wcPlayEditor.prototype = {
           name: this._selectedInputLink.name,
           targetId: this._highlightNode.id,
           targetName: this._highlightOutputLink.name,
-          editor: this,
+          engine: this._engine,
         },
         // Undo
         function() {
-          var myNode = this.editor._engine.nodeById(this.id);
-          var targetNode = this.editor._engine.nodeById(this.targetId);
+          var myNode = this.engine.nodeById(this.id);
+          var targetNode = this.engine.nodeById(this.targetId);
           myNode.connectInput(this.name, targetNode, this.targetName);
         },
         // Redo
         function() {
-          var myNode = this.editor._engine.nodeById(this.id);
-          var targetNode = this.editor._engine.nodeById(this.targetId);
+          var myNode = this.engine.nodeById(this.id);
+          var targetNode = this.engine.nodeById(this.targetId);
           myNode.disconnectInput(this.name, targetNode, this.targetName);
         });
       } else {
@@ -4539,18 +4543,18 @@ wcPlayEditor.prototype = {
           name: this._selectedInputLink.name,
           targetId: this._highlightNode.id,
           targetName: this._highlightOutputLink.name,
-          editor: this,
+          engine: this._engine,
         },
         // Undo
         function() {
-          var myNode = this.editor._engine.nodeById(this.id);
-          var targetNode = this.editor._engine.nodeById(this.targetId);
+          var myNode = this.engine.nodeById(this.id);
+          var targetNode = this.engine.nodeById(this.targetId);
           myNode.disconnectInput(this.name, targetNode, this.targetName);
         },
         // Redo
         function() {
-          var myNode = this.editor._engine.nodeById(this.id);
-          var targetNode = this.editor._engine.nodeById(this.targetId);
+          var myNode = this.engine.nodeById(this.id);
+          var targetNode = this.engine.nodeById(this.targetId);
           myNode.connectInput(this.name, targetNode, this.targetName);
         });
       }
@@ -4564,18 +4568,18 @@ wcPlayEditor.prototype = {
           name: this._selectedOutputLink.name,
           targetId: this._highlightNode.id,
           targetName: this._highlightInputLink.name,
-          editor: this,
+          engine: this._engine,
         },
         // Undo
         function() {
-          var myNode = this.editor._engine.nodeById(this.id);
-          var targetNode = this.editor._engine.nodeById(this.targetId);
+          var myNode = this.engine.nodeById(this.id);
+          var targetNode = this.engine.nodeById(this.targetId);
           myNode.connectOutput(this.name, targetNode, this.targetName);
         },
         // Redo
         function() {
-          var myNode = this.editor._engine.nodeById(this.id);
-          var targetNode = this.editor._engine.nodeById(this.targetId);
+          var myNode = this.engine.nodeById(this.id);
+          var targetNode = this.engine.nodeById(this.targetId);
           myNode.disconnectOutput(this.name, targetNode, this.targetName);
         });
       } else {
@@ -4585,18 +4589,18 @@ wcPlayEditor.prototype = {
           name: this._selectedOutputLink.name,
           targetId: this._highlightNode.id,
           targetName: this._highlightInputLink.name,
-          editor: this,
+          engine: this._engine,
         },
         // Undo
         function() {
-          var myNode = this.editor._engine.nodeById(this.id);
-          var targetNode = this.editor._engine.nodeById(this.targetId);
+          var myNode = this.engine.nodeById(this.id);
+          var targetNode = this.engine.nodeById(this.targetId);
           myNode.disconnectOutput(this.name, targetNode, this.targetName);
         },
         // Redo
         function() {
-          var myNode = this.editor._engine.nodeById(this.id);
-          var targetNode = this.editor._engine.nodeById(this.targetId);
+          var myNode = this.engine.nodeById(this.id);
+          var targetNode = this.engine.nodeById(this.targetId);
           myNode.connectOutput(this.name, targetNode, this.targetName);
         });
       }
@@ -4693,16 +4697,16 @@ wcPlayEditor.prototype = {
           {
             id: node.id,
             state: state,
-            editor: this,
+            engine: this._engine,
           },
           // Undo
           function() {
-            var myNode = this.editor._engine.nodeById(this.id);
+            var myNode = this.engine.nodeById(this.id);
             myNode.debugLog(!this.state);
           },
           // Redo
           function() {
-            var myNode = this.editor._engine.nodeById(this.id);
+            var myNode = this.engine.nodeById(this.id);
             myNode.debugLog(this.state);
           });
         }
@@ -4715,16 +4719,16 @@ wcPlayEditor.prototype = {
           {
             id: node.id,
             state: state,
-            editor: this,
+            engine: this._engine,
           },
           // Undo
           function() {
-            var myNode = this.editor._engine.nodeById(this.id);
+            var myNode = this.engine.nodeById(this.id);
             myNode.debugBreak(!this.state);
           },
           // Redo
           function() {
-            var myNode = this.editor._engine.nodeById(this.id);
+            var myNode = this.engine.nodeById(this.id);
             myNode.debugBreak(this.state);
           });
         }
