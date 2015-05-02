@@ -1,4 +1,7 @@
-window['wcPlayEditorClipboard'] = {
+'use strict'
+
+// Create a global clipboard that can be shared between all instances of the editor tool.
+window.wcPlayEditorClipboard = {
   bounds: {
     top: 0,
     left: 0,
@@ -22,13 +25,16 @@ function wcPlayEditor(container, options) {
   this.$typeButton = [];
   this.$typeArea = [];
   this._chainStyle = 1;
-  this._chainStyleMax = 1;
+  this._chainStyleMax = 1; 
 
   this._size = {x: 0, y: 0};
 
   this._engine = null;
   this._parent = null;
   this._nodeLibrary = {};
+
+  // this._nodeDrawCount = 0;
+  // this._chainDrawCount = 0;
 
   this._font = {
     breadcrumbs: {size: 15, family: 'Arial', weight: 'bold'},
@@ -85,6 +91,7 @@ function wcPlayEditor(container, options) {
 
   // Control properties.
   this._viewportCamera = {x: 0, y: 0, z: 1};
+  this._viewportBounds = {left: 0, top: 0, width: 0, height: 0};
   this._viewportMovingNode = false;
   this._viewportMoving = false;
   this._viewportMoved = false;
@@ -270,6 +277,11 @@ wcPlayEditor.prototype = {
       this.$palette.css('width', this._size.z).attr('width', this._size.z).attr('height', height);
       this.$viewport.css('width', width - this._size.z).attr('width', width - this._size.z).attr('height', height);
     }
+
+    this._viewportBounds.top    = -this._viewportCamera.y;
+    this._viewportBounds.left   = -this._viewportCamera.x;
+    this._viewportBounds.width  = this._size.x / this._viewportCamera.z;
+    this._viewportBounds.height = this._size.y / this._viewportCamera.z;
   },
 
   /**
@@ -434,14 +446,14 @@ wcPlayEditor.prototype = {
 
   /**
    * Tests whether a given rectangle is within a bounding rectangle.
-   * @function wcPlayEditor#__rectInRect
+   * @function wcPlayEditor#__rectOnRect
    * @private
    * @param {wcPlayEditor~Rect} rectA - The first rectangle.
    * @param {wcPlayEditor~Rect} rectB - The second rectangle.
    * @param {wcPlay~Coordinates} [offsetA] - An optional offset to apply to the rectA.
    * @returns {Boolean} - Whether there is a collision.
    */
-  __rectInRect: function(rectA, rectB, offsetA) {
+  __rectOnRect: function(rectA, rectB, offsetA) {
     if (offsetA === undefined) {
       offsetA = {
         x: 0,
@@ -517,7 +529,7 @@ wcPlayEditor.prototype = {
     this.$top.find('.wcPlayEditorMenuOptionPausePlay').children('i:first-child, span:first-child').toggleClass('fa-play', this._engine.paused()).toggleClass('fa-pause', !this._engine.paused());
     this.$top.find('.wcPlayEditorMenuOptionCut').toggleClass('disabled', this._selectedNodes.length === 0 || this._options.readOnly);
     this.$top.find('.wcPlayEditorMenuOptionCopy').toggleClass('disabled', this._selectedNodes.length === 0 || this._options.readOnly);
-    this.$top.find('.wcPlayEditorMenuOptionPaste').toggleClass('disabled', window.wcPlayEditorClipboard.nodes.length === 0 || this._options.readOnly);
+    this.$top.find('.wcPlayEditorMenuOptionPaste').toggleClass('disabled', wcPlayEditorClipboard.nodes.length === 0 || this._options.readOnly);
     this.$top.find('.wcPlayEditorMenuOptionDelete').toggleClass('disabled', this._selectedNodes.length === 0 || this._options.readOnly);
     this.$top.find('.wcPlayEditorMenuOptionComposite').toggleClass('disabled', this._selectedNodes.length === 0 || this._options.readOnly);
     this.$top.find('.wcPlayEditorMenuOptionCompositeExit').toggleClass('disabled', this._parent instanceof wcPlay);
@@ -562,6 +574,10 @@ wcPlayEditor.prototype = {
         this.__drawRoundedRect(this._highlightRect, "rgba(0, 255, 255, 0.25)", -1, radius, this._viewportContext);
         this.__drawRoundedRect(this._highlightRect, "darkcyan", 2, radius, this._viewportContext);
       }
+
+      // console.log('Draw count - Nodes: ' + this._nodeDrawCount + ', Chains: ' + this._chainDrawCount);
+      // this._nodeDrawCount = 0;
+      // this._chainDrawCount = 0;
 
       // if (this._selectedNodes.length) {
       //   var boundList = [];
@@ -1135,7 +1151,14 @@ wcPlayEditor.prototype = {
    * @param {Boolean} [isPalette] - If true, we're drawing for the palette, which is slightly different.
    */
   __drawNode: function(node, context, isPalette) {
-    // TODO: Ignore drawing if the node is outside of view.
+    // Ignore drawing if the node is outside of view.
+    if (!isPalette && !this.__rectOnRect(node._meta.bounds.farRect, this._viewportBounds, node.pos)) {
+      node._meta.visible = false;
+      return;
+    }
+
+    node._meta.visible = true;
+    // this._nodeDrawCount += 1;
 
     // Show an additional bounding rect around selected nodes.
     if (this._selectedNodes.indexOf(node) > -1) {
@@ -1962,6 +1985,11 @@ wcPlayEditor.prototype = {
         var targetName = exitLink.links[a].name;
         var entryLink;
 
+        // Skip pairs of nodes that are not visible.
+        if (!node._meta.visible && !targetNode._meta.visible) {
+          continue;
+        }
+
         for (var b = 0; b < targetNode.chain.entry.length; ++b) {
           if (targetNode.chain.entry[b].name === targetName) {
             entryLink = targetNode.chain.entry[b];
@@ -2029,6 +2057,11 @@ wcPlayEditor.prototype = {
         var targetNode = outputProp.outputs[a].node;
         var targetName = outputProp.outputs[a].name;
         var inputProp;
+
+        // Skip pairs of nodes that are not visible.
+        if (!node._meta.visible && !targetNode._meta.visible) {
+          continue;
+        }
 
         for (var b = 0; b < targetNode.properties.length; ++b) {
           if (targetNode.properties[b].name === targetName) {
@@ -2230,6 +2263,8 @@ wcPlayEditor.prototype = {
     context.lineJoin = "round";
     context.beginPath();
     context.moveTo((startOffset.x + startPos.x), (startOffset.y + startPos.y));
+
+    // this._chainDrawCount += 1;
 
     // Do some preparation to make the orientation invisible.
     function __lineTo(x, y) {
@@ -3219,7 +3254,7 @@ wcPlayEditor.prototype = {
         return;
       }
 
-      window.wcPlayEditorClipboard.nodes = [];
+      wcPlayEditorClipboard.nodes = [];
       var bounds = [];
       var offsets = [];
       for (var i = 0; i < self._selectedNodes.length; ++i) {
@@ -3228,15 +3263,15 @@ wcPlayEditor.prototype = {
         bounds.push(node._meta.bounds.farRect);
         offsets.push(node.pos);
 
-        window.wcPlayEditorClipboard.nodes.push(data);
+        wcPlayEditorClipboard.nodes.push(data);
       }
-      window.wcPlayEditorClipboard.bounds = self.__expandRect(bounds, offsets);
+      wcPlayEditorClipboard.bounds = self.__expandRect(bounds, offsets);
     });
     this.$top.on('click', '.wcPlayEditorMenuOptionPaste', function() {
       if ($(this).hasClass('disabled')) {
         return;
       }
-      if (window.wcPlayEditorClipboard.nodes.length === 0) {
+      if (wcPlayEditorClipboard.nodes.length === 0) {
         return;
       }
 
@@ -3255,9 +3290,9 @@ wcPlayEditor.prototype = {
       var idMap = [];
       var nodes = [];
       self._undoManager && self._undoManager.beginGroup('Paste Nodes from clipboard');
-      var bounds = window.wcPlayEditorClipboard.bounds;
-      for (var i = 0; i < window.wcPlayEditorClipboard.nodes.length; ++i) {
-        var data = window.wcPlayEditorClipboard.nodes[i];
+      var bounds = wcPlayEditorClipboard.bounds;
+      for (var i = 0; i < wcPlayEditorClipboard.nodes.length; ++i) {
+        var data = wcPlayEditorClipboard.nodes[i];
 
         var newNode = new window[data.className](self._parent, data.pos);
 
@@ -3265,8 +3300,8 @@ wcPlayEditor.prototype = {
         nodes.push(newNode);
       }
 
-      for (var i = 0; i < window.wcPlayEditorClipboard.nodes.length; ++i) {
-        var data = window.wcPlayEditorClipboard.nodes[i];
+      for (var i = 0; i < wcPlayEditorClipboard.nodes.length; ++i) {
+        var data = wcPlayEditorClipboard.nodes[i];
         var newNode = nodes[i];
         self._selectedNodes.push(newNode);
         if (!self._selectedNode) {
@@ -3744,7 +3779,7 @@ wcPlayEditor.prototype = {
       var self = this;
       function __nodesInRect(nodes) {
         for (var i = 0; i < nodes.length; ++i) {
-          if (self.__rectInRect(nodes[i]._meta.bounds.inner, self._highlightRect, nodes[i].pos)) {
+          if (self.__rectOnRect(nodes[i]._meta.bounds.inner, self._highlightRect, nodes[i].pos)) {
             self._selectedNodes.push(nodes[i]);
           }
         }
