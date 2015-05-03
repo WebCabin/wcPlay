@@ -22,7 +22,8 @@
     "indexDev.html",
     "demo.js",
     "Code",
-    "Compiler"
+    "Compiler",
+    "bower_components"
   ],
   "dependencies": {
     "jquery": "1.11.1",
