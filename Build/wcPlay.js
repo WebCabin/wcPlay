@@ -364,7 +364,7 @@ wcPlay.prototype = {
       data.inputChains = [];
       data.outputChains = [];
 
-      newNode.import(data);
+      newNode.import(data, []);
       newNode._parent = null;
 
       this.__removeNode(newNode);
