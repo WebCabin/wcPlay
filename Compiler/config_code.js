@@ -28,6 +28,7 @@ var header = '\
  * Dependancies:\n\
  *  JQuery 1.11.1\n\
  *  font-awesome 4.2.0\n\
+ *  wcMenu\n\
  * Optional Dependencies:\n\
  *  FileSaver.js\n\
  *  wcUndoManager\n\

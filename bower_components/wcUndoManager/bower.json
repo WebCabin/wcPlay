@@ -2,9 +2,12 @@
   "name": "wcUndoManager",
   "version": "1.0.0",
   "homepage": "http://undo.webcabin.org/",
-  "license": "MIT",
+  "main": [
+    "."
+  ],
   "ignore": [
     "/.*",
     "index.html"
-  ]
+  ],
+  "license": "MIT"
 }

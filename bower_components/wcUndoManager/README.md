@@ -1,9 +1,34 @@
-# Web Cabin Undo Manager #
+# Welcome! #
 
+Welcome to WebCabin.org!  Your developers cabin, on the web!  
+
+Here at Web Cabin, we sincerely believe that anyone with the proper tools can become a developer! The open source community provides us with a powerful network for sharing, inspiring, and revolutionizing the world! It is awfully daunting, viewing the long road ahead through our small cabin window, but all memorable journeys must have a beginning. Will you join us?
+
+
+****
+### What is wcUndoManager? ###
 
 Web Cabin's Undo Manager can be used to effectively provide undo/redo events into your own web application with ease.
 
-View a simple demonstration here: [http://undo.webcabin.org](http://undo.webcabin.org)
+### [http://undo.webcabin.org](http://undo.webcabin.org) ###
+ * View a simple demonstration here.
+
+
+****
+### Features ###
+* Undo or Redo any operation.
+* Group multiple operations into a single event.
+* Keep track of changes made since you last saved.
+* Completely free and open source!
+
+****
+## Installation ##
+
+You can manually copy the source file, or use bower
+```
+npm install -g bower
+bower install wcUndoManager
+```
 
 ****
 ## Basic Usage ##
@@ -61,10 +86,10 @@ In this example, we take our previous example and add a return value.
     var oldValue; // This should contain the old value of the element before the change.
     var newValue = document.getElementById("edit").value;
     undoManager.addEvent("Text Changed",
-      // Init Function
-      function() {
-        this.oldValue = oldValue;
-        this.newValue = newValue;
+      // Data
+      {
+        oldValue: oldValue,
+        newValue: newValue
       },
       // Undo Function
       function() {

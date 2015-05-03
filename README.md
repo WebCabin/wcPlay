@@ -45,6 +45,7 @@ See the [Getting Started](https://play.api.webcabin.org/tutorial-1.0.html) tutor
 
 * JQuery Library version 1.11.1 [http://jquery.com/](http://jquery.com/)
 * Font-Awesome [http://fortawesome.github.io/Font-Awesome/](http://fortawesome.github.io/Font-Awesome/)
+* wcMenu [https://github.com/WebCabin/wcMenu](https://github.com/WebCabin/wcMenu)
 
 ### Optional Dependencies ###
 

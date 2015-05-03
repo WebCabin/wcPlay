@@ -1,0 +1,36 @@
+{
+  "name": "wcMenu",
+  "description": "wcMenu (Web Cabin Menu) is a simple file and toolbar menu system.",
+  "keywords": [
+    "tool",
+    "interface",
+    "menu"
+  ],
+  "homepage": "https://menu.webcabin.org/",
+  "main": [
+    "Build"
+  ],
+  "ignore": [
+    "/.*",
+    "favicon.ico",
+    "index.html",
+    "indexDev.html",
+    "demo.js",
+    "Code",
+    "Compiler",
+    "bower_components"
+  ],
+  "dependencies": {
+    "jquery": "1.11.1"
+  },
+  "license": "MIT",
+  "_release": "1fe08f88aa",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "1fe08f88aaf2c226c40b30394648912427126fb9"
+  },
+  "_source": "git://github.com/WebCabin/wcMenu.git",
+  "_target": "master",
+  "_originalSource": "wcMenu"
+}

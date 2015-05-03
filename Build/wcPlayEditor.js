@@ -27,9 +27,7 @@ function wcPlayEditor(container, options) {
   this._chainStyle = 1;
   this._chainStyleMax = 1;
 
-  this.$fileMenu = null;
-  this.$toolbar = null;
-  this._menuOptions = [];
+  this._menu = null;
 
   this._size = {x: 0, y: 0};
 
@@ -289,260 +287,6 @@ wcPlayEditor.prototype = {
   },
 
   /**
-   * Adds a new file menu option to the editor.
-   * @function wcPlayEditor#addMenuOption
-   * @param {String} categoryName - The top level category to place this option in the menu.
-   * @param {String} name - The name to display for the option.
-   * @param {wcPlayEditor~MenuOptions} options - Custom options for the menu item.
-   * @returns {Boolean} - Success or failure.
-   */
-  addMenuOption: function(categoryName, name, options) {
-    if (!name || !categoryName) {
-      return false;
-    }
-
-    var optionData = {
-      name: name,
-    };
-
-    if (options && typeof options.onActivated === 'function') {
-      optionData.click = options.onActivated;
-    }
-
-    // Find the category if it exists.
-    var category = null;
-    var $category = null;
-    for (var i = 0; i < this._menuOptions.length; ++i) {
-      if (this._menuOptions[i].name === categoryName) {
-        category = this._menuOptions[i];
-        break;
-      }
-    }
-
-    if (options && typeof options.toolbarIndex === 'number') {
-      optionData.$toolbar = $('<div class="wcPlayMenuItem"><span class="wcPlayEditorMenuIcon wcButton"/></div>');
-      optionData.$toolbarSpan = optionData.$toolbar.children('span');
-
-      var $tools = this.$toolbar.children();
-      if ($tools.length === 0 || options.toolbarIndex < 0 || options.toolbarIndex >= $tools.length) {
-        this.$toolbar.append(optionData.$toolbar);
-      } else {
-        optionData.$toolbar.insertBefore($tools[options.toolbarIndex]);
-      }
-    }
-
-    if (options && typeof options.condition === 'function') {
-      optionData.condition = options.condition;
-    }
-
-    // Category doesn't exist, make it.
-    if (!category) {
-      $category = $('<li><span>' + categoryName + '</span><ul></ul></li>');
-      category = {
-        name: categoryName,
-        $category: $category,
-        items: []
-      };
-
-      if (this._menuOptions.length === 0) {
-        this.$fileMenu.append($category);
-        this._menuOptions.push(category);
-      } else {
-        var insertIndex = this._menuOptions.length;
-        if (options && typeof options.categoryIndex === 'number' && options.categoryIndex >= 0 && options.categoryIndex < insertIndex) {
-          insertIndex = options.categoryIndex;
-        }
-
-        if (insertIndex < this._menuOptions.length) {
-          $category.insertBefore(this._menuOptions[insertIndex].$category);
-          this._menuOptions.splice(insertIndex, 0, category);
-        } else {
-          $category.insertAfter(this._menuOptions[this._menuOptions.length-1].$category);
-          this._menuOptions.push(category);
-        }
-      }
-    } else {
-      $category = category.$category;
-    }
-
-    // Create the menu item.
-    optionData.$item = $('<li><span class="wcPlayMenuItem">' + name + '</span></li>');
-    optionData.$itemSpan = optionData.$item.children('span');
-
-    var $icon = $('<i class="wcPlayEditorMenuIcon wcButton"/>');
-    if (options && options.icon) {
-      if (typeof options.icon === 'string') {
-        $icon.addClass(options.icon);
-
-        if (optionData.$toolbar) {
-          optionData.$toolbarSpan.addClass(options.icon);
-        }
-      } else if (typeof options.icon === 'function') {
-        optionData.icon = options.icon;
-      }
-    }
-    optionData.$icon = $icon;
-    if (optionData.$toolbar) {
-      optionData.$toolbarIcon = optionData.$toolbarSpan;
-    }
-
-    if (options && typeof options.description === 'string') {
-      optionData.$itemSpan.attr('title', options.description);
-
-      if (optionData.$toolbar) {
-        optionData.$toolbarSpan.attr('title', options.description);
-      }
-    } else if (options && typeof options.description === 'function') {
-      optionData.description = options.description;
-    }
-
-    var $hotkey = $('<span>');
-    if (options && typeof options.hotkeys === 'string') {
-      optionData.hotkeys = [];
-
-      var hotkeys = (options.hotkeys.indexOf(',') > -1? options.hotkeys.split(','): [options.hotkeys]);
-
-      for (var i = 0; i < hotkeys.length; ++i) {
-        var hotkey = hotkeys[i].toLowerCase();
-        var hotkeyData = {
-          ctrlKey: false,
-          altKey: false,
-          shiftKey: false
-        };
-
-        // Modifier keys.
-        if (hotkey.indexOf('ctrl') > -1) {
-          hotkeyData.ctrlKey = true;
-        }
-        if (hotkey.indexOf('alt') > -1) {
-          hotkeyData.altKey = true;
-        }
-        if (hotkey.indexOf('shift') > -1) {
-          hotkeyData.shiftKey = true;
-        }
-
-        // Special keys.
-        if (hotkey.indexOf('del') > -1) {
-          hotkeyData.keyCode = 46;
-        } else if (hotkey.indexOf('ent') > -1 || hotkey.indexOf('ret') > -1) {
-          hotkeyData.keyCode = 13;
-        } else if (hotkey.indexOf('space') > -1 || hotkey.indexOf('spc') > -1) {
-          hotkeyData.keyCode = 32;
-        } else {
-          // Ascii character code.
-          hotkeyData.keyCode = hotkey.toUpperCase().charCodeAt(hotkey.length-1);
-        }
-
-        optionData.hotkeys.push(hotkeyData);
-      }
-
-      optionData.hotkeyString = options.hotkeys;
-      
-      $hotkey.text(options.hotkeys);
-      if (optionData.$toolbar) {
-        optionData.$toolbarSpan.attr('title', optionData.$toolbarSpan.attr('title') + ' (' + options.hotkeys + ')');
-      }
-    }
-
-    optionData.$itemSpan.prepend($icon).append($hotkey);
-    if (category.items.length === 0) {
-      category.items.push(optionData);
-      $category.children('ul').append(optionData.$item);
-    } else {
-      insertIndex = category.items.length;
-      if (options && typeof options.itemIndex === 'number' && options.itemIndex >= 0 && options.itemIndex < insertIndex) {
-        insertIndex = options.itemIndex;
-      }
-
-      if (insertIndex < category.items.length) {
-        optionData.$item.insertBefore(category.items[insertIndex].$item);
-        category.items.splice(insertIndex, 0, optionData);
-      } else {
-        optionData.$item.insertAfter(category.items[category.items.length-1].$spacer || category.items[category.items.length-1].$item);
-        category.items.push(optionData);
-      }
-    }
-
-    var editor = this;
-    function __onActivated(event) {
-      if ($(this).hasClass('disabled')) {
-        return;
-      }
-
-      options && options.onActivated && options.onActivated(event, editor, editor._engine);
-    };
-
-    optionData.$itemSpan.click(__onActivated);
-    if (optionData.$toolbar) {
-      optionData.$toolbar.click(__onActivated);
-    }
-
-    return true;
-  },
-
-  /**
-   * Adds a spacer to a menu list.
-   * @function wcPlayEditor#addMenuSpacer
-   * @param {String} categoryName - The top level category to place this spacer in the menu.
-   * @param {Number} index - The insertion index to place the spacer, use -1 to append to end. This spacer will go after the menu item found at that index, other spacers do not count as an index.
-   * @returns {Boolean} - Success or failure.
-   */
-  addMenuSpacer: function(categoryName, index) {
-    var category = null;
-    for (var i = 0; i < this._menuOptions.length; ++i) {
-      if (this._menuOptions[i].name === categoryName) {
-        category = this._menuOptions[i];
-        break;
-      }
-    }
-
-    if (!category) {
-      return false;
-    }
-
-    if (index < 0 || index >= category.items.length) {
-      index = category.items.length-1;
-    }
-
-    var item = category.items[index];
-    item.$spacer = $('<li><hr class="wcPlayMenuSeparator"></li>');
-    item.$spacer.insertAfter(item.$item);
-    return true;
-  },
-
-  /**
-   * Adds a spacer to the toolbar.
-   * @function wcPlayEditor#addToolbarSpacer
-   * @param {String} categoryName - The top level category to place this spacer in the menu.
-   * @param {Number} index - The insertion index to place the spacer, use -1 to append to end. This spacer will go after the toolbar button of the corresponding menu option, other spacers do not count as an index.
-   * @returns {Boolean} - Success or failure.
-   */
-  addToolbarSpacer: function(categoryName, index) {
-    var category = null;
-    for (var i = 0; i < this._menuOptions.length; ++i) {
-      if (this._menuOptions[i].name === categoryName) {
-        category = this._menuOptions[i];
-        break;
-      }
-    }
-
-    if (!category) {
-      return false;
-    }
-
-    if (index < 0 || index >= category.items.length) {
-      index = category.items.length-1;
-    }
-
-    var item = category.items[index];
-    if (item.$toolbar) {
-      item.$toolbarSpacer = $('<div class="ARPG_Separator"></div>');
-      item.$toolbarSpacer.insertAfter(item.$toolbar);
-    }
-    return true;
-  },
-
-  /**
    * Retrieve mouse or touch position.
    * @function wcPlayEditor#__mouse
    * @private
@@ -767,34 +511,7 @@ wcPlayEditor.prototype = {
     var elapsed = (timestamp - this._lastUpdate) / 1000;
     this._lastUpdate = timestamp;
 
-    // Update menu items.
-    for (var i = 0; i < this._menuOptions.length; ++i) {
-      var items = this._menuOptions[i].items;
-      for (var a = 0; a < items.length; ++a) {
-        var item = items[a];
-        if (item.icon) {
-          var icon = item.icon(this, this._engine);
-          item.$icon.removeClass().addClass('wcPlayEditorMenuIcon wcButton ' + icon);
-          item.$toolbarIcon.removeClass().addClass('wcPlayEditorMenuIcon wcButton ' + icon);
-        }
-
-        if (item.description) {
-          var desc = item.description(this, this._engine);
-          item.$itemSpan.attr('title', desc);
-          if (item.$toolbar) {
-            item.$toolbarSpan.attr('title', desc + ' (' + item.hotkeyString + ')');
-          }
-        }
-
-        if (item.condition) {
-          var disabled = !item.condition(this, this._engine);
-          item.$itemSpan.toggleClass('disabled', disabled);
-          if (item.$toolbar) {
-            item.$toolbar.toggleClass('disabled', disabled);
-          }
-        }
-      }
-    }
+    this._menu.update();
 
     this.onResized();
 
@@ -1068,24 +785,24 @@ wcPlayEditor.prototype = {
    * @private
    */
   __setupMenu: function() {
-    this.$fileMenu = $('<ul class="wcPlayEditorMenu wcPlayNoHighlights"></ul>');
-    this.$toolbar = $('<div class="wcPlayEditorToolbar wcPlayNoHighlights"></div>');
-
-    this.$top.append(this.$fileMenu);
-    this.$top.append(this.$toolbar);
+    this._menu = new wcMenu(this.$top, this.$main, {
+      manualUpdate: true,
+      data: this,
+      version: "v1.0.0"
+    });
 
     // File -> New Script...
-    this.addMenuOption('File', 'New Script...', {
+    this._menu.addOption('File', 'New Script...', {
       hotkeys: "Alt+N",
       icon: "fa fa-file-o fa-lg",
       description: "Start a new script...",
       toolbarIndex: -1,
-      condition: function(editor, engine) {
+      condition: function(editor) {
         return !editor._options.readOnly;
       },
-      onActivated: function(event, editor, engine) {
-        if (engine) {
-          engine.clear();
+      onActivated: function(editor) {
+        if (editor._engine) {
+          editor._engine.clear();
           editor._undoManager && editor._undoManager.clear();
           editor._parent = editor._engine;
         }
@@ -1093,16 +810,16 @@ wcPlayEditor.prototype = {
     });
 
     // File -> Open Script...
-    this.addMenuOption('File', 'Open Script...', {
+    this._menu.addOption('File', 'Open Script...', {
       hotkeys: "Ctrl+O",
       icon: "fa fa-folder-open-o fa-lg",
       description: "Open a script file...",
       toolbarIndex: -1,
-      condition: function(editor, engine) {
+      condition: function(editor) {
         return !editor._options.readOnly;
       },
-      onActivated: function(event, editor, engine) {
-        if (engine) {
+      onActivated: function(editor) {
+        if (editor._engine) {
           if (document.createEvent) {
             var evt = document.createEvent("MouseEvents");
             evt.initEvent("click", true, false);
@@ -1114,22 +831,22 @@ wcPlayEditor.prototype = {
     });
 
     // File -> Save Script
-    this.addMenuOption('File', 'Save Script', {
+    this._menu.addOption('File', 'Save Script', {
       hotkeys: "Ctrl+S",
       icon: "fa fa-save fa-lg",
       description: "Save this script...",
       toolbarIndex: -1,
-      condition: function(editor, engine) {
+      condition: function(editor) {
         return !editor._options.readOnly;
       },
-      onActivated: function(event, editor, engine) {
-        if (engine) {
+      onActivated: function(editor) {
+        if (editor._engine) {
           if (!saveAs) {
             console.log("ERROR: Attempted to save the script when external dependency 'FileSaver' was not included.");
             return;
           }
 
-          var savedData = engine.save();
+          var savedData = editor._engine.save();
           var blob;
           try {
             blob = new Blob([savedData], {type: 'text/plain'});
@@ -1145,19 +862,19 @@ wcPlayEditor.prototype = {
       }
     });
 
-    this.addMenuSpacer('File', -1);
-    this.addToolbarSpacer('File', -1);
+    this._menu.addSpacer('File', -1);
+    this._menu.addToolbarSpacer('File', -1);
 
     // File -> Import...
-    this.addMenuOption('File', 'Import...', {
+    this._menu.addOption('File', 'Import...', {
       icon: "fa fa-plus-square-o fa-lg",
       description: "Import a script file as a Composite Node.",
       toolbarIndex: -1,
-      condition: function(editor, engine) {
+      condition: function(editor) {
         return !editor._options.readOnly;
       },
-      onActivated: function(event, editor, engine) {
-        if (engine) {
+      onActivated: function(editor) {
+        if (editor._engine) {
           if (document.createEvent) {
             var evt = document.createEvent("MouseEvents");
             evt.initEvent("click", true, false);
@@ -1168,44 +885,44 @@ wcPlayEditor.prototype = {
       }
     });
 
-    this.addToolbarSpacer('File', -1);
+    this._menu.addToolbarSpacer('File', -1);
 
     // Edit -> Undo
-    this.addMenuOption('Edit', 'Undo', {
+    this._menu.addOption('Edit', 'Undo', {
       hotkeys: "Ctrl+Z",
       icon: "fa fa-undo fa-lg",
       toolbarIndex: -1,
-      description: function(editor, engine) {
+      description: function(editor) {
         return 'Undo ' + editor._undoManager.undoInfo();
       },
-      condition: function(editor, engine) {
+      condition: function(editor) {
         return editor._undoManager.canUndo();
       },
-      onActivated: function(event, editor, engine) {
+      onActivated: function(editor) {
         editor._undoManager && editor._undoManager.undo();
       }
     });
 
     // Edit -> Redo
-    this.addMenuOption('Edit', 'Redo', {
+    this._menu.addOption('Edit', 'Redo', {
       hotkeys: "Ctrl+Y,Ctrl+Shift+Z",
       icon: "fa fa-undo fa-flip-horizontal fa-lg",
       toolbarIndex: -1,
-      description: function(editor, engine) {
+      description: function(editor) {
         return 'Redo ' + editor._undoManager.redoInfo();
       },
-      condition: function(editor, engine) {
+      condition: function(editor) {
         return editor._undoManager.canRedo();
       },
-      onActivated: function(event, editor, engine) {
+      onActivated: function(editor) {
         editor._undoManager && editor._undoManager.redo();
       }
     });
 
-    this.addMenuSpacer('Edit', -1);
-    this.addToolbarSpacer('Edit', -1);
+    this._menu.addSpacer('Edit', -1);
+    this._menu.addToolbarSpacer('Edit', -1);
 
-    function __copy(event, editor, engine) {
+    function __copy(editor) {
       wcPlayEditorClipboard.nodes = [];
       var bounds = [];
       var offsets = [];
@@ -1221,16 +938,16 @@ wcPlayEditor.prototype = {
     }
 
     // Edit -> Cut
-    this.addMenuOption('Edit', 'Cut', {
+    this._menu.addOption('Edit', 'Cut', {
       hotkeys: "Ctrl+X",
       icon: "fa fa-cut fa-lg",
       toolbarIndex: -1,
       description: "Cut selected node(s) out of your script and into the clipboard.",
-      condition: function(editor, engine) {
+      condition: function(editor) {
         return editor._selectedNodes.length > 0;
       },
-      onActivated: function(event, editor, engine) {
-        __copy(event, editor, engine);
+      onActivated: function(editor) {
+        __copy(editor, editor._engine);
 
         editor._undoManager && editor._undoManager.beginGroup('Cut Nodes to clipboard');
         for (var i = 0; i < editor._selectedNodes.length; ++i) {
@@ -1243,27 +960,27 @@ wcPlayEditor.prototype = {
     });
 
     // Edit -> Copy
-    this.addMenuOption('Edit', 'Copy', {
+    this._menu.addOption('Edit', 'Copy', {
       hotkeys: "Ctrl+C",
       icon: "fa fa-copy fa-lg",
       toolbarIndex: -1,
       description: "Copy selected node(s) to your clipboard.",
-      condition: function(editor, engine) {
+      condition: function(editor) {
         return editor._selectedNodes.length > 0;
       },
       onActivated: __copy
     });
 
     // Edit -> Paste
-    this.addMenuOption('Edit', 'Paste', {
+    this._menu.addOption('Edit', 'Paste', {
       hotkeys: "Ctrl+V",
       icon: "fa fa-paste fa-lg",
       toolbarIndex: -1,
       description: "Paste node(s) in clipboard into your script.",
-      condition: function(editor, engine) {
+      condition: function(editor) {
         return wcPlayEditorClipboard.nodes.length > 0;
       },
-      onActivated: function(event, editor, engine) {
+      onActivated: function(editor) {
         var mouse = {
           x: editor._mouse.x,
           y: editor._mouse.y,
@@ -1308,15 +1025,15 @@ wcPlayEditor.prototype = {
     });
 
     // Edit -> Delete
-    this.addMenuOption('Edit', 'Delete', {
+    this._menu.addOption('Edit', 'Delete', {
       hotkeys: "Delete",
       icon: "fa fa-trash fa-lg",
       toolbarIndex: -1,
       description: "Delete selected node(s).",
-      condition: function(editor, engine) {
+      condition: function(editor) {
         return editor._selectedNodes.length > 0;
       },
-      onActivated: function(event, editor, engine) {
+      onActivated: function(editor) {
         if (editor._selectedNodes.length) {
           editor._undoManager && editor._undoManager.beginGroup('Removed Nodes');
           for (var i = 0; i < editor._selectedNodes.length; ++i) {
@@ -1330,19 +1047,19 @@ wcPlayEditor.prototype = {
       }
     });
 
-    this.addMenuSpacer('Edit', -1);
-    this.addToolbarSpacer('Edit', -1);
+    this._menu.addSpacer('Edit', -1);
+    this._menu.addToolbarSpacer('Edit', -1);
 
     // Edit -> Create Composite
-    this.addMenuOption('Edit', 'Create Composite', {
+    this._menu.addOption('Edit', 'Create Composite', {
       hotkeys: 'C',
       icon: "fa fa-suitcase fa-lg",
       toolbarIndex: -1,
       description: "Combine all selected nodes into a new \'Composite\' Node.",
-      condition: function(editor, engine) {
+      condition: function(editor) {
         return editor._selectedNodes.length > 0;
       },
-      onActivated: function(event, editor, engine) {
+      onActivated: function(editor) {
         if (editor._selectedNodes.length && editor._parent) {
           editor._undoManager && editor._undoManager.beginGroup("Combined Nodes into Composite");
           // Create undo events for removing the selected nodes.
@@ -1382,9 +1099,9 @@ wcPlayEditor.prototype = {
             // External entry chains.
             var createdLinks = [];
             for (var a = 0; a < entryChains.length; ++a) {
-              var targetNode = engine.nodeById(entryChains[a].outNodeId);
+              var targetNode = editor._engine.nodeById(entryChains[a].outNodeId);
               var targetName = entryChains[a].outName;
-              var node = engine.nodeById(entryChains[a].inNodeId);
+              var node = editor._engine.nodeById(entryChains[a].inNodeId);
               var linkName = entryChains[a].inName;
 
               // Make sure we only create one Composite Entry per link.
@@ -1413,9 +1130,9 @@ wcPlayEditor.prototype = {
             // External exit chains.
             createdLinks = [];
             for (var a = 0; a < exitChains.length; ++a) {
-              var targetNode = engine.nodeById(exitChains[a].inNodeId);
+              var targetNode = editor._engine.nodeById(exitChains[a].inNodeId);
               var targetName = exitChains[a].inName;
-              var node = engine.nodeById(exitChains[a].outNodeId);
+              var node = editor._engine.nodeById(exitChains[a].outNodeId);
               var linkName = exitChains[a].outName;
 
               // Make sure we only create one Composite Entry per link.
@@ -1444,9 +1161,9 @@ wcPlayEditor.prototype = {
             // External property input chains.
             createdLinks = [];
             for (var a = 0; a < inputChains.length; ++a) {
-              var targetNode = engine.nodeById(inputChains[a].outNodeId);
+              var targetNode = editor._engine.nodeById(inputChains[a].outNodeId);
               var targetName = inputChains[a].outName;
-              var node = engine.nodeById(inputChains[a].inNodeId);
+              var node = editor._engine.nodeById(inputChains[a].inNodeId);
               var linkName = inputChains[a].inName;
 
               // Make sure we only create one Composite Entry per link.
@@ -1475,9 +1192,9 @@ wcPlayEditor.prototype = {
             // External property output chains.
             createdLinks = [];
             for (var a = 0; a < outputChains.length; ++a) {
-              var targetNode = engine.nodeById(outputChains[a].inNodeId);
+              var targetNode = editor._engine.nodeById(outputChains[a].inNodeId);
               var targetName = outputChains[a].inName;
-              var node = engine.nodeById(outputChains[a].outNodeId);
+              var node = editor._engine.nodeById(outputChains[a].outNodeId);
               var linkName = outputChains[a].outName;
 
               // Make sure we only create one Composite Entry per link.
@@ -1523,18 +1240,18 @@ wcPlayEditor.prototype = {
       }
     });
 
-    this.addToolbarSpacer('Edit', -1);
+    this._menu.addToolbarSpacer('Edit', -1);
 
     // View -> Create Composite
-    this.addMenuOption('View', 'Fit in View', {
+    this._menu.addOption('View', 'Fit in View', {
       hotkeys: 'F',
       icon: "fa fa-crosshairs fa-lg",
       toolbarIndex: -1,
       description: "Center view on selected node(s).",
-      condition: function(editor, engine) {
+      condition: function(editor) {
         return editor._selectedNodes.length > 0;
       },
-      onActivated: function(event, editor, engine) {
+      onActivated: function(editor) {
         if (editor._selectedNodes.length) {
           editor.focus(editor._selectedNodes);
         } else {
@@ -1544,15 +1261,15 @@ wcPlayEditor.prototype = {
     });
 
     // View -> Exit Composite
-    this.addMenuOption('View', 'Exit Composite', {
+    this._menu.addOption('View', 'Exit Composite', {
       hotkeys: 'O',
       icon: "fa fa-level-up fa-lg",
       toolbarIndex: -1,
       description: "Step out of this Composite Node.",
-      condition: function(editor, engine) {
+      condition: function(editor) {
         return !editor._parent instanceof wcPlay;
       },
-      onActivated: function(event, editor, engine) {
+      onActivated: function(editor) {
         if (editor._parent instanceof wcNodeCompositeScript) {
           var focusNode = editor._parent;
           editor._parent = editor._parent._parent;
@@ -1565,15 +1282,15 @@ wcPlayEditor.prototype = {
     });
 
     // View -> Enter Composite
-    this.addMenuOption('View', 'Enter Composite', {
+    this._menu.addOption('View', 'Enter Composite', {
       hotkeys: 'I',
       icon: "fa fa-level-down fa-lg",
       toolbarIndex: -1,
       description: "Step in to this Composite Node.",
-      condition: function(editor, engine) {
+      condition: function(editor) {
         return !editor._parent instanceof wcPlay;
       },
-      onActivated: function(event, editor, engine) {
+      onActivated: function(editor) {
         if (editor._selectedNodes.length && editor._selectedNodes[0] instanceof wcNodeCompositeScript) {
           editor._parent = editor._selectedNodes[0];
           editor._selectedNode = null;
@@ -1584,16 +1301,16 @@ wcPlayEditor.prototype = {
       }
     });
 
-    this.addMenuSpacer('View', -1);
-    this.addToolbarSpacer('View', -1);
+    this._menu.addSpacer('View', -1);
+    this._menu.addToolbarSpacer('View', -1);
 
     // View -> Chain Style
-    this.addMenuOption('View', 'Chain Style', {
+    this._menu.addOption('View', 'Chain Style', {
       hotkeys: 'V',
       icon: "fa fa-sitemap fa-lg",
       toolbarIndex: -1,
       description: "Toggle the visual style of the chains.",
-      onActivated: function(event, editor, engine) {
+      onActivated: function(editor) {
         editor._chainStyle += 1;
         if (editor._chainStyle > editor._chainStyleMax) {
           editor._chainStyle = 0;
@@ -1601,29 +1318,29 @@ wcPlayEditor.prototype = {
       }
     });
 
-    this.addMenuSpacer('View', -1);
-    this.addToolbarSpacer('View', -1);
+    this._menu.addSpacer('View', -1);
+    this._menu.addToolbarSpacer('View', -1);
 
     // View -> Search...
-    this.addMenuOption('View', 'Search...', {
+    this._menu.addOption('View', 'Search...', {
       hotkeys: 'Ctrl+F',
       icon: "fa fa-search fa-lg",
       toolbarIndex: -1,
       description: "Toggle the visual style of the chains.",
-      condition: function(editor, engine) {
+      condition: function(editor) {
         return false;
       },
-      onActivated: function(event, editor, engine) {
+      onActivated: function(editor) {
         // TODO:
       }
     });
 
-    this.addToolbarSpacer('View', -1);
+    this._menu.addToolbarSpacer('View', -1);
 
     // Debugging -> Toggle Debug Mode
-    this.addMenuOption('Debugging', 'Toggle Debug Mode', {
-      icon: function(editor, engine) {
-        if (engine && engine.debugging()) {
+    this._menu.addOption('Debugging', 'Toggle Debug Mode', {
+      icon: function(editor) {
+        if (editor._engine && editor._engine.debugging()) {
           return "fa fa-dot-circle-o fa-lg";
         } else {
           return "fa fa-circle-o fa-lg";
@@ -1631,18 +1348,18 @@ wcPlayEditor.prototype = {
       },
       toolbarIndex: -1,
       description: "Toggle debugging mode for the entire script.",
-      onActivated: function(event, editor, engine) {
-        if (engine) {
-          engine.debugging(!engine.debugging());
-          engine.paused(false);
+      onActivated: function(editor) {
+        if (editor._engine) {
+          editor._engine.debugging(!editor._engine.debugging());
+          editor._engine.paused(false);
         }
       }
     });
 
     // Debugging -> Toggle Silence Mode
-    this.addMenuOption('Debugging', 'Toggle Silence Mode', {
-      icon: function(editor, engine) {
-        if (engine && engine.silent()) {
+    this._menu.addOption('Debugging', 'Toggle Silence Mode', {
+      icon: function(editor) {
+        if (editor._engine && editor._engine.silent()) {
           return "fa fa-volume-up fa-lg";
         } else {
           return "fa fa-volume-off fa-lg";
@@ -1650,36 +1367,36 @@ wcPlayEditor.prototype = {
       },
       toolbarIndex: -1,
       description: "Toggle silent mode for the entire script.",
-      onActivated: function(event, editor, engine) {
-        if (engine) {
-          engine.silent(!engine.silent());
+      onActivated: function(editor) {
+        if (editor._engine) {
+          editor._engine.silent(!editor._engine.silent());
         }
       }
     });
 
-    this.addMenuSpacer('Debugging', -1);
-    this.addToolbarSpacer('Debugging', -1);
+    this._menu.addSpacer('Debugging', -1);
+    this._menu.addToolbarSpacer('Debugging', -1);
 
     // Debugging -> Restart Script
-    this.addMenuOption('Debugging', 'Restart Script', {
+    this._menu.addOption('Debugging', 'Restart Script', {
       icon: "fa fa-play-circle fa-lg",
       toolbarIndex: -1,
       description: "Runs or restarts the script.",
-      condition: function(editor, engine) {
+      condition: function(editor) {
         return !editor._options.readOnly;
       },
-      onActivated: function(event, editor, engine) {
-        if (engine) {
-          engine.start();
+      onActivated: function(editor) {
+        if (editor._engine) {
+          editor._engine.start();
         }
       }
     });
 
     // Debugging -> Pause/Continue Script
-    this.addMenuOption('Debugging', 'Pause/Continue Script', {
+    this._menu.addOption('Debugging', 'Pause/Continue Script', {
       hotkeys: 'Return',
-      icon: function(editor, engine) {
-        if (engine && engine.paused()) {
+      icon: function(editor) {
+        if (editor._engine && editor._engine.paused()) {
           return "fa fa-pause fa-lg";
         } else {
           return "fa fa-play fa-lg";
@@ -1687,43 +1404,43 @@ wcPlayEditor.prototype = {
       },
       toolbarIndex: -1,
       description: "Pause or Continue the script.",
-      condition: function(editor, engine) {
+      condition: function(editor) {
         return !editor._options.readOnly;
       },
-      onActivated: function(event, editor, engine) {
-        if (engine) {
-          if (engine.paused() || engine.stepping()) {
-            engine.paused(false);
-            engine.stepping(false);
+      onActivated: function(editor) {
+        if (editor._engine) {
+          if (editor._engine.paused() || editor._engine.stepping()) {
+            editor._engine.paused(false);
+            editor._engine.stepping(false);
           } else {
-            engine.stepping(true);
+            editor._engine.stepping(true);
           }
         }
       }
     });
 
     // Debugging -> Step Script
-    this.addMenuOption('Debugging', 'Step Script', {
+    this._menu.addOption('Debugging', 'Step Script', {
       hotkeys: 'Spacebar',
       icon: "fa fa-fast-forward fa-lg",
       toolbarIndex: -1,
       description: "Perform a single script update.",
-      condition: function(editor, engine) {
+      condition: function(editor) {
         return !editor._options.readOnly;
       },
-      onActivated: function(event, editor, engine) {
-        if (engine) {
-          engine.paused(false);
-          engine.stepping(true);
+      onActivated: function(editor) {
+        if (editor._engine) {
+          editor._engine.paused(false);
+          editor._engine.stepping(true);
         }
       }
     });
 
     // Help -> Documentation...
-    this.addMenuOption('Help', 'Documentation...', {
+    this._menu.addOption('Help', 'Documentation...', {
       icon: "fa fa-file-pdf-o fa-lg",
       description: "Open the documentation for wcPlay in another window.",
-      onActivated: function(event, editor, engine) {
+      onActivated: function(editor) {
         window.open('https://play.api.webcabin.org/', '_blank');
       }
     });
@@ -3723,11 +3440,6 @@ wcPlayEditor.prototype = {
     var self = this;
 
     // Menu
-    // Setup events.
-    $('ul.wcPlayEditorMenu > li').on('mouseenter', this.__onMenuMouseEnter);
-    $('ul.wcPlayEditorMenu > li > ul').on('click', this.__onMenuClicked);
-    $('ul.wcPlayEditorMenu > li').on('mouseleave', this.__onMenuMouseLeave);
-    $('ul.wcPlayEditorMenu > li > ul').on('mouseleave', this.__onSubMenuMouseLeave);
     this.__bindMenuHandlers();
 
     // Palette
@@ -3744,36 +3456,6 @@ wcPlayEditor.prototype = {
     this.$viewport.on('click',      function(event){self.__onViewportMouseClick(event, this);});
     this.$viewport.on('dblclick',   function(event){self.__onViewportMouseDoubleClick(event, this);});
     this.$viewport.on('mousewheel DOMMouseScroll', function(event) {self.__onViewportMouseWheel(event, this);});
-
-    this.$main.keydown(function(event) {self.__onKey(event, this);});
-  },
-
-  /**
-   * Handle key press events.
-   * @function wcPlayEditor#__onKey
-   * @private
-   * @param {Object} event - The mouse event.
-   * @param {Object} elem - The target element.
-   */
-  __onKey: function(event, elem) {
-    // Update menu items.
-    for (var i = 0; i < this._menuOptions.length; ++i) {
-      var items = this._menuOptions[i].items;
-      for (var a = 0; a < items.length; ++a) {
-        var item = items[a];
-        if (item.hotkeys) {
-          for (var b = 0; b < item.hotkeys.length; ++b) {
-            var hotkey = item.hotkeys[b];
-            if (hotkey.ctrlKey == event.ctrlKey &&
-                hotkey.shiftKey == event.shiftKey &&
-                hotkey.altKey == event.altKey &&
-                hotkey.keyCode == event.keyCode) {
-              item.$itemSpan.click();
-            }
-          }
-        }
-      }
-    }
   },
 
   /**
