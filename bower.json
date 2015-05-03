@@ -13,7 +13,7 @@
   ],
   "homepage": "https://play.webcabin.org/",
   "main": [
-    "Build",
+    "Build"
   ],
   "ignore": [
     "/.*",
