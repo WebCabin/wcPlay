@@ -280,8 +280,8 @@ wcPlayEditor.prototype = {
       this.$viewport.css('width', width - this._size.z).attr('width', width - this._size.z).attr('height', height);
     }
 
-    this._viewportBounds.top    = -this._viewportCamera.y;
-    this._viewportBounds.left   = -this._viewportCamera.x;
+    this._viewportBounds.top    = -this._viewportCamera.y / this._viewportCamera.z;
+    this._viewportBounds.left   = -this._viewportCamera.x / this._viewportCamera.z;
     this._viewportBounds.width  = this._size.x / this._viewportCamera.z;
     this._viewportBounds.height = this._size.y / this._viewportCamera.z;
   },
