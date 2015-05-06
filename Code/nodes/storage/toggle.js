@@ -29,7 +29,7 @@ wcNodeStorage.extend('wcNodeStorageToggle', 'Toggle', 'Local', {
     this._super(name, oldValue, newValue);
 
     if (name === 'not') {
-      this.property('value', !newValue);
+      this.property('value', !newValue, true, true);
     }
   },
 });

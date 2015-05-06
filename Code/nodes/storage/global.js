@@ -90,7 +90,7 @@ wcNodeStorage.extend('wcNodeStorageGlobal', 'Global', 'Global', {
     if (name === 'value') {
       if (this.name) {
         var engine = this.engine();
-        return (engine && engine.property(this.name)) || 0;
+        return (engine && engine.property(this.name));
       }
     }
   },
@@ -130,7 +130,7 @@ wcNodeStorage.extend('wcNodeStorageGlobal', 'Global', 'Global', {
     if (name === 'value') {
       if (this.name) {
         var engine = this.engine();
-        return (engine && engine.initialProperty(this.name)) || 0;
+        return (engine && engine.initialProperty(this.name));
       }
     }
   },
@@ -146,8 +146,8 @@ wcNodeStorage.extend('wcNodeStorageGlobal', 'Global', 'Global', {
    * @param {Object} newValue - The new value of the global property.
    */
   onGlobalPropertyChanged: function(name, oldValue, newValue) {
-    if (this.name == name) {
-      this.property('value', this.property('value'), true, true);
+    if (this.name === name) {
+      this.property('value', newValue, true, true);
     };
   },
 
