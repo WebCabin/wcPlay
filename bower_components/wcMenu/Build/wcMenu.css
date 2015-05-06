@@ -4,7 +4,6 @@
   left: 0px;
   right: 0px;
   height: 48px;
-  /*border-bottom: 2px solid black;*/
 }
 
 .wcMenuVersionTag {
@@ -33,7 +32,6 @@ ul.wcMenu {
 
 /* Menu category */
 .wcMenuCategory {
-  position: relative;
   padding-top: 5px;
   padding-left: 5px;
   padding-right: 10px;
@@ -45,7 +43,7 @@ ul.wcMenu {
 }
 
 /* Menu category drop down */
-.wcMenuCategory > ul {
+.wcMenuCategoryDropdown {
   position: absolute;
   top: 20px;
   left: 0px;
@@ -134,17 +132,18 @@ ul.wcMenu span {
   top: 22px;
   left: 2px;
   right: 0px;
-  height: 30px;
+  height: 25px;
   margin: 0;
   padding: 0;
   font-size: 13px;
   border-top: 2px solid lightgray;
+  overflow-y: hidden;
 }
 
 .wcMenuToolbar div {
   float: left;
   width: 20px;
-  height: 20px;
+  height: 25px;
   margin: 0px;
   margin-right: 5px;
   padding: 0px;

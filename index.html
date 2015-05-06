@@ -13,7 +13,10 @@
     <link rel="stylesheet" type="text/css" href="Build/wcPlayEditor.min.css"/>
   </head>
   <body style="background-color:white;">
-    <div class="playContainer" style="position:absolute;left:0px;right:0px;top:0px;bottom:0px;border:3px solid black"></div>
+    <div class="playContainer" style="position:absolute;left:0px;right:25%;top:0px;bottom:0px;border:3px solid black;"></div>
+    <div class="gameContainer" style="position:absolute;left:75%;right:0px;top:0px;bottom:0px;border:3px solid black;background-color:lightgray;overflow:hidden;">
+        <div class="game" style="background-color:black;"></div>
+    </div>
 
     <!-- External modules -->
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
@@ -21,14 +24,20 @@
     <script src="bower_components/wcUndoManager/wcUndoManager.js"></script>
     <script src="bower_components/wcMenu/Build/wcMenu.min.js"></script>
 
+    <!-- External Demonstration Modules -->
+    <script src="bower_components/crafty/dist/crafty-min.js"></script>
+
     <!-- Core Modules -->
     <script src="Build/wcPlay.min.js"></script>
-    <script src="Build/wcPlayNodes.min.js"></script>
     <script src="Build/wcPlayEditor.min.js"></script>
 
     <!-- Demo specific files -->
+    <script src="Demo/demo.js"></script>
+    <script src="Demo/nodes.js"></script>
+
+    <!-- Core Nodes -->
+    <script src="Build/wcPlayNodes.min.js"></script>
     <script src="Build/wcPlayExampleNodes.js"></script>
-    <script src="demo.js"></script>
 
     <!-- Piwik Analytics -->
     <script type="text/javascript">

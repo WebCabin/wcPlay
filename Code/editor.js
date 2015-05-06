@@ -511,10 +511,9 @@ wcPlayEditor.prototype = {
     var elapsed = (timestamp - this._lastUpdate) / 1000;
     this._lastUpdate = timestamp;
 
-    this._menu.update();
-
     this.onResized();
 
+    this._menu.update();
     if (this._parent) {
 
       // Render the palette.
@@ -1248,9 +1247,6 @@ wcPlayEditor.prototype = {
       icon: "fa fa-crosshairs fa-lg",
       toolbarIndex: -1,
       description: "Center view on selected node(s).",
-      condition: function(editor) {
-        return editor._selectedNodes.length > 0;
-      },
       onActivated: function(editor) {
         if (editor._selectedNodes.length) {
           editor.focus(editor._selectedNodes);
@@ -1267,17 +1263,15 @@ wcPlayEditor.prototype = {
       toolbarIndex: -1,
       description: "Step out of this Composite Node.",
       condition: function(editor) {
-        return !editor._parent instanceof wcPlay;
+        return editor._parent instanceof wcNodeCompositeScript;
       },
       onActivated: function(editor) {
-        if (editor._parent instanceof wcNodeCompositeScript) {
-          var focusNode = editor._parent;
-          editor._parent = editor._parent._parent;
+        var focusNode = editor._parent;
+        editor._parent = editor._parent._parent;
 
-          editor._selectedNode = focusNode;
-          editor._selectedNodes = [focusNode];
-          editor.focus(editor._selectedNodes);
-        }
+        editor._selectedNode = focusNode;
+        editor._selectedNodes = [focusNode];
+        editor.focus(editor._selectedNodes);
       }
     });
 
@@ -1288,16 +1282,14 @@ wcPlayEditor.prototype = {
       toolbarIndex: -1,
       description: "Step in to this Composite Node.",
       condition: function(editor) {
-        return !editor._parent instanceof wcPlay;
+        return (editor._selectedNodes.length === 1 && editor._selectedNodes[0] instanceof wcNodeCompositeScript);
       },
       onActivated: function(editor) {
-        if (editor._selectedNodes.length && editor._selectedNodes[0] instanceof wcNodeCompositeScript) {
-          editor._parent = editor._selectedNodes[0];
-          editor._selectedNode = null;
-          editor._selectedNodes = [];
+        editor._parent = editor._selectedNodes[0];
+        editor._selectedNode = null;
+        editor._selectedNodes = [];
 
-          editor.center();
-        }
+        editor.center();
       }
     });
 
@@ -1360,9 +1352,9 @@ wcPlayEditor.prototype = {
     this._menu.addOption('Debugging', 'Toggle Silence Mode', {
       icon: function(editor) {
         if (editor._engine && editor._engine.silent()) {
-          return "fa fa-volume-up fa-lg";
-        } else {
           return "fa fa-volume-off fa-lg";
+        } else {
+          return "fa fa-volume-up fa-lg";
         }
       },
       toolbarIndex: -1,
@@ -1379,6 +1371,7 @@ wcPlayEditor.prototype = {
 
     // Debugging -> Restart Script
     this._menu.addOption('Debugging', 'Restart Script', {
+      hotkeys: "Shift+Enter",
       icon: "fa fa-play-circle fa-lg",
       toolbarIndex: -1,
       description: "Runs or restarts the script.",

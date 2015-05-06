@@ -19,6 +19,7 @@ function wcPlay(options) {
   this._importedScripts = [];
 
   this._updateID = 0;
+  this._isRunning = false;
   this._isPaused = false;
   this._isPausing = false;
   this._isStepping = false;
@@ -34,6 +35,13 @@ function wcPlay(options) {
   };
   for (var prop in options) {
     this._options[prop] = options[prop];
+  }
+
+  if (!this._updateId) {
+    var self = this;
+    this._updateID = setInterval(function() {
+      self.update();
+    }, this._options.updateRate);
   }
 };
 
@@ -108,18 +116,20 @@ wcPlay.prototype = {
    */
   start: function() {
     this.reset();
+    this._isRunning = true;
     this._isPaused = false;
     this._isPausing = false;
     this._isStepping = false;
 
-    if (!this._updateId) {
-      var self = this;
-      this._updateID = setInterval(function() {
-        self.update();
-      }, this._options.updateRate);
-    }
-
     this.__notifyNodes('onStart', []);
+  },
+
+  /**
+   * Stops the script.
+   * @function wcPlay#stop
+   */
+  stop: function() {
+    this._isRunning = false;
   },
 
   /**
@@ -327,7 +337,7 @@ wcPlay.prototype = {
     }
 
     var count = Math.min(this._queuedProperties.length, this._options.updateLimit);
-    if (!count && this._waitingChain.length) {
+    if (this._isRunning && !count && this._waitingChain.length) {
       // If no properties are queued, but we have waiting flow nodes, add them to the queue for next update.
       for (var i = 0; i < this._waitingChain.length; ++i) {
         var item = this._waitingChain[i];
@@ -352,7 +362,7 @@ wcPlay.prototype = {
     }
 
     // Update a queued node entry only if there are no more properties to update.
-    if (!count) {
+    if (this._isRunning && !count) {
       count = Math.min(this._queuedChain.length, this._options.updateLimit - count);
       index = count;
       while (index) {
@@ -684,12 +694,13 @@ wcPlay.prototype = {
   /**
    * Triggers an event into the Play script.
    * @function wcPlay#triggerEvent
-   * @param {String} name - The event name to trigger (more specifically, the name of the wcNodeEntry).
+   * @param {String} type - The type name of the node (as displayed in the title).
+   * @param {String} name - The event name to trigger (as displayed in the title between the parenthesis).
    * @param {Object} data - Any data object that will be passed into the entry node.
    */
-  triggerEvent: function(name, data) {
+  triggerEvent: function(type, name, data) {
     for (var i = 0; i < this._entryNodes.length; ++i) {
-      if (this._entryNodes[i].name === name) {
+      if (this._entryNodes[i].type === type && this._entryNodes[i].name === name) {
         this._entryNodes[i].onActivated(data);
       }
     }

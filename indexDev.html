@@ -14,13 +14,19 @@
 
   </head>
   <body style="background-color:white;">
-    <div class="playContainer" style="position:absolute;left:0px;right:0px;top:0px;bottom:0px;border:3px solid black"></div>
+    <div class="playContainer" style="position:absolute;left:0px;right:25%;top:0px;bottom:0px;border:3px solid black;"></div>
+    <div class="gameContainer" style="position:absolute;left:75%;right:0px;top:0px;bottom:0px;border:3px solid black;background-color:lightgray;overflow:hidden;">
+        <div class="game" style="background-color:black;"></div>
+    </div>
     
     <!-- External Modules -->
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <script src="bower_components/FileSaver/FileSaver.min.js"></script>
     <script src="bower_components/wcUndoManager/wcUndoManager.js"></script>
     <script src="bower_components/wcMenu/Build/wcMenu.min.js"></script>
+
+    <!-- External Demonstration Modules -->
+    <script src="bower_components/crafty/dist/crafty-min.js"></script>
 
     <!-- Core Modules -->
     <script src="Code/class.js"></script>
@@ -35,6 +41,10 @@
     <script src="Code/nodes/composite/compositeentry.js"></script>
     <script src="Code/nodes/composite/compositeexit.js"></script>
     <script src="Code/nodes/composite/compositeproperty.js"></script>
+
+    <!-- Demo Specific Files -->
+    <script src="Demo/demo.js"></script>
+    <script src="Demo/nodes.js"></script>
 
     <!-- Generic Nodes -->
     <script src="Code/nodes/entry/start.js"></script>
@@ -56,8 +66,5 @@
     <script src="Code/nodes/example/exampleviewport.js"></script>
     <script src="Code/nodes/example/exampleproperties.js"></script>
     <script src="Code/nodes/example/exampledynamic.js"></script>
-
-    <!-- Demo Specific Files -->
-    <script src="demo.js"></script>
   </body>
 </html>
