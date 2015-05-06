@@ -150,7 +150,7 @@
     if (name === 'value') {
       if (this.name) {
         var engine = this.engine();
-        return (engine &amp;&amp; engine.property(this.name)) || 0;
+        return (engine &amp;&amp; engine.property(this.name));
       }
     }
   },
@@ -190,7 +190,7 @@
     if (name === 'value') {
       if (this.name) {
         var engine = this.engine();
-        return (engine &amp;&amp; engine.initialProperty(this.name)) || 0;
+        return (engine &amp;&amp; engine.initialProperty(this.name));
       }
     }
   },
@@ -206,8 +206,8 @@
    * @param {Object} newValue - The new value of the global property.
    */
   onGlobalPropertyChanged: function(name, oldValue, newValue) {
-    if (this.name == name) {
-      this.property('value', this.property('value'), true, true);
+    if (this.name === name) {
+      this.property('value', newValue, true, true);
     };
   },
 
