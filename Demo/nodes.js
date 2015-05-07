@@ -16,7 +16,7 @@ wcNodeProcess.extend('wcNodeProcessGameMove', 'Move', 'Hero', {
 
     this.setTimeout(function() {
       this.activateExit('out');
-    }, 100);
+    }, 50);
   },
 });
 
