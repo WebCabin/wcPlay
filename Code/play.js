@@ -722,7 +722,7 @@ wcPlay.prototype = {
           node: node,
           name: name,
           fromNode: fromNode,
-          fromName: fromName,
+          fromName: fromName
         });
       }
       return;
@@ -731,7 +731,7 @@ wcPlay.prototype = {
     if (node.enabled()) {
       this._queuedChain.push({
         node: node,
-        name: name,
+        name: name
       });
 
       if (node.debugBreak() || this._isStepping) {

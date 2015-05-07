@@ -795,7 +795,7 @@ wcPlay.prototype = {
           node: node,
           name: name,
           fromNode: fromNode,
-          fromName: fromName,
+          fromName: fromName
         });
       }
       return;
@@ -804,7 +804,7 @@ wcPlay.prototype = {
     if (node.enabled()) {
       this._queuedChain.push({
         node: node,
-        name: name,
+        name: name
       });
 
       if (node.debugBreak() || this._isStepping) {
@@ -2272,10 +2272,10 @@ Class.extend('wcNode', 'Node', '', {
    */
   activateEntry: function(name, fromNode, fromName) {
     for (var i = 0; i < this.chain.entry.length; ++i) {
-      if (this.chain.entry[i].name == name) {
+      if (this.chain.entry[i].name === name) {
         // Always queue the trigger so execution is not immediate.
         var engine = this.engine();
-        engine && engine.queueNodeEntry(this, this.chain.entry[i].name, fromNode, fromName);
+        engine && engine.queueNodeEntry(this, this.chain.entry[i].name, fromNode, fromName, false);
         return true;
       }
     }
@@ -2293,19 +2293,28 @@ Class.extend('wcNode', 'Node', '', {
     if (!this.enabled()) {
       return false;
     }
+
     if (this.debugLog()) {
       console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" Triggered Exit link "' + name + '"');
     }
 
     for (var i = 0; i < this.chain.exit.length; ++i) {
       var exitLink = this.chain.exit[i];
-      if (exitLink.name == name) {
+      if (exitLink.name === name) {
         // Activate all entry links chained to this exit.
+        var queued = false;
         var engine = this.engine();
         for (var a = 0; a < exitLink.links.length; ++a) {
           if (exitLink.links[a].node) {
+            queued = true;
             exitLink.links[a].node.activateEntry(exitLink.links[a].name, this, name);
           }
+        }
+
+        // If we did not queue another node to activate, we should manually flash this link.
+        if (!queued) {
+          this.chain.exit[i].meta.flash = true;
+          this._meta.flash = true;
         }
         return true;
       }
