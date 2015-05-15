@@ -12,10 +12,10 @@ wcPlay (Web Cabin Play) is a node based visual scripting tool for the web! Allow
 
 You can design your own scripting nodes for the user to use and even provide a server backend for user login and ajax nodes.
 
-### [https://play.webcabin.org](https://play.webcabin.org) ###
+### [http://play.webcabin.org](http://play.webcabin.org) ###
   * Try the front page demo.
 
-### [https://play.api.webcabin.org](https://play.api.webcabin.org) ###
+### [http://play.api.webcabin.org](http://play.api.webcabin.org) ###
   * View the API documentation.
 
 
@@ -32,7 +32,7 @@ You can design your own scripting nodes for the user to use and even provide a s
 
 ****
 ### Getting Started ###
-See the [Getting Started](https://play.api.webcabin.org/tutorial-1.0.html) tutorial.
+See the [Getting Started](http://play.api.webcabin.org/tutorial-1.0.html) tutorial.
 
 
 ****

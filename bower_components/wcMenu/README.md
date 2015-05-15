@@ -10,16 +10,16 @@ Here at Web Cabin, we sincerely believe that anyone with the proper tools can be
 
 wcMenu (Web Cabin Menu) is a light weight file and toolbar menu system. It is designed to be extremely simple, yet powerful.
 
-### [https://menu.webcabin.org](https://menu.webcabin.org) ###
+### [http://menu.webcabin.org](http://menu.webcabin.org) ###
   * Try the front page demo.
 
-### [https://menu.api.webcabin.org](https://menu.api.webcabin.org) ###
+### [http://menu.api.webcabin.org](http://menu.api.webcabin.org) ###
   * View the API documentation.
 
 
 ****
 ### Getting Started ###
-See the [Getting Started](https://menu.api.webcabin.org/tutorial-1.0.html) tutorial.
+See the [Getting Started](http://menu.api.webcabin.org/tutorial-1.0.html) tutorial.
 
 
 ****

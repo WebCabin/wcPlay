@@ -158,6 +158,9 @@ function wcPlayEditor(container, options) {
   this._viewportMoving = false;
   this._viewportMoved = false;
   this._paletteMoving = false;
+  this._autoScrollDirection = {x: 0, y: 0};
+  this._autoScrollInterval = 0;
+  this._autoScrollNodes = false;
 
   this._mouse = {x: 0, y: 0};
   this._mouseInViewport = false;
@@ -1556,7 +1559,7 @@ wcPlayEditor.prototype = {
       icon: "fa fa-file-pdf-o fa-lg",
       description: "Open the documentation for wcPlay in another window.",
       onActivated: function(editor) {
-        window.open('https://play.api.webcabin.org/', '_blank');
+        window.open('http://play.api.webcabin.org/', '_blank');
       }
     });
 
@@ -3562,6 +3565,79 @@ wcPlayEditor.prototype = {
   },
 
   /**
+   * Handles auto scrolling based on mouse position.
+   * @function wcPlayEditor#__handleAutoScroll
+   * @param {Boolean} active - Whether the auto scroll is active.
+   * @param {Boolean} movingNodes - If true, the auto scroll will also move selected nodes.
+   */
+  __handleAutoScroll: function(active, movingNodes) {
+    var shouldBeActive = false;
+
+    var width = this.$viewport.width();
+    var height = this.$viewport.height();
+    var THRESHOLD = Math.min(50, width/2, height/2);
+    this._autoScrollNodes = movingNodes;
+
+    if (active) {
+      if (this._mouse.x >= width - THRESHOLD) {
+        shouldBeActive = true;
+        this._autoScrollDirection.x = this._mouse.x - width + THRESHOLD;
+        this._autoScrollDirection.y = 0;
+      } else if (this._mouse.x &lt;= THRESHOLD) {
+        shouldBeActive = true;
+        this._autoScrollDirection.x = this._mouse.x - THRESHOLD;
+        this._autoScrollDirection.y = 0;
+      }
+
+      if (this._mouse.y >= height - THRESHOLD) {
+        shouldBeActive = true;
+        this._autoScrollDirection.x = 0;
+        this._autoScrollDirection.y = this._mouse.y - height + THRESHOLD;
+      } else if (this._mouse.y &lt;= THRESHOLD) {
+        shouldBeActive = true;
+        this._autoScrollDirection.x = 0;
+        this._autoScrollDirection.y = this._mouse.y - THRESHOLD;
+      }
+    }
+
+    if (shouldBeActive &amp;&amp; !this._autoScrollInterval) {
+      var self = this;
+      this._autoScrollInterval = setInterval(function() {
+        var moveX = self._autoScrollDirection.x;
+        var moveY = self._autoScrollDirection.y;
+
+        self._viewportCamera.x -= moveX;
+        self._viewportCamera.y -= moveY;
+
+        if (self._autoScrollNodes) {
+          for (var i = 0; i &lt; self._selectedNodes.length; ++i) {
+            var node = self._selectedNodes[i];
+            var oldPos = {
+              x: node.pos.x,
+              y: node.pos.y,
+            };
+            var newPos = {
+              x: node.pos.x + (moveX / self._viewportCamera.z),
+              y: node.pos.y + (moveY / self._viewportCamera.z),
+            };
+
+            var newPos = node.onMoving(oldPos, newPos) || newPos;
+
+            if (oldPos.x !== newPos.x || oldPos.y !== newPos.y) {
+              node.pos.x = newPos.x;
+              node.pos.y = newPos.y;
+              node.onMoved(oldPos, newPos);
+            }
+          }
+        }
+      }, 10);
+    } else if (this._autoScrollInterval &amp;&amp; !shouldBeActive) {
+      clearInterval(this._autoScrollInterval);
+      this._autoScrollInterval = 0;
+    }
+  },
+
+  /**
    * Initializes user control.
    * @funciton wcPlayEditor#__setupControls
    * @private
@@ -3586,62 +3662,6 @@ wcPlayEditor.prototype = {
     this.$viewport.on('click',      function(event){self.__onViewportMouseClick(event, this);});
     this.$viewport.on('dblclick',   function(event){self.__onViewportMouseDoubleClick(event, this);});
     this.$viewport.on('mousewheel DOMMouseScroll', function(event) {self.__onViewportMouseWheel(event, this);});
-  },
-
-  /**
-   * Mouse over an menu option on the top bar to open it.
-   * @function wcPlayEditor#__onMenuMouseEnter
-   * @private
-   * @param {Object} event - The mouse event.
-   */
-  __onMenuMouseEnter: function(event) {
-    var $self = $(this);
-    setTimeout(function() {
-      if ($self.is(':hover')) {
-        $self.addClass('wcPlayEditorMenuOpen').addClass('wcMenuItemHover');
-      }
-    }, 100);
-  },
-
-  /**
-   * Clicking a menu item will also hide that menu.
-   * @function wcPlayEditor#__onMenuClicked
-   * @private
-   * @param {Object} event - The mouse event.
-   */
-  __onMenuClicked: function() {
-    // Clicking a menu item will also hide that menu.
-    $('ul.wcPlayEditorMenu li ul').css('display', 'none');
-    setTimeout(function() {
-      $('ul.wcPlayEditorMenu li ul').css('display', '');
-    }, 200);
-  },
-
-  /**
-   * Leaving the popup menu will hide it.
-   * @function wcPlayEditor#__onMenuMouseLeave
-   * @private
-   * @param {Object} event - The mouse event.
-   */
-  __onMenuMouseLeave: function(event) {
-    if ($(this).find(event.toElement).length === 0) {
-      $(this).removeClass('wcPlayEditorMenuOpen').removeClass('wcMenuItemHover');
-    }
-  },
-
-  /**
-   * Moving your mouse cursor away from the drop down menu will also hide it.
-   * @function wcPlayEditor#__onSubMenuMouseLeave
-   * @private
-   * @param {Object} event - The mouse event.
-   */
-  __onSubMenuMouseLeave: function(event) {
-    // Make sure that we are actually leaving the menu
-    // and not just jumping to another item in the menu
-    var $parent = $(this).parent();
-    if ($parent.find(event.toElement).length === 0) {
-      $parent.removeClass('wcPlayEditorMenuOpen').removeClass('wcMenuItemHover');
-    }
   },
 
   /**
@@ -3849,6 +3869,7 @@ wcPlayEditor.prototype = {
 
       this._draggingNodeData.$canvas.css('left', pos.x).css('top', pos.y);
       this._mouse = mouse;
+      this.__handleAutoScroll(true);
       return;
     }
 
@@ -3868,7 +3889,6 @@ wcPlayEditor.prototype = {
         this._highlightRect.height *= -1;
       }
 
-
       this._selectedNodes = [];
       var self = this;
       function __nodesInRect(nodes) {
@@ -3883,6 +3903,7 @@ wcPlayEditor.prototype = {
       __nodesInRect(this._parent._processNodes);
       __nodesInRect(this._parent._entryNodes);
       this._mouse = mouse;
+      this.__handleAutoScroll(true);
       return;
     }
 
@@ -3897,6 +3918,7 @@ wcPlayEditor.prototype = {
         this._viewportMoved = true;
         this.$viewport.addClass('wcMoving');
       }
+      this.__handleAutoScroll(false);
       return;
     }
 
@@ -3925,6 +3947,7 @@ wcPlayEditor.prototype = {
         }
       }
       this._mouse = mouse;
+      this.__handleAutoScroll(true, true);
       return;
     }
 
@@ -3941,6 +3964,8 @@ wcPlayEditor.prototype = {
     this._highlightOutputLink = false;
     this._highlightPropertyValue = false;
     this._highlightPropertyInitialValue = false;
+
+    this.__handleAutoScroll(this._selectedEntryLink || this._selectedExitLink || this._selectedInputLink || this._selectedOutputLink);
 
     var wasOverViewport = this._highlightViewport;
     this._highlightViewport = false;
