@@ -400,7 +400,7 @@
 
             
 
-            <td class="description last">The name to display for the option.</td>
+            <td class="description last">The name for the option.</td>
         </tr>
 
 	
@@ -516,7 +516,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="addSpacer"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>addSpacer</b>(categoryName, index)</toc>
+    <h4 class="name" id="addSpacer"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>addSpacer</b>(categoryName, name)</toc>
         
         >
         
@@ -591,7 +591,7 @@
 
         <tr>
             
-                <td class="name"><code>index</code></td>
+                <td class="name"><code>name</code></td>
             
 
             <td class="type">
@@ -607,7 +607,1798 @@
 
             
 
-            <td class="description last">The insertion index to place the spacer, use -1 to append to end. This spacer will go after the menu item found at that index, other spacers do not count as an index.</td>
+            <td class="description last">The name of the menu option, the spacer is inserted after.</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+    
+<h5>Returns: 
+<span class="param-type">Boolean</span>
+
+</h5>
+    
+            <p class="param-desc" style="margin-left: 20px;">
+    
+		 Success or failure.
+	</p>
+
+        
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="menu.js.html">menu.js</a>,
+     <a href="menu.js.html#sunlight-1-line-357">line 357</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="menu.js.html">menu.js</a>,
+				 <a href="menu.js.html#sunlight-1-line-357">line 357</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="addToolbarSpacer"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>addToolbarSpacer</b>(categoryName, name)</toc>
+        
+        >
+        
+        <i><small>
+<span class="param-type">Boolean</span>
+
+</small></i>
+        
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p style="margin-left: 20px;">Adds a spacer to the toolbar.</p>
+    </div>
+    
+
+    
+
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>categoryName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The top level category to place this spacer in the menu.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The name of the toolbar option, the spacer is inserted after.</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+    
+<h5>Returns: 
+<span class="param-type">Boolean</span>
+
+</h5>
+    
+            <p class="param-desc" style="margin-left: 20px;">
+    
+		 Success or failure.
+	</p>
+
+        
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="menu.js.html">menu.js</a>,
+     <a href="menu.js.html#sunlight-1-line-442">line 442</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="menu.js.html">menu.js</a>,
+				 <a href="menu.js.html#sunlight-1-line-442">line 442</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="optionCondition"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>optionCondition</b>(categoryName, name, <span class="optional">description</span>)</toc>
+        
+        >
+        
+        <i><small>
+<span class="param-type">Boolean</span>
+
+</small></i>
+        
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p style="margin-left: 20px;">Replaces the description for an existing option.</p>
+    </div>
+    
+
+    
+
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>categoryName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The top level category of the option.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The name of the option.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>description</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+|
+
+<span class="param-type"><a href="wcMenu.html#~MenuDescriptionFunc">wcMenu~MenuDescriptionFunc</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The description to show as a tooltip for this option.</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+    
+<h5>Returns: 
+<span class="param-type">Boolean</span>
+
+</h5>
+    
+            <p class="param-desc" style="margin-left: 20px;">
+    
+		 Success or failure.
+	</p>
+
+        
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="menu.js.html">menu.js</a>,
+     <a href="menu.js.html#sunlight-1-line-675">line 675</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="menu.js.html">menu.js</a>,
+				 <a href="menu.js.html#sunlight-1-line-675">line 675</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="optionCondition"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>optionCondition</b>(categoryName, name, <span class="optional">condition</span>)</toc>
+        
+        >
+        
+        <i><small>
+<span class="param-type">Boolean</span>
+
+</small></i>
+        
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p style="margin-left: 20px;">Replaces the condition for an existing option.</p>
+    </div>
+    
+
+    
+
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>categoryName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The top level category of the option.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The name of the option.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>condition</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">A function to call during the update to determine if the menu option should be enabled or disabled. Return false to disable the option.</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+    
+<h5>Returns: 
+<span class="param-type">Boolean</span>
+
+</h5>
+    
+            <p class="param-desc" style="margin-left: 20px;">
+    
+		 Success or failure.
+	</p>
+
+        
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="menu.js.html">menu.js</a>,
+     <a href="menu.js.html#sunlight-1-line-820">line 820</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="menu.js.html">menu.js</a>,
+				 <a href="menu.js.html#sunlight-1-line-820">line 820</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="optionDisplay"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>optionDisplay</b>(categoryName, name, <span class="optional">display</span>)</toc>
+        
+        >
+        
+        <i><small>
+<span class="param-type">Boolean</span>
+
+</small></i>
+        
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p style="margin-left: 20px;">Replaces the display for an existing option.</p>
+    </div>
+    
+
+    
+
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>categoryName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The top level category of the option.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The name of the option.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>display</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="wcMenu.html#~MenuDisplayFunc">wcMenu~MenuDisplayFunc</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">A function that returns the display text that should be shown on the menu option item. If not supplied, the default menu name will be applied.</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+    
+<h5>Returns: 
+<span class="param-type">Boolean</span>
+
+</h5>
+    
+            <p class="param-desc" style="margin-left: 20px;">
+    
+		 Success or failure.
+	</p>
+
+        
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="menu.js.html">menu.js</a>,
+     <a href="menu.js.html#sunlight-1-line-575">line 575</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="menu.js.html">menu.js</a>,
+				 <a href="menu.js.html#sunlight-1-line-575">line 575</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="optionHotkeys"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>optionHotkeys</b>(categoryName, name)</toc>
+        
+        >
+        
+        <i><small>
+<span class="param-type">Boolean</span>
+
+</small></i>
+        
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p style="margin-left: 20px;">Replaces the hotkeys for an existing option.</p>
+    </div>
+    
+
+    
+
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>categoryName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The top level category of the option.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The name of the option.</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+    
+<h5>Returns: 
+<span class="param-type">Boolean</span>
+
+</h5>
+    
+            <p class="param-desc" style="margin-left: 20px;">
+    
+		 Success or failure.
+	</p>
+
+        
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
+	
+
+	<h5 class="subsection-title">Properties:</h5>
+
+	<dl>
+
+<div class="prop-container">
+<table class="props table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>hotkeys</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">A string that describes hotkeys for your control, the format is 'Ctrl+Z' or 'Alt+Shift+L,Shift+L' for multiple.</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+</div></dl>
+
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="menu.js.html">menu.js</a>,
+     <a href="menu.js.html#sunlight-1-line-729">line 729</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="menu.js.html">menu.js</a>,
+				 <a href="menu.js.html#sunlight-1-line-729">line 729</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="optionIcon"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>optionIcon</b>(categoryName, name, <span class="optional">icon</span>)</toc>
+        
+        >
+        
+        <i><small>
+<span class="param-type">Boolean</span>
+
+</small></i>
+        
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p style="margin-left: 20px;">Replaces the icon for an existing option.</p>
+    </div>
+    
+
+    
+
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>categoryName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The top level category of the option.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The name of the option.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>icon</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+|
+
+<span class="param-type"><a href="wcMenu.html#~MenuIconFunc">wcMenu~MenuIconFunc</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">A classname to apply as an icon for the option.  If this is a function, it will be called during the update call and should return the icon class.</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+    
+<h5>Returns: 
+<span class="param-type">Boolean</span>
+
+</h5>
+    
+            <p class="param-desc" style="margin-left: 20px;">
+    
+		 Success or failure.
+	</p>
+
+        
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="menu.js.html">menu.js</a>,
+     <a href="menu.js.html#sunlight-1-line-622">line 622</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="menu.js.html">menu.js</a>,
+				 <a href="menu.js.html#sunlight-1-line-622">line 622</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="optionOnActivated"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>optionOnActivated</b>(categoryName, name, onActivated)</toc>
+        
+        >
+        
+        <i><small>
+<span class="param-type">Boolean</span>
+
+</small></i>
+        
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p style="margin-left: 20px;">Replaces the activation handler for an existing option.</p>
+    </div>
+    
+
+    
+
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>categoryName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The top level category of the option.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The name of the option.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>onActivated</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="wcMenu.html#~OnActivation">wcMenu~OnActivation</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">A handler to call when the option is activated.</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+    
+<h5>Returns: 
+<span class="param-type">Boolean</span>
+
+</h5>
+    
+            <p class="param-desc" style="margin-left: 20px;">
+    
+		 Success or failure.
+	</p>
+
+        
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="menu.js.html">menu.js</a>,
+     <a href="menu.js.html#sunlight-1-line-529">line 529</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="menu.js.html">menu.js</a>,
+				 <a href="menu.js.html#sunlight-1-line-529">line 529</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="removeOption"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>removeOption</b>(categoryName, name, options)</toc>
+        
+        >
+        
+        <i><small>
+<span class="param-type">Boolean</span>
+
+</small></i>
+        
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p style="margin-left: 20px;">Removes an existing file menu and/or toolbar option.</p>
+    </div>
+    
+
+    
+
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>categoryName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The top level category to place this option in the menu.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The name to display for the option.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="wcMenu.html#~MenuOptions">wcMenu~MenuOptions</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Custom options for the menu item.</td>
         </tr>
 
 	
@@ -700,7 +2491,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="addToolbarSpacer"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>addToolbarSpacer</b>(categoryName, index)</toc>
+    <h4 class="name" id="removeSpacer"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>removeSpacer</b>(categoryName, name)</toc>
         
         >
         
@@ -717,7 +2508,7 @@
     
     
     <div class="description">
-        <p style="margin-left: 20px;">Adds a spacer to the toolbar.</p>
+        <p style="margin-left: 20px;">Removes an existing spacer from the menu list.</p>
     </div>
     
 
@@ -768,14 +2559,14 @@
 
             
 
-            <td class="description last">The top level category to place this spacer in the menu.</td>
+            <td class="description last">The top level category where this spacer can be found.</td>
         </tr>
 
 	
 
         <tr>
             
-                <td class="name"><code>index</code></td>
+                <td class="name"><code>name</code></td>
             
 
             <td class="type">
@@ -791,7 +2582,7 @@
 
             
 
-            <td class="description last">The insertion index to place the spacer, use -1 to append to end. This spacer will go after the toolbar button of the corresponding menu option, other spacers do not count as an index.</td>
+            <td class="description last">The name of the menu option to remove the spacer from.</td>
         </tr>
 
 	
@@ -859,13 +2650,197 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="menu.js.html">menu.js</a>,
-     <a href="menu.js.html#sunlight-1-line-335">line 335</a>
+     <a href="menu.js.html#sunlight-1-line-399">line 399</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="menu.js.html">menu.js</a>,
-				 <a href="menu.js.html#sunlight-1-line-335">line 335</a>
+				 <a href="menu.js.html#sunlight-1-line-399">line 399</a>
+			</li>
+		</ul>
+	</dd> -->
+	
+
+	
+
+	
+
+	
+</dl>
+
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="removeToolbarSpacer"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>removeToolbarSpacer</b>(categoryName, name)</toc>
+        
+        >
+        
+        <i><small>
+<span class="param-type">Boolean</span>
+
+</small></i>
+        
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p style="margin-left: 20px;">Removes an existing spacer from the toolbar.</p>
+    </div>
+    
+
+    
+
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>categoryName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The top level category where this spacer can be found.</td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The name of the toolbar option to remove the spacer from.</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+    
+<h5>Returns: 
+<span class="param-type">Boolean</span>
+
+</h5>
+    
+            <p class="param-desc" style="margin-left: 20px;">
+    
+		 Success or failure.
+	</p>
+
+        
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:
+    <a href="menu.js.html">menu.js</a>,
+     <a href="menu.js.html#sunlight-1-line-486">line 486</a>
+  </dt>
+<!-- 	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="menu.js.html">menu.js</a>,
+				 <a href="menu.js.html#sunlight-1-line-486">line 486</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -1273,13 +3248,16 @@
 
         <tr>
             
-                <td class="name"><code>description|wcMenu~MenuDescriptionFunc</code></td>
+                <td class="name"><code>description</code></td>
             
 
             <td class="type">
             
                 
 <span class="param-type">String</span>
+|
+
+<span class="param-type"><a href="wcMenu.html#~MenuDescriptionFunc">wcMenu~MenuDescriptionFunc</a></span>
 
 
             
@@ -2371,7 +4349,7 @@
 		
 		<span class="jsdoc-message">
 			Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a>
-			on 2015-05-05 using the <a
+			on 2015-05-14 using the <a
 			href="https://github.com/WebCabin/docstrap">Web Cabin DocStrap template</a>.
 		</span>
 		</footer>

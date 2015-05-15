@@ -162,7 +162,7 @@ wcMenu.prototype = {
    * Adds a new file menu and/or toolbar option.
    * @function wcMenu#addOption
    * @param {String} categoryName - The top level category to place this option in the menu.
-   * @param {String} name - The name to display for the option.
+   * @param {String} name - The name for the option.
    * @param {wcMenu~MenuOptions} options - Custom options for the menu item.
    * @returns {Boolean} - Success or failure.
    */
@@ -315,7 +315,7 @@ wcMenu.prototype = {
       
       $hotkey.text(options.hotkeys);
       if (optionData.$toolbar) {
-        optionData.$toolbarSpan.attr('title', optionData.$toolbarSpan.attr('title') + ' (' + options.hotkeys + ')');
+        optionData.$toolbarSpan.attr('title', optionData.$toolbarSpan.attr('title') + (options.hotkeys? ' (' + options.hotkeys + ')': ''));
       }
     }
 
@@ -356,13 +356,70 @@ wcMenu.prototype = {
   },
 
   /**
+   * Removes an existing file menu and/or toolbar option.
+   * @function wcMenu#removeOption
+   * @param {String} categoryName - The top level category to place this option in the menu.
+   * @param {String} name - The name to display for the option.
+   * @param {wcMenu~MenuOptions} options - Custom options for the menu item.
+   * @returns {Boolean} - Success or failure.
+   */
+  removeOption: function(categoryName, name) {
+    if (!name || !categoryName) {
+      return false;
+    }
+
+    // Find the category if it exists.
+    var category = null;
+    var $category = null;
+    for (var i = 0; i &lt; this._menuOptions.length; ++i) {
+      if (this._menuOptions[i].name === categoryName) {
+        category = this._menuOptions[i];
+        break;
+      }
+    }
+
+    if (!category) {
+      return false;
+    }
+
+    var optionData = null;
+    for (var i = 0; i &lt; category.items.length; ++i) {
+      if (category.items[i].name === name) {
+        optionData = category.items[i];
+        category.items.splice(i, 1);
+        break;
+      }
+    }
+
+    if (!optionData) {
+      return false;
+    }
+
+    optionData.$item.remove();
+    optionData.$toolbar.remove();
+
+    if (optionData.$spacer) {
+      optionData.$spacer.remove();
+    }
+
+    if (optionData.$toolbarSpacer) {
+      optionData.$toolbarSpacer.remove();
+    }
+  },
+
+  /**
    * Adds a spacer to a menu list.
    * @function wcMenu#addSpacer
    * @param {String} categoryName - The top level category to place this spacer in the menu.
-   * @param {Number} index - The insertion index to place the spacer, use -1 to append to end. This spacer will go after the menu item found at that index, other spacers do not count as an index.
+   * @param {Number} name - The name of the menu option, the spacer is inserted after.
    * @returns {Boolean} - Success or failure.
    */
-  addSpacer: function(categoryName, index) {
+  addSpacer: function(categoryName, name) {
+    if (!name || !categoryName) {
+      return false;
+    }
+
+    // Find the category if it exists.
     var category = null;
     for (var i = 0; i &lt; this._menuOptions.length; ++i) {
       if (this._menuOptions[i].name === categoryName) {
@@ -375,13 +432,63 @@ wcMenu.prototype = {
       return false;
     }
 
-    if (index &lt; 0 || index >= category.items.length) {
-      index = category.items.length-1;
+    var optionData = null;
+    for (var i = 0; i &lt; category.items.length; ++i) {
+      if (category.items[i].name === name) {
+        optionData = category.items[i];
+        break;
+      }
     }
 
-    var item = category.items[index];
-    item.$spacer = $('&lt;li>&lt;hr class="wcMenuSeparator">&lt;/li>');
-    item.$spacer.insertAfter(item.$item);
+    if (!optionData) {
+      return false;
+    }
+
+    optionData.$spacer = $('&lt;li>&lt;hr class="wcMenuSeparator">&lt;/li>');
+    optionData.$spacer.insertAfter(optionData.$item);
+    return true;
+  },
+
+  /**
+   * Removes an existing spacer from the menu list.
+   * @function wcMenu#removeSpacer
+   * @param {String} categoryName - The top level category where this spacer can be found.
+   * @param {Number} name - The name of the menu option to remove the spacer from.
+   * @returns {Boolean} - Success or failure.
+   */
+  removeSpacer: function(categoryName, name) {
+    if (!name || !categoryName) {
+      return false;
+    }
+
+    // Find the category if it exists.
+    var category = null;
+    for (var i = 0; i &lt; this._menuOptions.length; ++i) {
+      if (this._menuOptions[i].name === categoryName) {
+        category = this._menuOptions[i];
+        break;
+      }
+    }
+
+    if (!category) {
+      return false;
+    }
+
+    var optionData = null;
+    for (var i = 0; i &lt; category.items.length; ++i) {
+      if (category.items[i].name === name) {
+        optionData = category.items[i];
+        break;
+      }
+    }
+
+    if (!optionData) {
+      return false;
+    }
+
+    if (optionData.$spacer) {
+      optionData.$spacer.remove();
+    }
     return true;
   },
 
@@ -389,10 +496,15 @@ wcMenu.prototype = {
    * Adds a spacer to the toolbar.
    * @function wcMenu#addToolbarSpacer
    * @param {String} categoryName - The top level category to place this spacer in the menu.
-   * @param {Number} index - The insertion index to place the spacer, use -1 to append to end. This spacer will go after the toolbar button of the corresponding menu option, other spacers do not count as an index.
+   * @param {Number} name - The name of the toolbar option, the spacer is inserted after.
    * @returns {Boolean} - Success or failure.
    */
-  addToolbarSpacer: function(categoryName, index) {
+  addToolbarSpacer: function(categoryName, name) {
+    if (!name || !categoryName) {
+      return false;
+    }
+
+    // Find the category if it exists.
     var category = null;
     for (var i = 0; i &lt; this._menuOptions.length; ++i) {
       if (this._menuOptions[i].name === categoryName) {
@@ -405,14 +517,402 @@ wcMenu.prototype = {
       return false;
     }
 
-    if (index &lt; 0 || index >= category.items.length) {
-      index = category.items.length-1;
+    var optionData = null;
+    for (var i = 0; i &lt; category.items.length; ++i) {
+      if (category.items[i].name === name) {
+        optionData = category.items[i];
+        break;
+      }
     }
 
-    var item = category.items[index];
-    if (item.$toolbar) {
-      item.$toolbarSpacer = $('&lt;div class="ARPG_Separator">&lt;/div>');
-      item.$toolbarSpacer.insertAfter(item.$toolbar);
+    if (!optionData) {
+      return false;
+    }
+
+    if (optionData.$toolbar) {
+      optionData.$toolbarSpacer = $('&lt;div class="ARPG_Separator">&lt;/div>');
+      optionData.$toolbarSpacer.insertAfter(optionData.$toolbar);
+    }
+    return true;
+  },
+
+  /**
+   * Removes an existing spacer from the toolbar.
+   * @function wcMenu#removeToolbarSpacer
+   * @param {String} categoryName - The top level category where this spacer can be found.
+   * @param {Number} name - The name of the toolbar option to remove the spacer from.
+   * @returns {Boolean} - Success or failure.
+   */
+  removeToolbarSpacer: function(categoryName, name) {
+    if (!name || !categoryName) {
+      return false;
+    }
+
+    // Find the category if it exists.
+    var category = null;
+    for (var i = 0; i &lt; this._menuOptions.length; ++i) {
+      if (this._menuOptions[i].name === categoryName) {
+        category = this._menuOptions[i];
+        break;
+      }
+    }
+
+    if (!category) {
+      return false;
+    }
+
+    var optionData = null;
+    for (var i = 0; i &lt; category.items.length; ++i) {
+      if (category.items[i].name === name) {
+        optionData = category.items[i];
+        break;
+      }
+    }
+
+    if (!optionData) {
+      return false;
+    }
+
+    if (optionData.$toolbarSpacer) {
+      optionData.$toolbarSpacer.remove();
+    }
+    return true;
+  },
+
+  /**
+   * Replaces the activation handler for an existing option.
+   * @function wcMenu#optionOnActivated
+   * @param {String} categoryName - The top level category of the option.
+   * @param {String} name - The name of the option.
+   * @param {wcMenu~OnActivation} onActivated - A handler to call when the option is activated.
+   * @returns {Boolean} - Success or failure.
+   */
+  optionOnActivated: function(categoryName, name, onActivated) {
+    if (!name || !categoryName) {
+      return false;
+    }
+
+    if (typeof onActivated !== 'function') {
+      return false;
+    }
+
+    // Find the category if it exists.
+    var category = null;
+    for (var i = 0; i &lt; this._menuOptions.length; ++i) {
+      if (this._menuOptions[i].name === categoryName) {
+        category = this._menuOptions[i];
+        break;
+      }
+    }
+
+    if (!category) {
+      return false;
+    }
+
+    var optionData = null;
+    for (var i = 0; i &lt; category.items.length; ++i) {
+      if (category.items[i].name === name) {
+        optionData = category.items[i];
+        break;
+      }
+    }
+
+    if (!optionData) {
+      return false;
+    }
+
+    optionData.click = onActivated;
+    return true;
+  },
+
+  /**
+   * Replaces the display for an existing option.
+   * @function wcMenu#optionDisplay
+   * @param {String} categoryName - The top level category of the option.
+   * @param {String} name - The name of the option.
+   * @param {wcMenu~MenuDisplayFunc} [display] - A function that returns the display text that should be shown on the menu option item. If not supplied, the default menu name will be applied.
+   * @returns {Boolean} - Success or failure.
+   */
+  optionDisplay: function(categoryName, name, display) {
+    if (!name || !categoryName) {
+      return false;
+    }
+
+    // Find the category if it exists.
+    var category = null;
+    for (var i = 0; i &lt; this._menuOptions.length; ++i) {
+      if (this._menuOptions[i].name === categoryName) {
+        category = this._menuOptions[i];
+        break;
+      }
+    }
+
+    if (!category) {
+      return false;
+    }
+
+    var optionData = null;
+    for (var i = 0; i &lt; category.items.length; ++i) {
+      if (category.items[i].name === name) {
+        optionData = category.items[i];
+        break;
+      }
+    }
+
+    if (!optionData) {
+      return false;
+    }
+
+    if (typeof display !== 'function') {
+      optionData.display = undefined;
+      delete optionData.display;
+    } else {
+      optionData.display = display;
+    }
+    return true;
+  },
+
+  /**
+   * Replaces the icon for an existing option.
+   * @function wcMenu#optionIcon
+   * @param {String} categoryName - The top level category of the option.
+   * @param {String} name - The name of the option.
+   * @param {String|wcMenu~MenuIconFunc} [icon] - A classname to apply as an icon for the option.  If this is a function, it will be called during the update call and should return the icon class.
+   * @returns {Boolean} - Success or failure.
+   */
+  optionIcon: function(categoryName, name, icon) {
+    if (!name || !categoryName) {
+      return false;
+    }
+
+    // Find the category if it exists.
+    var category = null;
+    for (var i = 0; i &lt; this._menuOptions.length; ++i) {
+      if (this._menuOptions[i].name === categoryName) {
+        category = this._menuOptions[i];
+        break;
+      }
+    }
+
+    if (!category) {
+      return false;
+    }
+
+    var optionData = null;
+    for (var i = 0; i &lt; category.items.length; ++i) {
+      if (category.items[i].name === name) {
+        optionData = category.items[i];
+        break;
+      }
+    }
+
+    if (!optionData) {
+      return false;
+    }
+
+    if (typeof icon !== 'function') {
+      optionData.icon = undefined;
+      delete optionData.icon;
+
+      if (typeof icon === 'string') {
+        optionData.$icon.removeClass().addClass('wcMenuIcon wcButton ' + icon);
+        optionData.$toolbarIcon.removeClass().addClass('wcMenuIcon wcButton ' + icon);
+      }
+    } else {
+      optionData.icon = icon;
+    }
+    return true;
+  },
+
+
+  /**
+   * Replaces the description for an existing option.
+   * @function wcMenu#optionCondition
+   * @param {String} categoryName - The top level category of the option.
+   * @param {String} name - The name of the option.
+   * @param {String|wcMenu~MenuDescriptionFunc} [description] - The description to show as a tooltip for this option.
+   * @returns {Boolean} - Success or failure.
+   */
+  optionDescription: function(categoryName, name, description) {
+    if (!name || !categoryName) {
+      return false;
+    }
+
+    // Find the category if it exists.
+    var category = null;
+    for (var i = 0; i &lt; this._menuOptions.length; ++i) {
+      if (this._menuOptions[i].name === categoryName) {
+        category = this._menuOptions[i];
+        break;
+      }
+    }
+
+    if (!category) {
+      return false;
+    }
+
+    var optionData = null;
+    for (var i = 0; i &lt; category.items.length; ++i) {
+      if (category.items[i].name === name) {
+        optionData = category.items[i];
+        break;
+      }
+    }
+
+    if (!optionData) {
+      return false;
+    }
+
+    if (typeof description !== 'function') {
+      optionData.description = undefined;
+      delete optionData.description;
+
+      if (typeof description === 'string') {
+        optionData.$itemSpan.attr('title', description);
+        if (optionData.$toolbar) {
+          optionData.$toolbarSpan.attr('title', description + (item.hotkeyString? ' (' + item.hotkeyString + ')': ''));
+        }
+      }
+    } else {
+      optionData.description = description;
+    }
+    return true;
+  },
+
+  /**
+   * Replaces the hotkeys for an existing option.
+   * @function wcMenu#optionHotkeys
+   * @param {String} categoryName - The top level category of the option.
+   * @param {String} name - The name of the option.
+   * @property {String} [hotkeys] - A string that describes hotkeys for your control, the format is 'Ctrl+Z' or 'Alt+Shift+L,Shift+L' for multiple.
+   * @returns {Boolean} - Success or failure.
+   */
+  optionHotkeys: function(categoryName, name, hotkeys) {
+    if (!name || !categoryName) {
+      return false;
+    }
+
+    // Find the category if it exists.
+    var category = null;
+    for (var i = 0; i &lt; this._menuOptions.length; ++i) {
+      if (this._menuOptions[i].name === categoryName) {
+        category = this._menuOptions[i];
+        break;
+      }
+    }
+
+    if (!category) {
+      return false;
+    }
+
+    var optionData = null;
+    for (var i = 0; i &lt; category.items.length; ++i) {
+      if (category.items[i].name === name) {
+        optionData = category.items[i];
+        break;
+      }
+    }
+
+    if (!optionData) {
+      return false;
+    }
+
+    if (typeof hotkeys === 'string') {
+      optionData.hotkeys = [];
+
+      var optionHotkeys = (hotkeys.indexOf(',') > -1? hotkeys.split(','): [hotkeys]);
+
+      for (var i = 0; i &lt; optionHotkeys.length; ++i) {
+        var hotkey = optionHotkeys[i].toLowerCase();
+        var hotkeyData = {
+          ctrlKey: false,
+          altKey: false,
+          shiftKey: false
+        };
+
+        // Modifier keys.
+        if (hotkey.indexOf('ctrl') > -1) {
+          hotkeyData.ctrlKey = true;
+        }
+        if (hotkey.indexOf('alt') > -1) {
+          hotkeyData.altKey = true;
+        }
+        if (hotkey.indexOf('shift') > -1) {
+          hotkeyData.shiftKey = true;
+        }
+
+        // Special keys.
+        if (hotkey.indexOf('del') > -1) {
+          hotkeyData.keyCode = 46;
+        } else if (hotkey.indexOf('ent') > -1 || hotkey.indexOf('ret') > -1) {
+          hotkeyData.keyCode = 13;
+        } else if (hotkey.indexOf('space') > -1 || hotkey.indexOf('spc') > -1) {
+          hotkeyData.keyCode = 32;
+        } else {
+          // Ascii character code.
+          hotkeyData.keyCode = hotkey.toUpperCase().charCodeAt(hotkey.length-1);
+        }
+
+        optionData.hotkeys.push(hotkeyData);
+      }
+
+      optionData.$hotkey.text(hotkeys);
+      if (optionData.$toolbar) {
+        var title = optionData.$toolbarSpan.attr('title');
+        if (optionData.hotkeyString) {
+          title = title.replace(' (' + optionData.hotkeyString + ')', '');
+        }
+
+        optionData.$toolbarSpan.attr('title', title + (hotkeys? ' (' + hotkeys + ')': ''));
+      }
+      optionData.hotkeyString = hotkeys;
+    }
+    return true;
+  },
+
+  /**
+   * Replaces the condition for an existing option.
+   * @function wcMenu#optionCondition
+   * @param {String} categoryName - The top level category of the option.
+   * @param {String} name - The name of the option.
+   * @param {Function} [condition] - A function to call during the update to determine if the menu option should be enabled or disabled. Return false to disable the option.
+   * @returns {Boolean} - Success or failure.
+   */
+  optionCondition: function(categoryName, name, condition) {
+    if (!name || !categoryName) {
+      return false;
+    }
+
+    // Find the category if it exists.
+    var category = null;
+    for (var i = 0; i &lt; this._menuOptions.length; ++i) {
+      if (this._menuOptions[i].name === categoryName) {
+        category = this._menuOptions[i];
+        break;
+      }
+    }
+
+    if (!category) {
+      return false;
+    }
+
+    var optionData = null;
+    for (var i = 0; i &lt; category.items.length; ++i) {
+      if (category.items[i].name === name) {
+        optionData = category.items[i];
+        break;
+      }
+    }
+
+    if (!optionData) {
+      return false;
+    }
+
+    if (typeof condition !== 'function') {
+      optionData.condition = undefined;
+      delete optionData.condition;
+    } else {
+      optionData.condition = condition;
     }
     return true;
   },
@@ -546,7 +1046,7 @@ wcMenu.prototype = {
 		
 		<span class="jsdoc-message">
 			Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a>
-			on 2015-05-05 using the <a
+			on 2015-05-14 using the <a
 			href="https://github.com/WebCabin/docstrap">Web Cabin DocStrap template</a>.
 		</span>
 		</footer>
