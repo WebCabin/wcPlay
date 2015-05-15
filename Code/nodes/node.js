@@ -377,6 +377,21 @@ Class.extend('wcNode', 'Node', '', {
   },
 
   /**
+   * Determines whether a search value matches this node.
+   * @function wcNode#search
+   * @param {String} search - The search value.
+   * @returns {Boolean}
+   */
+  search: function(search) {
+    if (this.type.toLowerCase().indexOf(search) > -1 ||
+        this.name.toLowerCase().indexOf(search) > -1) {
+      return true;
+    }
+
+    return false;
+  },
+
+  /**
    * Utility function for setting a timed event in a way that is compatible with live debugging in the editor tool.
    * @function wcNode#setTimeout
    * @param {Function} callback - A callback function to call when the time has elapsed. As an added convenience, 'this' will be the node instance.

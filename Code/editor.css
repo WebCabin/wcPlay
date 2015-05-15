@@ -13,6 +13,35 @@
   user-select: none;
 }
 
+.wcPlayEditorSearch {
+  position: absolute;
+  top: 53px;
+  right: 5px;
+}
+
+.wcPlayEditorSearch span {
+  margin-right: 5px;
+}
+
+.wcPlayEditorSearch input {
+  width: 200px;
+}
+
+.wcPlayEditorSearch i {
+  margin-left: 2px;
+  border-radius: 5px;
+  border: 2px solid white;
+}
+
+.wcPlayEditorSearch i:hover {
+  background-color: lightgray;
+  border: 2px outset lightgray;
+}
+
+.wcPlayEditorSearch i:active {
+  border: 2px inset lightgray;
+}
+
 .wcPlayEditorTop {
   position: absolute;
   top: 0px;

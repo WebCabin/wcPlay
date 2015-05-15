@@ -21,9 +21,9 @@ window.wcPlayEditorClipboard = {
  */
 function wcPlayEditor(container, options) {
   this.$container = $(container);
-  this._paletteSize = 300;
   this.$typeButton = [];
   this.$typeArea = [];
+  this._paletteSize = 300;
   this._chainStyle = 1;
   this._chainStyleMax = 1;
 
@@ -162,8 +162,11 @@ function wcPlayEditor(container, options) {
   this.$container.append(this.$top);
   this.$container.append(this.$main);
 
+  this.$search = $('<div class="wcPlayEditorSearch wcPlayHidden"><span>Search</span><input type="text"/><i class="fa fa-chevron-up wcPlayEditorSearchPrev"/><i class="fa fa-chevron-down wcPlayEditorSearchNext"/></div>');
   this.$hiddenFileLoader = $('<input type="file" id="wcPlayEditorHiddenFileLoader"/>');
   this.$hiddenFileImporter = $('<input type="file" id="wcPlayEditorHiddenFileImporter"/>');
+
+  this.$container.append(this.$search);
 
   this.onResized();
 
@@ -861,9 +864,6 @@ wcPlayEditor.prototype = {
       }
     });
 
-    this._menu.addSpacer('File', -1);
-    this._menu.addToolbarSpacer('File', -1);
-
     // File -> Import...
     this._menu.addOption('File', 'Import...', {
       icon: "fa fa-plus-square-o fa-lg",
@@ -883,8 +883,6 @@ wcPlayEditor.prototype = {
         }
       }
     });
-
-    this._menu.addToolbarSpacer('File', -1);
 
     // Edit -> Undo
     this._menu.addOption('Edit', 'Undo', {
@@ -917,9 +915,6 @@ wcPlayEditor.prototype = {
         editor._undoManager && editor._undoManager.redo();
       }
     });
-
-    this._menu.addSpacer('Edit', -1);
-    this._menu.addToolbarSpacer('Edit', -1);
 
     function __copy(editor) {
       wcPlayEditorClipboard.nodes = [];
@@ -1045,9 +1040,6 @@ wcPlayEditor.prototype = {
         }
       }
     });
-
-    this._menu.addSpacer('Edit', -1);
-    this._menu.addToolbarSpacer('Edit', -1);
 
     // Edit -> Create Composite
     this._menu.addOption('Edit', 'Create Composite', {
@@ -1239,96 +1231,6 @@ wcPlayEditor.prototype = {
       }
     });
 
-    this._menu.addToolbarSpacer('Edit', -1);
-
-    // View -> Create Composite
-    this._menu.addOption('View', 'Fit in View', {
-      hotkeys: 'F',
-      icon: "fa fa-crosshairs fa-lg",
-      toolbarIndex: -1,
-      description: "Center view on selected node(s).",
-      onActivated: function(editor) {
-        if (editor._selectedNodes.length) {
-          editor.focus(editor._selectedNodes);
-        } else {
-          editor.center();
-        }
-      }
-    });
-
-    // View -> Exit Composite
-    this._menu.addOption('View', 'Exit Composite', {
-      hotkeys: 'O',
-      icon: "fa fa-level-up fa-lg",
-      toolbarIndex: -1,
-      description: "Step out of this Composite Node.",
-      condition: function(editor) {
-        return editor._parent instanceof wcNodeCompositeScript;
-      },
-      onActivated: function(editor) {
-        var focusNode = editor._parent;
-        editor._parent = editor._parent._parent;
-
-        editor._selectedNode = focusNode;
-        editor._selectedNodes = [focusNode];
-        editor.focus(editor._selectedNodes);
-      }
-    });
-
-    // View -> Enter Composite
-    this._menu.addOption('View', 'Enter Composite', {
-      hotkeys: 'I',
-      icon: "fa fa-level-down fa-lg",
-      toolbarIndex: -1,
-      description: "Step in to this Composite Node.",
-      condition: function(editor) {
-        return (editor._selectedNodes.length === 1 && editor._selectedNodes[0] instanceof wcNodeCompositeScript);
-      },
-      onActivated: function(editor) {
-        editor._parent = editor._selectedNodes[0];
-        editor._selectedNode = null;
-        editor._selectedNodes = [];
-
-        editor.center();
-      }
-    });
-
-    this._menu.addSpacer('View', -1);
-    this._menu.addToolbarSpacer('View', -1);
-
-    // View -> Chain Style
-    this._menu.addOption('View', 'Chain Style', {
-      hotkeys: 'V',
-      icon: "fa fa-sitemap fa-lg",
-      toolbarIndex: -1,
-      description: "Toggle the visual style of the chains.",
-      onActivated: function(editor) {
-        editor._chainStyle += 1;
-        if (editor._chainStyle > editor._chainStyleMax) {
-          editor._chainStyle = 0;
-        }
-      }
-    });
-
-    this._menu.addSpacer('View', -1);
-    this._menu.addToolbarSpacer('View', -1);
-
-    // View -> Search...
-    this._menu.addOption('View', 'Search...', {
-      hotkeys: 'Ctrl+F',
-      icon: "fa fa-search fa-lg",
-      toolbarIndex: -1,
-      description: "Toggle the visual style of the chains.",
-      condition: function(editor) {
-        return false;
-      },
-      onActivated: function(editor) {
-        // TODO:
-      }
-    });
-
-    this._menu.addToolbarSpacer('View', -1);
-
     // Debugging -> Toggle Debug Mode
     this._menu.addOption('Debugging', 'Toggle Debug Mode', {
       icon: function(editor) {
@@ -1365,9 +1267,6 @@ wcPlayEditor.prototype = {
         }
       }
     });
-
-    this._menu.addSpacer('Debugging', -1);
-    this._menu.addToolbarSpacer('Debugging', -1);
 
     // Debugging -> Restart Script
     this._menu.addOption('Debugging', 'Restart Script', {
@@ -1429,6 +1328,169 @@ wcPlayEditor.prototype = {
       }
     });
 
+    // View -> Create Composite
+    this._menu.addOption('View', 'Fit in View', {
+      hotkeys: 'F',
+      icon: "fa fa-crosshairs fa-lg",
+      categoryIndex: 2,
+      toolbarIndex: -1,
+      description: "Center view on selected node(s).",
+      onActivated: function(editor) {
+        if (editor._selectedNodes.length) {
+          editor.focus(editor._selectedNodes);
+        } else {
+          editor.center();
+        }
+      }
+    });
+
+    // View -> Exit Composite
+    this._menu.addOption('View', 'Exit Composite', {
+      hotkeys: 'O',
+      icon: "fa fa-level-up fa-lg",
+      toolbarIndex: -1,
+      description: "Step out of this Composite Node.",
+      condition: function(editor) {
+        return editor._parent instanceof wcNodeCompositeScript;
+      },
+      onActivated: function(editor) {
+        var focusNode = editor._parent;
+        editor._parent = editor._parent._parent;
+
+        editor._selectedNode = focusNode;
+        editor._selectedNodes = [focusNode];
+        editor.focus(editor._selectedNodes);
+      }
+    });
+
+    // View -> Enter Composite
+    this._menu.addOption('View', 'Enter Composite', {
+      hotkeys: 'I',
+      icon: "fa fa-level-down fa-lg",
+      toolbarIndex: -1,
+      description: "Step in to this Composite Node.",
+      condition: function(editor) {
+        return (editor._selectedNodes.length === 1 && editor._selectedNodes[0] instanceof wcNodeCompositeScript);
+      },
+      onActivated: function(editor) {
+        editor._parent = editor._selectedNodes[0];
+        editor._selectedNode = null;
+        editor._selectedNodes = [];
+
+        editor.center();
+      }
+    });
+
+    // View -> Chain Style
+    this._menu.addOption('View', 'Chain Style', {
+      hotkeys: 'V',
+      icon: "fa fa-sitemap fa-lg",
+      toolbarIndex: -1,
+      description: "Toggle the visual style of the chains.",
+      onActivated: function(editor) {
+        editor._chainStyle += 1;
+        if (editor._chainStyle > editor._chainStyleMax) {
+          editor._chainStyle = 0;
+        }
+      }
+    });
+
+    var self = this;
+    var $field = this.$search.children('input');
+    var searchResults = [];
+    var searchParent = null;
+    var searchValue = '';
+    var searchIndex = 0;
+    function __searchNodes() {
+      // Search nodes and focus on them.
+      if (searchParent) {
+        searchResults = searchParent.nodesBySearch(searchValue);
+
+        if (searchResults.length > 0) {
+          self._parent = searchResults[searchIndex]._parent;
+          self.focus([searchResults[searchIndex]]);
+          self._selectedNodes = searchResults;
+        }
+      }
+    };
+
+    function __searchPrev() {
+      if (searchResults.length) {
+        searchIndex -= 1;
+        if (searchIndex < 0) {
+          searchIndex = searchResults.length-1;
+        }
+        self._parent = searchResults[searchIndex]._parent;
+        self.focus([searchResults[searchIndex]]);
+        self._selectedNodes = searchResults;
+      }
+    };
+
+    function __searchNext() {
+      if (searchResults.length) {
+        searchIndex += 1;
+        if (searchIndex >= searchResults.length) {
+          searchIndex = 0;
+        }
+        self._parent = searchResults[searchIndex]._parent;
+        self.focus([searchResults[searchIndex]]);
+        self._selectedNodes = searchResults;
+      }
+    };
+
+    this.$search.children('.wcPlayEditorSearchPrev').click(__searchPrev);
+    this.$search.children('.wcPlayEditorSearchNext').click(__searchNext);
+
+    this.$search.keydown(function(event) {
+      if (event.keyCode === 27) {
+        if (!self.$search.hasClass('wcPlayHidden')) {
+          self.$search.addClass('wcPlayHidden');
+        }
+      }
+      // Return, Down arrow, or Tab to cycle next item.
+      else if (event.keyCode === 13 || event.keyCode === 40 || event.keyCode === 9) {
+        __searchNext();
+        event.stopPropagation();
+        event.preventDefault();
+        return true;
+      }
+      // Up arrow to cycle previous item.
+      else if (event.keyCode === 38) {
+        __searchPrev();
+        event.stopPropagation();
+        event.preventDefault();
+        return true;
+      }
+    });
+
+    this.$search.keyup(function(event) {
+      // Re-perform the search when the search value has changed.
+      var val = $field.val().toLowerCase();
+      if (searchValue !== val) {
+        searchIndex = 0;
+        searchParent = self._parent;
+        searchValue = val;
+        __searchNodes();
+      }
+    });
+
+    // View -> Search...
+    this._menu.addOption('View', 'Search...', {
+      hotkeys: 'Ctrl+F',
+      icon: "fa fa-search fa-lg",
+      toolbarIndex: -1,
+      description: "Toggle the visual style of the chains.",
+      onActivated: function(editor) {
+        editor.$search.removeClass('wcPlayHidden');
+        $field.focus();
+        $field.select();
+
+        if (searchResults.length) {
+          __searchNodes();
+        }
+      }
+    });
+
     // Help -> Documentation...
     this._menu.addOption('Help', 'Documentation...', {
       icon: "fa fa-file-pdf-o fa-lg",
@@ -1437,6 +1499,21 @@ wcPlayEditor.prototype = {
         window.open('https://play.api.webcabin.org/', '_blank');
       }
     });
+
+    this._menu.addSpacer('File', 'Save Script');
+    this._menu.addSpacer('Edit', 'Redo');
+    this._menu.addSpacer('Edit', 'Delete');
+    this._menu.addSpacer('View', 'Enter Composite');
+    this._menu.addSpacer('View', 'Chain Style');
+    this._menu.addSpacer('Debugging', 'Toggle Silence Mode');
+    this._menu.addToolbarSpacer('File', 'Save Script');
+    this._menu.addToolbarSpacer('Edit', 'Redo');
+    this._menu.addToolbarSpacer('Edit', 'Delete');
+    this._menu.addToolbarSpacer('Edit', 'Create Composite');
+    this._menu.addToolbarSpacer('View', 'Enter Composite');
+    this._menu.addToolbarSpacer('View', 'Chain Style');
+    this._menu.addToolbarSpacer('Debugging', 'Toggle Silence Mode');
+    this._menu.addToolbarSpacer('Debugging', 'Step Script');
   },
 
   /**

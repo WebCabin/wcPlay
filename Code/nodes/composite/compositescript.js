@@ -187,6 +187,46 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
   },
 
   /**
+   * Retrieves a list of nodes that match a given search filter.
+   * @function wcPlay#nodesBySearch
+   * @param {String} search - The search value.
+   * @returns {wcNode[]} - A list of all found nodes.
+   */
+  nodesBySearch: function(search) {
+    var result = [];
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      if (this._compositeNodes[i].search(search)) {
+        result.push(this._compositeNodes[i]);
+      }
+    }
+    for (var i = 0; i < this._entryNodes.length; ++i) {
+      if (this._entryNodes[i].search(search)) {
+        result.push(this._entryNodes[i]);
+      }
+    }
+    for (var i = 0; i < this._processNodes.length; ++i) {
+      if (this._processNodes[i].search(search)) {
+        result.push(this._processNodes[i]);
+      }
+    }
+    for (var i = 0; i < this._storageNodes.length; ++i) {
+      if (this._storageNodes[i].search(search)) {
+        result.push(this._storageNodes[i]);
+      }
+    }
+
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      if (this._compositeNodes[i] instanceof wcNodeCompositeScript) {
+        var found = this._compositeNodes[i].nodesBySearch(search);
+        if (found.length) {
+          result = result.concat(found);
+        }
+      }
+    }
+    return result;
+  },
+
+  /**
    * Called by a child composite link node to notify and sort entry links based on position.
    * @function wcNodeCompositeScript#sortEntryLinks
    */
