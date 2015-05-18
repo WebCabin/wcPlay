@@ -24,11 +24,11 @@
     "jquery": "1.11.1"
   },
   "license": "MIT",
-  "_release": "1869f9ab58",
+  "_release": "5c92bcf666",
   "_resolution": {
     "type": "branch",
     "branch": "master",
-    "commit": "1869f9ab5865aab02a71131b744e27dec500becc"
+    "commit": "5c92bcf666906a0c3c569f63beb52bd561db4e78"
   },
   "_source": "git://github.com/WebCabin/wcMenu.git",
   "_target": "master",

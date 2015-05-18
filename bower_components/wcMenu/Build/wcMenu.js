@@ -70,12 +70,23 @@ wcMenu.prototype = {
           }
         }
 
+        if (item.toggle) {
+          var toggle = item.toggle(this._options.data);
+          if (toggle !== item.lastToggle) {
+            item.$icon.toggleClass('wcButtonActive', toggle);
+            if (item.$toolbarIcon) {
+              item.$toolbarIcon.parent().toggleClass('wcButtonActive', toggle);
+            }
+            item.lastToggle = toggle;
+          }
+        }
+
         if (item.icon) {
           var icon = item.icon(this._options.data);
           if (icon !== item.lastIcon) {
-            item.$icon.removeClass().addClass('wcMenuIcon wcButton ' + icon);
+            item.$icon.children('i').removeClass().addClass('' + icon);
             if (item.$toolbarIcon) {
-              item.$toolbarIcon.removeClass().addClass('wcMenuIcon wcButton ' + icon);
+              item.$toolbarIcon.removeClass().addClass('' + icon);
             }
             item.lastIcon = icon;
           }
@@ -145,6 +156,10 @@ wcMenu.prototype = {
       optionData.display = options.display;
     }
 
+    if (options && typeof options.toggle === 'function') {
+      optionData.toggle = options.toggle;
+    }
+
     // Find the category if it exists.
     var category = null;
     var $category = null;
@@ -156,7 +171,7 @@ wcMenu.prototype = {
     }
 
     if (options && typeof options.toolbarIndex === 'number') {
-      optionData.$toolbar = $('<div><span class="wcMenuIcon wcButton"/></div>');
+      optionData.$toolbar = $('<div class="wcMenuIcon wcButton"><span></span></div>');
       optionData.$toolbarSpan = optionData.$toolbar.children('span');
 
       var $tools = this.$toolbar.children();
@@ -205,10 +220,10 @@ wcMenu.prototype = {
     optionData.$item = $('<li><span class="wcMenuItem">&nbsp;&nbsp;&nbsp;&nbsp;' + name + '</span></li>');
     optionData.$itemSpan = optionData.$item.children('span');
 
-    var $icon = $('<i class="wcMenuIcon wcButton"/>');
+    var $icon = $('<div class="wcMenuIcon wcButton"><i></i></div>');
     if (options && options.icon) {
       if (typeof options.icon === 'string') {
-        $icon.addClass(options.icon);
+        $icon.children('i').addClass(options.icon);
 
         if (optionData.$toolbar) {
           optionData.$toolbarSpan.addClass(options.icon);
@@ -230,6 +245,12 @@ wcMenu.prototype = {
       }
     } else if (options && typeof options.description === 'function') {
       optionData.description = options.description;
+    } else {
+      optionData.$itemSpan.attr('title', '');
+
+      if (optionData.$toolbar) {
+        optionData.$toolbarSpan.attr('title', '');
+      }
     }
 
     var $hotkey = $('<span class="wcMenuHotkey">');
@@ -635,6 +656,58 @@ wcMenu.prototype = {
   },
 
   /**
+   * Replaces the toggle function for an existing option.
+   * @function wcMenu#optionToggle
+   * @param {String} categoryName - The top level category of the option.
+   * @param {String} name - The name of the option.
+   * @param {wcMenu~MenuToggleFunc} [toggle] - A function that returns the toggle state of the menu option item. If not supplied, option will no longer toggle.
+   * @returns {Boolean} - Success or failure.
+   */
+  optionToggle: function(categoryName, name, toggle) {
+    if (!name || !categoryName) {
+      return false;
+    }
+
+    // Find the category if it exists.
+    var category = null;
+    for (var i = 0; i < this._menuOptions.length; ++i) {
+      if (this._menuOptions[i].name === categoryName) {
+        category = this._menuOptions[i];
+        break;
+      }
+    }
+
+    if (!category) {
+      return false;
+    }
+
+    var optionData = null;
+    for (var i = 0; i < category.items.length; ++i) {
+      if (category.items[i].name === name) {
+        optionData = category.items[i];
+        break;
+      }
+    }
+
+    if (!optionData) {
+      return false;
+    }
+
+    if (typeof toggle !== 'function') {
+      optionData.toggle = undefined;
+      delete optionData.toggle;
+
+      optionData.$icon.removeClass('wcButtonActive');
+      if (item.$toolbarIcon) {
+        optionData.$toolbarIcon.parent().removeClass('wcButtonActive');
+      }
+    } else {
+      optionData.toggle = toggle;
+    }
+    return true;
+  },
+
+  /**
    * Replaces the icon for an existing option.
    * @function wcMenu#optionIcon
    * @param {String} categoryName - The top level category of the option.
@@ -677,9 +750,9 @@ wcMenu.prototype = {
       delete optionData.icon;
 
       if (typeof icon === 'string') {
-        optionData.$icon.removeClass().addClass('wcMenuIcon wcButton ' + icon);
+        optionData.$icon.children('i').removeClass().addClass('' + icon);
         if (optionData.$toolbar) {
-          optionData.$toolbarIcon.removeClass().addClass('wcMenuIcon wcButton ' + icon);
+          optionData.$toolbarIcon.removeClass().addClass('' + icon);
         }
       }
     } else {

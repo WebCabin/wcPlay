@@ -123,7 +123,7 @@ ul.wcMenu span {
 }
 
 .wcMenu .disabled {
-  color: gray !important;
+  color: gray;
 }
 
 .wcMenu .wcMenuItemHover,
@@ -153,11 +153,11 @@ ul.wcMenu span {
   padding: 0px;
   border: 0px;
   cursor: pointer;
-  color: #444;
+  /*color: #444;*/
 }
 
 .wcMenuToolbar .wcButton {
-  position: absolute;
+  /*position: absolute;*/
   width: 20px;
   height: 20px;
   line-height: 20px !important;
@@ -192,20 +192,24 @@ ul.wcMenu span {
   border-left: 2px solid lightgray;
 }
 
-.wcMenuToolbar span:hover {
+.wcMenuToolbar .wcMenuIcon:hover {
   border: 2px outset #888;
   background-color: #CCC;
 }
 
 /* Disabled menu item */
-.wcMenuToolbar div.disabled span {
-  border: 2px outset #888;
+.wcMenuToolbar .wcMenuIcon.disabled {
+  border-width: 2px !important;
+  border-style: outset;
+  border-color: #888;
   cursor: default;
   opacity: 0.5;
 }
 
-.wcMenuToolbar div.disabled span:hover {
-  border: 2px outset #888;
+.wcMenuToolbar .wcMenuIcon.disabled:hover {
+  border-width: 2px !important;
+  border-style: outset;
+  border-color: #888;
   background-color: #EEE;
   opacity: 0.5;
 }
@@ -220,7 +224,7 @@ ul.wcMenu span {
 }
 
 .wcButtonActive, .wcButton:active, button:active {
-  border-width: 1px;
+  border-width: 2px;
   border-style: inset !important;
   border-color: #666;
 }
