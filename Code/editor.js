@@ -790,7 +790,8 @@ wcPlayEditor.prototype = {
    * @private
    */
   __setupMenu: function() {
-    this._menu = new wcMenu(this.$top, this.$main, {
+    this._menu = new wcMenu(this.$top, {
+      outer: this.$main,
       manualUpdate: true,
       data: this,
       version: "v1.0.0"

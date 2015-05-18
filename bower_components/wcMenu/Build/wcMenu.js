@@ -6,21 +6,16 @@
  *
  * @constructor
  * @param {external:jQuery~Object|external:jQuery~Selector|external:domNode} container - The container element.
- * @param {external:jQuery~Object|external:jQuery~Selector|external:domNode} outerContainer - The outer container element, this is your main container area for the entire window.
  * @param {wcMenu~Options} [options] - Custom options.
  */
-function wcMenu(container, outerContainer, options) {
+function wcMenu(container, options) {
   this.$container = $(container);
-  this.$outer = $(outerContainer);
-
-  if (!this.$outer.attr('tabindex')) {
-    this.$outer.attr('tabindex', '1');
-  }
 
   this._menuOptions = [];
 
   // Setup our options.
   this._options = {
+    outer: 'body',
     data: false,
     manualUpdate: false,
     version: ''
@@ -33,9 +28,14 @@ function wcMenu(container, outerContainer, options) {
   this.$toolbar = $('<div class="wcMenuToolbar wcMenuNoHighlights"></div>');
   this.$version = $('<div class="wcMenuVersionTag">' + this._options.version + '</div>');
 
+  this.$outer = $(this._options.outer);
   this.$container.append(this.$fileMenu);
   this.$container.append(this.$toolbar);
   this.$fileMenu.append(this.$version);
+
+  if (!this.$outer.attr('tabindex')) {
+    this.$outer.attr('tabindex', '1');
+  }
 
   // Setup events.
   var self = this;
@@ -62,29 +62,44 @@ wcMenu.prototype = {
       for (var a = 0; a < items.length; ++a) {
         var item = items[a];
         if (item.display) {
-          item.$itemSpan.html('&nbsp;&nbsp;&nbsp;&nbsp;' + item.display(this._options.data))
-          item.$itemSpan.prepend(item.$icon).append(item.$hotkey);
+          var display = item.display(this._options.data);
+          if (display !== item.lastDisplay) {
+            item.$itemSpan.html('&nbsp;&nbsp;&nbsp;&nbsp;' + display)
+            item.$itemSpan.prepend(item.$icon).append(item.$hotkey);
+            item.lastDisplay = display;
+          }
         }
 
         if (item.icon) {
           var icon = item.icon(this._options.data);
-          item.$icon.removeClass().addClass('wcMenuIcon wcButton ' + icon);
-          item.$toolbarIcon.removeClass().addClass('wcMenuIcon wcButton ' + icon);
+          if (icon !== item.lastIcon) {
+            item.$icon.removeClass().addClass('wcMenuIcon wcButton ' + icon);
+            if (item.$toolbarIcon) {
+              item.$toolbarIcon.removeClass().addClass('wcMenuIcon wcButton ' + icon);
+            }
+            item.lastIcon = icon;
+          }
         }
 
         if (item.description) {
           var desc = item.description(this._options.data);
-          item.$itemSpan.attr('title', desc);
-          if (item.$toolbar) {
-            item.$toolbarSpan.attr('title', desc + (item.hotkeyString? ' (' + item.hotkeyString + ')': ''));
+          if (desc !== item.lastDesc) {
+            item.$itemSpan.attr('title', desc);
+            if (item.$toolbar) {
+              item.$toolbarSpan.attr('title', desc + (item.hotkeyString? ' (' + item.hotkeyString + ')': ''));
+            }
+            item.lastDesc = desc;
           }
         }
 
         if (item.condition) {
           var disabled = !item.condition(this._options.data);
-          item.$itemSpan.toggleClass('disabled', disabled);
-          if (item.$toolbar) {
-            item.$toolbar.toggleClass('disabled', disabled);
+          if (disabled !== item.lastDisabled) {
+            item.$itemSpan.toggleClass('disabled', disabled);
+            if (item.$toolbar) {
+              item.$toolbar.toggleClass('disabled', disabled);
+            }
+            item.lastDisabled = disabled;
           }
         }
       }
@@ -477,7 +492,7 @@ wcMenu.prototype = {
     }
 
     if (optionData.$toolbar) {
-      optionData.$toolbarSpacer = $('<div class="ARPG_Separator"></div>');
+      optionData.$toolbarSpacer = $('<div class="wcMenuSeparator"></div>');
       optionData.$toolbarSpacer.insertAfter(optionData.$toolbar);
     }
     return true;
@@ -663,7 +678,9 @@ wcMenu.prototype = {
 
       if (typeof icon === 'string') {
         optionData.$icon.removeClass().addClass('wcMenuIcon wcButton ' + icon);
-        optionData.$toolbarIcon.removeClass().addClass('wcMenuIcon wcButton ' + icon);
+        if (optionData.$toolbar) {
+          optionData.$toolbarIcon.removeClass().addClass('wcMenuIcon wcButton ' + icon);
+        }
       }
     } else {
       optionData.icon = icon;
