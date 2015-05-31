@@ -217,6 +217,15 @@ wcPlayEditor.prototype = {
   },
 
   /**
+   * Retrieves the menu instance.
+   * @function wcPlayEditor#menu
+   * @returns {wcMenu}
+   */
+  menu: function() {
+    return this._menu;
+  },
+
+  /**
    * Positions the canvas view to the center of all nodes.
    * @function wcPlayEditor#center
    */
