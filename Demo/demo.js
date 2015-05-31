@@ -28,37 +28,6 @@ $(document).ready(function() {
   // Now initialize our little demo game view, using CraftyJS
   var $game = $('.game');
 
-  // Crafty.c("PlayerControls", {
-  //   _keys: {
-  //     UP_ARROW: 'north',
-  //     DOWN_ARROW: 'south',
-  //     RIGHT_ARROW: 'east',
-  //     LEFT_ARROW: 'west',
-  //     W: 'north',
-  //     S: 'south',
-  //     D: 'east',
-  //     A: 'west',
-  //   }, 
-
-  //   init: function() {
-  //     for(var k in this._keys) {
-  //       var keyCode = Crafty.keys[k] || k;
-  //       this._keys[keyCode] = this._keys[k];
-  //     }
-
-  //     this.bind("KeyDown",function(e) {
-  //       if(this._keys[e.key]) {
-         
-  //         var direction = this._keys[e.key];
-
-  //         this.trigger('Slide', direction);
-  //       }
-  //     })
-  //   }
-    
-  // });
-
-
   // Our slide component - listens for slide events
   // and smoothly slides to another tile location
   Crafty.c("Slide", {

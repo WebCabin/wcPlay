@@ -1288,7 +1288,7 @@ wcPlayEditor.prototype = {
       toolbarIndex: -1,
       description: "Runs or restarts the script.",
       condition: function(editor) {
-        return !editor._options.readOnly;
+        return !editor._options.readOnly && (editor._engine && editor._engine.isRunning());
       },
       onActivated: function(editor) {
         if (editor._engine) {
@@ -1310,7 +1310,7 @@ wcPlayEditor.prototype = {
       toolbarIndex: -1,
       description: "Pause or Continue the script.",
       condition: function(editor) {
-        return !editor._options.readOnly;
+        return !editor._options.readOnly && (editor._engine && editor._engine.isRunning());
       },
       onActivated: function(editor) {
         if (editor._engine) {
@@ -1331,7 +1331,7 @@ wcPlayEditor.prototype = {
       toolbarIndex: -1,
       description: "Perform a single script update.",
       condition: function(editor) {
-        return !editor._options.readOnly;
+        return !editor._options.readOnly && (editor._engine && editor._engine.isRunning());
       },
       onActivated: function(editor) {
         if (editor._engine) {

@@ -110,6 +110,7 @@ wcPlay.registerNodeType = function(name, displayName, category, nodeType) {
 }
 
 wcPlay.prototype = {
+
   /**
    * Initializes the script and begins the update process.
    * @function wcPlay#start
@@ -130,6 +131,14 @@ wcPlay.prototype = {
    */
   stop: function() {
     this._isRunning = false;
+  },
+
+  /**
+   * Retrieves whether the script is running.
+   * @returns {Boolean}
+   */
+  isRunning: function() {
+    return this._isRunning;
   },
 
   /**
@@ -756,6 +765,11 @@ wcPlay.prototype = {
    * @param {Boolean} [forceQueue] - If true, will force the event into the queue rather than the waiting list.
    */
   queueNodeEntry: function(node, name, fromNode, fromName, forceQueue) {
+    // Skip node queueing if the script is not even running.
+    if (!this._isRunning) {
+      return;
+    }
+
     if (!forceQueue && this._isStepping && this._isPaused) {
       if (node.enabled()) {
         this._waitingChain.push({
@@ -823,6 +837,11 @@ wcPlay.prototype = {
    * @param {Boolean} [upstream] - If true, we are propagating the property change in reverse.
    */
   queueNodeProperty: function(node, name, value, upstream) {
+    // Skip node queueing if the script is not even running.
+    if (!this._isRunning) {
+      return;
+    }
+
     if (node.enabled() || name === 'enabled') {
       this._queuedProperties.push({
         node: node,
