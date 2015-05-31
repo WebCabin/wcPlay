@@ -894,10 +894,10 @@ wcPlayEditor.prototype = {
       icon: "fa fa-undo fa-lg",
       toolbarIndex: -1,
       description: function(editor) {
-        return 'Undo ' + editor._undoManager.undoInfo();
+        return 'Undo ' + ((editor._undoManager && editor._undoManager.undoInfo()) || 'Event');
       },
       condition: function(editor) {
-        return editor._undoManager.canUndo();
+        return editor._undoManager && editor._undoManager.canUndo();
       },
       onActivated: function(editor) {
         editor._undoManager && editor._undoManager.undo();
@@ -910,10 +910,10 @@ wcPlayEditor.prototype = {
       icon: "fa fa-undo fa-flip-horizontal fa-lg",
       toolbarIndex: -1,
       description: function(editor) {
-        return 'Redo ' + editor._undoManager.redoInfo();
+        return 'Redo ' + ((editor._undoManager && editor._undoManager.redoInfo()) || 'Event');
       },
       condition: function(editor) {
-        return editor._undoManager.canRedo();
+        return editor._undoManager && editor._undoManager.canRedo();
       },
       onActivated: function(editor) {
         editor._undoManager && editor._undoManager.redo();
