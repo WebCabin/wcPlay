@@ -77,10 +77,10 @@ function wcPlayEditor(container, options) {
       spacing: 5,           // The pixel space between adjacent properties.
       strLen: 20,           // The maximum character length a property value can display.
       minLength: 30,        // The minimum length the property value can be.
-      valueWrapL: ' ',      // The left string to wrap around a property value.
-      valueWrapR: ' ',      // The right string to wrap around a property value.
-      initialWrapL: ' [',   // The left string to wrap around a property initial value.
-      initialWrapR: '] ',   // The right string to wrap around a property initial value.
+      valueWrapL: ' [',      // The left string to wrap around a property value.
+      valueWrapR: '] ',      // The right string to wrap around a property value.
+      initialWrapL: ' ',   // The left string to wrap around a property initial value.
+      initialWrapR: ' ',   // The right string to wrap around a property initial value.
       highlightColor: 'rgba(255, 255, 255, 0.5)',
       normalColor:    'rgba(255, 255, 255, 0.5)',
       highlightBorder: -1,
