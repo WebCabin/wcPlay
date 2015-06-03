@@ -39,22 +39,22 @@ function wcPlayEditor(container, options) {
   // this._chainDrawCount = 0;
 
   this._font = {
-    breadcrumbs: {size: 15, family: 'Arial', weight: 'bold'},
-    title: {size: 15, family: 'Arial', weight: 'bold'},
-    titleDesc: {size: 15, family: 'Arial', weight: 'italic'},
-    details: {size: 13, family: 'Arial', weight: 'bold'},
-    links: {size: 10, family: 'Arial'},
-    property: {size: 10, family: 'Arial', weight: 'italic'},
-    value: {size: 10, family: 'Arial', weight: 'bold'},
-    initialValue: {size: 10, family: 'Arial', weight: 'bold italic'},
+    breadcrumbs: {size: 10, family: 'Arial', weight: 'bold'},
+    title: {size: 13, family: 'Arial', weight: 'bold'},
+    titleDesc: {size: 10, family: 'Arial', weight: 'italic'},
+    details: {size: 9, family: 'Arial', weight: 'bold'},
+    links: {size: 9, family: 'Arial'},
+    property: {size: 9, family: 'Arial', weight: 'italic'},
+    value: {size: 9, family: 'Arial', weight: 'bold'},
+    initialValue: {size: 9, family: 'Arial', weight: 'bold italic'},
   };
 
   this._drawStyle = {
     palette: {
-      spacing: 20,          // Spacing between nodes in the palette view.
+      spacing: 10,          // Spacing between nodes in the palette view.
     },
     node: {
-      radius: 10,           // The radius to draw node corners.
+      radius: 7,            // The radius to draw node corners.
       margin: 15,           // The pixel space between the property text and the edge of the node border.
     },
     title: {
@@ -67,15 +67,15 @@ function wcPlayEditor(container, options) {
       details: ' [?] ',     // The text to display for the detail popup button for the node.
     },
     links: {
-      length: 15,           // Length of each link 'nub'
-      width: 10,             // Width of each link 'nub'
-      spacing: 10,          // The pixel space between the text of adjacent links.
+      length: 10,           // Length of each link 'nub'
+      width: 7,             // Width of each link 'nub'
+      spacing: 7,           // The pixel space between the text of adjacent links.
       padding: 5,           // The pixel space between the link and its text.
-      margin: 10,           // The pixel space between the link text and the edge of the node border.
+      margin: 7,           // The pixel space between the link text and the edge of the node border.
     },
     property: {
       spacing: 5,           // The pixel space between adjacent properties.
-      strLen: 10,           // The maximum character length a property value can display.
+      strLen: 20,           // The maximum character length a property value can display.
       minLength: 30,        // The minimum length the property value can be.
       valueWrapL: ' ',      // The left string to wrap around a property value.
       valueWrapR: ' ',      // The right string to wrap around a property value.
@@ -1838,9 +1838,9 @@ wcPlayEditor.prototype = {
 
     // Increase the nodes border thickness when flashing.
     if (node.isBroken()) {
-      this.__drawRoundedRect(node._meta.bounds.inner, "#CC0000", 5, 10, context, node.pos);
+      this.__drawRoundedRect(node._meta.bounds.inner, "#CC0000", 5, this._drawStyle.node.radius, context, node.pos);
     } else if (node._meta.flashDelta) {
-      this.__drawRoundedRect(node._meta.bounds.inner, "yellow", 2, 10, context, node.pos);
+      this.__drawRoundedRect(node._meta.bounds.inner, "yellow", 2, this._drawStyle.node.radius, context, node.pos);
     }
   },
 
