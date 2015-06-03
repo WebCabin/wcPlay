@@ -55,7 +55,7 @@ function wcPlayEditor(container, options) {
     },
     node: {
       radius: 7,            // The radius to draw node corners.
-      margin: 15,           // The pixel space between the property text and the edge of the node border.
+      margin: 14,           // The pixel space between the property text and the edge of the node border.
     },
     title: {
       spacing: 5,           // The pixel space between the title text and the bar that separates the properties.
@@ -140,6 +140,7 @@ function wcPlayEditor(container, options) {
   // Setup our options.
   this._options = {
     readOnly: false,
+    playable: true,
     category: {
       items: [],
       isBlacklist: true,
@@ -1282,17 +1283,27 @@ wcPlayEditor.prototype = {
     });
 
     // Debugging -> Restart Script
-    this._menu.addOption('Debugging', 'Restart Script', {
+    this._menu.addOption('Debugging', 'Start Script', {
       hotkeys: "Shift+Enter",
-      icon: "fa fa-play-circle fa-lg",
+      icon: function(editor) {
+        if (editor._engine && editor._engine.isRunning()) {
+          return "fa fa-stop fa-lg";
+        } else {
+          return "fa fa-play fa-lg";
+        }
+      },
       toolbarIndex: -1,
-      description: "Runs or restarts the script.",
+      description: "Starts or Stops execution of the script.",
       condition: function(editor) {
-        return !editor._options.readOnly && (editor._engine && editor._engine.isRunning());
+        return !editor._options.readOnly && editor._options.playable;
       },
       onActivated: function(editor) {
         if (editor._engine) {
-          editor._engine.start();
+          if (editor._engine.isRunning()) {
+            editor._engine.stop();
+          } else {
+            editor._engine.start();
+          }
         }
       }
     });
@@ -1300,12 +1311,9 @@ wcPlayEditor.prototype = {
     // Debugging -> Pause/Continue Script
     this._menu.addOption('Debugging', 'Pause/Continue Script', {
       hotkeys: 'Return',
-      icon: function(editor) {
-        if (editor._engine && editor._engine.paused()) {
-          return "fa fa-pause fa-lg";
-        } else {
-          return "fa fa-play fa-lg";
-        }
+      icon: "fa fa-pause fa-lg",
+      toggle: function(editor) {
+        return editor._engine && editor._engine.paused();
       },
       toolbarIndex: -1,
       description: "Pause or Continue the script.",
@@ -2075,7 +2083,7 @@ wcPlayEditor.prototype = {
           rect: {
             top: rect.top + upper - this._font.property.size,
             left: rect.left + rect.width - this._drawStyle.node.margin - rect.valueWidth - rect.initialWidth,
-            width: rect.valueWidth,
+            width: (this._engine.isRunning()? rect.valueWidth: 0),
             height: this._font.property.size + this._drawStyle.property.spacing,
           },
           name: props[i].name,
@@ -2371,10 +2379,12 @@ wcPlayEditor.prototype = {
 
       // Highlight hovered values.
       if (!this._options.readOnly) {
-        if (this._highlightNode === node && this._highlightPropertyValue && this._highlightPropertyValue.name === props[i].name) {
-          this.__drawRoundedRect(valueBound.rect, this._drawStyle.property.highlightColor, this._drawStyle.property.highlightBorder, this._font.property.size/2, context, node.pos);
-        } else if (!isPalette && this._highlightNode === node) {
-          this.__drawRoundedRect(valueBound.rect, this._drawStyle.property.normalColor, this._drawStyle.property.normalBorder, this._font.property.size/2, context, node.pos);
+        if (this._engine && this._engine.isRunning()) {
+          if (this._highlightNode === node && this._highlightPropertyValue && this._highlightPropertyValue.name === props[i].name) {
+            this.__drawRoundedRect(valueBound.rect, this._drawStyle.property.highlightColor, this._drawStyle.property.highlightBorder, this._font.property.size/2, context, node.pos);
+          } else if (!isPalette && this._highlightNode === node) {
+            this.__drawRoundedRect(valueBound.rect, this._drawStyle.property.normalColor, this._drawStyle.property.normalBorder, this._font.property.size/2, context, node.pos);
+          }
         }
 
         if (this._highlightNode === node && this._highlightPropertyInitialValue && this._highlightPropertyInitialValue.name === props[i].name) {
@@ -2391,12 +2401,14 @@ wcPlayEditor.prototype = {
 
       context.textAlign = "right";
       this.__setCanvasFont(this._font.initialValue, context);
-      context.fillStyle = "#444444";
+      context.fillStyle = "black";
       context.fillText(this._drawStyle.property.initialWrapL + this.__drawPropertyValue(node, props[i], true) + this._drawStyle.property.initialWrapR, node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin, node.pos.y + node._meta.bounds.center.top + upper);
 
-      this.__setCanvasFont(this._font.value, context);
-      context.fillStyle = "black";
-      context.fillText(this._drawStyle.property.valueWrapL + this.__drawPropertyValue(node, props[i]) + this._drawStyle.property.valueWrapR, node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin - node._meta.bounds.center.initialWidth, node.pos.y + node._meta.bounds.center.top + upper);
+      if (this._engine && this._engine.isRunning()) {
+        this.__setCanvasFont(this._font.value, context);
+        context.fillStyle = "#444444";
+        context.fillText(this._drawStyle.property.valueWrapL + this.__drawPropertyValue(node, props[i]) + this._drawStyle.property.valueWrapR, node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin - node._meta.bounds.center.initialWidth, node.pos.y + node._meta.bounds.center.top + upper);
+      }
 
       // Property input.
       if (!collapsed || props[i].inputs.length) {

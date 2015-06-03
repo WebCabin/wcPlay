@@ -2,6 +2,7 @@
  * Custom options available when constructing a new {@link wcPlay} instance.
  * @typedef {Object} wcPlayEditor~Options
  * @property {Boolean} [readOnly=false] - If true, the script will not be editable.
+ * @property {Boolean} [playable=true] - Whether the script can be played using the live debugger.
  * @property {wcPlayEditor~CategoryOptions} [category] - Options that determine what categories appear in the palette. By default, all categories are visible.
  */
 
