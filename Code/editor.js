@@ -1293,6 +1293,13 @@ wcPlayEditor.prototype = {
         }
       },
       toolbarIndex: -1,
+      display: function(editor) {
+        if (editor._engine && editor._engine.isRunning()) {
+          return "Stop Script";
+        } else {
+          return "Start Script";
+        }
+      },
       description: "Starts or Stops execution of the script.",
       condition: function(editor) {
         return !editor._options.readOnly && editor._options.playable;
@@ -1309,11 +1316,18 @@ wcPlayEditor.prototype = {
     });
 
     // Debugging -> Pause/Continue Script
-    this._menu.addOption('Debugging', 'Pause/Continue Script', {
+    this._menu.addOption('Debugging', 'Pause Script', {
       hotkeys: 'Return',
       icon: "fa fa-pause fa-lg",
       toggle: function(editor) {
         return editor._engine && editor._engine.paused();
+      },
+      display: function(editor) {
+        if (editor._engine && editor._engine.paused()) {
+          return 'Resume Script';
+        } else {
+          return 'Pause Script';
+        }
       },
       toolbarIndex: -1,
       description: "Pause or Continue the script.",
