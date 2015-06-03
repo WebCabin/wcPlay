@@ -3953,7 +3953,7 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
   },
 });
 
-wcNodeComposite.extend('wcNodeCompositeEntry', 'Entry', 'External', {
+wcNodeComposite.extend('wcNodeCompositeEntry', 'Entry', 'Linkers', {
   /**
    * @class
    * This node acts as a connection between entry links on a composite node and the script inside.<br>
@@ -4115,7 +4115,7 @@ wcNodeComposite.extend('wcNodeCompositeEntry', 'Entry', 'External', {
     this._parent.sortEntryLinks();
   },
 });
-wcNodeComposite.extend('wcNodeCompositeExit', 'Exit', 'External', {
+wcNodeComposite.extend('wcNodeCompositeExit', 'Exit', 'Linkers', {
   /**
    * @class
    * This node acts as a connection between exit links on a composite node and the script inside.<br>
@@ -4294,7 +4294,7 @@ wcNodeComposite.extend('wcNodeCompositeExit', 'Exit', 'External', {
     this._parent.sortExitLinks();
   },
 });
-wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'External', {
+wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'Linkers', {
   /**
    * @class
    * This node acts as a connection between exit links on a composite node and the script inside.<br>
