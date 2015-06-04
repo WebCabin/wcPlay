@@ -18,6 +18,9 @@ You can design your own scripting nodes for the user to use and even provide a s
 ### [http://play.api.webcabin.org](http://play.api.webcabin.org) ###
   * View the API documentation.
 
+### [https://github.com/WebCabin/wcPlay](https://github.com/WebCabin/wcPlay) ###
+  * View the source code.
+
 
 ****
 ### Features ###
