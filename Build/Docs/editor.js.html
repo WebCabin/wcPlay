@@ -327,8 +327,8 @@ wcPlayEditor.prototype = {
    * @param {wcPlayEditor~Rect} rect - The rectangle to focus on.
    */
   focusRect: function(rect) {
-    var scaleX = (this.$viewport.width() / (rect.width + 100));
-    var scaleY = (this.$viewport.height() / (rect.height + 100));
+    var scaleX = this.$viewport.width()? (this.$viewport.width() / (rect.width + 100)): 1;
+    var scaleY = this.$viewport.height()? (this.$viewport.height() / (rect.height + 100)): 1;
     this._viewportCamera.z = Math.min(scaleX, scaleY);
     if (scaleX > scaleY) {
       rect.left -= ((this.$viewport.width() / scaleY - (rect.width + 100))) / 2;
