@@ -265,8 +265,8 @@ wcPlayEditor.prototype = {
    * @param {wcPlayEditor~Rect} rect - The rectangle to focus on.
    */
   focusRect: function(rect) {
-    var scaleX = (this.$viewport.width() / (rect.width + 100));
-    var scaleY = (this.$viewport.height() / (rect.height + 100));
+    var scaleX = this.$viewport.width()? (this.$viewport.width() / (rect.width + 100)): 1;
+    var scaleY = this.$viewport.height()? (this.$viewport.height() / (rect.height + 100)): 1;
     this._viewportCamera.z = Math.min(scaleX, scaleY);
     if (scaleX > scaleY) {
       rect.left -= ((this.$viewport.width() / scaleY - (rect.width + 100))) / 2;
@@ -1761,7 +1761,7 @@ wcPlayEditor.prototype = {
           this.__updateNode(typeData.nodes[i], 0, typeData.context);
           typeData.nodes[i].pos.x = xPos;
           typeData.nodes[i].pos.y = yPos;
-          this.__drawNode(typeData.nodes[i], typeData.context);
+          this.__drawNode(typeData.nodes[i], typeData.context, true);
           yPos += typeData.nodes[i]._meta.bounds.rect.height + this._drawStyle.palette.spacing;
         }
 
@@ -1790,10 +1790,11 @@ wcPlayEditor.prototype = {
    * @param {wcNode} node - The node to render.
    * @param {wcPlay~Coordinates} pos - The position to render the node in the canvas, relative to the top-middle of the node.
    * @param {external:Canvas~Context} context - The canvas context to render on.
+   * @param {Boolean} [noclip] - If true, this node will not be 
    */
-  __drawNode: function(node, context) {
+  __drawNode: function(node, context, noclip) {
     // Ignore drawing if the node is outside of view.
-    if (!this.__rectOnRect(node._meta.bounds.farRect, this._viewportBounds, node.pos)) {
+    if (!noclip && !this.__rectOnRect(node._meta.bounds.farRect, this._viewportBounds, node.pos)) {
       node._meta.visible = false;
       return;
     }
