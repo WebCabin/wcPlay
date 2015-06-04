@@ -271,7 +271,7 @@ wcPlay.prototype = {
       return true;
     } catch (e) {
       // Something went wrong, restore the previous script.
-      this.restore(saveData);
+      this.load(saveData);
     }
     return false;
   },

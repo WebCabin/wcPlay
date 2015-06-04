@@ -42,7 +42,6 @@ Class.extend('wcNode', 'Node', '', {
       description: '',
       details: '',
     };
-    this._collapsed = true;
     this._break = false;
     this._log = false;
 
@@ -148,7 +147,6 @@ Class.extend('wcNode', 'Node', '', {
     this.color = data.color,
     this.pos.x = data.pos.x,
     this.pos.y = data.pos.y,
-    this.collapsed(data.collapsed);
     this.debugBreak(data.breakpoint);
 
     if (this.id > wcNodeNextID) {
@@ -216,7 +214,6 @@ Class.extend('wcNode', 'Node', '', {
         x: this.pos.x,
         y: this.pos.y
       },
-      collapsed: this.collapsed(),
       breakpoint: this._break,
       properties: this.listProperties(minimal),
       exitChains: this.listExitChains(),
@@ -331,21 +328,6 @@ Class.extend('wcNode', 'Node', '', {
 
     var engine = this.engine();
     return (engine && engine.debugging() && this._break);
-  },
-
-  /**
-   * Sets, or Gets this node's collapsed state.
-   * @function wcNode#collapsed
-   * @param {Boolean} [enabled] - If supplied, will assign a new debug pause state.
-   * @returns {Boolean} - The current debug pause state.
-   */
-  collapsed: function(enabled) {
-    if (enabled !== undefined) {
-      this._collapsed = enabled;
-      this._meta.dirty = true;
-    }
-
-    return this._collapsed;
   },
 
   /**

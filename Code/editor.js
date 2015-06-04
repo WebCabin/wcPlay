@@ -108,8 +108,6 @@ function wcPlayEditor(container, options) {
   this._highlightNode = null;
   this._selectedNode = null;
   this._selectedNodes = [];
-  this._expandedHighlightNode = null;
-  this._expandedSelectedNode = null;
 
   this._highlightTitle = false;
   this._highlightDetails = false;
@@ -1120,7 +1118,6 @@ wcPlayEditor.prototype = {
               if (!linkNode) {
                 // Create a Composite Entry Node, this acts as a surrogate entry link for the Composite node.
                 linkNode = new wcNodeCompositeEntry(compNode, {x: node.pos.x, y: bounds.top - 100}, linkName);
-                linkNode.collapsed(true);
                 createdLinks.push({
                   name: linkName,
                   node: linkNode,
@@ -1151,7 +1148,6 @@ wcPlayEditor.prototype = {
               if (!linkNode) {
                 // Create a Composite Exit Node, this acts as a surrogate exit link for the Composite node.
                 linkNode = new wcNodeCompositeExit(compNode, {x: node.pos.x, y: bounds.top + bounds.height + 50}, linkName);
-                linkNode.collapsed(true);
                 createdLinks.push({
                   name: linkName,
                   node: linkNode,
@@ -1182,7 +1178,6 @@ wcPlayEditor.prototype = {
               if (!linkNode) {
                 // Create a Composite Property Node, this acts as a surrogate property link for the Composite node.
                 linkNode = new wcNodeCompositeProperty(compNode, {x: bounds.left - 200, y: node.pos.y}, linkName);
-                linkNode.collapsed(true);
                 createdLinks.push({
                   name: linkName,
                   node: linkNode,
@@ -1213,7 +1208,6 @@ wcPlayEditor.prototype = {
               if (!linkNode) {
                 // Create a Composite Property Node, this acts as a surrogate property link for the Composite node.
                 linkNode = new wcNodeCompositeProperty(compNode, {x: bounds.left + bounds.width + 200, y: node.pos.y}, linkName);
-                linkNode.collapsed(true);
                 createdLinks.push({
                   name: linkName,
                   node: linkNode,
@@ -1660,7 +1654,6 @@ wcPlayEditor.prototype = {
 
       // Now create an instance of the node.
       var node = new window[data.className](null);
-      node.collapsed(false);
       this._nodeLibrary[data.category][data.nodeType].nodes.push(node);
     }
 
@@ -1686,7 +1679,7 @@ wcPlayEditor.prototype = {
           this.__updateNode(typeData.nodes[i], 0, typeData.context);
           typeData.nodes[i].pos.x = xPos;
           typeData.nodes[i].pos.y = yPos;
-          this.__drawNode(typeData.nodes[i], typeData.context, true);
+          this.__drawNode(typeData.nodes[i], typeData.context);
           yPos += typeData.nodes[i]._meta.bounds.rect.height + this._drawStyle.palette.spacing;
         }
         typeData.$canvas.attr('height', yPos);
@@ -1768,7 +1761,7 @@ wcPlayEditor.prototype = {
           this.__updateNode(typeData.nodes[i], 0, typeData.context);
           typeData.nodes[i].pos.x = xPos;
           typeData.nodes[i].pos.y = yPos;
-          this.__drawNode(typeData.nodes[i], typeData.context, true);
+          this.__drawNode(typeData.nodes[i], typeData.context);
           yPos += typeData.nodes[i]._meta.bounds.rect.height + this._drawStyle.palette.spacing;
         }
 
@@ -1783,11 +1776,10 @@ wcPlayEditor.prototype = {
    * @private
    * @param {wcNode[]} nodes - The node to render.
    * @param {external:Canvas~Context} context - The canvas context to render on.
-   * @param {Boolean} [isPalette] - If true, we're drawing for the palette, which is slightly different.
    */
-  __drawNodes: function(nodes, context, isPalette) {
+  __drawNodes: function(nodes, context) {
     for (var i = 0; i < nodes.length; ++i) {
-      this.__drawNode(nodes[i], context, isPalette);
+      this.__drawNode(nodes[i], context);
     }
   },
 
@@ -1798,11 +1790,10 @@ wcPlayEditor.prototype = {
    * @param {wcNode} node - The node to render.
    * @param {wcPlay~Coordinates} pos - The position to render the node in the canvas, relative to the top-middle of the node.
    * @param {external:Canvas~Context} context - The canvas context to render on.
-   * @param {Boolean} [isPalette] - If true, we're drawing for the palette, which is slightly different.
    */
-  __drawNode: function(node, context, isPalette) {
+  __drawNode: function(node, context) {
     // Ignore drawing if the node is outside of view.
-    if (!isPalette && !this.__rectOnRect(node._meta.bounds.farRect, this._viewportBounds, node.pos)) {
+    if (!this.__rectOnRect(node._meta.bounds.farRect, this._viewportBounds, node.pos)) {
       node._meta.visible = false;
       return;
     }
@@ -1817,7 +1808,7 @@ wcPlayEditor.prototype = {
     }
 
     // Now use our measurements to draw our node.
-    this.__drawCenter(node, context, isPalette);
+    this.__drawCenter(node, context);
     this.__drawEntryLinks(node, context, node._meta.bounds.entryOuter.width);
     this.__drawExitLinks(node, context, node._meta.bounds.entryOuter.height + node._meta.bounds.centerOuter.height, node._meta.bounds.exitOuter.width);
 
@@ -1966,7 +1957,6 @@ wcPlayEditor.prototype = {
     var propWidth = 0;
     var valueWidth = 0;
     var initialWidth = 0;
-    var collapsed = node.collapsed();
     var props = node.properties;
     for (var i = 0; i < props.length; ++i) {
       bounds.height += this._font.property.size + this._drawStyle.property.spacing;
@@ -2061,97 +2051,88 @@ wcPlayEditor.prototype = {
     }
 
     var linkRect;
-    var collapsed = node.collapsed();
     var props = node.properties;
     for (var i = 0; i < props.length; ++i) {
       upper += this._font.property.size;
-      // Skip properties that are collapsible if it is not chained.
-      if (!collapsed || !props[i].options.collapsible || props[i].inputs.length || props[i].outputs.length) {
+      // Property name.
+      var propertyBound = {
+        rect: {
+          top: rect.top + upper - this._font.property.size,
+          left: rect.left + this._drawStyle.node.margin,
+          width: rect.width - this._drawStyle.node.margin * 2,
+          height: this._font.property.size + this._drawStyle.property.spacing,
+        },
+        name: props[i].name,
+      };
+      node._meta.bounds.propertyBounds.push(propertyBound);
 
-        // Property name.
-        var propertyBound = {
-          rect: {
-            top: rect.top + upper - this._font.property.size,
-            left: rect.left + this._drawStyle.node.margin,
-            width: rect.width - this._drawStyle.node.margin * 2,
-            height: this._font.property.size + this._drawStyle.property.spacing,
-          },
-          name: props[i].name,
-        };
-        node._meta.bounds.propertyBounds.push(propertyBound);
+      // Initial property value.
+      var initialBound = {
+        rect: {
+          top: rect.top + upper - this._font.property.size,
+          left: rect.left + rect.width - this._drawStyle.node.margin - rect.initialWidth,
+          width: rect.initialWidth,
+          height: this._font.property.size + this._drawStyle.property.spacing,
+        },
+        name: props[i].name,
+      };
+      node._meta.bounds.initialBounds.push(initialBound);
 
-        // Initial property value.
-        var initialBound = {
-          rect: {
-            top: rect.top + upper - this._font.property.size,
-            left: rect.left + rect.width - this._drawStyle.node.margin - rect.initialWidth,
-            width: rect.initialWidth,
-            height: this._font.property.size + this._drawStyle.property.spacing,
-          },
-          name: props[i].name,
-        };
-        node._meta.bounds.initialBounds.push(initialBound);
+      // Property value.
+      var valueBound = {
+        rect: {
+          top: rect.top + upper - this._font.property.size,
+          left: rect.left + rect.width - this._drawStyle.node.margin - rect.valueWidth - rect.initialWidth,
+          width: (this._engine.isRunning()? rect.valueWidth: 0),
+          height: this._font.property.size + this._drawStyle.property.spacing,
+        },
+        name: props[i].name,
+      };
+      node._meta.bounds.valueBounds.push(valueBound);
 
-        // Property value.
-        var valueBound = {
-          rect: {
-            top: rect.top + upper - this._font.property.size,
-            left: rect.left + rect.width - this._drawStyle.node.margin - rect.valueWidth - rect.initialWidth,
-            width: (this._engine.isRunning()? rect.valueWidth: 0),
-            height: this._font.property.size + this._drawStyle.property.spacing,
-          },
-          name: props[i].name,
-        };
-        node._meta.bounds.valueBounds.push(valueBound);
+      // Property input.
+      linkRect = {
+        top: rect.top + upper - this._font.property.size/3 - this._drawStyle.links.width/2,
+        left: rect.left - this._drawStyle.links.length,
+        width: this._drawStyle.links.length,
+        height: this._drawStyle.links.width,
+      };
 
-        // Property input.
-        if (!collapsed || props[i].inputs.length) {
-          linkRect = {
-            top: rect.top + upper - this._font.property.size/3 - this._drawStyle.links.width/2,
-            left: rect.left - this._drawStyle.links.length,
-            width: this._drawStyle.links.length,
-            height: this._drawStyle.links.width,
-          };
+      // Expand the bounding rect just a little so it is easier to click.
+      linkRect.top -= 5;
+      linkRect.height += 10;
 
-          // Expand the bounding rect just a little so it is easier to click.
-          linkRect.top -= 5;
-          linkRect.height += 10;
+      node._meta.bounds.inputBounds.push({
+        rect: linkRect,
+        point: {
+          x: linkRect.left + linkRect.width/3 - 2,
+          y: linkRect.top + linkRect.height/2,
+        },
+        name: props[i].name,
+      });
 
-          node._meta.bounds.inputBounds.push({
-            rect: linkRect,
-            point: {
-              x: linkRect.left + linkRect.width/3 - 2,
-              y: linkRect.top + linkRect.height/2,
-            },
-            name: props[i].name,
-          });
-        }
-
-        // Property output.
-        if (!collapsed || props[i].outputs.length) {
-          linkRect = {
-            top: rect.top + upper - this._font.property.size/3 - this._drawStyle.links.width/2,
-            left: rect.left + rect.width,
-            width: this._drawStyle.links.length,
-            height: this._drawStyle.links.width,
-          }
-
-          // Expand the bounding rect just a little so it is easier to click.
-          linkRect.top -= 5;
-          linkRect.height += 10;
-
-          node._meta.bounds.outputBounds.push({
-            rect: linkRect,
-            point: {
-              x: linkRect.left + linkRect.width + 1,
-              y: linkRect.top + linkRect.height/2,
-            },
-            name: props[i].name,
-          });
-        }
-
-        upper += this._drawStyle.property.spacing;
+      // Property output.
+      linkRect = {
+        top: rect.top + upper - this._font.property.size/3 - this._drawStyle.links.width/2,
+        left: rect.left + rect.width,
+        width: this._drawStyle.links.length,
+        height: this._drawStyle.links.width,
       }
+
+      // Expand the bounding rect just a little so it is easier to click.
+      linkRect.top -= 5;
+      linkRect.height += 10;
+
+      node._meta.bounds.outputBounds.push({
+        rect: linkRect,
+        point: {
+          x: linkRect.left + linkRect.width + 1,
+          y: linkRect.top + linkRect.height/2,
+        },
+        name: props[i].name,
+      });
+
+      upper += this._drawStyle.property.spacing;
     }
 
     context.restore();
@@ -2174,7 +2155,6 @@ wcPlayEditor.prototype = {
     context.save();
     this.__setCanvasFont(this._font.links, context);
 
-    var collapsed = node.collapsed();
     var links = node.chain.entry;
     for (var i = 0; i < links.length; ++i) {
       // Link label
@@ -2224,7 +2204,6 @@ wcPlayEditor.prototype = {
     context.save();
     this.__setCanvasFont(this._font.links, context);
 
-    var collapsed = node.collapsed();
     var links = node.chain.exit;
     for (var i = 0; i < links.length; ++i) {
       // Link label
@@ -2262,10 +2241,9 @@ wcPlayEditor.prototype = {
    * @private
    * @param {wcNode} node - The node to draw.
    * @param {external:Canvas~Context} context - The canvas context.
-   * @param {Boolean} [isPalette] - If true, all collapsible properties will be hidden, even if the node is not collapsed.
    * @returns {wcPlayEditor~DrawPropertyData} - Contains bounding rectangles for various drawings.
    */
-  __drawCenter: function(node, context, isPalette) {
+  __drawCenter: function(node, context) {
     var upper = node.chain.entry.length? this._font.links.size + this._drawStyle.links.padding: 0;
     var lower = node.chain.exit.length? this._font.links.size + this._drawStyle.links.padding: 0;
 
@@ -2304,7 +2282,7 @@ wcPlayEditor.prototype = {
     if (!this._options.readOnly) {
       if (this._highlightTitle && this._highlightNode === node) {
         this.__drawRoundedRect(node._meta.bounds.titleBounds, this._drawStyle.property.highlightColor, this._drawStyle.property.highlightBorder, this._font.title.size/2, context, node.pos);
-      } else if (!isPalette && this._highlightNode === node) {
+      } else if (this._highlightNode === node) {
         this.__drawRoundedRect(node._meta.bounds.titleBounds, this._drawStyle.property.normalColor, this._drawStyle.property.normalBorder, this._font.title.size/2, context, node.pos);
       }
     }
@@ -2313,7 +2291,7 @@ wcPlayEditor.prototype = {
     if (!this._options.readOnly && node._meta.bounds.detailsBounds.width > 0) {
       if (this._highlightDetails && this._highlightNode === node) {
         this.__drawRoundedRect(node._meta.bounds.detailsBounds, this._drawStyle.property.highlightColor, this._drawStyle.property.highlightBorder, this._font.title.size/2, context, node.pos);
-      } else if (!isPalette && this._highlightNode === node) {
+      } else if (this._highlightNode === node) {
         this.__drawRoundedRect(node._meta.bounds.detailsBounds, this._drawStyle.property.normalColor, this._drawStyle.property.normalBorder, this._font.title.size/2, context, node.pos);
       }
     }
@@ -2360,7 +2338,6 @@ wcPlayEditor.prototype = {
     }
 
     context.save();
-    var collapsed = node.collapsed();
     var props = node.properties;
     for (var i = 0; i < props.length; ++i) {
       upper += this._font.property.size;
@@ -2396,14 +2373,14 @@ wcPlayEditor.prototype = {
         if (this._engine && this._engine.isRunning()) {
           if (this._highlightNode === node && this._highlightPropertyValue && this._highlightPropertyValue.name === props[i].name) {
             this.__drawRoundedRect(valueBound.rect, this._drawStyle.property.highlightColor, this._drawStyle.property.highlightBorder, this._font.property.size/2, context, node.pos);
-          } else if (!isPalette && this._highlightNode === node) {
+          } else if (this._highlightNode === node) {
             this.__drawRoundedRect(valueBound.rect, this._drawStyle.property.normalColor, this._drawStyle.property.normalBorder, this._font.property.size/2, context, node.pos);
           }
         }
 
         if (this._highlightNode === node && this._highlightPropertyInitialValue && this._highlightPropertyInitialValue.name === props[i].name) {
           this.__drawRoundedRect(initialBound.rect, this._drawStyle.property.highlightColor, this._drawStyle.property.highlightBorder, this._font.property.size/2, context, node.pos);
-        } else if (!isPalette && this._highlightNode === node) {
+        } else if (this._highlightNode === node) {
           this.__drawRoundedRect(initialBound.rect, this._drawStyle.property.normalColor, this._drawStyle.property.normalBorder, this._font.property.size/2, context, node.pos);
         }
       }
@@ -2425,50 +2402,46 @@ wcPlayEditor.prototype = {
       }
 
       // Property input.
-      if (!collapsed || props[i].inputs.length) {
-        var linkRect = null;
-        for (var a = 0; a < node._meta.bounds.inputBounds.length; ++a) {
-          if (node._meta.bounds.inputBounds[a].name === props[i].name) {
-            linkRect = node._meta.bounds.inputBounds[a].rect;
-            break;
-          }
+      var linkRect = null;
+      for (var a = 0; a < node._meta.bounds.inputBounds.length; ++a) {
+        if (node._meta.bounds.inputBounds[a].name === props[i].name) {
+          linkRect = node._meta.bounds.inputBounds[a].rect;
+          break;
         }
-
-        context.fillStyle = (this._highlightInputLink && this._highlightInputLink.name === props[i].name && this._highlightNode === node? "cyan": props[i].inputMeta.color);
-        context.strokeStyle = "black";
-        context.beginPath();
-        context.moveTo(node.pos.x + linkRect.left, node.pos.y + linkRect.top + 5);
-        context.lineTo(node.pos.x + linkRect.left + linkRect.width, node.pos.y + linkRect.top + 5);
-        context.lineTo(node.pos.x + linkRect.left + linkRect.width, node.pos.y + linkRect.top + linkRect.height - 5);
-        context.lineTo(node.pos.x + linkRect.left, node.pos.y + linkRect.top + linkRect.height - 5);
-        context.lineTo(node.pos.x + linkRect.left + linkRect.width/3, node.pos.y + linkRect.top + linkRect.height/2);
-        context.closePath();
-        context.stroke();
-        context.fill();
       }
+
+      context.fillStyle = (this._highlightInputLink && this._highlightInputLink.name === props[i].name && this._highlightNode === node? "cyan": props[i].inputMeta.color);
+      context.strokeStyle = "black";
+      context.beginPath();
+      context.moveTo(node.pos.x + linkRect.left, node.pos.y + linkRect.top + 5);
+      context.lineTo(node.pos.x + linkRect.left + linkRect.width, node.pos.y + linkRect.top + 5);
+      context.lineTo(node.pos.x + linkRect.left + linkRect.width, node.pos.y + linkRect.top + linkRect.height - 5);
+      context.lineTo(node.pos.x + linkRect.left, node.pos.y + linkRect.top + linkRect.height - 5);
+      context.lineTo(node.pos.x + linkRect.left + linkRect.width/3, node.pos.y + linkRect.top + linkRect.height/2);
+      context.closePath();
+      context.stroke();
+      context.fill();
 
       // Property output.
-      if (!collapsed || props[i].outputs.length) {
-        var linkRect = null;
-        for (var a = 0; a < node._meta.bounds.outputBounds.length; ++a) {
-          if (node._meta.bounds.outputBounds[a].name === props[i].name) {
-            linkRect = node._meta.bounds.outputBounds[a].rect;
-            break;
-          }
+      var linkRect = null;
+      for (var a = 0; a < node._meta.bounds.outputBounds.length; ++a) {
+        if (node._meta.bounds.outputBounds[a].name === props[i].name) {
+          linkRect = node._meta.bounds.outputBounds[a].rect;
+          break;
         }
-
-        context.fillStyle = (this._highlightOutputLink && this._highlightOutputLink.name === props[i].name && this._highlightNode === node? "cyan": props[i].outputMeta.color);
-        context.strokeStyle = "black";
-        context.beginPath();
-        context.moveTo(node.pos.x + linkRect.left, node.pos.y + linkRect.top + 5);
-        context.lineTo(node.pos.x + linkRect.left + linkRect.width/2, node.pos.y + linkRect.top + 5);
-        context.lineTo(node.pos.x + linkRect.left + linkRect.width, node.pos.y + linkRect.top + linkRect.height/2);
-        context.lineTo(node.pos.x + linkRect.left + linkRect.width/2, node.pos.y + linkRect.top + linkRect.height - 5);
-        context.lineTo(node.pos.x + linkRect.left, node.pos.y + linkRect.top + linkRect.height - 5);
-        context.closePath();
-        context.stroke();
-        context.fill();
       }
+
+      context.fillStyle = (this._highlightOutputLink && this._highlightOutputLink.name === props[i].name && this._highlightNode === node? "cyan": props[i].outputMeta.color);
+      context.strokeStyle = "black";
+      context.beginPath();
+      context.moveTo(node.pos.x + linkRect.left, node.pos.y + linkRect.top + 5);
+      context.lineTo(node.pos.x + linkRect.left + linkRect.width/2, node.pos.y + linkRect.top + 5);
+      context.lineTo(node.pos.x + linkRect.left + linkRect.width, node.pos.y + linkRect.top + linkRect.height/2);
+      context.lineTo(node.pos.x + linkRect.left + linkRect.width/2, node.pos.y + linkRect.top + linkRect.height - 5);
+      context.lineTo(node.pos.x + linkRect.left, node.pos.y + linkRect.top + linkRect.height - 5);
+      context.closePath();
+      context.stroke();
+      context.fill();
 
       upper += this._drawStyle.property.spacing;
     }
@@ -2500,7 +2473,6 @@ wcPlayEditor.prototype = {
     context.save();
     this.__setCanvasFont(this._font.links, context);
 
-    var collapsed = node.collapsed();
     var links = node.chain.entry;
     for (var i = 0; i < links.length; ++i) {
       // Link label
@@ -2509,27 +2481,25 @@ wcPlayEditor.prototype = {
       context.fillText(links[i].name, xPos + this._drawStyle.links.spacing/2, yPos);
 
       // Link connector
-      if (!collapsed || links[i].links.length) {
-        var rect = null;
-        for (var a = 0; a < node._meta.bounds.entryBounds.length; ++a) {
-          if (node._meta.bounds.entryBounds[a].name === links[i].name) {
-            rect = node._meta.bounds.entryBounds[a].rect;
-            break;
-          }
+      var rect = null;
+      for (var a = 0; a < node._meta.bounds.entryBounds.length; ++a) {
+        if (node._meta.bounds.entryBounds[a].name === links[i].name) {
+          rect = node._meta.bounds.entryBounds[a].rect;
+          break;
         }
-
-        context.fillStyle = (this._highlightEntryLink && this._highlightEntryLink.name === links[i].name && this._highlightNode === node? "cyan": links[i].meta.color);
-        context.strokeStyle = "black";
-        context.beginPath();
-        context.moveTo(node.pos.x + rect.left + 5, node.pos.y + rect.top);
-        context.lineTo(node.pos.x + rect.left + rect.width/2, node.pos.y + rect.top + rect.height/3);
-        context.lineTo(node.pos.x + rect.left + rect.width - 5, node.pos.y + rect.top);
-        context.lineTo(node.pos.x + rect.left + rect.width - 5, node.pos.y + rect.top + rect.height);
-        context.lineTo(node.pos.x + rect.left + 5, node.pos.y + rect.top + rect.height);
-        context.closePath();
-        context.stroke();
-        context.fill();
       }
+
+      context.fillStyle = (this._highlightEntryLink && this._highlightEntryLink.name === links[i].name && this._highlightNode === node? "cyan": links[i].meta.color);
+      context.strokeStyle = "black";
+      context.beginPath();
+      context.moveTo(node.pos.x + rect.left + 5, node.pos.y + rect.top);
+      context.lineTo(node.pos.x + rect.left + rect.width/2, node.pos.y + rect.top + rect.height/3);
+      context.lineTo(node.pos.x + rect.left + rect.width - 5, node.pos.y + rect.top);
+      context.lineTo(node.pos.x + rect.left + rect.width - 5, node.pos.y + rect.top + rect.height);
+      context.lineTo(node.pos.x + rect.left + 5, node.pos.y + rect.top + rect.height);
+      context.closePath();
+      context.stroke();
+      context.fill();
 
       xPos += w;
     }
@@ -2553,7 +2523,6 @@ wcPlayEditor.prototype = {
     context.save();
     this.__setCanvasFont(this._font.links, context);
 
-    var collapsed = node.collapsed();
     var links = node.chain.exit;
     for (var i = 0; i < links.length; ++i) {
       // Link label
@@ -2562,27 +2531,25 @@ wcPlayEditor.prototype = {
       context.fillText(links[i].name, xPos + this._drawStyle.links.spacing/2, yPos);
 
       // Link connector
-      if (!collapsed || links[i].links.length) {
-        var rect = null;
-        for (var a = 0; a < node._meta.bounds.exitBounds.length; ++a) {
-          if (node._meta.bounds.exitBounds[a].name === links[i].name) {
-            rect = node._meta.bounds.exitBounds[a].rect;
-            break;
-          }
+      var rect = null;
+      for (var a = 0; a < node._meta.bounds.exitBounds.length; ++a) {
+        if (node._meta.bounds.exitBounds[a].name === links[i].name) {
+          rect = node._meta.bounds.exitBounds[a].rect;
+          break;
         }
-
-        context.fillStyle = (this._highlightExitLink && this._highlightExitLink.name === links[i].name && this._highlightNode === node? "cyan": links[i].meta.color);
-        context.strokeStyle = "black";
-        context.beginPath();
-        context.moveTo(node.pos.x + rect.left + 5, node.pos.y + rect.top);
-        context.lineTo(node.pos.x + rect.left + rect.width - 5, node.pos.y + rect.top);
-        context.lineTo(node.pos.x + rect.left + rect.width - 5, node.pos.y + rect.top + rect.height/2);
-        context.lineTo(node.pos.x + rect.left + rect.width/2, node.pos.y + rect.top + rect.height);
-        context.lineTo(node.pos.x + rect.left + 5, node.pos.y + rect.top + rect.height/2);
-        context.closePath();
-        context.stroke();
-        context.fill();
       }
+
+      context.fillStyle = (this._highlightExitLink && this._highlightExitLink.name === links[i].name && this._highlightNode === node? "cyan": links[i].meta.color);
+      context.strokeStyle = "black";
+      context.beginPath();
+      context.moveTo(node.pos.x + rect.left + 5, node.pos.y + rect.top);
+      context.lineTo(node.pos.x + rect.left + rect.width - 5, node.pos.y + rect.top);
+      context.lineTo(node.pos.x + rect.left + rect.width - 5, node.pos.y + rect.top + rect.height/2);
+      context.lineTo(node.pos.x + rect.left + rect.width/2, node.pos.y + rect.top + rect.height);
+      context.lineTo(node.pos.x + rect.left + 5, node.pos.y + rect.top + rect.height/2);
+      context.closePath();
+      context.stroke();
+      context.fill();
       xPos += w;
     }
 
@@ -2779,7 +2746,6 @@ wcPlayEditor.prototype = {
         targetOffset = {x: 0, y: 0};
       }
 
-      // In case our selected node gets uncollapsed, get the current position of the link.
       var point;
       for (var i = 0; i < node._meta.bounds.entryBounds.length; ++i) {
         if (node._meta.bounds.entryBounds[i].name === this._selectedEntryLink.name) {
@@ -2814,7 +2780,6 @@ wcPlayEditor.prototype = {
         targetOffset = {x: 0, y: 0};
       }
 
-      // In case our selected node gets uncollapsed, get the current position of the link.
       var point;
       for (var i = 0; i < node._meta.bounds.exitBounds.length; ++i) {
         if (node._meta.bounds.exitBounds[i].name === this._selectedExitLink.name) {
@@ -2849,7 +2814,6 @@ wcPlayEditor.prototype = {
         targetOffset = {x: 0, y: 0};
       }
 
-      // In case our selected node gets uncollapsed, get the current position of the link.
       var point;
       for (var i = 0; i < node._meta.bounds.inputBounds.length; ++i) {
         if (node._meta.bounds.inputBounds[i].name === this._selectedInputLink.name) {
@@ -2884,7 +2848,6 @@ wcPlayEditor.prototype = {
         targetOffset = {x: 0, y: 0};
       }
 
-      // In case our selected node gets uncollapsed, get the current position of the link.
       var point;
       for (var i = 0; i < node._meta.bounds.outputBounds.length; ++i) {
         if (node._meta.bounds.outputBounds[i].name === this._selectedOutputLink.name) {
@@ -3801,7 +3764,7 @@ wcPlayEditor.prototype = {
 
         this._highlightNode.pos.x = rect.width/2;
         this._highlightNode.pos.y = yPos+3;
-        this.__drawNode(this._highlightNode, this._draggingNodeData.$canvas[0].getContext('2d'), true);
+        this.__drawNode(this._highlightNode, this._draggingNodeData.$canvas[0].getContext('2d'));
       }
     }
   },
@@ -4168,32 +4131,6 @@ wcPlayEditor.prototype = {
         }
       }
     }
-
-    // If you hover over a node that is not currently expanded by hovering, force the expanded node to collapse again.
-    if (this._expandedHighlightNode && this._expandedHighlightNode !== this._highlightNode) {
-      // If we are not highlighting a new node, only uncollapse the previously hovered node if we are far from it.
-      if (this._highlightNode || !this.__inRect(mouse, this._expandedHighlightNode._meta.bounds.farRect, this._expandedHighlightNode.pos, this._viewportCamera)) {
-        // Recollapse our previous node, if necessary.
-        if (this._expandedSelectedNode !== this._expandedHighlightNode) {
-          this._expandedHighlightNode.collapsed(true);
-        }
-
-        this._expandedHighlightNode = null;
-      }
-    }
-
-    // If the user is creating a new connection and hovering over another node, uncollapse it temporarily to expose links.
-    if (!this._expandedHighlightNode && this._highlightNode && 
-        this.__inRect(mouse, node._meta.bounds.farRect, node.pos, this._viewportCamera)) {
-
-      this._expandedHighlightNode = this._highlightNode;
-      var self = this;
-      // setTimeout(function() {
-      //   if (self._expandedHighlightNode) {
-          self._expandedHighlightNode.collapsed(false);
-      //   }
-      // }, 500);
-    }
   },
 
   /**
@@ -4266,8 +4203,6 @@ wcPlayEditor.prototype = {
             this._selectedNodes = [node];
             this._selectedEntryLink = node._meta.bounds.entryBounds[i];
             this.$viewport.addClass('wcGrabbing');
-
-            this._expandedSelectedNode = this._expandedHighlightNode;
             break;
           }
         }
@@ -4316,8 +4251,6 @@ wcPlayEditor.prototype = {
             this._selectedNodes = [node];
             this._selectedExitLink = node._meta.bounds.exitBounds[i];
             this.$viewport.addClass('wcGrabbing');
-
-            this._expandedSelectedNode = this._expandedHighlightNode;
             break;
           }
         }
@@ -4361,8 +4294,6 @@ wcPlayEditor.prototype = {
             this._selectedNodes = [node];
             this._selectedInputLink = node._meta.bounds.inputBounds[i];
             this.$viewport.addClass('wcGrabbing');
-
-            this._expandedSelectedNode = this._expandedHighlightNode;
             break;
           }
         }
@@ -4406,8 +4337,6 @@ wcPlayEditor.prototype = {
             this._selectedNodes = [node];
             this._selectedOutputLink = node._meta.bounds.outputBounds[i];
             this.$viewport.addClass('wcGrabbing');
-
-            this._expandedSelectedNode = this._expandedHighlightNode;
             break;
           }
         }
@@ -4483,9 +4412,7 @@ wcPlayEditor.prototype = {
 
       this._selectedNode = newNode;
       this._selectedNodes = [newNode];
-      this._expandedHighlightNode = newNode;
 
-      newNode.collapsed(false);
       this.__updateNode(newNode, 0, this._viewportContext);
       this.__drawNode(newNode, this._viewportContext);
 
@@ -4743,11 +4670,6 @@ wcPlayEditor.prototype = {
       this._selectedNode.onViewportMouseUp(event, pos, this._options.readOnly);
     }
 
-    if (this._expandedSelectedNode && this._expandedSelectedNode !== this._expandedHighlightNode) {
-      this._expandedSelectedNode.collapsed(true);
-    }
-
-    this._expandedSelectedNode = null;
     this._selectedEntryLink = false;
     this._selectedExitLink = false;
     this._selectedInputLink = false;
