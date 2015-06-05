@@ -1,5 +1,3 @@
-'use strict'
-
 // Create a global clipboard that can be shared between all instances of the editor tool.
 window.wcPlayEditorClipboard = {
   bounds: {
