@@ -94,19 +94,21 @@ wcPlay.NODE_LIBRARY = [];
  * @returns {Boolean} - Success or failure.
  */
 wcPlay.registerNodeType = function(name, displayName, category, nodeType) {
-  for (var i = 0; i < wcPlay.NODE_LIBRARY.length; ++i) {
-    if (wcPlay.NODE_LIBRARY[i].className === name) {
-      wcPlay.NODE_LIBRARY.splice(i, 1);
-      break;
-    }
-  }
-
-  wcPlay.NODE_LIBRARY.push({
+  var data = {
     className: name,
     displayName: displayName,
     category: category,
     nodeType: nodeType,
-  });
+  };
+
+  for (var i = 0; i < wcPlay.NODE_LIBRARY.length; ++i) {
+    if (wcPlay.NODE_LIBRARY[i].className === name) {
+      wcPlay.NODE_LIBRARY[i] = data;
+      break;
+    }
+  }
+
+  wcPlay.NODE_LIBRARY.push(data);
   return true;
 }
 
