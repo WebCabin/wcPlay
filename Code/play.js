@@ -96,7 +96,8 @@ wcPlay.NODE_LIBRARY = [];
 wcPlay.registerNodeType = function(name, displayName, category, nodeType) {
   for (var i = 0; i < wcPlay.NODE_LIBRARY.length; ++i) {
     if (wcPlay.NODE_LIBRARY[i].name === name) {
-      return false;
+      wcPlay.NODE_LIBRARY.splice(i, 1);
+      break;
     }
   }
 
