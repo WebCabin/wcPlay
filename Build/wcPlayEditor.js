@@ -1641,6 +1641,8 @@ wcPlayEditor.prototype = {
             (this._options.category.isBlacklist && catIndex > -1)) {
           continue;
         }
+      } else {
+        continue;
       }
 
       __organize.call(this, data);
