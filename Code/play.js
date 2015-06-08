@@ -104,7 +104,7 @@ wcPlay.registerNodeType = function(name, displayName, category, nodeType) {
   for (var i = 0; i < wcPlay.NODE_LIBRARY.length; ++i) {
     if (wcPlay.NODE_LIBRARY[i].className === name) {
       wcPlay.NODE_LIBRARY[i] = data;
-      break;
+      return true;
     }
   }
 
