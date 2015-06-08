@@ -15,7 +15,7 @@ $(document).ready(function() {
 
   // Create an instance of our script editor.
   var myPlayEditor = new wcPlayEditor('.playContainer', {
-    readOnly: false,
+    readOnly: false
   });
 
   // Assign the current Play script to be rendered.

@@ -1635,15 +1635,10 @@ wcPlayEditor.prototype = {
       var data = wcPlay.NODE_LIBRARY[i];
 
       // Skip categories we are not showing.
-      if (data.nodeType !== wcPlay.NODE.COMPOSITE) {
+      if (data.className !== 'wcNodeCompositeScript') {
         var catIndex = this._options.category.items.indexOf(data.category);
         if ((!this._options.category.isBlacklist && catIndex === -1) ||
             (this._options.category.isBlacklist && catIndex > -1)) {
-          continue;
-        }
-      } else {
-        // Skip our internal script node.
-        if (data.className === 'wcNodeCompositeScript') {
           continue;
         }
       }
@@ -1659,7 +1654,6 @@ wcPlayEditor.prototype = {
     var composites = this._engine.importedComposites();
     for (var i = 0; i < composites.length; ++i) {
       var node = composites[i];
-      // TODO: Check the contents of each composite node and make sure it does not contain any categories we are hiding.
       
       __organize.call(this, node);
 
