@@ -804,7 +804,7 @@ wcPlayEditor.prototype = {
     });
 
     // File -> New Script...
-    this._menu.addOption('File', 'New Script...', {
+    this._menu.addOption('File', 'New Script', {
       hotkeys: "Alt+N",
       icon: "fa fa-file-o fa-lg",
       description: "Start a new script...",
@@ -1528,12 +1528,14 @@ wcPlayEditor.prototype = {
     });
 
     this._menu.addSpacer('File', 'Save Script');
+    this._menu.addSpacer('File', 'Import...');
     this._menu.addSpacer('Edit', 'Redo');
     this._menu.addSpacer('Edit', 'Delete');
     this._menu.addSpacer('View', 'Enter Composite');
     this._menu.addSpacer('View', 'Chain Style');
     this._menu.addSpacer('Debugging', 'Toggle Silence Mode');
     this._menu.addToolbarSpacer('File', 'Save Script');
+    this._menu.addToolbarSpacer('File', 'Import...');
     this._menu.addToolbarSpacer('Edit', 'Redo');
     this._menu.addToolbarSpacer('Edit', 'Delete');
     this._menu.addToolbarSpacer('Edit', 'Create Composite');
@@ -1782,13 +1784,12 @@ wcPlayEditor.prototype = {
    * @function wcPlayEditor#__drawNode
    * @private
    * @param {wcNode} node - The node to render.
-   * @param {wcPlay~Coordinates} pos - The position to render the node in the canvas, relative to the top-middle of the node.
    * @param {external:Canvas~Context} context - The canvas context to render on.
-   * @param {Boolean} [noclip] - If true, this node will not be 
+   * @param {Boolean} [isPalette] - If true, this node will be rendered for the palette view. 
    */
-  __drawNode: function(node, context, noclip) {
+  __drawNode: function(node, context, isPalette) {
     // Ignore drawing if the node is outside of view.
-    if (!noclip && !this.__rectOnRect(node._meta.bounds.farRect, this._viewportBounds, node.pos)) {
+    if (!isPalette && !this.__rectOnRect(node._meta.bounds.farRect, this._viewportBounds, node.pos)) {
       node._meta.visible = false;
       return;
     }
@@ -1803,7 +1804,7 @@ wcPlayEditor.prototype = {
     }
 
     // Now use our measurements to draw our node.
-    this.__drawCenter(node, context);
+    this.__drawCenter(node, context, isPalette);
     this.__drawEntryLinks(node, context, node._meta.bounds.entryOuter.width);
     this.__drawExitLinks(node, context, node._meta.bounds.entryOuter.height + node._meta.bounds.centerOuter.height, node._meta.bounds.exitOuter.width);
 
@@ -2236,9 +2237,10 @@ wcPlayEditor.prototype = {
    * @private
    * @param {wcNode} node - The node to draw.
    * @param {external:Canvas~Context} context - The canvas context.
+   * @param {Boolean} [isPalette] - If true, this node will be rendered for the palette view. 
    * @returns {wcPlayEditor~DrawPropertyData} - Contains bounding rectangles for various drawings.
    */
-  __drawCenter: function(node, context) {
+  __drawCenter: function(node, context, isPalette) {
     var upper = node.chain.entry.length? this._font.links.size + this._drawStyle.links.padding: 0;
     var lower = node.chain.exit.length? this._font.links.size + this._drawStyle.links.padding: 0;
 
@@ -2274,7 +2276,7 @@ wcPlayEditor.prototype = {
     }
 
     // Highlight title text.
-    if (!this._options.readOnly) {
+    if (!this._options.readOnly && !isPalette) {
       if (this._highlightTitle && this._highlightNode === node) {
         this.__drawRoundedRect(node._meta.bounds.titleBounds, this._drawStyle.property.highlightColor, this._drawStyle.property.highlightBorder, this._font.title.size/2, context, node.pos);
       } else if (this._highlightNode === node) {
@@ -2283,7 +2285,7 @@ wcPlayEditor.prototype = {
     }
 
     // Highlight details button.
-    if (!this._options.readOnly && node._meta.bounds.detailsBounds.width > 0) {
+    if (!this._options.readOnly && node._meta.bounds.detailsBounds.width > 0 && !isPalette) {
       if (this._highlightDetails && this._highlightNode === node) {
         this.__drawRoundedRect(node._meta.bounds.detailsBounds, this._drawStyle.property.highlightColor, this._drawStyle.property.highlightBorder, this._font.title.size/2, context, node.pos);
       } else if (this._highlightNode === node) {
@@ -2364,7 +2366,7 @@ wcPlayEditor.prototype = {
       }
 
       // Highlight hovered values.
-      if (!this._options.readOnly) {
+      if (!this._options.readOnly && !isPalette) {
         if (this._engine && this._engine.isRunning()) {
           if (this._highlightNode === node && this._highlightPropertyValue && this._highlightPropertyValue.name === props[i].name) {
             this.__drawRoundedRect(valueBound.rect, this._drawStyle.property.highlightColor, this._drawStyle.property.highlightBorder, this._font.property.size/2, context, node.pos);
