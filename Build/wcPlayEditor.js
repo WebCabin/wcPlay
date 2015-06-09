@@ -4453,12 +4453,13 @@ wcPlayEditor.prototype = {
 
     if (this._draggingNodeData) {
       // Create an instance of the node and add it to the script.
+      var screenOffset = this.$container.offset();
       var mouse = this.__mouse(event, this.$viewport.offset(), this._viewportCamera);
       var newNode = new window[this._draggingNodeData.node.className](this._parent, {x: 0, y: 0});
       var data = this._draggingNodeData.node.export();
       data.id = newNode.id;
-      data.pos.x = (mouse.x / this._viewportCamera.z) + (this._draggingNodeData.$canvas.width()/2 + this._draggingNodeData.offset.x);
-      data.pos.y = (mouse.y / this._viewportCamera.z) + (this._draggingNodeData.offset.y + 5);
+      data.pos.x = (mouse.x / this._viewportCamera.z) + (this._draggingNodeData.$canvas.width()/2 + this._draggingNodeData.offset.x + screenOffset.left);
+      data.pos.y = (mouse.y / this._viewportCamera.z) + (this._draggingNodeData.offset.y + 5 + screenOffset.top);
       if (!newNode.chain.entry.length) {
         data.y += this._drawStyle.links.length;
       }
