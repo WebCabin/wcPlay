@@ -19,7 +19,7 @@ wcNodeProcess.extend('wcNodeProcessExampleDynamic', 'Example Dynamic', 'Example'
     this.createEntry('change color', "Change the color of this node!");
 
     this._propCount = 0;
-    this.createProperty('count', wcPlay.PROPERTY.NUMBER, 0, {min: 0, max: 10, description: "Dynamically create a property for each count."});
+    this.createProperty('count', wcPlay.PROPERTY.NUMBER, 0, {min: 0, max: 10, description: "Dynamically create a property for each count.", noread: true});
   },
 
   /**

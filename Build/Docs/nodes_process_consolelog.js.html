@@ -74,7 +74,7 @@
     this.description("For debugging purposes, will print out a message into the console log when activated (only if silent mode is not on).");
 
     // Create the message property so we know what to output in the log.
-    this.createProperty('message', wcPlay.PROPERTY.STRING, 'msg', {description: "The message that will appear in the console log."});
+    this.createProperty('message', wcPlay.PROPERTY.STRING, 'msg', {description: "The message that will appear in the console log.", noread: true});
   },
 
   /**

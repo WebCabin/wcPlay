@@ -66,9 +66,12 @@
  */
 
 /**
+ * A set of options that apply to all property types.
  * @typedef {Object} wcNode~PropertyOptions
  * @property {String} [description] - An optional description to display as a tooltip for this property.
  * @property {wcNode~PropertyDisplay} [display] - An optional function that will be called to retrieve the display string for the value/initial value for this property.
+ * @property {Boolean} [noread] - If true, this property will not have an output link so its value can not be retrieved through script.
+ * @property {Boolean} [nowrite] - If true, this property will not have an input link so its value can not be changed through script.
  */
 
 /**
@@ -76,6 +79,8 @@
  * @typedef {Object} wcNode~NumberOptions
  * @property {String} [description] - An optional description to display as a tooltip for this property.
  * @property {wcNode~PropertyDisplay} [display] - An optional function that will be called to retrieve the display string for the value/initial value for this property.
+ * @property {Boolean} [noread] - If true, this property will not have an output link so its value can not be retrieved through script.
+ * @property {Boolean} [nowrite] - If true, this property will not have an input link so its value can not be changed through script.
  * @property {Number} [min=-Infinity] - The minimum value of the number range.
  * @property {Number} [max=Infinity] - The maximum value of the number range.
  * @property {Number} [step=1] - The amount the value will go up or down when the user clicks the up and down arrow controls.
@@ -86,6 +91,8 @@
  * @typedef {Object} wcNode~StringOptions
  * @property {String} [description] - An optional description to display as a tooltip for this property.
  * @property {wcNode~PropertyDisplay} [display] - An optional function that will be called to retrieve the display string for the value/initial value for this property.
+ * @property {Boolean} [noread] - If true, this property will not have an output link so its value can not be retrieved through script.
+ * @property {Boolean} [nowrite] - If true, this property will not have an input link so its value can not be changed through script.
  * @property {Number} [maxlength=Infinity] - The maximum number of characters allowed.
  * @property {Boolean} [multiline=false] - Whether to use a multi-line text editor for this property.
  */
@@ -95,6 +102,8 @@
  * @typedef {Object} wcNode~SelectOptions
  * @property {String} [description] - An optional description to display as a tooltip for this property.
  * @property {wcNode~PropertyDisplay} [display] - An optional function that will be called to retrieve the display string for the value/initial value for this property.
+ * @property {Boolean} [noread] - If true, this property will not have an output link so its value can not be retrieved through script.
+ * @property {Boolean} [nowrite] - If true, this property will not have an input link so its value can not be changed through script.
  * @property {wcNode~SelectItem[]|String[]|wcNode~SelectItemFunc} items - A list of items to display in the combo box, or a callback function that can dynamically retrieve a list.
  */
 

@@ -210,9 +210,9 @@ wcNodeProcess.extend('wcNodeProcessOperation', 'Operation', 'Data Manipulation',
     this.createEntry('div', "valueA / valueB = result");
 
     // Create our two operator values.
-    this.createProperty('valueA', wcPlay.PROPERTY.NUMBER, 0, {description: "Left hand value for the operation."});
-    this.createProperty('valueB', wcPlay.PROPERTY.NUMBER, 0, {description: "Right hand value for the operation."});
-    this.createProperty('result', wcPlay.PROPERTY.NUMBER, 0, {description: "The result of the operation."});
+    this.createProperty('valueA', wcPlay.PROPERTY.NUMBER, 0, {description: "Left hand value for the operation.", noread: true});
+    this.createProperty('valueB', wcPlay.PROPERTY.NUMBER, 0, {description: "Right hand value for the operation.", noread: true});
+    this.createProperty('result', wcPlay.PROPERTY.NUMBER, 0, {description: "The result of the operation.", nowrite: true});
   },
 
   /**
@@ -257,9 +257,9 @@ wcNodeProcess.extend('wcNodeProcessStrCat', 'String Concat', 'Data Manipulation'
     this.details("This takes the string of valueA and appends valueB to it, the result is stored in the result property.");
 
     // Create our two operator values.
-    this.createProperty('valueA', wcPlay.PROPERTY.STRING, '', {description: "The left side string to join."});
-    this.createProperty('valueB', wcPlay.PROPERTY.STRING, '', {description: "The right side string to join."});
-    this.createProperty('result', wcPlay.PROPERTY.STRING, '', {description: "The concatenated result."});
+    this.createProperty('valueA', wcPlay.PROPERTY.STRING, '', {description: "The left side string to join.", noread: true});
+    this.createProperty('valueB', wcPlay.PROPERTY.STRING, '', {description: "The right side string to join.", noread: true});
+    this.createProperty('result', wcPlay.PROPERTY.STRING, '', {description: "The concatenated result.", nowrite: true});
   },
 
   /**
@@ -296,10 +296,10 @@ wcNodeProcess.extend('wcNodeProcessAJAX', 'AJAX', 'Data Retrieval', {
     this.createExit('success');
     this.createExit('failure');
 
-    this.createProperty('type', wcPlay.PROPERTY.SELECT, 'GET', {items: ['GET', 'POST'], description:"The AJAX method to perform."});
-    this.createProperty('url', wcPlay.PROPERTY.STRING, 'example.com', {description: "The URL to send the request."});
-    this.createProperty('data', wcPlay.PROPERTY.STRING, 'foo=bar&bar=foo', {description: "The data to send with the request. This can be in query string form, or any object that $.ajax supports as the data parameter."});
-    this.createProperty('result', wcPlay.PROPERTY.STRING, '', {description: "The result of the ajax request, if successful."});
+    this.createProperty('type', wcPlay.PROPERTY.SELECT, 'GET', {items: ['GET', 'POST'], description:"The AJAX method to perform.", noread: true});
+    this.createProperty('url', wcPlay.PROPERTY.STRING, 'example.com', {description: "The URL to send the request.", noread: true});
+    this.createProperty('data', wcPlay.PROPERTY.STRING, 'foo=bar&bar=foo', {description: "The data to send with the request. This can be in query string form, or any object that $.ajax supports as the data parameter.", noread: true});
+    this.createProperty('result', wcPlay.PROPERTY.STRING, '', {description: "The result of the ajax request, if successful.", nowrite: true});
   },
 
   /**
@@ -352,7 +352,7 @@ wcNodeProcess.extend('wcNodeProcessConsoleLog', 'Console Log', 'Debugging', {
     this.description("For debugging purposes, will print out a message into the console log when activated (only if silent mode is not on).");
 
     // Create the message property so we know what to output in the log.
-    this.createProperty('message', wcPlay.PROPERTY.STRING, 'msg', {description: "The message that will appear in the console log."});
+    this.createProperty('message', wcPlay.PROPERTY.STRING, 'msg', {description: "The message that will appear in the console log.", noread: true});
   },
 
   /**
@@ -394,7 +394,7 @@ wcNodeProcess.extend('wcNodeProcessAlert', 'Alert', 'Debugging', {
     this.description("For debugging purposes, will popup an alert box with a message when activated (only if silent mode is not on).");
 
     // Create the message property so we know what to output in the log.
-    this.createProperty('message', wcPlay.PROPERTY.STRING, 'Alert message.', {multiline: true, description: "The message that will appear in the alert box."});
+    this.createProperty('message', wcPlay.PROPERTY.STRING, 'Alert message.', {multiline: true, description: "The message that will appear in the alert box.", noread: true});
   },
 
   /**

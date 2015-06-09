@@ -162,7 +162,7 @@
 }
 
 .wcPlayHoverCanvas {
-  position: fixed;
+  position: absolute;
   pointer-events: none;
 }
 

@@ -198,7 +198,7 @@ wcPlay.prototype = {
     this._isPausing = false;
     this._isStepping = false;
 
-    this.__notifyNodes('onStart', []);
+    this.notifyNodes('onStart', []);
   },
 
   /**
@@ -714,7 +714,7 @@ wcPlay.prototype = {
     }
 
     prop.name = newName;
-    this.__notifyNodes('onGlobalPropertyRenamed', [name, newName]);
+    this.notifyNodes('onGlobalPropertyRenamed', [name, newName]);
   },
 
   /**
@@ -725,7 +725,7 @@ wcPlay.prototype = {
   removeProperty: function(name) {
     for (var i = 0; i < this._properties.length; ++i) {
       if (this._properties[i].name === name) {
-        this.__notifyNodes('onGlobalPropertyRemoved', [name]);
+        this.notifyNodes('onGlobalPropertyRemoved', [name]);
         this._properties.splice(i, 1);
         return true;
       }
@@ -756,7 +756,7 @@ wcPlay.prototype = {
     if (value !== undefined && value !== prop.value) {
       var oldValue = prop.value;
       prop.value = value;
-      this.__notifyNodes('onGlobalPropertyChanged', [prop.name, oldValue, prop.value]);
+      this.notifyNodes('onGlobalPropertyChanged', [prop.name, oldValue, prop.value]);
     }
 
     return prop.value;
@@ -788,7 +788,7 @@ wcPlay.prototype = {
 
       if (prop.value == oldValue) {
         prop.value = value;
-        this.__notifyNodes('onGlobalInitialPropertyChanged', [prop.name, oldValue, prop.value]);
+        this.notifyNodes('onGlobalInitialPropertyChanged', [prop.name, oldValue, prop.value]);
       }
     }
 
@@ -827,6 +827,64 @@ wcPlay.prototype = {
     for (var i = 0; i < this._entryNodes.length; ++i) {
       if (this._entryNodes[i].type === type && this._entryNodes[i].name === name) {
         this._entryNodes[i].onActivated(data);
+      }
+    }
+  },
+
+  /**
+   * Sends a custom notification event to all nodes.
+   * @function wcPlay#notifyNodes
+   * @private
+   * @param {String} func - The node function to call.
+   * @param {Object[]} args - A list of arguments to forward into the function call.
+   */
+  notifyNodes: function(func, args) {
+    var self;
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      self = this._compositeNodes[i];
+      if (typeof self[func] === 'function') {
+        self[func].apply(self, args);
+      }
+    }
+    for (var i = 0; i < this._entryNodes.length; ++i) {
+      self = this._entryNodes[i];
+      if (typeof self[func] === 'function') {
+        self[func].apply(self, args);
+      }
+    }
+    for (var i = 0; i < this._processNodes.length; ++i) {
+      self = this._processNodes[i];
+      if (typeof self[func] === 'function') {
+        self[func].apply(self, args);
+      }
+    }
+    for (var i = 0; i < this._storageNodes.length; ++i) {
+      self = this._storageNodes[i];
+      if (typeof self[func] === 'function') {
+        self[func].apply(self, args);
+      }
+    }
+
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      if (this._compositeNodes[i] instanceof wcNodeCompositeScript) {
+        this._compositeNodes[i].notifyNodes(func, args);
+      }
+    }
+  },
+
+  /**
+   * Sends a custom notification event to all renderers.
+   * @function wcPlay#notifyEditors
+   * @private
+   * @param {String} func - The renderer function to call.
+   * @param {Object[]} args - A list of arguments to forward into the function call.
+   */
+  notifyEditors: function(func, args) {
+    var self;
+    for (var i = 0; i < this._editors.length; ++i) {
+      self = this._editors[i];
+      if (typeof self[func] === 'function') {
+        self[func].apply(self, args);
       }
     }
   },
@@ -1005,64 +1063,6 @@ wcPlay.prototype = {
 
     return false;
   },
-
-  /**
-   * Sends a custom notification event to all nodes.
-   * @function wcPlay#__notifyNodes
-   * @private
-   * @param {String} func - The node function to call.
-   * @param {Object[]} args - A list of arguments to forward into the function call.
-   */
-  __notifyNodes: function(func, args) {
-    var self;
-    for (var i = 0; i < this._compositeNodes.length; ++i) {
-      self = this._compositeNodes[i];
-      if (typeof self[func] === 'function') {
-        self[func].apply(self, args);
-      }
-    }
-    for (var i = 0; i < this._entryNodes.length; ++i) {
-      self = this._entryNodes[i];
-      if (typeof self[func] === 'function') {
-        self[func].apply(self, args);
-      }
-    }
-    for (var i = 0; i < this._processNodes.length; ++i) {
-      self = this._processNodes[i];
-      if (typeof self[func] === 'function') {
-        self[func].apply(self, args);
-      }
-    }
-    for (var i = 0; i < this._storageNodes.length; ++i) {
-      self = this._storageNodes[i];
-      if (typeof self[func] === 'function') {
-        self[func].apply(self, args);
-      }
-    }
-
-    for (var i = 0; i < this._compositeNodes.length; ++i) {
-      if (this._compositeNodes[i] instanceof wcNodeCompositeScript) {
-        this._compositeNodes[i].__notifyNodes(func, args);
-      }
-    }
-  },
-
-  /**
-   * Sends a custom notification event to all renderers.
-   * @function wcPlay#__notifyEditors
-   * @private
-   * @param {String} func - The renderer function to call.
-   * @param {Object[]} args - A list of arguments to forward into the function call.
-   */
-  __notifyEditors: function(func, args) {
-    var self;
-    for (var i = 0; i < this._editors.length; ++i) {
-      self = this._editors[i];
-      if (typeof self[func] === 'function') {
-        self[func].apply(self, args);
-      }
-    }
-  },
 };
 
 
@@ -1149,7 +1149,7 @@ Class.extend('wcNode', 'Node', '', {
     this._parent = parent;
 
     // Give the node its default properties.
-    this.createProperty(wcNode.PROPERTY_ENABLED, wcPlay.PROPERTY.TOGGLE, true, {description: "Disabled nodes will be treated as if they were not there, all connections will be ignored."});
+    this.createProperty(wcNode.PROPERTY_ENABLED, wcPlay.PROPERTY.TOGGLE, true, {description: "Disabled nodes will be treated as if they were not there, all connections will be ignored.", noread: true});
     // this.createProperty(wcNode.PROPERTY.DEBUG_LOG, wcPlay.PROPERTY.TOGGLE, false, {collapsible: true, description: "Output various debugging information about this node."});
 
     // Add this node to its parent.
@@ -2380,6 +2380,23 @@ Class.extend('wcNode', 'Node', '', {
     }
 
     return false;
+  },
+
+  /** Gets the options assigned to a property, you may change attributes from here.
+   * @function wcNode#propertyOptions
+   * @param {String} name - The name of the property.
+   * @returns {Object|null} - The options object associated with the property, or null if the property does not exist.
+   */
+  propertyOptions: function(name) {
+    for (var i = 0; i < this.properties.length; ++i) {
+      var prop = this.properties[i];
+      if (prop.name === name) {
+        // Assume the user will change options for this property, so make it dirty.
+        this._meta.dirty = true;
+        return prop.options;
+      }
+    }
+    return null;
   },
 
   /**
@@ -3835,6 +3852,47 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
   },
 
   /**
+   * Sends a custom notification event to all nodes.
+   * @function wcNodeCompositeScript#notifyNodes
+   * @private
+   * @param {String} func - The node function to call.
+   * @param {Object[]} args - A list of arguments to forward into the function call.
+   */
+  notifyNodes: function(func, args) {
+    var self;
+    for (var i = 0; i < this._storageNodes.length; ++i) {
+      self = this._storageNodes[i];
+      if (typeof self[func] === 'function') {
+        self[func].apply(self, args);
+      }
+    }
+    for (var i = 0; i < this._processNodes.length; ++i) {
+      self = this._processNodes[i];
+      if (typeof self[func] === 'function') {
+        self[func].apply(self, args);
+      }
+    }
+    for (var i = 0; i < this._entryNodes.length; ++i) {
+      self = this._entryNodes[i];
+      if (typeof self[func] === 'function') {
+        self[func].apply(self, args);
+      }
+    }
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      self = this._compositeNodes[i];
+      if (typeof self[func] === 'function') {
+        self[func].apply(self, args);
+      }
+    }
+
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      if (this._compositeNodes[i] instanceof wcNodeCompositeScript) {
+        this._compositeNodes[i].notifyNodes(func, args);
+      }
+    }
+  },
+
+  /**
    * Adds a node into the known node stacks.
    * @function wcNodeCompositeScript#__addNode
    * @private
@@ -3894,47 +3952,6 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
     }
 
     return false;
-  },
-
-  /**
-   * Sends a custom notification event to all nodes.
-   * @function wcNodeCompositeScript#__notifyNodes
-   * @private
-   * @param {String} func - The node function to call.
-   * @param {Object[]} args - A list of arguments to forward into the function call.
-   */
-  __notifyNodes: function(func, args) {
-    var self;
-    for (var i = 0; i < this._storageNodes.length; ++i) {
-      self = this._storageNodes[i];
-      if (typeof self[func] === 'function') {
-        self[func].apply(self, args);
-      }
-    }
-    for (var i = 0; i < this._processNodes.length; ++i) {
-      self = this._processNodes[i];
-      if (typeof self[func] === 'function') {
-        self[func].apply(self, args);
-      }
-    }
-    for (var i = 0; i < this._entryNodes.length; ++i) {
-      self = this._entryNodes[i];
-      if (typeof self[func] === 'function') {
-        self[func].apply(self, args);
-      }
-    }
-    for (var i = 0; i < this._compositeNodes.length; ++i) {
-      self = this._compositeNodes[i];
-      if (typeof self[func] === 'function') {
-        self[func].apply(self, args);
-      }
-    }
-
-    for (var i = 0; i < this._compositeNodes.length; ++i) {
-      if (this._compositeNodes[i] instanceof wcNodeCompositeScript) {
-        this._compositeNodes[i].__notifyNodes(func, args);
-      }
-    }
   },
 });
 
@@ -4305,6 +4322,8 @@ wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'Linkers', {
       this._parent && this._parent.createProperty(this.name, wcPlay.PROPERTY.STRING, '');
     }
 
+    this.createProperty('input', wcPlay.PROPERTY.TOGGLE, true, {description: "Assign whether the parent Composite Node can set this property's value.", noread: true});
+    this.createProperty('output', wcPlay.PROPERTY.TOGGLE, true, {description: "Assign whether the parent Composite Node can read this property's value.", noread: true});
     this.createProperty('value', wcPlay.PROPERTY.STRING, '');
   },
 
@@ -4325,7 +4344,15 @@ wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'Linkers', {
     if (newName) {
       // Attempt to create a new property, if it does not exist, then synchronize our local property.
       if (this._parent) {
-        this._parent.createProperty(newName, wcPlay.PROPERTY.STRING, '');
+        var opts = {};
+        if (!this.property('input')) {
+          opts.nowrite = true;
+        }
+        if (!this.property('output')) {
+          opts.noread = true;
+        }
+        this._parent.createProperty(newName, wcPlay.PROPERTY.STRING, '', opts);
+
         // Copy all chains from the old property links to the new.
         var inputChains = this._parent.listInputChains(oldName);
         var outputChains = this._parent.listOutputChains(oldName);
@@ -4358,13 +4385,61 @@ wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'Linkers', {
   onPropertyChanging: function(name, oldValue, newValue) {
     this._super(name, oldValue, newValue);
 
-    if (this._invalid) {
+    if (this._invalid || !this.name || !this._parent) {
       return '';
     }
 
-    if (name === 'value') {
-      if (this.name) {
-        this._parent && this._parent.property(this.name, newValue);
+    switch (name) {
+      case 'value':
+        this._parent.property(this.name, newValue);
+        break;
+      case 'input':
+        var engine = this.engine();
+        var opts = this._parent.propertyOptions(this.name);
+        if (opts && engine) {
+          engine.notifyEditors('onBeginUndoGroup', ['Property "' + name + '" changed for Node "' + this.category + '.' + this.type + '"']);
+
+          opts.nowrite = !newValue;
+
+          if (opts.nowrite) {
+            engine.notifyEditors('onDisconnectInputChains', [this._parent, this.name]);
+            this._parent.disconnectInput(this.name);
+          }
+        }
+        break;
+      case 'output':
+        var engine = this.engine();
+        var opts = this._parent.propertyOptions(this.name);
+        if (opts && engine) {
+          engine.notifyEditors('onBeginUndoGroup', ['Property "' + name + '" changed for Node "' + this.category + '.' + this.type + '"']);
+          opts.noread = !newValue;
+
+          if (opts.noread) {
+            engine.notifyEditors('onDisconnectOutputChains', [this._parent, this.name]);
+            this._parent.disconnectOutput(this.name);
+          }
+        }
+        break;
+    }
+  },
+
+  /**
+   * Event that is called when a property has changed.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeCompositeProperty#onPropertyChanged
+   * @param {String} name - The name of the property.
+   * @param {Object} oldValue - The old value of the property.
+   * @param {Object} newValue - The new value of the property.
+   */
+  onPropertyChanged: function(name, oldValue, newValue) {
+    this._super(name, oldValue, newValue);
+
+    if (name === 'input' || name === 'output') {
+      var engine = this.engine();
+      if (engine) {
+        setTimeout(function() {
+          engine.notifyEditors('onEndUndoGroup');
+        }, 0);
       }
     }
   },

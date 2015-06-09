@@ -336,6 +336,23 @@ wcPlayEditor.prototype = {
   },
 
   /**
+   * Event that is called to begin an undo manager group operation.
+   * @function wcPlayEditor#onBeginUndoGroup
+   * @param {String} description - The description of the undo event.
+   */
+  onBeginUndoGroup: function(description) {
+    this._undoManager &amp;&amp; this._undoManager.beginGroup(description);
+  },
+
+  /**
+   * Event that is called to end an undo manager group operation.
+   * @function wcPlayEditor#onEndUndoGroup
+   */
+  onEndUndoGroup: function() {
+    this._undoManager &amp;&amp; this._undoManager.endGroup();
+  },
+
+  /**
    * Event that is called when the container view is resized.
    * @function wcPlayEditor#onResized
    */
@@ -356,6 +373,142 @@ wcPlayEditor.prototype = {
     this._viewportBounds.left   = -this._viewportCamera.x / this._viewportCamera.z;
     this._viewportBounds.width  = this._size.x / this._viewportCamera.z;
     this._viewportBounds.height = this._size.y / this._viewportCamera.z;
+  },
+
+  /**
+   * Disconnects all chains attached to a node's entry link.
+   * @function wcPlayEditor#onDisconnectEntryChains
+   * @param {wcNode} node - The node to disconnect from.
+   * @param {String} linkName - The name of the link.
+   */
+  onDisconnectEntryChains: function(node, linkName) {
+      var chains = node.listEntryChains(linkName);
+      if (chains.length) {
+        this._undoManager &amp;&amp; this._undoManager.addEvent('Disconnected Entry Links for "' + node.category + '.' + node.type + '.' + linkName + '"',
+          {
+            id: node.id,
+            name: linkName,
+            chains: chains,
+            engine: this._engine,
+          },
+          // Undo
+          function() {
+            var myNode = this.engine.nodeById(this.id);
+            for (var i = 0; i &lt; this.chains.length; ++i) {
+              var targetNode = this.engine.nodeById(this.chains[i].outNodeId);
+              var targetName = this.chains[i].outName;
+              myNode.connectEntry(this.name, targetNode, targetName);
+            }
+          },
+          // Redo
+          function() {
+            var myNode = this.engine.nodeById(this.id);
+            myNode.disconnectEntry(this.name);
+          });
+      }
+      node.disconnectEntry(linkName);
+  },
+
+  /**
+   * Disconnects all chains attached to a node's exit link.
+   * @function wcPlayEditor#onDisconnectExitChains
+   * @param {wcNode} node - The node to disconnect from.
+   * @param {String} linkName - The name of the link.
+   */
+  onDisconnectExitChains: function(node, linkName) {
+    var chains = node.listExitChains(linkName);
+    if (chains.length) {
+      this._undoManager &amp;&amp; this._undoManager.addEvent('Disconnected Exit Links for "' + node.category + '.' + node.type + '.' + linkName + '"',
+        {
+          id: node.id,
+          name: linkName,
+          chains: chains,
+          engine: this._engine,
+        },
+        // Undo
+        function() {
+          var myNode = this.engine.nodeById(this.id);
+          for (var i = 0; i &lt; this.chains.length; ++i) {
+            var targetNode = this.engine.nodeById(this.chains[i].inNodeId);
+            var targetName = this.chains[i].inName;
+            myNode.connectExit(this.name, targetNode, targetName);
+          }
+        },
+        // Redo
+        function() {
+          var myNode = this.engine.nodeById(this.id);
+          myNode.disconnectExit(this.name);
+        });
+    }
+    node.disconnectExit(linkName);
+  },
+
+  /**
+   * Disconnects all chains attached to a node's input link.
+   * @function wcPlayEditor#onDisconnectInputChains
+   * @param {wcNode} node - The node to disconnect from.
+   * @param {String} linkName - The name of the link.
+   */
+  onDisconnectInputChains: function(node, linkName) {
+    var chains = node.listInputChains(linkName);
+    if (chains.length) {
+      this._undoManager &amp;&amp; this._undoManager.addEvent('Disconnected Property Input Links for "' + node.category + '.' + node.type + '.' + linkName + '"',
+        {
+          id: node.id,
+          name: linkName,
+          chains: chains,
+          engine: this._engine,
+        },
+        // Undo
+        function() {
+          var myNode = this.engine.nodeById(this.id);
+          for (var i = 0; i &lt; this.chains.length; ++i) {
+            var targetNode = this.engine.nodeById(this.chains[i].outNodeId);
+            var targetName = this.chains[i].outName;
+            myNode.connectInput(this.name, targetNode, targetName);
+          }
+        },
+        // Redo
+        function() {
+          var myNode = this.engine.nodeById(this.id);
+          myNode.disconnectInput(this.name);
+        });
+    }
+    node.disconnectInput(linkName);
+  },
+
+  /**
+   * Disconnects all chains attached to a node's output link.
+   * @function wcPlayEditor#onDisconnectOutputChains
+   * @param {wcNode} node - The node to disconnect from.
+   * @param {String} linkName - The name of the link.
+   */
+  onDisconnectOutputChains: function(node, linkName) {
+    var chains = node.listOutputChains(linkName);
+    if (chains.length) {
+      this._undoManager &amp;&amp; this._undoManager.addEvent('Disconnected Property Output Links for "' + node.category + '.' + node.type + '.' + linkName + '"',
+        {
+          id: node.id,
+          name: linkName,
+          chains: chains,
+          engine: this._engine,
+        },
+        // Undo
+        function() {
+          var myNode = this.engine.nodeById(this.id);
+          for (var i = 0; i &lt; this.chains.length; ++i) {
+            var targetNode = this.engine.nodeById(this.chains[i].inNodeId);
+            var targetName = this.chains[i].inName;
+            myNode.connectOutput(this.name, targetNode, targetName);
+          }
+        },
+        // Redo
+        function() {
+          var myNode = this.engine.nodeById(this.id);
+          myNode.disconnectOutput(this.name);
+        });
+    }
+    node.disconnectOutput(linkName);
   },
 
   /**
@@ -2148,15 +2301,11 @@ wcPlayEditor.prototype = {
 
       // Property input.
       linkRect = {
-        top: rect.top + upper - this._font.property.size/3 - this._drawStyle.links.width/2,
+        top: rect.top + upper - this._font.property.size/3 - this._drawStyle.links.width/2 - 5,
         left: rect.left - this._drawStyle.links.length,
         width: this._drawStyle.links.length,
-        height: this._drawStyle.links.width,
+        height: (!props[i].options || !props[i].options.nowrite)? this._drawStyle.links.width + 10: 0,
       };
-
-      // Expand the bounding rect just a little so it is easier to click.
-      linkRect.top -= 5;
-      linkRect.height += 10;
 
       node._meta.bounds.inputBounds.push({
         rect: linkRect,
@@ -2169,15 +2318,11 @@ wcPlayEditor.prototype = {
 
       // Property output.
       linkRect = {
-        top: rect.top + upper - this._font.property.size/3 - this._drawStyle.links.width/2,
+        top: rect.top + upper - this._font.property.size/3 - this._drawStyle.links.width/2 - 5,
         left: rect.left + rect.width,
         width: this._drawStyle.links.length,
-        height: this._drawStyle.links.width,
+        height: (!props[i].options || !props[i].options.noread)? this._drawStyle.links.width + 10: 0,
       }
-
-      // Expand the bounding rect just a little so it is easier to click.
-      linkRect.top -= 5;
-      linkRect.height += 10;
 
       node._meta.bounds.outputBounds.push({
         rect: linkRect,
@@ -2467,17 +2612,19 @@ wcPlayEditor.prototype = {
         }
       }
 
-      context.fillStyle = (this._highlightInputLink &amp;&amp; this._highlightInputLink.name === props[i].name &amp;&amp; this._highlightNode === node? "cyan": props[i].inputMeta.color);
-      context.strokeStyle = "black";
-      context.beginPath();
-      context.moveTo(node.pos.x + linkRect.left, node.pos.y + linkRect.top + 5);
-      context.lineTo(node.pos.x + linkRect.left + linkRect.width, node.pos.y + linkRect.top + 5);
-      context.lineTo(node.pos.x + linkRect.left + linkRect.width, node.pos.y + linkRect.top + linkRect.height - 5);
-      context.lineTo(node.pos.x + linkRect.left, node.pos.y + linkRect.top + linkRect.height - 5);
-      context.lineTo(node.pos.x + linkRect.left + linkRect.width/3, node.pos.y + linkRect.top + linkRect.height/2);
-      context.closePath();
-      context.stroke();
-      context.fill();
+      if (!props[i].options || !props[i].options.nowrite) {
+        context.fillStyle = (this._highlightInputLink &amp;&amp; this._highlightInputLink.name === props[i].name &amp;&amp; this._highlightNode === node? "cyan": props[i].inputMeta.color);
+        context.strokeStyle = "black";
+        context.beginPath();
+        context.moveTo(node.pos.x + linkRect.left, node.pos.y + linkRect.top + 5);
+        context.lineTo(node.pos.x + linkRect.left + linkRect.width, node.pos.y + linkRect.top + 5);
+        context.lineTo(node.pos.x + linkRect.left + linkRect.width, node.pos.y + linkRect.top + linkRect.height - 5);
+        context.lineTo(node.pos.x + linkRect.left, node.pos.y + linkRect.top + linkRect.height - 5);
+        context.lineTo(node.pos.x + linkRect.left + linkRect.width/3, node.pos.y + linkRect.top + linkRect.height/2);
+        context.closePath();
+        context.stroke();
+        context.fill();
+      }
 
       // Property output.
       var linkRect = null;
@@ -2488,17 +2635,19 @@ wcPlayEditor.prototype = {
         }
       }
 
-      context.fillStyle = (this._highlightOutputLink &amp;&amp; this._highlightOutputLink.name === props[i].name &amp;&amp; this._highlightNode === node? "cyan": props[i].outputMeta.color);
-      context.strokeStyle = "black";
-      context.beginPath();
-      context.moveTo(node.pos.x + linkRect.left, node.pos.y + linkRect.top + 5);
-      context.lineTo(node.pos.x + linkRect.left + linkRect.width/2, node.pos.y + linkRect.top + 5);
-      context.lineTo(node.pos.x + linkRect.left + linkRect.width, node.pos.y + linkRect.top + linkRect.height/2);
-      context.lineTo(node.pos.x + linkRect.left + linkRect.width/2, node.pos.y + linkRect.top + linkRect.height - 5);
-      context.lineTo(node.pos.x + linkRect.left, node.pos.y + linkRect.top + linkRect.height - 5);
-      context.closePath();
-      context.stroke();
-      context.fill();
+      if (!props[i].options || !props[i].options.noread) {
+        context.fillStyle = (this._highlightOutputLink &amp;&amp; this._highlightOutputLink.name === props[i].name &amp;&amp; this._highlightNode === node? "cyan": props[i].outputMeta.color);
+        context.strokeStyle = "black";
+        context.beginPath();
+        context.moveTo(node.pos.x + linkRect.left, node.pos.y + linkRect.top + 5);
+        context.lineTo(node.pos.x + linkRect.left + linkRect.width/2, node.pos.y + linkRect.top + 5);
+        context.lineTo(node.pos.x + linkRect.left + linkRect.width, node.pos.y + linkRect.top + linkRect.height/2);
+        context.lineTo(node.pos.x + linkRect.left + linkRect.width/2, node.pos.y + linkRect.top + linkRect.height - 5);
+        context.lineTo(node.pos.x + linkRect.left, node.pos.y + linkRect.top + linkRect.height - 5);
+        context.closePath();
+        context.stroke();
+        context.fill();
+      }
 
       upper += this._drawStyle.property.spacing;
     }
@@ -3356,12 +3505,16 @@ wcPlayEditor.prototype = {
       // Undo
       function() {
         var myNode = this.engine.nodeById(this.id);
-        myNode[this.propFn](this.name, this.oldValue, true, true);
+        if (myNode) {
+          myNode[this.propFn](this.name, this.oldValue, true, true);
+        }
       },
       // Redo
       function() {
         var myNode = this.engine.nodeById(this.id);
-        myNode[this.propFn](this.name, this.newValue, true, true);
+        if (myNode) {
+          myNode[this.propFn](this.name, this.newValue, true, true);
+        }
       });
     };
 
@@ -3370,8 +3523,8 @@ wcPlayEditor.prototype = {
       case wcPlay.PROPERTY.TOGGLE:
         // Toggles do not show an editor, instead, they just toggle their state.
         var state = node[propFn](property.name);
-        undoChange(node, property.name, state, !state);
         node[propFn](property.name, !state, true, true);
+        undoChange(node, property.name, state, !state);
         break;
       case wcPlay.PROPERTY.NUMBER:
         $control = $('&lt;input type="number"' + (property.options.min? ' min="' + property.options.min + '"': '') + (property.options.max? ' max="' + property.options.max + '"': '') + (property.options.step? ' step="' + property.options.step + '"': '') + '>');
@@ -3381,8 +3534,8 @@ wcPlayEditor.prototype = {
             var min = $(this).attr('min') !== undefined? parseInt($(this).attr('min')): -Infinity;
             var max = $(this).attr('max') !== undefined? parseInt($(this).attr('max')):  Infinity;
             value = Math.min(max, Math.max(min, parseInt($control.val())));
-            undoChange(node, property.name, node[propFn](property.name), value);
             node[propFn](property.name, value, true, true);
+            undoChange(node, property.name, node[propFn](property.name), value);
           }
         });
         break;
@@ -3397,8 +3550,8 @@ wcPlayEditor.prototype = {
         $control.val(node[propFn](property.name).toString());
         $control.change(function() {
           if (!cancelled) {
-            undoChange(node, property.name, node[propFn](property.name), $control.val());
             node[propFn](property.name, $control.val(), true, true);
+            undoChange(node, property.name, node[propFn](property.name), $control.val());
           }
         });
         break;
@@ -3427,8 +3580,8 @@ wcPlayEditor.prototype = {
 
         $control.change(function() {
           if (!cancelled) {
-            undoChange(node, property.name, node[propFn](property.name), $control.val());
             node[propFn](property.name, $control.val(), true, true);
+            undoChange(node, property.name, node[propFn](property.name), $control.val());
             $(this).blur();
           }
         });
@@ -3802,7 +3955,7 @@ wcPlayEditor.prototype = {
           $canvas: $('&lt;canvas class="wcPlayHoverCanvas">'),
           offset: {x: 0, y: 0}
         };
-        this.$main.append(this._draggingNodeData.$canvas);
+        this.$container.append(this._draggingNodeData.$canvas);
 
         this.$palette.addClass('wcMoving');
         this.$viewport.addClass('wcMoving');
@@ -4229,31 +4382,7 @@ wcPlayEditor.prototype = {
             hasTarget = true;
             // Alt click to disconnect all chains from this link.
             if (event.altKey) {
-              var chains = node.listEntryChains(node._meta.bounds.entryBounds[i].name);
-              if (chains.length) {
-                this._undoManager &amp;&amp; this._undoManager.addEvent('Disconnected Entry Links for "' + node.category + '.' + node.type + '.' + node._meta.bounds.entryBounds[i].name + '"',
-                  {
-                    id: node.id,
-                    name: node._meta.bounds.entryBounds[i].name,
-                    chains: chains,
-                    engine: this._engine,
-                  },
-                  // Undo
-                  function() {
-                    var myNode = this.engine.nodeById(this.id);
-                    for (var i = 0; i &lt; this.chains.length; ++i) {
-                      var targetNode = this.engine.nodeById(this.chains[i].outNodeId);
-                      var targetName = this.chains[i].outName;
-                      myNode.connectEntry(this.name, targetNode, targetName);
-                    }
-                  },
-                  // Redo
-                  function() {
-                    var myNode = this.engine.nodeById(this.id);
-                    myNode.disconnectEntry(this.name);
-                  });
-              }
-              node.disconnectEntry(node._meta.bounds.entryBounds[i].name);
+              this.onDisconnectEntryChains(node, node._meta.bounds.entryBounds[i].name);
               break;
             }
             this._selectedNode = node;
@@ -4272,31 +4401,7 @@ wcPlayEditor.prototype = {
             hasTarget = true;
             // Alt click to disconnect all chains from this link.
             if (event.altKey) {
-              var chains = node.listExitChains(node._meta.bounds.exitBounds[i].name);
-              if (chains.length) {
-                this._undoManager &amp;&amp; this._undoManager.addEvent('Disconnected Exit Links for "' + node.category + '.' + node.type + '.' + node._meta.bounds.exitBounds[i].name + '"',
-                  {
-                    id: node.id,
-                    name: node._meta.bounds.exitBounds[i].name,
-                    chains: chains,
-                    engine: this._engine,
-                  },
-                  // Undo
-                  function() {
-                    var myNode = this.engine.nodeById(this.id);
-                    for (var i = 0; i &lt; this.chains.length; ++i) {
-                      var targetNode = this.engine.nodeById(this.chains[i].inNodeId);
-                      var targetName = this.chains[i].inName;
-                      myNode.connectExit(this.name, targetNode, targetName);
-                    }
-                  },
-                  // Redo
-                  function() {
-                    var myNode = this.engine.nodeById(this.id);
-                    myNode.disconnectExit(this.name);
-                  });
-              }
-              node.disconnectExit(node._meta.bounds.exitBounds[i].name);
+              this.onDisconnectExitChains(node, node._meta.bounds.exitBounds[i].name);
               break;
             } 
             // Shift click to manually fire this exit chain.
@@ -4320,31 +4425,7 @@ wcPlayEditor.prototype = {
             hasTarget = true;
             // Alt click to disconnect all chains from this link.
             if (event.altKey) {
-              var chains = node.listInputChains(node._meta.bounds.inputBounds[i].name);
-              if (chains.length) {
-                this._undoManager &amp;&amp; this._undoManager.addEvent('Disconnected Property Input Links for "' + node.category + '.' + node.type + '.' + node._meta.bounds.inputBounds[i].name + '"',
-                  {
-                    id: node.id,
-                    name: node._meta.bounds.inputBounds[i].name,
-                    chains: chains,
-                    engine: this._engine,
-                  },
-                  // Undo
-                  function() {
-                    var myNode = this.engine.nodeById(this.id);
-                    for (var i = 0; i &lt; this.chains.length; ++i) {
-                      var targetNode = this.engine.nodeById(this.chains[i].outNodeId);
-                      var targetName = this.chains[i].outName;
-                      myNode.connectInput(this.name, targetNode, targetName);
-                    }
-                  },
-                  // Redo
-                  function() {
-                    var myNode = this.engine.nodeById(this.id);
-                    myNode.disconnectInput(this.name);
-                  });
-              }
-              node.disconnectInput(node._meta.bounds.inputBounds[i].name);
+              this.onDisconnectInputChains(node, node._meta.bounds.inputBounds[i].name);
               break;
             }
             this._selectedNode = node;
@@ -4363,31 +4444,7 @@ wcPlayEditor.prototype = {
             hasTarget = true;
             // Alt click to disconnect all chains from this link.
             if (event.altKey) {
-              var chains = node.listOutputChains(node._meta.bounds.outputBounds[i].name);
-              if (chains.length) {
-                this._undoManager &amp;&amp; this._undoManager.addEvent('Disconnected Property Output Links for "' + node.category + '.' + node.type + '.' + node._meta.bounds.outputBounds[i].name + '"',
-                  {
-                    id: node.id,
-                    name: node._meta.bounds.outputBounds[i].name,
-                    chains: chains,
-                    engine: this._engine,
-                  },
-                  // Undo
-                  function() {
-                    var myNode = this.engine.nodeById(this.id);
-                    for (var i = 0; i &lt; this.chains.length; ++i) {
-                      var targetNode = this.engine.nodeById(this.chains[i].inNodeId);
-                      var targetName = this.chains[i].inName;
-                      myNode.connectOutput(this.name, targetNode, targetName);
-                    }
-                  },
-                  // Redo
-                  function() {
-                    var myNode = this.engine.nodeById(this.id);
-                    myNode.disconnectOutput(this.name);
-                  });
-              }
-              node.disconnectOutput(node._meta.bounds.outputBounds[i].name);
+              this.onDisconnectOutputChains(node, node._meta.bounds.outputBounds[i].name);
               break;
             }
             this._selectedNode = node;

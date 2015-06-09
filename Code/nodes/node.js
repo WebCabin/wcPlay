@@ -48,7 +48,7 @@ Class.extend('wcNode', 'Node', '', {
     this._parent = parent;
 
     // Give the node its default properties.
-    this.createProperty(wcNode.PROPERTY_ENABLED, wcPlay.PROPERTY.TOGGLE, true, {description: "Disabled nodes will be treated as if they were not there, all connections will be ignored."});
+    this.createProperty(wcNode.PROPERTY_ENABLED, wcPlay.PROPERTY.TOGGLE, true, {description: "Disabled nodes will be treated as if they were not there, all connections will be ignored.", noread: true});
     // this.createProperty(wcNode.PROPERTY.DEBUG_LOG, wcPlay.PROPERTY.TOGGLE, false, {collapsible: true, description: "Output various debugging information about this node."});
 
     // Add this node to its parent.
@@ -1279,6 +1279,23 @@ Class.extend('wcNode', 'Node', '', {
     }
 
     return false;
+  },
+
+  /** Gets the options assigned to a property, you may change attributes from here.
+   * @function wcNode#propertyOptions
+   * @param {String} name - The name of the property.
+   * @returns {Object|null} - The options object associated with the property, or null if the property does not exist.
+   */
+  propertyOptions: function(name) {
+    for (var i = 0; i < this.properties.length; ++i) {
+      var prop = this.properties[i];
+      if (prop.name === name) {
+        // Assume the user will change options for this property, so make it dirty.
+        this._meta.dirty = true;
+        return prop.options;
+      }
+    }
+    return null;
   },
 
   /**

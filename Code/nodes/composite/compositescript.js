@@ -493,6 +493,47 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
   },
 
   /**
+   * Sends a custom notification event to all nodes.
+   * @function wcNodeCompositeScript#notifyNodes
+   * @private
+   * @param {String} func - The node function to call.
+   * @param {Object[]} args - A list of arguments to forward into the function call.
+   */
+  notifyNodes: function(func, args) {
+    var self;
+    for (var i = 0; i < this._storageNodes.length; ++i) {
+      self = this._storageNodes[i];
+      if (typeof self[func] === 'function') {
+        self[func].apply(self, args);
+      }
+    }
+    for (var i = 0; i < this._processNodes.length; ++i) {
+      self = this._processNodes[i];
+      if (typeof self[func] === 'function') {
+        self[func].apply(self, args);
+      }
+    }
+    for (var i = 0; i < this._entryNodes.length; ++i) {
+      self = this._entryNodes[i];
+      if (typeof self[func] === 'function') {
+        self[func].apply(self, args);
+      }
+    }
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      self = this._compositeNodes[i];
+      if (typeof self[func] === 'function') {
+        self[func].apply(self, args);
+      }
+    }
+
+    for (var i = 0; i < this._compositeNodes.length; ++i) {
+      if (this._compositeNodes[i] instanceof wcNodeCompositeScript) {
+        this._compositeNodes[i].notifyNodes(func, args);
+      }
+    }
+  },
+
+  /**
    * Adds a node into the known node stacks.
    * @function wcNodeCompositeScript#__addNode
    * @private
@@ -552,46 +593,5 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
     }
 
     return false;
-  },
-
-  /**
-   * Sends a custom notification event to all nodes.
-   * @function wcNodeCompositeScript#__notifyNodes
-   * @private
-   * @param {String} func - The node function to call.
-   * @param {Object[]} args - A list of arguments to forward into the function call.
-   */
-  __notifyNodes: function(func, args) {
-    var self;
-    for (var i = 0; i < this._storageNodes.length; ++i) {
-      self = this._storageNodes[i];
-      if (typeof self[func] === 'function') {
-        self[func].apply(self, args);
-      }
-    }
-    for (var i = 0; i < this._processNodes.length; ++i) {
-      self = this._processNodes[i];
-      if (typeof self[func] === 'function') {
-        self[func].apply(self, args);
-      }
-    }
-    for (var i = 0; i < this._entryNodes.length; ++i) {
-      self = this._entryNodes[i];
-      if (typeof self[func] === 'function') {
-        self[func].apply(self, args);
-      }
-    }
-    for (var i = 0; i < this._compositeNodes.length; ++i) {
-      self = this._compositeNodes[i];
-      if (typeof self[func] === 'function') {
-        self[func].apply(self, args);
-      }
-    }
-
-    for (var i = 0; i < this._compositeNodes.length; ++i) {
-      if (this._compositeNodes[i] instanceof wcNodeCompositeScript) {
-        this._compositeNodes[i].__notifyNodes(func, args);
-      }
-    }
   },
 });

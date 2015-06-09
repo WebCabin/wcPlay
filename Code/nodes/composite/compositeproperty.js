@@ -24,6 +24,8 @@ wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'Linkers', {
       this._parent && this._parent.createProperty(this.name, wcPlay.PROPERTY.STRING, '');
     }
 
+    this.createProperty('input', wcPlay.PROPERTY.TOGGLE, true, {description: "Assign whether the parent Composite Node can set this property's value.", noread: true});
+    this.createProperty('output', wcPlay.PROPERTY.TOGGLE, true, {description: "Assign whether the parent Composite Node can read this property's value.", noread: true});
     this.createProperty('value', wcPlay.PROPERTY.STRING, '');
   },
 
@@ -44,7 +46,15 @@ wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'Linkers', {
     if (newName) {
       // Attempt to create a new property, if it does not exist, then synchronize our local property.
       if (this._parent) {
-        this._parent.createProperty(newName, wcPlay.PROPERTY.STRING, '');
+        var opts = {};
+        if (!this.property('input')) {
+          opts.nowrite = true;
+        }
+        if (!this.property('output')) {
+          opts.noread = true;
+        }
+        this._parent.createProperty(newName, wcPlay.PROPERTY.STRING, '', opts);
+
         // Copy all chains from the old property links to the new.
         var inputChains = this._parent.listInputChains(oldName);
         var outputChains = this._parent.listOutputChains(oldName);
@@ -77,13 +87,61 @@ wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'Linkers', {
   onPropertyChanging: function(name, oldValue, newValue) {
     this._super(name, oldValue, newValue);
 
-    if (this._invalid) {
+    if (this._invalid || !this.name || !this._parent) {
       return '';
     }
 
-    if (name === 'value') {
-      if (this.name) {
-        this._parent && this._parent.property(this.name, newValue);
+    switch (name) {
+      case 'value':
+        this._parent.property(this.name, newValue);
+        break;
+      case 'input':
+        var engine = this.engine();
+        var opts = this._parent.propertyOptions(this.name);
+        if (opts && engine) {
+          engine.notifyEditors('onBeginUndoGroup', ['Property "' + name + '" changed for Node "' + this.category + '.' + this.type + '"']);
+
+          opts.nowrite = !newValue;
+
+          if (opts.nowrite) {
+            engine.notifyEditors('onDisconnectInputChains', [this._parent, this.name]);
+            this._parent.disconnectInput(this.name);
+          }
+        }
+        break;
+      case 'output':
+        var engine = this.engine();
+        var opts = this._parent.propertyOptions(this.name);
+        if (opts && engine) {
+          engine.notifyEditors('onBeginUndoGroup', ['Property "' + name + '" changed for Node "' + this.category + '.' + this.type + '"']);
+          opts.noread = !newValue;
+
+          if (opts.noread) {
+            engine.notifyEditors('onDisconnectOutputChains', [this._parent, this.name]);
+            this._parent.disconnectOutput(this.name);
+          }
+        }
+        break;
+    }
+  },
+
+  /**
+   * Event that is called when a property has changed.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeCompositeProperty#onPropertyChanged
+   * @param {String} name - The name of the property.
+   * @param {Object} oldValue - The old value of the property.
+   * @param {Object} newValue - The new value of the property.
+   */
+  onPropertyChanged: function(name, oldValue, newValue) {
+    this._super(name, oldValue, newValue);
+
+    if (name === 'input' || name === 'output') {
+      var engine = this.engine();
+      if (engine) {
+        setTimeout(function() {
+          engine.notifyEditors('onEndUndoGroup');
+        }, 0);
       }
     }
   },

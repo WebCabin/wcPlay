@@ -23,7 +23,7 @@ wcNodeProcess.extend('wcNodeProcessExampleViewport', 'Example Viewport', 'Exampl
     this.mouseClicked = false;
     this.mouseDoubleClicked = false;
 
-    this.createProperty('lock viewport', wcPlay.PROPERTY.TOGGLE, true, {description: "If true, dragging in the viewport will not move the node."});
+    this.createProperty('lock viewport', wcPlay.PROPERTY.TOGGLE, true, {description: "If true, dragging in the viewport will not move the node.", noread: true});
   },
 
   /**
