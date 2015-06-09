@@ -3949,6 +3949,7 @@ wcPlayEditor.prototype = {
       var categoryData = this.__findCategoryAreaAtPos(mouse);
       if (categoryData) {
         var offset = categoryData.$canvas.offset();
+        var screenOffset = this.$container.offset();
 
         this._draggingNodeData = {
           node: this._highlightNode,
@@ -3960,12 +3961,13 @@ wcPlayEditor.prototype = {
         this.$palette.addClass('wcMoving');
         this.$viewport.addClass('wcMoving');
 
-        this._draggingNodeData.$canvas.css('left', this._highlightNode.pos.x + rect.left + offset.left).css('top', this._highlightNode.pos.y + rect.top + offset.top);
+        this._draggingNodeData.$canvas.css('left', this._highlightNode.pos.x + rect.left + offset.left - screenOffset.left)
+          .css('top', this._highlightNode.pos.y + rect.top + offset.top - screenOffset.top);
         this._draggingNodeData.$canvas.attr('width', rect.width).css('width', rect.width);
         this._draggingNodeData.$canvas.attr('height', rect.height).css('height', rect.height);
 
-        this._draggingNodeData.offset.x = (this._highlightNode.pos.x + rect.left + offset.left) - mouse.x;
-        this._draggingNodeData.offset.y = (this._highlightNode.pos.y + rect.top + offset.top) - mouse.y;
+        this._draggingNodeData.offset.x = (this._highlightNode.pos.x + rect.left + offset.left - screenOffset.left) - mouse.x;
+        this._draggingNodeData.offset.y = (this._highlightNode.pos.y + rect.top + offset.top - screenOffset.top) - mouse.y;
 
         var yPos = 0;
         if (!this._highlightNode.chain.entry.length) {
