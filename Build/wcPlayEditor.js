@@ -3271,7 +3271,7 @@ wcPlayEditor.prototype = {
       }
     }
 
-    return this.__clampString(value.toString(), this._drawStyle.property.strLen)
+    return this.__clampString(String(value), this._drawStyle.property.strLen)
   },
 
   /**
