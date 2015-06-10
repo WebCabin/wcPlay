@@ -1829,6 +1829,9 @@ wcPlayEditor.prototype = {
         var yPos = this._drawStyle.palette.spacing;
         var xPos = this.$paletteInner.width() / 2;
         for (var i = 0; i < typeData.nodes.length; ++i) {
+          if (!typeData.nodes[i]._meta) {
+            continue;
+          }
           this.__updateNode(typeData.nodes[i], 0, typeData.context);
           typeData.nodes[i].pos.x = xPos;
           typeData.nodes[i].pos.y = yPos;
@@ -1914,7 +1917,7 @@ wcPlayEditor.prototype = {
           if (!typeData.nodes[i]._meta) {
             continue;
           }
-          
+
           this.__updateNode(typeData.nodes[i], 0, typeData.context);
           typeData.nodes[i].pos.x = xPos;
           typeData.nodes[i].pos.y = yPos;
