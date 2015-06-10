@@ -1945,6 +1945,10 @@ wcPlayEditor.prototype = {
    * @param {Boolean} [isPalette] - If true, this node will be rendered for the palette view. 
    */
   __drawNode: function(node, context, isPalette) {
+    if (!node._meta) {
+      return;
+    }
+
     // Ignore drawing if the node is outside of view.
     if (!isPalette && !this.__rectOnRect(node._meta.bounds.farRect, this._viewportBounds, node.pos)) {
       node._meta.visible = false;
