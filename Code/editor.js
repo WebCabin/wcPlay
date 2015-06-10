@@ -823,10 +823,6 @@ wcPlayEditor.prototype = {
       meta.color = self.__blendColors(darkColor, meta.broken? pauseColor: lightColor, meta.flashDelta * colorMul);
     }
 
-    if (!node._meta) {
-      return;
-    }
-
     var color = node.color;
     if (this._highlightNode === node) {
       color = this.__blendColors(node.color, "#FFFFFF", 0.25);
@@ -1829,9 +1825,6 @@ wcPlayEditor.prototype = {
         var yPos = this._drawStyle.palette.spacing;
         var xPos = this.$paletteInner.width() / 2;
         for (var i = 0; i < typeData.nodes.length; ++i) {
-          if (!typeData.nodes[i]._meta) {
-            continue;
-          }
           this.__updateNode(typeData.nodes[i], 0, typeData.context);
           typeData.nodes[i].pos.x = xPos;
           typeData.nodes[i].pos.y = yPos;
@@ -1914,10 +1907,6 @@ wcPlayEditor.prototype = {
         typeData.context.save();
 
         for (var i = 0; i < typeData.nodes.length; ++i) {
-          if (!typeData.nodes[i]._meta) {
-            continue;
-          }
-
           this.__updateNode(typeData.nodes[i], 0, typeData.context);
           typeData.nodes[i].pos.x = xPos;
           typeData.nodes[i].pos.y = yPos;
@@ -1952,10 +1941,6 @@ wcPlayEditor.prototype = {
    * @param {Boolean} [isPalette] - If true, this node will be rendered for the palette view. 
    */
   __drawNode: function(node, context, isPalette) {
-    if (!node._meta) {
-      return;
-    }
-
     // Ignore drawing if the node is outside of view.
     if (!isPalette && !this.__rectOnRect(node._meta.bounds.farRect, this._viewportBounds, node.pos)) {
       node._meta.visible = false;
