@@ -1971,6 +1971,10 @@ wcPlayEditor.prototype = {
         typeData.context.save();
 
         for (var i = 0; i &lt; typeData.nodes.length; ++i) {
+          if (!typeData.nodes[i]._meta) {
+            continue;
+          }
+          
           this.__updateNode(typeData.nodes[i], 0, typeData.context);
           typeData.nodes[i].pos.x = xPos;
           typeData.nodes[i].pos.y = yPos;
