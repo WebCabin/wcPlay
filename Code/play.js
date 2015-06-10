@@ -18,7 +18,7 @@ function wcPlay(options) {
   this._queuedProperties = [];
   this._importedScripts = [];
 
-  this._updateID = 0;
+  this._updateId = 0;
   this._isRunning = false;
   this._isPaused = false;
   this._isPausing = false;
@@ -39,10 +39,12 @@ function wcPlay(options) {
 
   if (!this._updateId) {
     var self = this;
-    this._updateID = setInterval(function() {
+    this._updateId = setInterval(function() {
       self.update();
     }, this._options.updateRate);
   }
+
+  wcPlay.INSTANCE_LIBRARY.push(this);
 };
 
 /**
@@ -86,6 +88,12 @@ wcPlay.NODE = {
 wcPlay.NODE_LIBRARY = [];
 
 /**
+ * A global list of play engine instances that exist.
+ * @member
+ */
+wcPlay.INSTANCE_LIBRARY = [];
+
+/**
  * A global function that registers a new node type into the library. This is called automatically when a new extended node type is defined, you should not have to do this manually.
  * @param {String} name - The name of the node constructor.
  * @param {String} displayName - The display name.
@@ -104,13 +112,45 @@ wcPlay.registerNodeType = function(name, displayName, category, nodeType) {
   for (var i = 0; i < wcPlay.NODE_LIBRARY.length; ++i) {
     if (wcPlay.NODE_LIBRARY[i].className === name) {
       wcPlay.NODE_LIBRARY[i] = data;
+
+      for (var a = 0; a < wcPlay.INSTANCE_LIBRARY.length; ++a) {
+        var play = wcPlay.INSTANCE_LIBRARY[a];
+        for (var b = 0; b < play._editors.length; ++b) {
+          var editor = play._editors[b];
+          editor.__setupPalette();
+        }
+      }
       return true;
     }
   }
 
   wcPlay.NODE_LIBRARY.push(data);
   return true;
-}
+};
+
+/**
+ * A global function that unregisters a node type from the library.
+ * @param {String} name - The name of the node constructor.
+ * @returns {Boolean} - True if the node type has been found and removed.
+ */
+wcPlay.unregisterNodeType = function(name) {
+  for (var i = 0; i < wcPlay.NODE_LIBRARY.length; ++i) {
+    if (wcPlay.NODE_LIBRARY[i].className === name) {
+      wcPlay.NODE_LIBRARY.splice(i, 1);
+
+      for (var a = 0; a < wcPlay.INSTANCE_LIBRARY.length; ++a) {
+        var play = wcPlay.INSTANCE_LIBRARY[a];
+        for (var b = 0; b < play._editors.length; ++b) {
+          var editor = play._editors[b];
+          editor.__setupPalette();
+        }
+      }
+      return true;
+    }
+  }
+
+  return false;
+};
 
 wcPlay.prototype = {
 
@@ -138,6 +178,7 @@ wcPlay.prototype = {
 
   /**
    * Retrieves whether the script is running.
+   * @function wcPlay#isRunning
    * @returns {Boolean}
    */
   isRunning: function() {
@@ -177,6 +218,7 @@ wcPlay.prototype = {
   clear: function() {
     this._queuedChain = [];
     this._queuedProperties = [];
+    this._waitingChain = [];
 
     this._properties = [];
 
@@ -589,6 +631,7 @@ wcPlay.prototype = {
 
   /**
    * Creates a new global property (can be used with the global storage node).
+   * @function wcPlay#createProperty
    * @param {String} name - The name of the property.
    * @param {wcPlay.PROPERTY} type - The type of property.
    * @param {Object} [initialValue] - A default value for this property.
@@ -646,6 +689,7 @@ wcPlay.prototype = {
 
   /**
    * Removes a global property.
+   * @function wcPlay#removeProperty
    * @param {String} name - The name of the property to remove.
    * @returns {Boolean} - Fails if the property does not exist.
    */
@@ -926,6 +970,29 @@ wcPlay.prototype = {
         this.paused(true);
         this._isPausing = false;
       }
+    }
+  },
+
+  /**
+   * Destroys this instance.
+   * @function wcPlay#destroy
+   */
+  destroy: function() {
+    this.clear();
+
+    this._importedScripts = [];
+
+    while (this._editors.length) {
+      this._editors[0].engine(null);
+    }
+
+    if (this._updateId) {
+      clearInterval(this._updateId);
+    }
+
+    var index = wcPlay.INSTANCE_LIBRARY.indexOf(this);
+    if (index > -1) {
+      wcPlay.INSTANCE_LIBRARY.splice(index, 1);
     }
   },
 
