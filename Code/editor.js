@@ -823,6 +823,10 @@ wcPlayEditor.prototype = {
       meta.color = self.__blendColors(darkColor, meta.broken? pauseColor: lightColor, meta.flashDelta * colorMul);
     }
 
+    if (!node._meta) {
+      return;
+    }
+
     var color = node.color;
     if (this._highlightNode === node) {
       color = this.__blendColors(node.color, "#FFFFFF", 0.25);
