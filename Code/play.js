@@ -756,10 +756,11 @@ wcPlay.prototype = {
     if (value !== undefined && value !== prop.initialValue) {
       var oldValue = prop.initialValue;
       prop.initialValue = value;
+      this.notifyNodes('onGlobalInitialPropertyChanged', [prop.name, oldValue, prop.initialValue]);
 
       if (prop.value == oldValue) {
         prop.value = value;
-        this.notifyNodes('onGlobalInitialPropertyChanged', [prop.name, oldValue, prop.value]);
+        this.notifyNodes('onGlobalPropertyChanged', [prop.name, oldValue, prop.value]);
       }
     }
 

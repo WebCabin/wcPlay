@@ -570,7 +570,24 @@ wcNodeStorage.extend('wcNodeStorageGlobal', 'Global', 'Global', {
   onGlobalPropertyChanged: function(name, oldValue, newValue) {
     if (this.name === name) {
       this.property('value', newValue, true, true);
+      this._meta.dirty = true;
     };
+  },
+
+  /**
+   * Event that is called when a global property initial value has changed.
+   * Overload this in inherited nodes.<br>
+   * <b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.
+   * @function wcNodeStorageGlobal#onGlobalInitialPropertyChanged
+   * @param {String} name - The name of the global property.
+   * @param {Object} oldValue - The old value of the global property.
+   * @param {Object} newValue - The new value of the global property.
+   */
+  onGlobalInitialPropertyChanged: function (name, oldValue, newValue) {
+    if (this.name === name) {
+      this.initialProperty('value', newValue, true, true);
+      this._meta.dirty = true;
+    }
   },
 
   /**
