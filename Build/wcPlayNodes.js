@@ -420,7 +420,7 @@ wcNodeProcess.extend('wcNodeProcessAlert', 'Alert', 'Debugging', {
   },
 });
 
-wcNodeStorage.extend('wcNodeStorageGlobal', 'Global', 'Global', {
+wcNodeStorage.extend('wcNodeStorageGlobal', 'Script Value', 'Global', {
   /**
    * @class
    * References a global property on the script.

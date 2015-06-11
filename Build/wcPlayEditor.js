@@ -1713,8 +1713,8 @@ wcPlayEditor.prototype = {
 
     if (this.$typeButton.length == 0) {
       // Create our top bar with buttons for each node type.
-      this.$typeButton.push($('<button class="wcPlayEditorButton" title="Show Entry Nodes.">Entry</button>'));
-      this.$typeButton.push($('<button class="wcPlayEditorButton wcToggled" title="Show Process Nodes.">Process</button>'));
+      this.$typeButton.push($('<button class="wcPlayEditorButton wcToggled" title="Show Entry Nodes.">Entry</button>'));
+      this.$typeButton.push($('<button class="wcPlayEditorButton" title="Show Process Nodes.">Process</button>'));
       this.$typeButton.push($('<button class="wcPlayEditorButton" title="Show Storage Nodes.">Storage</button>'));
       this.$typeButton.push($('<button class="wcPlayEditorButton" title="Show Composite Nodes.">Composite</button>'));
       this.$palette.append(this.$typeButton[0]);
@@ -1722,8 +1722,8 @@ wcPlayEditor.prototype = {
       this.$palette.append(this.$typeButton[2]);
       this.$palette.append(this.$typeButton[3]);
 
-      this.$typeArea.push($('<div class="wcPlayTypeArea wcPlayHidden">'));
       this.$typeArea.push($('<div class="wcPlayTypeArea">'));
+      this.$typeArea.push($('<div class="wcPlayTypeArea wcPlayHidden">'));
       this.$typeArea.push($('<div class="wcPlayTypeArea wcPlayHidden">'));
       this.$typeArea.push($('<div class="wcPlayTypeArea wcPlayHidden">'));
       this.$paletteInner.append(this.$typeArea[0]);
