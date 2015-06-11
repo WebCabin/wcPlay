@@ -13,6 +13,6 @@ wcNodeStorage.extend('wcNodeStorageNumber', 'Number', 'Local', {
 
     this.description("Stores a number value.");
 
-    this.createProperty('value', wcPlay.PROPERTY.NUMBER);
+    this.createProperty('value', wcPlay.PROPERTY.NUMBER, '', {input: true, output: true});
   },
 });

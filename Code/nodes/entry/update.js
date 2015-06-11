@@ -13,7 +13,7 @@ wcNodeEntry.extend('wcNodeEntryUpdate', 'Update', 'Automatic', {
 
     this.description("Once the script starts, this will activate continuously on a time interval defined by the milliseconds property.");
 
-    this.createProperty("milliseconds", wcPlay.PROPERTY.NUMBER, 1000, {description: "The time, in milliseconds, per update."});
+    this.createProperty("milliseconds", wcPlay.PROPERTY.NUMBER, 1000, {description: "The time, in milliseconds, per update.", input: true});
   },
 
   /**

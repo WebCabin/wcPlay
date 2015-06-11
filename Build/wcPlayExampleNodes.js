@@ -23,7 +23,7 @@ wcNodeProcess.extend('wcNodeProcessExampleViewport', 'Example Viewport', 'Exampl
     this.mouseClicked = false;
     this.mouseDoubleClicked = false;
 
-    this.createProperty('lock viewport', wcPlay.PROPERTY.TOGGLE, true, {description: "If true, dragging in the viewport will not move the node.", noread: true});
+    this.createProperty('lock viewport', wcPlay.PROPERTY.TOGGLE, true, {description: "If true, dragging in the viewport will not move the node.", input: true});
   },
 
   /**
@@ -192,10 +192,10 @@ wcNodeProcess.extend('wcNodeProcessExampleProperties', 'Example Properties', 'Ex
     this.removeEntry('in');
     this.removeExit('out');
 
-    this.createProperty('toggle', wcPlay.PROPERTY.TOGGLE, true, {description: "Demonstration of the toggle property type.", noread: true, nowrite: true});
-    this.createProperty('number', wcPlay.PROPERTY.NUMBER, 3, {description: "Demonstration of the number property type with a clamped range of 1-5.", min: 1, max: 5, noread: true, nowrite: true});
-    this.createProperty('string', wcPlay.PROPERTY.STRING, 'Text', {description: "Demonstration of the string property with a max character length of 10.", maxlength: 10, noread: true, nowrite: true});
-    this.createProperty('select', wcPlay.PROPERTY.SELECT, 3, {description: "Demonstration of the select property with a dynamic number of options based on the 'number' property.", items: this.selectItems, noread: true, nowrite: true});
+    this.createProperty('toggle', wcPlay.PROPERTY.TOGGLE, true, {description: "Demonstration of the toggle property type."});
+    this.createProperty('number', wcPlay.PROPERTY.NUMBER, 3, {description: "Demonstration of the number property type with a clamped range of 1-5.", min: 1, max: 5});
+    this.createProperty('string', wcPlay.PROPERTY.STRING, 'Text', {description: "Demonstration of the string property with a max character length of 10.", maxlength: 10});
+    this.createProperty('select', wcPlay.PROPERTY.SELECT, 3, {description: "Demonstration of the select property with a dynamic number of options based on the 'number' property.", items: this.selectItems});
   },
 
   /**
@@ -239,7 +239,7 @@ wcNodeProcess.extend('wcNodeProcessExampleDynamic', 'Example Dynamic', 'Example'
     this.createEntry('change color', "Change the color of this node!");
 
     this._propCount = 0;
-    this.createProperty('count', wcPlay.PROPERTY.NUMBER, 0, {min: 0, max: 10, description: "Dynamically create a property for each count.", noread: true});
+    this.createProperty('count', wcPlay.PROPERTY.NUMBER, 0, {min: 0, max: 10, description: "Dynamically create a property for each count.", input: true});
   },
 
   /**

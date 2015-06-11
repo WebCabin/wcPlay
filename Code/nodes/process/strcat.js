@@ -15,9 +15,9 @@ wcNodeProcess.extend('wcNodeProcessStrCat', 'String Concat', 'Data Manipulation'
     this.details("This takes the string of valueA and appends valueB to it, the result is stored in the result property.");
 
     // Create our two operator values.
-    this.createProperty('valueA', wcPlay.PROPERTY.STRING, '', {description: "The left side string to join.", noread: true});
-    this.createProperty('valueB', wcPlay.PROPERTY.STRING, '', {description: "The right side string to join.", noread: true});
-    this.createProperty('result', wcPlay.PROPERTY.STRING, '', {description: "The concatenated result.", nowrite: true});
+    this.createProperty('valueA', wcPlay.PROPERTY.STRING, '', {description: "The left side string to join.", input: true});
+    this.createProperty('valueB', wcPlay.PROPERTY.STRING, '', {description: "The right side string to join.", input: true});
+    this.createProperty('result', wcPlay.PROPERTY.STRING, '', {description: "The concatenated result.", output: true});
   },
 
   /**

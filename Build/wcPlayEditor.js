@@ -2244,7 +2244,7 @@ wcPlayEditor.prototype = {
         top: rect.top + upper - this._font.property.size/3 - this._drawStyle.links.width/2 - 5,
         left: rect.left - this._drawStyle.links.length,
         width: this._drawStyle.links.length,
-        height: (!props[i].options || !props[i].options.nowrite)? this._drawStyle.links.width + 10: 0,
+        height: (props[i].options && props[i].options.input)? this._drawStyle.links.width + 10: 0,
       };
 
       node._meta.bounds.inputBounds.push({
@@ -2261,7 +2261,7 @@ wcPlayEditor.prototype = {
         top: rect.top + upper - this._font.property.size/3 - this._drawStyle.links.width/2 - 5,
         left: rect.left + rect.width,
         width: this._drawStyle.links.length,
-        height: (!props[i].options || !props[i].options.noread)? this._drawStyle.links.width + 10: 0,
+        height: (props[i].options && props[i].options.output)? this._drawStyle.links.width + 10: 0,
       }
 
       node._meta.bounds.outputBounds.push({
@@ -2552,7 +2552,7 @@ wcPlayEditor.prototype = {
         }
       }
 
-      if (!props[i].options || !props[i].options.nowrite) {
+      if (props[i].options && props[i].options.input) {
         context.fillStyle = (this._highlightInputLink && this._highlightInputLink.name === props[i].name && this._highlightNode === node? "cyan": props[i].inputMeta.color);
         context.strokeStyle = "black";
         context.beginPath();
@@ -2575,7 +2575,7 @@ wcPlayEditor.prototype = {
         }
       }
 
-      if (!props[i].options || !props[i].options.noread) {
+      if (props[i].options && props[i].options.output) {
         context.fillStyle = (this._highlightOutputLink && this._highlightOutputLink.name === props[i].name && this._highlightNode === node? "cyan": props[i].outputMeta.color);
         context.strokeStyle = "black";
         context.beginPath();

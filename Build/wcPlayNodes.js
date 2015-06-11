@@ -39,7 +39,7 @@ wcNodeEntry.extend('wcNodeEntryUpdate', 'Update', 'Automatic', {
 
     this.description("Once the script starts, this will activate continuously on a time interval defined by the milliseconds property.");
 
-    this.createProperty("milliseconds", wcPlay.PROPERTY.NUMBER, 1000, {description: "The time, in milliseconds, per update."});
+    this.createProperty("milliseconds", wcPlay.PROPERTY.NUMBER, 1000, {description: "The time, in milliseconds, per update.", input: true});
   },
 
   /**
@@ -162,7 +162,7 @@ wcNodeProcess.extend('wcNodeProcessDelay', 'Delay', 'Flow Control', {
 
     this.description("Waits for a specified amount of time before continuing the flow chain.");
 
-    this.createProperty('milliseconds', wcPlay.PROPERTY.NUMBER, 1000, {description: "The time delay, in milliseconds, to wait before firing the 'out' Exit link."});
+    this.createProperty('milliseconds', wcPlay.PROPERTY.NUMBER, 1000, {description: "The time delay, in milliseconds, to wait before firing the 'out' Exit link.", input: true});
   },
 
   /**
@@ -210,9 +210,9 @@ wcNodeProcess.extend('wcNodeProcessOperation', 'Operation', 'Data Manipulation',
     this.createEntry('div', "valueA / valueB = result");
 
     // Create our two operator values.
-    this.createProperty('valueA', wcPlay.PROPERTY.NUMBER, 0, {description: "Left hand value for the operation.", noread: true});
-    this.createProperty('valueB', wcPlay.PROPERTY.NUMBER, 0, {description: "Right hand value for the operation.", noread: true});
-    this.createProperty('result', wcPlay.PROPERTY.NUMBER, 0, {description: "The result of the operation.", nowrite: true});
+    this.createProperty('valueA', wcPlay.PROPERTY.NUMBER, 0, {description: "Left hand value for the operation.", input: true});
+    this.createProperty('valueB', wcPlay.PROPERTY.NUMBER, 0, {description: "Right hand value for the operation.", input: true});
+    this.createProperty('result', wcPlay.PROPERTY.NUMBER, 0, {description: "The result of the operation.", output: true});
   },
 
   /**
@@ -257,9 +257,9 @@ wcNodeProcess.extend('wcNodeProcessStrCat', 'String Concat', 'Data Manipulation'
     this.details("This takes the string of valueA and appends valueB to it, the result is stored in the result property.");
 
     // Create our two operator values.
-    this.createProperty('valueA', wcPlay.PROPERTY.STRING, '', {description: "The left side string to join.", noread: true});
-    this.createProperty('valueB', wcPlay.PROPERTY.STRING, '', {description: "The right side string to join.", noread: true});
-    this.createProperty('result', wcPlay.PROPERTY.STRING, '', {description: "The concatenated result.", nowrite: true});
+    this.createProperty('valueA', wcPlay.PROPERTY.STRING, '', {description: "The left side string to join.", input: true});
+    this.createProperty('valueB', wcPlay.PROPERTY.STRING, '', {description: "The right side string to join.", input: true});
+    this.createProperty('result', wcPlay.PROPERTY.STRING, '', {description: "The concatenated result.", output: true});
   },
 
   /**
@@ -296,10 +296,10 @@ wcNodeProcess.extend('wcNodeProcessAJAX', 'AJAX', 'Data Retrieval', {
     this.createExit('success');
     this.createExit('failure');
 
-    this.createProperty('type', wcPlay.PROPERTY.SELECT, 'GET', {items: ['GET', 'POST'], description:"The AJAX method to perform.", noread: true});
-    this.createProperty('url', wcPlay.PROPERTY.STRING, 'example.com', {description: "The URL to send the request.", noread: true});
-    this.createProperty('data', wcPlay.PROPERTY.STRING, 'foo=bar&bar=foo', {description: "The data to send with the request. This can be in query string form, or any object that $.ajax supports as the data parameter.", noread: true});
-    this.createProperty('result', wcPlay.PROPERTY.STRING, '', {description: "The result of the ajax request, if successful.", nowrite: true});
+    this.createProperty('type', wcPlay.PROPERTY.SELECT, 'GET', {items: ['GET', 'POST'], description:"The AJAX method to perform.", input: true});
+    this.createProperty('url', wcPlay.PROPERTY.STRING, 'example.com', {description: "The URL to send the request.", input: true});
+    this.createProperty('data', wcPlay.PROPERTY.STRING, 'foo=bar&bar=foo', {description: "The data to send with the request. This can be in query string form, or any object that $.ajax supports as the data parameter.", input: true});
+    this.createProperty('result', wcPlay.PROPERTY.STRING, '', {description: "The result of the ajax request, if successful.", output: true});
   },
 
   /**
@@ -352,7 +352,7 @@ wcNodeProcess.extend('wcNodeProcessConsoleLog', 'Console Log', 'Debugging', {
     this.description("For debugging purposes, will print out a message into the console log when activated (only if silent mode is not on).");
 
     // Create the message property so we know what to output in the log.
-    this.createProperty('message', wcPlay.PROPERTY.STRING, 'msg', {description: "The message that will appear in the console log.", noread: true});
+    this.createProperty('message', wcPlay.PROPERTY.STRING, 'msg', {description: "The message that will appear in the console log.", input: true});
   },
 
   /**
@@ -394,7 +394,7 @@ wcNodeProcess.extend('wcNodeProcessAlert', 'Alert', 'Debugging', {
     this.description("For debugging purposes, will popup an alert box with a message when activated (only if silent mode is not on).");
 
     // Create the message property so we know what to output in the log.
-    this.createProperty('message', wcPlay.PROPERTY.STRING, 'Alert message.', {multiline: true, description: "The message that will appear in the alert box.", noread: true});
+    this.createProperty('message', wcPlay.PROPERTY.STRING, 'Alert message.', {multiline: true, description: "The message that will appear in the alert box.", input: true});
   },
 
   /**
@@ -633,7 +633,7 @@ wcNodeStorage.extend('wcNodeStorageString', 'String', 'Local', {
 
     this.description("Stores a string value.");
 
-    this.createProperty('value', wcPlay.PROPERTY.STRING, '', {multiline: true});
+    this.createProperty('value', wcPlay.PROPERTY.STRING, '', {multiline: true, input: true, output: true});
   },
 });
 
@@ -652,7 +652,7 @@ wcNodeStorage.extend('wcNodeStorageNumber', 'Number', 'Local', {
 
     this.description("Stores a number value.");
 
-    this.createProperty('value', wcPlay.PROPERTY.NUMBER);
+    this.createProperty('value', wcPlay.PROPERTY.NUMBER, '', {input: true, output: true});
   },
 });
 
@@ -671,23 +671,6 @@ wcNodeStorage.extend('wcNodeStorageToggle', 'Toggle', 'Local', {
 
     this.description("Stores a boolean (toggleable) value.");
 
-    this.createProperty('not', wcPlay.PROPERTY.TOGGLE, true, {description: "If set, will assign the opposite to value."});
-    this.createProperty('value', wcPlay.PROPERTY.TOGGLE, false);
-  },
-
-  /**
-   * Event that is called when a property has changed.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNodeStorageToggle#onPropertyChanged
-   * @param {String} name - The name of the property.
-   * @param {Object} oldValue - The old value of the property.
-   * @param {Object} newValue - The new value of the property.
-   */
-  onPropertyChanged: function(name, oldValue, newValue) {
-    this._super(name, oldValue, newValue);
-
-    if (name === 'not') {
-      this.property('value', !newValue, true, true);
-    }
-  },
+    this.createProperty('value', wcPlay.PROPERTY.TOGGLE, false, {input: true, output: true});
+  }
 });

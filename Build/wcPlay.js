@@ -1217,7 +1217,7 @@ Class.extend('wcNode', 'Node', '', {
     this._parent = parent;
 
     // Give the node its default properties.
-    this.createProperty(wcNode.PROPERTY_ENABLED, wcPlay.PROPERTY.TOGGLE, true, {description: "Disabled nodes will be treated as if they were not there, all connections will be ignored.", noread: true});
+    this.createProperty(wcNode.PROPERTY_ENABLED, wcPlay.PROPERTY.TOGGLE, true, {description: "Disabled nodes will be treated as if they were not there, all connections will be ignored.", input: true, output: true});
     // this.createProperty(wcNode.PROPERTY.DEBUG_LOG, wcPlay.PROPERTY.TOGGLE, false, {collapsible: true, description: "Output various debugging information about this node."});
 
     // Add this node to its parent.
@@ -4390,9 +4390,9 @@ wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'Linkers', {
       this._parent && this._parent.createProperty(this.name, wcPlay.PROPERTY.STRING, '');
     }
 
-    this.createProperty('input', wcPlay.PROPERTY.TOGGLE, true, {description: "Assign whether the parent Composite Node can set this property's value.", noread: true});
-    this.createProperty('output', wcPlay.PROPERTY.TOGGLE, true, {description: "Assign whether the parent Composite Node can read this property's value.", noread: true});
-    this.createProperty('value', wcPlay.PROPERTY.STRING, '');
+    this.createProperty('input', wcPlay.PROPERTY.TOGGLE, true, {description: "Assign whether the parent Composite Node can set this property's value."});
+    this.createProperty('output', wcPlay.PROPERTY.TOGGLE, true, {description: "Assign whether the parent Composite Node can read this property's value."});
+    this.createProperty('value', wcPlay.PROPERTY.STRING, '', {input: true, output: true});
   },
 
   /**
@@ -4414,10 +4414,10 @@ wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'Linkers', {
       if (this._parent) {
         var opts = {};
         if (!this.property('input')) {
-          opts.nowrite = true;
+          opts.input = true;
         }
         if (!this.property('output')) {
-          opts.noread = true;
+          opts.output = true;
         }
         this._parent.createProperty(newName, wcPlay.PROPERTY.STRING, '', opts);
 
@@ -4467,9 +4467,9 @@ wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'Linkers', {
         if (opts && engine) {
           engine.notifyEditors('onBeginUndoGroup', ['Property "' + name + '" changed for Node "' + this.category + '.' + this.type + '"']);
 
-          opts.nowrite = !newValue;
+          opts.input = !newValue;
 
-          if (opts.nowrite) {
+          if (!opts.input) {
             engine.notifyEditors('onDisconnectInputChains', [this._parent, this.name]);
             this._parent.disconnectInput(this.name);
           }
@@ -4480,9 +4480,9 @@ wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'Linkers', {
         var opts = this._parent.propertyOptions(this.name);
         if (opts && engine) {
           engine.notifyEditors('onBeginUndoGroup', ['Property "' + name + '" changed for Node "' + this.category + '.' + this.type + '"']);
-          opts.noread = !newValue;
+          opts.output = !newValue;
 
-          if (opts.noread) {
+          if (!opts.output) {
             engine.notifyEditors('onDisconnectOutputChains', [this._parent, this.name]);
             this._parent.disconnectOutput(this.name);
           }

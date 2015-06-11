@@ -13,7 +13,7 @@ wcNodeProcess.extend('wcNodeProcessDelay', 'Delay', 'Flow Control', {
 
     this.description("Waits for a specified amount of time before continuing the flow chain.");
 
-    this.createProperty('milliseconds', wcPlay.PROPERTY.NUMBER, 1000, {description: "The time delay, in milliseconds, to wait before firing the 'out' Exit link."});
+    this.createProperty('milliseconds', wcPlay.PROPERTY.NUMBER, 1000, {description: "The time delay, in milliseconds, to wait before firing the 'out' Exit link.", input: true});
   },
 
   /**

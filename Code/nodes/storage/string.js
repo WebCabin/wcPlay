@@ -13,6 +13,6 @@ wcNodeStorage.extend('wcNodeStorageString', 'String', 'Local', {
 
     this.description("Stores a string value.");
 
-    this.createProperty('value', wcPlay.PROPERTY.STRING, '', {multiline: true});
+    this.createProperty('value', wcPlay.PROPERTY.STRING, '', {multiline: true, input: true, output: true});
   },
 });

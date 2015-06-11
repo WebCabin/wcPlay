@@ -24,9 +24,9 @@ wcNodeProcess.extend('wcNodeProcessOperation', 'Operation', 'Data Manipulation',
     this.createEntry('div', "valueA / valueB = result");
 
     // Create our two operator values.
-    this.createProperty('valueA', wcPlay.PROPERTY.NUMBER, 0, {description: "Left hand value for the operation.", noread: true});
-    this.createProperty('valueB', wcPlay.PROPERTY.NUMBER, 0, {description: "Right hand value for the operation.", noread: true});
-    this.createProperty('result', wcPlay.PROPERTY.NUMBER, 0, {description: "The result of the operation.", nowrite: true});
+    this.createProperty('valueA', wcPlay.PROPERTY.NUMBER, 0, {description: "Left hand value for the operation.", input: true});
+    this.createProperty('valueB', wcPlay.PROPERTY.NUMBER, 0, {description: "Right hand value for the operation.", input: true});
+    this.createProperty('result', wcPlay.PROPERTY.NUMBER, 0, {description: "The result of the operation.", output: true});
   },
 
   /**
