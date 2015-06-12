@@ -3419,18 +3419,6 @@ wcPlayEditor.prototype = {
     var enterConfirms = true;
     var propFn = (initial? 'initialProperty': 'property');
 
-    var type = property.type;
-    // if (type === wcPlay.PROPERTY.DYNAMIC) {
-    //   var value = node.property(property.name);
-    //   if (typeof value === 'string') {
-    //     type = wcPlay.PROPERTY.STRING;
-    //   } else if (typeof value === 'bool') {
-    //     type = wcPlay.PROPERTY.TOGGLE;
-    //   } else if (typeof value === 'number') {
-    //     type = wcPlay.PROPERTY.NUMBER;
-    //   }
-    // }
-
     var self = this;
     function undoChange(node, name, oldValue, newValue) {
       self._undoManager && self._undoManager.addEvent('Property "' + name + '" changed for Node "' + node.category + '.' + node.type + '"',
@@ -3458,8 +3446,11 @@ wcPlayEditor.prototype = {
       });
     };
 
+    var $blocker = $('<div class="wcPlayEditorBlocker">');
+
     // Determine what editor to use for the property.
-    switch (type) {
+    switch (property.type) {
+
       case wcPlay.PROPERTY.TOGGLE:
         // Toggles do not show an editor, instead, they just toggle their state.
         var state = node[propFn](property.name);
@@ -3475,10 +3466,13 @@ wcPlayEditor.prototype = {
             var max = $(this).attr('max') !== undefined? parseInt($(this).attr('max')):  Infinity;
             value = Math.min(max, Math.max(min, parseInt($control.val())));
             node[propFn](property.name, value, true, true);
-            undoChange(node, property.name, node[propFn](property.name), value);
+            undoChange(node, property.name, value, node[propFn](property.name));
+            $blocker.click();
           }
         });
         break;
+
+
       case wcPlay.PROPERTY.STRING:
       case wcPlay.PROPERTY.DYNAMIC:
         if (property.options.multiline) {
@@ -3490,11 +3484,15 @@ wcPlayEditor.prototype = {
         $control.val(node[propFn](property.name).toString());
         $control.change(function() {
           if (!cancelled) {
+            value = node[propFn](property.name);
             node[propFn](property.name, $control.val(), true, true);
-            undoChange(node, property.name, node[propFn](property.name), $control.val());
+            undoChange(node, property.name, value, node[propFn](property.name));
+            $blocker.click();
           }
         });
         break;
+
+
       case wcPlay.PROPERTY.SELECT:
         var value = node[propFn](property.name);
         $control = $('<select>');
@@ -3520,11 +3518,28 @@ wcPlayEditor.prototype = {
 
         $control.change(function() {
           if (!cancelled) {
+            value = node[propFn](property.name);
             node[propFn](property.name, $control.val(), true, true);
-            undoChange(node, property.name, node[propFn](property.name), $control.val());
-            $(this).blur();
+            undoChange(node, property.name, value, node[propFn](property.name));
+            $blocker.click();
           }
         });
+        break;
+
+
+      case wcPlay.PROPERTY.CUSTOM:
+        if (typeof property.options.onCreate === 'function') {
+          var value = node[propFn](property.name);
+
+          $control = $(property.options.onCreate(node, property.name, value, initial, function(newValue) {
+            if (!cancelled) {
+              value = node[propFn](property.name);
+              node[propFn](property.name, newValue, true, true);
+              undoChange(node, property.name, value, node[propFn](property.name));
+              $blocker.click();
+            }
+          }));
+        }
         break;
     }
 
@@ -3534,6 +3549,7 @@ wcPlayEditor.prototype = {
         left: this.$palette.width(),
       };
 
+      this.$main.append($blocker);
       this.$main.append($control);
 
       $control.addClass('wcPlayEditorControl');
@@ -3541,8 +3557,10 @@ wcPlayEditor.prototype = {
       $control.select();
 
       // Clicking away will close the editor control.
-      $control.blur(function() {
-        $(this).remove();
+      $blocker.click(function(event) {
+        event.stopPropagation();
+        $blocker.remove();
+        $control.remove();
       });
 
       $control.keydown(function(event) {
@@ -5044,7 +5062,7 @@ wcPlayEditor.prototype = {
       function __test(nodes) {
         // Iterate backwards so we always test the nodes that are drawn on top first.
         for (var i = nodes.length-1; i >= 0; --i) {
-          if (nodes[i]._meta.bounds && self.__inRect(pos, nodes[i]._meta.bounds.farRect, nodes[i].pos, camera)) {
+          if (nodes[i]._meta.bounds && self.__inRect(pos, nodes[i]._meta.bounds.rect, nodes[i].pos, camera)) {
             return nodes[i];
           }
         }

@@ -184,8 +184,18 @@
   cursor: pointer;
 }
 
+.wcPlayEditorBlocker {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  z-index: 1000;
+}
+
 .wcPlayEditorControl {
   position: absolute;
+  z-index: 1001;
 }
 
 .wcPlayHidden {
