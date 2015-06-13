@@ -792,12 +792,12 @@ wcPlay.prototype = {
    * Triggers an event into the Play script.
    * @function wcPlay#triggerEvent
    * @param {String} type - The type name of the node (as displayed in the title).
-   * @param {String} name - The event name to trigger (as displayed in the title between the parenthesis).
-   * @param {Object} data - Any data object that will be passed into the entry node.
+   * @param {String} [name] - The event name to trigger (as displayed in the title between the parenthesis). Use an empty string to ignore the name.
+   * @param {Object} [data] - Any data object that will be passed into the entry node.
    */
   triggerEvent: function(type, name, data) {
     for (var i = 0; i < this._entryNodes.length; ++i) {
-      if (this._entryNodes[i].type === type && this._entryNodes[i].name === name) {
+      if (this._entryNodes[i].type === type && (!name || this._entryNodes[i].name === name)) {
         this._entryNodes[i].onActivated(data);
       }
     }
