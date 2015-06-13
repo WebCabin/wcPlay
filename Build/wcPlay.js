@@ -369,12 +369,16 @@ wcPlay.prototype = {
       var nodes = [];
       for (var i = 0; i < data.nodes.length; ++i) {
         if (window[data.nodes[i].className]) {
-          var newNode = new window[data.nodes[i].className](this, data.nodes[i].pos, data.nodes[i].name);
-          newNode.id = data.nodes[i].id;
-          nodes.push({
-            node: newNode,
-            data: data.nodes[i]
-          });
+          try {
+            var newNode = new window[data.nodes[i].className](this, data.nodes[i].pos, data.nodes[i].name);
+            newNode.id = data.nodes[i].id;
+            nodes.push({
+              node: newNode,
+              data: data.nodes[i]
+            });
+          } catch (e) {
+            console.log('ERROR: Attempted to load node "' + data.nodes[i].className + '" with error :' + e);
+          }
         } else {
           console.log('ERROR: Attempted to load node "' + data.nodes[i].className + '", but the constructor could not be found!');
         }
