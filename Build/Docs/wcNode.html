@@ -15847,13 +15847,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.jsdoc.html">nodes/node.jsdoc</a>,
-     <a href="nodes_node.jsdoc.html#sunlight-1-line-92">line 92</a>
+     <a href="nodes_node.jsdoc.html#sunlight-1-line-91">line 91</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.jsdoc.html">nodes/node.jsdoc</a>,
-				 <a href="nodes_node.jsdoc.html#sunlight-1-line-92">line 92</a>
+				 <a href="nodes_node.jsdoc.html#sunlight-1-line-91">line 91</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -16661,13 +16661,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.jsdoc.html">nodes/node.jsdoc</a>,
-     <a href="nodes_node.jsdoc.html#sunlight-1-line-101">line 101</a>
+     <a href="nodes_node.jsdoc.html#sunlight-1-line-100">line 100</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.jsdoc.html">nodes/node.jsdoc</a>,
-				 <a href="nodes_node.jsdoc.html#sunlight-1-line-101">line 101</a>
+				 <a href="nodes_node.jsdoc.html#sunlight-1-line-100">line 100</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -17058,13 +17058,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.jsdoc.html">nodes/node.jsdoc</a>,
-     <a href="nodes_node.jsdoc.html#sunlight-1-line-85">line 85</a>
+     <a href="nodes_node.jsdoc.html#sunlight-1-line-84">line 84</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.jsdoc.html">nodes/node.jsdoc</a>,
-				 <a href="nodes_node.jsdoc.html#sunlight-1-line-85">line 85</a>
+				 <a href="nodes_node.jsdoc.html#sunlight-1-line-84">line 84</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -17687,7 +17687,7 @@
                 
 <hr>
 <dt>
-    <h4 class="name" id="~CustomCreateFunc"><toc class="small"><i>inner</i></toc><toc> </toc>typedef function <toc><b>CustomCreateFunc</b>()</toc>
+    <h4 class="name" id="~CustomCreateFunc"><toc class="small"><i>inner</i></toc><toc> </toc>typedef function <toc><b>CustomCreateFunc</b>(node, name, value, isInitial, onChanged)</toc>
         
         >
         
@@ -17714,43 +17714,10 @@
     
     
     
-    
-    
-    
-<h5>Returns: 
-<span class="param-type">external:jQuery~Object</span>
-
-</h5>
-    
-            <p class="param-desc" style="margin-left: 20px;">
-    
-		 A containing element that contains the control.
-	</p>
-
+        <h5>Parameters:</h5>
         
 
-    
-
-    
-
-    
-
-    
-    
-    
-    
-    
-
-    
-<dl class="details">
-	
-
-	<h5 class="subsection-title">Properties:</h5>
-
-	<dl>
-
-<div class="prop-container">
-<table class="props table table-striped">
+<table class="params table table-striped">
     <thead>
 	<tr>
 		
@@ -17864,29 +17831,6 @@
 
         <tr>
             
-                <td class="name"><code>bounds</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="wcPlayEditor.html#~Rect">wcPlayEditor~Rect</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The bounds to place and size the generated control.</td>
-        </tr>
-
-	
-
-        <tr>
-            
                 <td class="name"><code>onChanged</code></td>
             
 
@@ -17909,8 +17853,37 @@
 	
 	</tbody>
 </table>
-</div></dl>
 
+    
+    
+    
+    
+<h5>Returns: 
+<span class="param-type">external:jQuery~Object</span>
+
+</h5>
+    
+            <p class="param-desc" style="margin-left: 20px;">
+    
+		 A containing element that contains the control.
+	</p>
+
+        
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
 	
 
 	
@@ -17967,7 +17940,7 @@
                 
 <hr>
 <dt>
-    <h4 class="name" id="~CustomOnChangedFunc"><toc class="small"><i>inner</i></toc><toc> </toc>typedef function <toc><b>CustomOnChangedFunc</b>()</toc>
+    <h4 class="name" id="~CustomOnChangedFunc"><toc class="small"><i>inner</i></toc><toc> </toc>typedef function <toc><b>CustomOnChangedFunc</b>(newValue)</toc>
         
     </h4>
 
@@ -17987,31 +17960,10 @@
     
     
     
-    
-    
+        <h5>Parameters:</h5>
+        
 
-    
-
-    
-
-    
-
-    
-    
-    
-    
-    
-
-    
-<dl class="details">
-	
-
-	<h5 class="subsection-title">Properties:</h5>
-
-	<dl>
-
-<div class="prop-container">
-<table class="props table table-striped">
+<table class="params table table-striped">
     <thead>
 	<tr>
 		
@@ -18055,8 +18007,25 @@
 	
 	</tbody>
 </table>
-</div></dl>
 
+    
+    
+    
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
 	
 
 	
@@ -18088,13 +18057,13 @@
 	
 	<dt class="tag-source method-doc-label method-doc-details-label">Source:
     <a href="nodes_node.jsdoc.html">nodes/node.jsdoc</a>,
-     <a href="nodes_node.jsdoc.html#sunlight-1-line-79">line 79</a>
+     <a href="nodes_node.jsdoc.html#sunlight-1-line-78">line 78</a>
   </dt>
 <!-- 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.jsdoc.html">nodes/node.jsdoc</a>,
-				 <a href="nodes_node.jsdoc.html#sunlight-1-line-79">line 79</a>
+				 <a href="nodes_node.jsdoc.html#sunlight-1-line-78">line 78</a>
 			</li>
 		</ul>
 	</dd> -->
@@ -18270,7 +18239,7 @@
                 
 <hr>
 <dt>
-    <h4 class="name" id="~SelectItemFunc"><toc class="small"><i>inner</i></toc><toc> </toc>typedef function <toc><b>SelectItemFunc</b>()</toc>
+    <h4 class="name" id="~SelectItemFunc"><toc class="small"><i>inner</i></toc><toc> </toc>typedef function <toc><b>SelectItemFunc</b>(items)</toc>
         
     </h4>
 
@@ -18290,31 +18259,10 @@
     
     
     
-    
-    
+        <h5>Parameters:</h5>
+        
 
-    
-
-    
-
-    
-
-    
-    
-    
-    
-    
-
-    
-<dl class="details">
-	
-
-	<h5 class="subsection-title">Properties:</h5>
-
-	<dl>
-
-<div class="prop-container">
-<table class="props table table-striped">
+<table class="params table table-striped">
     <thead>
 	<tr>
 		
@@ -18361,8 +18309,25 @@
 	
 	</tbody>
 </table>
-</div></dl>
 
+    
+    
+    
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+    
+
+    
+<dl class="details">
 	
 
 	

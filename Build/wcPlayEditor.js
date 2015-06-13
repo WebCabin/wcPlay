@@ -4469,7 +4469,7 @@ wcPlayEditor.prototype = {
   __onViewportMouseUp: function(event, elem) {
     this.$viewport.removeClass('wcGrabbing');
 
-    if (this._draggingNodeData) {
+    if (this._draggingNodeData && event.type === 'mouseup') {
       // Create an instance of the node and add it to the script.
       var screenOffset = this.$container.offset();
       var mouse = this.__mouse(event, this.$viewport.offset(), this._viewportCamera);
@@ -4784,6 +4784,8 @@ wcPlayEditor.prototype = {
    */
   __onViewportMouseLeave: function(event, elem) {
     this._mouseInViewport = false;
+    this.__handleAutoScroll(false);
+    this.__onViewportMouseUp(event, elem);
   },
 
   /**
