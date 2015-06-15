@@ -3513,7 +3513,7 @@ wcPlayEditor.prototype = {
           if (property.options.hasOwnProperty('noneValue')) {
             noneValue = property.options.noneValue;
           }
-          $control.append($('<option value="' + noneValue + '"' + (noneValue == value? ' selected': '') + '>&lt;none&gt;</option>'));
+          $control.append($('<option value=""' + (noneValue == value? ' selected': '') + '>&lt;none&gt;</option>'));
           for (var i = 0; i < items.length; ++i) {
             if (typeof items[i] === 'object') {
               $control.append($('<option value="' + items[i].value + '"' + (items[i].value == value? ' selected': '') + '>' + items[i].name + '</option>'));
@@ -3529,7 +3529,11 @@ wcPlayEditor.prototype = {
         $control.change(function() {
           if (!cancelled) {
             value = node[propFn](property.name);
-            node[propFn](property.name, $control.val(), true, true);
+            var newValue = $control.val();
+            if (newValue == '' && property.options.hasOwnProperty('noneValue')) {
+              newValue = property.options.noneValue;
+            }
+            node[propFn](property.name, newValue, true, true);
             undoChange(node, property.name, value, node[propFn](property.name));
             $blocker.click();
           }
