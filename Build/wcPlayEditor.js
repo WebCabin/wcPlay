@@ -3238,9 +3238,15 @@ wcPlayEditor.prototype = {
           // Display toggle buttons as 'yes', 'no'
           return (value? 'yes': 'no');
         case wcPlay.PROPERTY.SELECT:
-          if (value == '') {
+          var noneValue = '';
+          if (property.options.hasOwnProperty('noneValue')) {
+            noneValue = property.options.noneValue;
+          }
+
+          if (value == noneValue) {
             return '<none>';
           }
+
           var items = property.options.items;
           if ($.isFunction(items)) {
             items = items.call(node);
@@ -3503,7 +3509,11 @@ wcPlayEditor.prototype = {
         }
 
         if ($.isArray(items)) {
-          $control.append($('<option value=""' + ('' == value? ' selected': '') + '>&lt;none&gt;</option>'));
+          var noneValue = '';
+          if (property.options.hasOwnProperty('noneValue')) {
+            noneValue = property.options.noneValue;
+          }
+          $control.append($('<option value="' + noneValue + '"' + (noneValue == value? ' selected': '') + '>&lt;none&gt;</option>'));
           for (var i = 0; i < items.length; ++i) {
             if (typeof items[i] === 'object') {
               $control.append($('<option value="' + items[i].value + '"' + (items[i].value == value? ' selected': '') + '>' + items[i].name + '</option>'));

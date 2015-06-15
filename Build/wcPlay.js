@@ -2530,7 +2530,11 @@ Class.extend('wcNode', 'Node', '', {
               }
 
               if (!found) {
-                value = '';
+                if (prop.options.hasOwnProperty('noneValue')) {
+                  value = prop.options.noneValue;
+                } else {
+                  value = '';
+                }
               }
               break;
           }
