@@ -2783,6 +2783,13 @@ Class.extend('wcNode', 'Node', '', {
         data.value = myProp.value;
       }
 
+      if (typeof myProp.options.exportValue === 'function') {
+        var val = myProp.options.exportValue(myProp.initialValue);
+        if (val !== undefined) {
+          data.initialValue = val;
+        }
+      }
+
       result.push(data);
     }
 
