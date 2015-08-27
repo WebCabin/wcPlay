@@ -3463,6 +3463,8 @@ wcPlayEditor.prototype = {
         node[propFn](property.name, !state, true, true);
         undoChange(node, property.name, state, !state);
         break;
+
+
       case wcPlay.PROPERTY.NUMBER:
         $control = $('<input type="number"' + (property.options.min? ' min="' + property.options.min + '"': '') + (property.options.max? ' max="' + property.options.max + '"': '') + (property.options.step? ' step="' + property.options.step + '"': '') + '>');
         $control.val(parseFloat(node[propFn](property.name)));
@@ -3470,10 +3472,10 @@ wcPlayEditor.prototype = {
           if (!cancelled) {
             var min = $(this).attr('min') !== undefined? parseInt($(this).attr('min')): -Infinity;
             var max = $(this).attr('max') !== undefined? parseInt($(this).attr('max')):  Infinity;
-            value = Math.min(max, Math.max(min, parseInt($control.val())));
+            value = Math.min(max, Math.max(min, parseFloat($control.val())));
             node[propFn](property.name, value, true, true);
             undoChange(node, property.name, value, node[propFn](property.name));
-            $blocker.click();
+            // $blocker.click();
           }
         });
         break;
