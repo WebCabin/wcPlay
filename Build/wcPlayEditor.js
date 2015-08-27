@@ -3470,12 +3470,17 @@ wcPlayEditor.prototype = {
         $control.val(parseFloat(node[propFn](property.name)));
         $control.change(function() {
           if (!cancelled) {
-            var min = $(this).attr('min') !== undefined? parseInt($(this).attr('min')): -Infinity;
-            var max = $(this).attr('max') !== undefined? parseInt($(this).attr('max')):  Infinity;
+            var min = $(this).attr('min') !== undefined? parseFloat($(this).attr('min')): -Infinity;
+            var max = $(this).attr('max') !== undefined? parseFloat($(this).attr('max')):  Infinity;
             value = Math.min(max, Math.max(min, parseFloat($control.val())));
             node[propFn](property.name, value, true, true);
             undoChange(node, property.name, value, node[propFn](property.name));
             // $blocker.click();
+          }
+        });
+        $control.keyup(function(event) {
+          if (event.keyCode === 13) {
+            $blocker.click();
           }
         });
         break;
