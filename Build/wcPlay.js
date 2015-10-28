@@ -1817,7 +1817,7 @@ Class.extend('wcNode', 'Node', '', {
         flashDelta: 0,
         broken: 0,
         color: "#000000",
-      },
+      }
     });
     this._meta.dirty = true;
     return true;
@@ -4402,7 +4402,7 @@ wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'Linkers', {
     this.name = linkName || 'value';
 
     if (!this._invalid) {
-      this._parent && this._parent.createProperty(this.name, wcPlay.PROPERTY.STRING, '');
+      this._parent && this._parent.createProperty(this.name, wcPlay.PROPERTY.STRING, '', {input: true, output: true});
     }
 
     this.createProperty('input', wcPlay.PROPERTY.TOGGLE, true, {description: "Assign whether the parent Composite Node can set this property's value."});
@@ -4427,28 +4427,10 @@ wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'Linkers', {
     if (newName) {
       // Attempt to create a new property, if it does not exist, then synchronize our local property.
       if (this._parent) {
-        var opts = {};
-        if (!this.property('input')) {
-          opts.input = true;
-        }
-        if (!this.property('output')) {
-          opts.output = true;
-        }
-        this._parent.createProperty(newName, wcPlay.PROPERTY.STRING, '', opts);
-
-        // Copy all chains from the old property links to the new.
-        var inputChains = this._parent.listInputChains(oldName);
-        var outputChains = this._parent.listOutputChains(oldName);
-        var engine = this.engine();
-        if (engine) {
-          for (var i = 0; i < inputChains.length; ++i) {
-            this._parent.connectInput(newName, engine.nodeById(inputChains[i].outNodeId), inputChains[i].outName);
-          }
-          for (var i = 0; i < outputChains.length; ++i) {
-            this._parent.connectOutput(newName, engine.nodeById(outputChains[i].inNodeId), outputChains[i].inName);
-          }
-        }
-        this._parent.sortPropertyLinks();
+        this._parent.renameProperty(oldName, newName);
+        var options = this._parent.propertyOptions(newName);
+        options.input = this.property('input');
+        options.output = this.property('output');
       }
       this.property('value', this.property('value'));
     } else {
@@ -4481,8 +4463,7 @@ wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'Linkers', {
         var opts = this._parent.propertyOptions(this.name);
         if (opts && engine) {
           engine.notifyEditors('onBeginUndoGroup', ['Property "' + name + '" changed for Node "' + this.category + '.' + this.type + '"']);
-
-          opts.input = !newValue;
+          opts.input = newValue;
 
           if (!opts.input) {
             engine.notifyEditors('onDisconnectInputChains', [this._parent, this.name]);
@@ -4495,7 +4476,7 @@ wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'Linkers', {
         var opts = this._parent.propertyOptions(this.name);
         if (opts && engine) {
           engine.notifyEditors('onBeginUndoGroup', ['Property "' + name + '" changed for Node "' + this.category + '.' + this.type + '"']);
-          opts.output = !newValue;
+          opts.output = newValue;
 
           if (!opts.output) {
             engine.notifyEditors('onDisconnectOutputChains', [this._parent, this.name]);

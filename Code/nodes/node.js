@@ -644,7 +644,7 @@ Class.extend('wcNode', 'Node', '', {
         flashDelta: 0,
         broken: 0,
         color: "#000000",
-      },
+      }
     });
     this._meta.dirty = true;
     return true;
