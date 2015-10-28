@@ -248,6 +248,12 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
     });
 
     var oldLinks = this.chain.entry;
+
+    var oldOrder = [];
+    for (var i = 0; i < oldLinks.length; ++i) {
+      oldOrder.push(oldLinks[i].name);
+    }
+
     this.chain.entry = [];
     for (var i = 0; i < order.length; ++i) {
       var name = order[i].name;
@@ -255,6 +261,14 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
         if (oldLinks[a].name === name) {
           this.chain.entry.push(oldLinks[a]);
         }
+      }
+    }
+
+    // Check to see if our order has changed.
+    for (var i = 0; i < oldOrder.length; ++i) {
+      if (this.chain.entry.length <= i || this.chain.entry[i].name !== oldOrder[i]) {
+        this._meta.dirty = true;
+        break;
       }
     }
   },
@@ -281,6 +295,12 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
     });
 
     var oldLinks = this.chain.exit;
+
+    var oldOrder = [];
+    for (var i = 0; i < oldLinks.length; ++i) {
+      oldOrder.push(oldLinks[i].name);
+    }
+
     this.chain.exit = [];
     for (var i = 0; i < order.length; ++i) {
       var name = order[i].name;
@@ -288,6 +308,14 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
         if (oldLinks[a].name === name) {
           this.chain.exit.push(oldLinks[a]);
         }
+      }
+    }
+
+    // Check to see if our order has changed.
+    for (var i = 0; i < oldOrder.length; ++i) {
+      if (this.chain.exit.length <= i || this.chain.exit[i].name !== oldOrder[i]) {
+        this._meta.dirty = true;
+        break;
       }
     }
   },
@@ -314,6 +342,12 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
     });
 
     var oldProperties = this.properties;
+
+    var oldOrder = [];
+    for (var i = 0; i < oldProperties.length; ++i) {
+      oldOrder.push(oldProperties[i].name);
+    }
+
     this.properties = [oldProperties[0]];
     oldProperties.splice(0, 1);
     for (var i = 0; i < order.length; ++i) {
@@ -324,6 +358,14 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
           oldProperties.splice(a, 1);
           a--;
         }
+      }
+    }
+
+    // Check to see if our order has changed.
+    for (var i = 0; i < oldOrder.length; ++i) {
+      if (this.properties.length <= i || this.properties[i].name !== oldOrder[i]) {
+        this._meta.dirty = true;
+        break;
       }
     }
   },

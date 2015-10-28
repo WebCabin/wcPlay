@@ -3690,6 +3690,12 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
     });
 
     var oldLinks = this.chain.entry;
+
+    var oldOrder = [];
+    for (var i = 0; i < oldLinks.length; ++i) {
+      oldOrder.push(oldLinks[i].name);
+    }
+
     this.chain.entry = [];
     for (var i = 0; i < order.length; ++i) {
       var name = order[i].name;
@@ -3697,6 +3703,14 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
         if (oldLinks[a].name === name) {
           this.chain.entry.push(oldLinks[a]);
         }
+      }
+    }
+
+    // Check to see if our order has changed.
+    for (var i = 0; i < oldOrder.length; ++i) {
+      if (this.chain.entry.length <= i || this.chain.entry[i].name !== oldOrder[i]) {
+        this._meta.dirty = true;
+        break;
       }
     }
   },
@@ -3723,6 +3737,12 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
     });
 
     var oldLinks = this.chain.exit;
+
+    var oldOrder = [];
+    for (var i = 0; i < oldLinks.length; ++i) {
+      oldOrder.push(oldLinks[i].name);
+    }
+
     this.chain.exit = [];
     for (var i = 0; i < order.length; ++i) {
       var name = order[i].name;
@@ -3730,6 +3750,14 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
         if (oldLinks[a].name === name) {
           this.chain.exit.push(oldLinks[a]);
         }
+      }
+    }
+
+    // Check to see if our order has changed.
+    for (var i = 0; i < oldOrder.length; ++i) {
+      if (this.chain.exit.length <= i || this.chain.exit[i].name !== oldOrder[i]) {
+        this._meta.dirty = true;
+        break;
       }
     }
   },
@@ -3756,6 +3784,12 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
     });
 
     var oldProperties = this.properties;
+
+    var oldOrder = [];
+    for (var i = 0; i < oldProperties.length; ++i) {
+      oldOrder.push(oldProperties[i].name);
+    }
+
     this.properties = [oldProperties[0]];
     oldProperties.splice(0, 1);
     for (var i = 0; i < order.length; ++i) {
@@ -3766,6 +3800,14 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
           oldProperties.splice(a, 1);
           a--;
         }
+      }
+    }
+
+    // Check to see if our order has changed.
+    for (var i = 0; i < oldOrder.length; ++i) {
+      if (this.properties.length <= i || this.properties[i].name !== oldOrder[i]) {
+        this._meta.dirty = true;
+        break;
       }
     }
   },
@@ -4078,6 +4120,10 @@ wcNodeComposite.extend('wcNodeCompositeEntry', 'Entry', 'Linkers', {
     this.createExit('out');
 
     this.name = name;
+
+    if (!this._invalid && this._parent) {
+      this._parent.sortEntryLinks();
+    }
   },
 
   /**
@@ -4240,6 +4286,10 @@ wcNodeComposite.extend('wcNodeCompositeExit', 'Exit', 'Linkers', {
     this.removeExit('out');
 
     this.name = name;
+
+    if (!this._invalid && this._parent) {
+      this._parent.sortExitLinks();
+    }
   },
 
   /**
@@ -4401,13 +4451,17 @@ wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'Linkers', {
     this.details("The title name for this node becomes the name of the Property on the parent Composite Node. Multiple Property Nodes can reference the same property value name.\n\nAlthough this node does nothing while it is outside of a Composite Node, it can be placed within the Root level of the script. Doing so is useful if you intend to 'File->Import' this script into another.");
     this.name = linkName || 'value';
 
-    if (!this._invalid) {
-      this._parent && this._parent.createProperty(this.name, wcPlay.PROPERTY.STRING, '', {input: true, output: true});
+    if (!this._invalid && this._parent) {
+      this._parent.createProperty(this.name, wcPlay.PROPERTY.STRING, '', {input: true, output: true});
     }
 
     this.createProperty('input', wcPlay.PROPERTY.TOGGLE, true, {description: "Assign whether the parent Composite Node can set this property's value."});
     this.createProperty('output', wcPlay.PROPERTY.TOGGLE, true, {description: "Assign whether the parent Composite Node can read this property's value."});
     this.createProperty('value', wcPlay.PROPERTY.STRING, '', {input: true, output: true});
+
+    if (!this._invalid && this._parent) {
+      this._parent.sortPropertyLinks();
+    }
   },
 
   /**

@@ -38,6 +38,10 @@ wcNodeComposite.extend('wcNodeCompositeEntry', 'Entry', 'Linkers', {
     this.createExit('out');
 
     this.name = name;
+
+    if (!this._invalid && this._parent) {
+      this._parent.sortEntryLinks();
+    }
   },
 
   /**

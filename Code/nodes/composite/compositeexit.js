@@ -38,6 +38,10 @@ wcNodeComposite.extend('wcNodeCompositeExit', 'Exit', 'Linkers', {
     this.removeExit('out');
 
     this.name = name;
+
+    if (!this._invalid && this._parent) {
+      this._parent.sortExitLinks();
+    }
   },
 
   /**

@@ -20,13 +20,17 @@ wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'Linkers', {
     this.details("The title name for this node becomes the name of the Property on the parent Composite Node. Multiple Property Nodes can reference the same property value name.\n\nAlthough this node does nothing while it is outside of a Composite Node, it can be placed within the Root level of the script. Doing so is useful if you intend to 'File->Import' this script into another.");
     this.name = linkName || 'value';
 
-    if (!this._invalid) {
-      this._parent && this._parent.createProperty(this.name, wcPlay.PROPERTY.STRING, '', {input: true, output: true});
+    if (!this._invalid && this._parent) {
+      this._parent.createProperty(this.name, wcPlay.PROPERTY.STRING, '', {input: true, output: true});
     }
 
     this.createProperty('input', wcPlay.PROPERTY.TOGGLE, true, {description: "Assign whether the parent Composite Node can set this property's value."});
     this.createProperty('output', wcPlay.PROPERTY.TOGGLE, true, {description: "Assign whether the parent Composite Node can read this property's value."});
     this.createProperty('value', wcPlay.PROPERTY.STRING, '', {input: true, output: true});
+
+    if (!this._invalid && this._parent) {
+      this._parent.sortPropertyLinks();
+    }
   },
 
   /**
