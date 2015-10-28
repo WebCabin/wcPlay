@@ -179,7 +179,7 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
       if (this._compositeNodes[i] instanceof wcNodeCompositeScript) {
         var found = this._compositeNodes[i].nodesByClassName(className);
         if (found.length) {
-          result.concat(found);
+          result = result.concat(found);
         }
       }
     }
