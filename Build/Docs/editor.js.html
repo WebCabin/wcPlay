@@ -3963,7 +3963,7 @@ wcPlayEditor.prototype = {
     if (categoryData) {
       var offset = categoryData.$canvas.offset();
       mouse = this.__mouse(event, offset);
-      var node = this.__findNodeAtPos(mouse, undefined, categoryData.nodes);
+      var node = this.__findNodeAtPos(mouse, {x:0,y:0,z:this._drawStyle.palette.scale}, categoryData.nodes);
       if (node) {
         this._highlightNode = node;
         this.$palette.addClass('wcClickable');
@@ -4008,8 +4008,8 @@ wcPlayEditor.prototype = {
         this._draggingNodeData.$canvas.attr('width', rect.width).css('width', rect.width);
         this._draggingNodeData.$canvas.attr('height', rect.height).css('height', rect.height);
 
-        this._draggingNodeData.offset.x = (this._highlightNode.pos.x + rect.left + offset.left - screenOffset.left) - mouse.x;
-        this._draggingNodeData.offset.y = (this._highlightNode.pos.y + rect.top + offset.top - screenOffset.top) - mouse.y;
+        this._draggingNodeData.offset.x = (this._highlightNode.pos.x * this._drawStyle.palette.scale + rect.left + offset.left - screenOffset.left) - mouse.x;
+        this._draggingNodeData.offset.y = (this._highlightNode.pos.y * this._drawStyle.palette.scale + rect.top + offset.top - screenOffset.top) - mouse.y;
 
         var yPos = 0;
         if (!this._highlightNode.chain.entry.length) {
