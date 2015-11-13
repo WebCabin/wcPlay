@@ -810,7 +810,6 @@ wcPlay.prototype = {
   /**
    * Sends a custom notification event to all nodes.
    * @function wcPlay#notifyNodes
-   * @private
    * @param {String} func - The node function to call.
    * @param {Object[]} args - A list of arguments to forward into the function call.
    */
@@ -851,7 +850,6 @@ wcPlay.prototype = {
   /**
    * Sends a custom notification event to all renderers.
    * @function wcPlay#notifyEditors
-   * @private
    * @param {String} func - The renderer function to call.
    * @param {Object[]} args - A list of arguments to forward into the function call.
    */
