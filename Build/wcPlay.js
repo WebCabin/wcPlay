@@ -364,6 +364,8 @@ wcPlay.prototype = {
         return value;
       });
 
+      this.customData(data.custom);
+
       this.clear();
       for (var i = 0; i < data.properties.length; ++i) {
         this.createProperty(data.properties[i].name, data.properties[i].type, data.properties[i].initialValue, data.properties[i].options);
@@ -908,8 +910,9 @@ wcPlay.prototype = {
    * @function wcPlay#notifyNodes
    * @param {String} func - The node function to call.
    * @param {Object[]} args - A list of arguments to forward into the function call.
+   * @param {Boolean} [includeEditorPalette] - If true, will also notify all nodes generated for use with editor palette views.
    */
-  notifyNodes: function(func, args) {
+  notifyNodes: function(func, args, includeEditorPalette) {
     var self;
     for (var i = 0; i < this._compositeNodes.length; ++i) {
       self = this._compositeNodes[i];
@@ -940,6 +943,10 @@ wcPlay.prototype = {
       if (this._compositeNodes[i] instanceof wcNodeCompositeScript) {
         this._compositeNodes[i].notifyNodes(func, args);
       }
+    }
+
+    if (includeEditorPalette) {
+      this.notifyEditors('notifyPaletteNodes', [func, args]);
     }
   },
 

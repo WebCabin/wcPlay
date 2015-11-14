@@ -278,6 +278,27 @@ wcPlayEditor.prototype = {
   },
 
   /**
+   * Sends a custom notification event to all nodes.
+   * @function wcPlayEditor#notifyPaletteNodes
+   * @param {String} func - The node function to call.
+   * @param {Object[]} args - A list of arguments to forward into the function call.
+   */
+  notifyPaletteNodes: function(func, args) {
+    for (var cat in this._nodeLibrary) {
+      for (var type in this._nodeLibrary[cat]) {
+        var typeData = this._nodeLibrary[cat][type];
+
+        for (var i = 0; i < typeData.nodes.length; ++i) {
+          var node = typeData.nodes[i];
+          if (typeof node[func] === 'function') {
+            node[func].apply(node, args);
+          }
+        }
+      }
+    }
+  },
+
+  /**
    * Event that is called to begin an undo manager group operation.
    * @function wcPlayEditor#onBeginUndoGroup
    * @param {String} description - The description of the undo event.
