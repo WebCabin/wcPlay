@@ -21,7 +21,29 @@ $(document).ready(function() {
   // Assign the current Play script to be rendered.
   myPlayEditor.engine(myPlay);
 
+  myPlayEditor.onBeforeLoad(function() {
+    console.log('onBeforeLoad');
+  });
 
+  myPlayEditor.onLoaded(function() {
+    console.log('onLoaded');
+  });
+
+  myPlayEditor.onBeforeSave(function() {
+    console.log('onBeforeSave');
+  });
+
+  myPlayEditor.onSaved(function() {
+    console.log('onSaved');
+  });
+
+  myPlayEditor.onBeforeImport(function() {
+    console.log('onBeforeImport');
+  });
+
+  myPlayEditor.onImported(function() {
+    console.log('onImported');
+  });
 
 
 

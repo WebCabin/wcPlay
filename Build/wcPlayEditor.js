@@ -33,6 +33,17 @@ function wcPlayEditor(container, options) {
   this._parent = null;
   this._nodeLibrary = {};
 
+  this._eventHandlers = {
+    onBeforeSave: null,
+    onSaved: null,
+
+    onBeforeLoad: null,
+    onLoaded: null,
+
+    onBeforeImport: null,
+    onImported: null
+  };
+
   // this._nodeDrawCount = 0;
   // this._chainDrawCount = 0;
 
@@ -296,6 +307,115 @@ wcPlayEditor.prototype = {
         }
       }
     }
+  },
+
+  /**
+   * Triggers a previously bound event handler.
+   * @function wcPlayEditor#triggerEvent
+   * @param {String} eventName - The name of the event to trigger.
+   */
+  triggerEvent: function(eventName, args) {
+    if (this._eventHandlers.hasOwnProperty(eventName)) {
+      if (this._eventHandlers[eventName]) {
+        this._eventHandlers[eventName].apply(this, args);
+      }
+    }
+  },
+
+  /**
+   * Binds an event handler for when we are about to save our script.
+   * @function wcPlayEditor#onBeforeSave
+   * @param {Function} func - Assigns the function to handle this event.
+   * @returns {Boolean} - Success or failure.
+   */
+  onBeforeSave: function(func) {
+    if (typeof func !== 'function') {
+      console.log('Failed to bind event handler for onBeforeSave, argument must be a function!');
+      return false;
+    }
+
+    this._eventHandlers.onBeforeSave = func;
+    return true;
+  },
+
+  /**
+   * Binds an event handler for when we are about to save our script.
+   * @function wcPlayEditor#onSaved
+   * @param {Function} func - Assigns the function to handle this event.
+   * @returns {Boolean} - Success or failure.
+   */
+  onSaved: function(func) {
+    if (typeof func !== 'function') {
+      console.log('Failed to bind event handler for onSaved, argument must be a function!');
+      return false;
+    }
+
+    this._eventHandlers.onSaved = func;
+    return true;
+  },
+
+  /**
+   * Binds an event handler for when we are about to save our script.
+   * @function wcPlayEditor#onBeforeLoad
+   * @param {Function} func - Assigns the function to handle this event.
+   * @returns {Boolean} - Success or failure.
+   */
+  onBeforeLoad: function(func) {
+    if (typeof func !== 'function') {
+      console.log('Failed to bind event handler for onBeforeLoad, argument must be a function!');
+      return false;
+    }
+
+    this._eventHandlers.onBeforeLoad = func;
+    return true;
+  },
+
+  /**
+   * Binds an event handler for when we are about to save our script.
+   * @function wcPlayEditor#onLoaded
+   * @param {Function} func - Assigns the function to handle this event.
+   * @returns {Boolean} - Success or failure.
+   */
+  onLoaded: function(func) {
+    if (typeof func !== 'function') {
+      console.log('Failed to bind event handler for onLoaded, argument must be a function!');
+      return false;
+    }
+
+    this._eventHandlers.onLoaded = func;
+    return true;
+  },
+
+  /**
+   * Binds an event handler for when we are about to save our script.
+   * @function wcPlayEditor#onBeforeImport
+   * @param {Function} func - Assigns the function to handle this event.
+   * @returns {Boolean} - Success or failure.
+   */
+  onBeforeImport: function(func) {
+    if (typeof func !== 'function') {
+      console.log('Failed to bind event handler for onBeforeImport, argument must be a function!');
+      return false;
+    }
+
+    this._eventHandlers.onBeforeImport = func;
+    return true;
+  },
+
+  /**
+   * Binds an event handler for when we are about to save our script.
+   * @function wcPlayEditor#onImported
+   * @param {Function} func - Assigns the function to handle this event.
+   * @returns {Boolean} - Success or failure.
+   */
+  onImported: function(func) {
+    if (typeof func !== 'function') {
+      console.log('Failed to bind event handler for onImported, argument must be a function!');
+      return false;
+    }
+
+    this._eventHandlers.onImported = func;
+    return true;
   },
 
   /**
@@ -1034,6 +1154,8 @@ wcPlayEditor.prototype = {
             return;
           }
 
+          editor.triggerEvent('onBeforeSave', []);
+
           var savedData = editor._engine.save();
           var blob;
           try {
@@ -1046,6 +1168,8 @@ wcPlayEditor.prototype = {
           }
 
           saveAs(blob, 'script.wcplay');
+
+          editor.triggerEvent('onSaved', []);
         }
       }
     });
@@ -3825,6 +3949,12 @@ wcPlayEditor.prototype = {
     var self = this;
     // Import the contents of a file.
     function __importScriptFile(file, importing) {
+      if (importing) {
+        self.triggerEvent('onBeforeImport', []);
+      } else {
+        self.triggerEvent('onBeforeLoad', []);
+      }
+
       var reader = new FileReader();
       reader.onload = function(e) {
         if (self._engine) {
@@ -3832,6 +3962,7 @@ wcPlayEditor.prototype = {
             // Import the script as its own Composite node.
             if (self._engine.import(e.target.result, file.name)) {
               self.__setupPalette();
+              self.triggerEvent('onImported', []);
               self.$typeButton[3].click();
             }
           } else {
@@ -3841,6 +3972,7 @@ wcPlayEditor.prototype = {
               self._selectedNodes = [];
               self._undoManager && self._undoManager.clear();
               self.center();
+              self.triggerEvent('onLoaded', []);
             } else {
               alert('Failed to open file "' + file.name + '"\nPlease check to ensure it is actually a wcPlay script file.');
             }
