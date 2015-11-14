@@ -97,6 +97,8 @@ function wcPlay(options) {
   this._isPausing = false;
   this._isStepping = false;
 
+  this._customData = null;
+
   this._editors = [];
 
   // Setup our options.
@@ -318,6 +320,8 @@ wcPlay.prototype = {
     var data = {
       version: '1.0.0'
     };
+
+    data.custom = this.customData();
     data.properties = this.listProperties();
 
     data.nodes = [];
@@ -396,6 +400,25 @@ wcPlay.prototype = {
       this.load(saveData);
     }
     return false;
+  },
+
+  /**
+   * Gets, or Sets a custom data object to the script that will be saved and restored with the output file data.<br>
+   * NOTE: Binding new data will always replace any data that may have been previously bound.
+   * @function wcPlay#customData
+   * @param {Object|Function} [data] - If supplied, will assign a new custom data. If you supply a function, it will be invoked when retrieving the data. If not supplied, will retrieve the currently bound data.
+   * @returns {Object} - The current custom data object.
+   */
+  customData: function(data) {
+    if (typeof data !== 'undefined') {
+      this._customData = data;
+    }
+
+    if (typeof this._customData === 'function') {
+      return this._customData();
+    }
+
+    return this._customData;
   },
 
   /**
