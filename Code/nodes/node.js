@@ -1,5 +1,5 @@
 var wcNodeNextID = 0;
-Class.extend('wcNode', 'Node', '', {
+wcClass.extend('wcNode', 'Node', '', {
   /**
    * @class
    * The foundation class for all nodes.<br>

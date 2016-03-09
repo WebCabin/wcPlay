@@ -326,6 +326,7 @@ wcPlay.prototype = {
       return true;
     } catch (e) {
       // Something went wrong, restore the previous script.
+      console.log(e.stack);
       this.load(saveData);
     }
     return false;
