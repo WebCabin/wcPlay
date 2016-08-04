@@ -19,7 +19,7 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
     this._storageNodes = [];
     this._compositeNodes = [];
 
-    if ($.isArray(nodes)) {
+    if (Array.isArray(nodes)) {
       for (var i = 0; i < nodes.length; ++i) {
         this.__addNode(nodes[i]);
         nodes[i]._parent = this;

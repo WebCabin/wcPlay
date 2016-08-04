@@ -1340,7 +1340,7 @@ wcClass.extend('wcNode', 'Node', '', {
                 items = items.call(this);
               }
               var found = false;
-              if ($.isArray(items)) {
+              if (Array.isArray(items)) {
                 for (var i = 0; i < items.length; ++i) {
                   if (typeof items[i] === 'object') {
                     if (items[i].value == value) {
