@@ -34,8 +34,8 @@ var header = '\
  *  wcUndoManager\n\
  *\n\
  * Author: Jeff Houde (lochemage@webcabin.org)\n\
- * Web: https://play.webcabin.org/\n\
- * API: https://play.api.webcabin.org/\n\
+ * Web: http://play.webcabin.org/\n\
+ * API: http://play.api.webcabin.org/\n\
  *\n\
  * Licensed under\n\
  *   MIT License http://www.opensource.org/licenses/mit-license\n\

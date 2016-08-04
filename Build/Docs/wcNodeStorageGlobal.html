@@ -3,55 +3,72 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>wcPlay Class: wcNodeStorageGlobal</title>
+	<meta name="viewport" content="width=device-width">
+	<title> Class: wcNodeStorageGlobal</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
 	<link type="text/css" rel="stylesheet" href="styles/sunlight.dark.css">
 
-	<link type="text/css" rel="stylesheet" href="styles/site.superhero.css">
+	<link type="text/css" rel="stylesheet" href="styles/site.slate.css">
 
 </head>
 
 <body>
 
-<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
-<div class="container-fluid">
+<div class="navbar navbar-default navbar-fixed-top ">
+<div class="container">
 	<div class="navbar-header">
 		<a class="navbar-brand" href="index.html"><div style='font-size:15px;line-height:15px;margin-top:-5px;'>Web Cabin Play<br>v1.0.0</div></a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
 	</div>
-	<div class="navbar-collapse">
+	<div class="navbar-collapse collapse" id="topNavigation">
 		<ul class="nav navbar-nav">
 			
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
-				<ul class="dropdown-menu ">
+				<ul class="dropdown-menu inline">
 					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeComposite.html">wcNodeComposite</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryCallRemote.html">wcNodeEntryCallRemote</a></li><li><a href="wcNodeEntryRemote.html">wcNodeEntryRemote</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeEntryUpdate.html">wcNodeEntryUpdate</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAJAX.html">wcNodeProcessAJAX</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeProcessStrCat.html">wcNodeProcessStrCat</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageGlobal.html">wcNodeStorageGlobal</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
 				</ul>
 			</li>
 			
 			<li class="dropdown">
 				<a href="tutorials.list.html" class="dropdown-toggle" data-toggle="dropdown">Tutorials<b class="caret"></b></a>
-				<ul class="dropdown-menu ">
+				<ul class="dropdown-menu inline">
 					<li><a href="tutorial-1.0.html">Getting Started</a></li><li><a href="tutorial-2.0.html">Node Anatomy</a></li><li><a href="tutorial-3.0.html">Debugging</a></li><li><a href="tutorial-4.0.html">Custom Nodes</a></li><li><a href="tutorial-5.0.html">FAQ</a></li>
 				</ul>
 			</li>
 			
 		</ul>
+		<div class="col-sm-3 col-md-3">
+            <form class="navbar-form" role="search">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                    <div class="input-group-btn">
+                        <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
 	</div>
+
 </div>
 </div>
 
 
-<div class="container-fluid">
+<div class="container" id="toc-content">
 <div class="row">
 
 	
-	<div class="col-xs-8 col-sm-8 col-md-8 col-xs-offset-1">
+	<div class="col-md-8">
 	
 		<div id="main">
-    		
+			
 
 	<h1 class="page-title">Class: wcNodeStorageGlobal</h1>
 <section>
@@ -62,7 +79,7 @@
         wcNodeStorageGlobal
         </h2>
         
-            <div class="class-description"><p style="margin-left:20px;">References a global property on the script.When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.</p></div>
+            <div class="class-description">References a global property on the script.When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.</div>
         
     
 </header>
@@ -74,20 +91,20 @@
         
 <hr>
 <dt>
-    <h4 class="name" id="wcNodeStorageGlobal"><toc class="small"><i></i></toc><toc> </toc><toc>new </toc><toc><b>wcNodeStorageGlobal</b>(parent, pos)</toc>
+    <h4 class="name" id="wcNodeStorageGlobal"><toc class="attribs"><span class="type-signature"></span></toc>new <toc class="method"><b>wcNodeStorageGlobal</b>(parent, pos)</toc>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
-    
 
     
 
     
+
     
+
     
     
         <h5>Parameters:</h5>
@@ -95,23 +112,23 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -124,6 +141,7 @@
 <span class="param-type">String</span>
 
 
+
             
             </td>
 
@@ -134,7 +152,7 @@
             <td class="description last">The parent object of this node.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -147,6 +165,7 @@
 <span class="param-type"><a href="wcPlay.html#~Coordinates">wcPlay~Coordinates</a></span>
 
 
+
             
             </td>
 
@@ -157,29 +176,15 @@
             <td class="description last">The position of this node in the visual editor.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
-    
-    
-    
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -208,18 +213,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="nodes_storage_global.js.html">nodes/storage/global.js</a>,
-     <a href="nodes_storage_global.js.html#sunlight-1-line-2">line 2</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_storage_global.js.html">nodes/storage/global.js</a>,
 				 <a href="nodes_storage_global.js.html#sunlight-1-line-2">line 2</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -229,6 +231,20 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 </dd>
 
     
@@ -253,24 +269,24 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="onGlobalInitialPropertyChanged"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onGlobalInitialPropertyChanged</b>(name, oldValue, newValue)</toc>
+    <h4 class="name" id="onGlobalInitialPropertyChanged"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>onGlobalInitialPropertyChanged</b>(name, oldValue, newValue)</toc>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">Event that is called when a global property initial value has changed.Overload this in inherited nodes.<br><b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.</p>
+        <p style="margin-left:20px;">Event that is called when a global property initial value has changed.Overload this in inherited nodes.<br><b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.</p>
     </div>
     
 
     
 
     
-    
+
     
     
         <h5>Parameters:</h5>
@@ -278,23 +294,23 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -307,6 +323,7 @@
 <span class="param-type">String</span>
 
 
+
             
             </td>
 
@@ -317,7 +334,7 @@
             <td class="description last">The name of the global property.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -330,6 +347,7 @@
 <span class="param-type">Object</span>
 
 
+
             
             </td>
 
@@ -340,7 +358,7 @@
             <td class="description last">The old value of the global property.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -353,6 +371,7 @@
 <span class="param-type">Object</span>
 
 
+
             
             </td>
 
@@ -363,29 +382,15 @@
             <td class="description last">The new value of the global property.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
-    
-    
-    
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -414,18 +419,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="nodes_storage_global.js.html">nodes/storage/global.js</a>,
-     <a href="nodes_storage_global.js.html#sunlight-1-line-155">line 155</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_storage_global.js.html">nodes/storage/global.js</a>,
 				 <a href="nodes_storage_global.js.html#sunlight-1-line-155">line 155</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -435,30 +437,44 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 </dd>
 
         
             
 <hr>
 <dt>
-    <h4 class="name" id="onGlobalPropertyChanged"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onGlobalPropertyChanged</b>(name, oldValue, newValue)</toc>
+    <h4 class="name" id="onGlobalPropertyChanged"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>onGlobalPropertyChanged</b>(name, oldValue, newValue)</toc>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">Event that is called when a global property value has changed.Overload this in inherited nodes.<br><b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.</p>
+        <p style="margin-left:20px;">Event that is called when a global property value has changed.Overload this in inherited nodes.<br><b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.</p>
     </div>
     
 
     
 
     
-    
+
     
     
         <h5>Parameters:</h5>
@@ -466,23 +482,23 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -495,6 +511,7 @@
 <span class="param-type">String</span>
 
 
+
             
             </td>
 
@@ -505,7 +522,7 @@
             <td class="description last">The name of the global property.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -518,6 +535,7 @@
 <span class="param-type">Object</span>
 
 
+
             
             </td>
 
@@ -528,7 +546,7 @@
             <td class="description last">The old value of the global property.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -541,6 +559,7 @@
 <span class="param-type">Object</span>
 
 
+
             
             </td>
 
@@ -551,29 +570,15 @@
             <td class="description last">The new value of the global property.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
-    
-    
-    
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -602,18 +607,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="nodes_storage_global.js.html">nodes/storage/global.js</a>,
-     <a href="nodes_storage_global.js.html#sunlight-1-line-139">line 139</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_storage_global.js.html">nodes/storage/global.js</a>,
 				 <a href="nodes_storage_global.js.html#sunlight-1-line-139">line 139</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -623,30 +625,44 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 </dd>
 
         
             
 <hr>
 <dt>
-    <h4 class="name" id="onGlobalPropertyRemoved"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onGlobalPropertyRemoved</b>(name)</toc>
+    <h4 class="name" id="onGlobalPropertyRemoved"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>onGlobalPropertyRemoved</b>(name)</toc>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">Event that is called when a global property has been removed.Overload this in inherited nodes.<br><b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.</p>
+        <p style="margin-left:20px;">Event that is called when a global property has been removed.Overload this in inherited nodes.<br><b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.</p>
     </div>
     
 
     
 
     
-    
+
     
     
         <h5>Parameters:</h5>
@@ -654,23 +670,23 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -683,6 +699,7 @@
 <span class="param-type">String</span>
 
 
+
             
             </td>
 
@@ -693,29 +710,15 @@
             <td class="description last">The name of the global property.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
-    
-    
-    
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -744,18 +747,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="nodes_storage_global.js.html">nodes/storage/global.js</a>,
-     <a href="nodes_storage_global.js.html#sunlight-1-line-171">line 171</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_storage_global.js.html">nodes/storage/global.js</a>,
 				 <a href="nodes_storage_global.js.html#sunlight-1-line-171">line 171</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -765,30 +765,44 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 </dd>
 
         
             
 <hr>
 <dt>
-    <h4 class="name" id="onGlobalPropertyRenamed"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onGlobalPropertyRenamed</b>(oldName, newName)</toc>
+    <h4 class="name" id="onGlobalPropertyRenamed"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>onGlobalPropertyRenamed</b>(oldName, newName)</toc>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">Event that is called when a global property has been renamed.Overload this in inherited nodes.<br><b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.</p>
+        <p style="margin-left:20px;">Event that is called when a global property has been renamed.Overload this in inherited nodes.<br><b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.</p>
     </div>
     
 
     
 
     
-    
+
     
     
         <h5>Parameters:</h5>
@@ -796,23 +810,23 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -823,6 +837,7 @@
             
                 
 <span class="param-type">String</span>
+
 
 
             
@@ -835,7 +850,7 @@
             <td class="description last">The old name of the global property.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -846,6 +861,7 @@
             
                 
 <span class="param-type">String</span>
+
 
 
             
@@ -858,29 +874,15 @@
             <td class="description last">The new name of the global property.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
-    
-    
-    
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -909,18 +911,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="nodes_storage_global.js.html">nodes/storage/global.js</a>,
-     <a href="nodes_storage_global.js.html#sunlight-1-line-184">line 184</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_storage_global.js.html">nodes/storage/global.js</a>,
 				 <a href="nodes_storage_global.js.html#sunlight-1-line-184">line 184</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -930,37 +929,52 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 </dd>
 
         
             
 <hr>
 <dt>
-    <h4 class="name" id="onInitialPropertyChanging"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onInitialPropertyChanging</b>(name, oldValue, newValue)</toc>
+    <h4 class="name" id="onInitialPropertyChanging"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>onInitialPropertyChanging</b>(name, oldValue, newValue)</toc>
         
-        >
+        ->
         
         <i><small>
 <span class="param-type">Object</span>
 
+
 </small></i>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">Any changes to the 'value' property will also change the global property.<br>Event that is called when a property initial value is about to be changed.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
+        <p style="margin-left:20px;">Any changes to the 'value' property will also change the global property.<br>Event that is called when a property initial value is about to be changed.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
     </div>
     
 
     
 
     
-    
+
     
     
         <h5>Parameters:</h5>
@@ -968,23 +982,23 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -997,6 +1011,7 @@
 <span class="param-type">String</span>
 
 
+
             
             </td>
 
@@ -1007,7 +1022,7 @@
             <td class="description last">The name of the property.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -1018,6 +1033,7 @@
             
                 
 <span class="param-type">Object</span>
+
 
 
             
@@ -1030,7 +1046,7 @@
             <td class="description last">The current value of the property.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -1041,6 +1057,7 @@
             
                 
 <span class="param-type">Object</span>
+
 
 
             
@@ -1053,41 +1070,15 @@
             <td class="description last">The new, proposed, value of the property.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
-    
-    
-    
-    
-<h5>Returns: 
-<span class="param-type">Object</span>
-
-</h5>
-    
-            <p class="param-desc" style="margin-left: 20px;">
-    
-		 Return the new value of the property (usually newValue unless you are proposing restrictions). If no value is returned, newValue is assumed.
-	</p>
-
-        
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -1116,18 +1107,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="nodes_storage_global.js.html">nodes/storage/global.js</a>,
-     <a href="nodes_storage_global.js.html#sunlight-1-line-98">line 98</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_storage_global.js.html">nodes/storage/global.js</a>,
 				 <a href="nodes_storage_global.js.html#sunlight-1-line-98">line 98</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -1137,15 +1125,53 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    - Return the new value of the property (usually newValue unless you are proposing restrictions). If no value is returned, newValue is assumed.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Object</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
 </dd>
 
         
             
 <hr>
 <dt>
-    <h4 class="name" id="onInitialPropertyGet"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onInitialPropertyGet</b>(name)</toc>
+    <h4 class="name" id="onInitialPropertyGet"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>onInitialPropertyGet</b>(name)</toc>
         
-        >
+        ->
         
         <i><small>
 <span class="param-type">Object</span>
@@ -1153,24 +1179,25 @@
 
 <span class="param-type">undefined</span>
 
+
 </small></i>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">Always redirect property gets on 'value' to the referenced global property.<br>Event that is called when the property initial value is being asked its value, before the value is actually retrieved.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
+        <p style="margin-left:20px;">Always redirect property gets on 'value' to the referenced global property.<br>Event that is called when the property initial value is being asked its value, before the value is actually retrieved.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
     </div>
     
 
     
 
     
-    
+
     
     
         <h5>Parameters:</h5>
@@ -1178,23 +1205,23 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -1207,6 +1234,7 @@
 <span class="param-type">String</span>
 
 
+
             
             </td>
 
@@ -1217,44 +1245,15 @@
             <td class="description last">The name of the property.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
-    
-    
-    
-    
-<h5>Returns: 
-<span class="param-type">Object</span>
-|
-
-<span class="param-type">undefined</span>
-
-</h5>
-    
-            <p class="param-desc" style="margin-left: 20px;">
-    
-		 If a value is returned, that value is what will be retrieved from the get.
-	</p>
-
-        
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -1283,18 +1282,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="nodes_storage_global.js.html">nodes/storage/global.js</a>,
-     <a href="nodes_storage_global.js.html#sunlight-1-line-119">line 119</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_storage_global.js.html">nodes/storage/global.js</a>,
 				 <a href="nodes_storage_global.js.html#sunlight-1-line-119">line 119</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -1304,30 +1300,71 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    - If a value is returned, that value is what will be retrieved from the get.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Object</span>
+|
+
+<span class="param-type">undefined</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
 </dd>
 
         
             
 <hr>
 <dt>
-    <h4 class="name" id="onNameChanged"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onNameChanged</b>(oldName, newName)</toc>
+    <h4 class="name" id="onNameChanged"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>onNameChanged</b>(oldName, newName)</toc>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">Event that is called when the name of this node has changed.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
+        <p style="margin-left:20px;">Event that is called when the name of this node has changed.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
     </div>
     
 
     
 
     
-    
+
     
     
         <h5>Parameters:</h5>
@@ -1335,23 +1372,23 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -1364,6 +1401,7 @@
 <span class="param-type">String</span>
 
 
+
             
             </td>
 
@@ -1374,7 +1412,7 @@
             <td class="description last">The current name.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -1387,6 +1425,7 @@
 <span class="param-type">String</span>
 
 
+
             
             </td>
 
@@ -1397,29 +1436,15 @@
             <td class="description last">The new name.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
-    
-    
-    
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -1448,18 +1473,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="nodes_storage_global.js.html">nodes/storage/global.js</a>,
-     <a href="nodes_storage_global.js.html#sunlight-1-line-21">line 21</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_storage_global.js.html">nodes/storage/global.js</a>,
 				 <a href="nodes_storage_global.js.html#sunlight-1-line-21">line 21</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -1469,30 +1491,44 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 </dd>
 
         
             
 <hr>
 <dt>
-    <h4 class="name" id="onPropertyChanged"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onPropertyChanged</b>(name, oldValue, newValue)</toc>
+    <h4 class="name" id="onPropertyChanged"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>onPropertyChanged</b>(name, oldValue, newValue)</toc>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">Any changes to the 'value' property will also change the global property.<br>Event that is called when a property has changed.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
+        <p style="margin-left:20px;">Any changes to the 'value' property will also change the global property.<br>Event that is called when a property has changed.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
     </div>
     
 
     
 
     
-    
+
     
     
         <h5>Parameters:</h5>
@@ -1500,23 +1536,23 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -1529,6 +1565,7 @@
 <span class="param-type">String</span>
 
 
+
             
             </td>
 
@@ -1539,7 +1576,7 @@
             <td class="description last">The name of the property.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -1552,6 +1589,7 @@
 <span class="param-type">Object</span>
 
 
+
             
             </td>
 
@@ -1562,7 +1600,7 @@
             <td class="description last">The old value of the property.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -1575,6 +1613,7 @@
 <span class="param-type">Object</span>
 
 
+
             
             </td>
 
@@ -1585,29 +1624,15 @@
             <td class="description last">The new value of the property.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
-    
-    
-    
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -1636,18 +1661,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="nodes_storage_global.js.html">nodes/storage/global.js</a>,
-     <a href="nodes_storage_global.js.html#sunlight-1-line-59">line 59</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_storage_global.js.html">nodes/storage/global.js</a>,
 				 <a href="nodes_storage_global.js.html#sunlight-1-line-59">line 59</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -1657,15 +1679,29 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 </dd>
 
         
             
 <hr>
 <dt>
-    <h4 class="name" id="onPropertyGet"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onPropertyGet</b>(name)</toc>
+    <h4 class="name" id="onPropertyGet"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>onPropertyGet</b>(name)</toc>
         
-        >
+        ->
         
         <i><small>
 <span class="param-type">Object</span>
@@ -1673,24 +1709,25 @@
 
 <span class="param-type">undefined</span>
 
+
 </small></i>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">Always redirect property gets on 'value' to the referenced global property.<br>Event that is called when the property is being asked its value, before the value is actually retrieved.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
+        <p style="margin-left:20px;">Always redirect property gets on 'value' to the referenced global property.<br>Event that is called when the property is being asked its value, before the value is actually retrieved.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
     </div>
     
 
     
 
     
-    
+
     
     
         <h5>Parameters:</h5>
@@ -1698,23 +1735,23 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -1727,6 +1764,7 @@
 <span class="param-type">String</span>
 
 
+
             
             </td>
 
@@ -1737,44 +1775,15 @@
             <td class="description last">The name of the property.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
-    
-    
-    
-    
-<h5>Returns: 
-<span class="param-type">Object</span>
-|
-
-<span class="param-type">undefined</span>
-
-</h5>
-    
-            <p class="param-desc" style="margin-left: 20px;">
-    
-		 If a value is returned, that value is what will be retrieved from the get.
-	</p>
-
-        
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -1803,18 +1812,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="nodes_storage_global.js.html">nodes/storage/global.js</a>,
-     <a href="nodes_storage_global.js.html#sunlight-1-line-79">line 79</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="nodes_storage_global.js.html">nodes/storage/global.js</a>,
 				 <a href="nodes_storage_global.js.html#sunlight-1-line-79">line 79</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -1824,6 +1830,47 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    - If a value is returned, that value is what will be retrieved from the get.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Object</span>
+|
+
+<span class="param-type">undefined</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
 </dd>
 
         </dl>
@@ -1846,56 +1893,55 @@
 
 	
 		<div class="col-md-3">
-			<div id="toc" class="col-xs-3 col-sm-3 col-md-3 small"></div>
+			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
 		</div>
 	
 
 </div>
-
-<div class="row">
-	
-	<div class="col-xs-8 col-sm-8 col-md-8 col-xs-offset-1">
-	
-		<footer>
-		
-		
-		<span class="jsdoc-message">
-			Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a>
-			on 2016-03-09 using the <a
-			href="https://github.com/WebCabin/docstrap">Web Cabin DocStrap template</a>.
-		</span>
-		</footer>
-	</div>
 </div>
-<div style="height:1000px;"></div>
 
-<!--<script src="scripts/sunlight.js"></script>-->
+<div class="modal fade" id="searchResults">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Search results</h4>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div>
+
+<footer>
+
+
+	<span class="copyright">
+	2014-2016 Jeff Houde (<a href='mailto:lochemage@webcabin.org'>lochemage@webcabin.org</a>)
+	</span>
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
+	
+		on 2016-08-03
+	
+	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
 <script src="scripts/docstrap.lib.js"></script>
-<script src="scripts/bootstrap-dropdown.js"></script>
 <script src="scripts/toc.js"></script>
+<script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
 
 <script>
 $( function () {
-	// $( "[id*='$']" ).each( function () {
-	// 	var $this = $( this );
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
 
-	// 	$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
-	// } );
-
-	$( "#toc" ).toc( {
-		anchorName  : function ( i, heading, prefix ) {
-			// return $( heading ).attr( "id" ) || ( prefix + i );
-			return ( prefix + i );
-		},
-		selectors   : "h1,h2,h3,h4",
-		showAndHide : false,
-		scrollTo    : "100px"
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
 	} );
-
-	$( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
-	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
-	$( '.dropdown-toggle' ).dropdown();
-	// $( ".tutorial-section pre, .readme-section pre" ).addClass( "sunlight-highlight-javascript" ).addClass( "linenums" );
 
 	$( ".tutorial-section pre, .readme-section pre" ).each( function () {
 		var $this = $( this );
@@ -1908,7 +1954,8 @@ $( function () {
 			example.html( exampleText );
 			lang = lang[1];
 		} else {
-			lang = "javascript";
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
 		}
 
 		if ( lang ) {
@@ -1927,17 +1974,32 @@ $( function () {
 		enableDoclinks : true
 	} );
 
-	$("a[name^='sunlight-1-line-']").each(function() {
-		$(this).wrap('<div id="' + this.name + '" style="padding-top:40px;margin-top:-40px;display:inline-block;" class="sunlight-line-container"></div>');
-		this.name = '';
-	});
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			return $( heading ).attr( "id" ) || ( prefix + i );
+		},
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		showAndHide : false,
+		smoothScrolling: true
+	} );
 
-  $("h1,h2,h3,h4").each(function() {
-  	$(this).css('padding-top', 50).css('margin-top', -50);
-  });
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
+
 } );
 </script>
 
+
+
+<!--Navigation and Symbol Display-->
 
 
 
@@ -1946,6 +2008,7 @@ $( function () {
 <!-- Piwik Analytics -->
 <script type="text/javascript">
   var _paq = _paq || [];
+  
   
   
   _paq.push(['trackPageView']);
@@ -1962,6 +2025,11 @@ $( function () {
 <!-- End Piwik Code -->
 
 
+<script type="text/javascript">
+	$(document).ready(function() {
+		SearcherDisplay.init();
+	});
+</script>
 
 </body>
 </html>

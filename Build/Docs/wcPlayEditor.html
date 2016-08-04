@@ -3,55 +3,72 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>wcPlay Class: wcPlayEditor</title>
+	<meta name="viewport" content="width=device-width">
+	<title> Class: wcPlayEditor</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
 	<link type="text/css" rel="stylesheet" href="styles/sunlight.dark.css">
 
-	<link type="text/css" rel="stylesheet" href="styles/site.superhero.css">
+	<link type="text/css" rel="stylesheet" href="styles/site.slate.css">
 
 </head>
 
 <body>
 
-<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
-<div class="container-fluid">
+<div class="navbar navbar-default navbar-fixed-top ">
+<div class="container">
 	<div class="navbar-header">
 		<a class="navbar-brand" href="index.html"><div style='font-size:15px;line-height:15px;margin-top:-5px;'>Web Cabin Play<br>v1.0.0</div></a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
 	</div>
-	<div class="navbar-collapse">
+	<div class="navbar-collapse collapse" id="topNavigation">
 		<ul class="nav navbar-nav">
 			
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
-				<ul class="dropdown-menu ">
+				<ul class="dropdown-menu inline">
 					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeComposite.html">wcNodeComposite</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryCallRemote.html">wcNodeEntryCallRemote</a></li><li><a href="wcNodeEntryRemote.html">wcNodeEntryRemote</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeEntryUpdate.html">wcNodeEntryUpdate</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAJAX.html">wcNodeProcessAJAX</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeProcessStrCat.html">wcNodeProcessStrCat</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageGlobal.html">wcNodeStorageGlobal</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
 				</ul>
 			</li>
 			
 			<li class="dropdown">
 				<a href="tutorials.list.html" class="dropdown-toggle" data-toggle="dropdown">Tutorials<b class="caret"></b></a>
-				<ul class="dropdown-menu ">
+				<ul class="dropdown-menu inline">
 					<li><a href="tutorial-1.0.html">Getting Started</a></li><li><a href="tutorial-2.0.html">Node Anatomy</a></li><li><a href="tutorial-3.0.html">Debugging</a></li><li><a href="tutorial-4.0.html">Custom Nodes</a></li><li><a href="tutorial-5.0.html">FAQ</a></li>
 				</ul>
 			</li>
 			
 		</ul>
+		<div class="col-sm-3 col-md-3">
+            <form class="navbar-form" role="search">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                    <div class="input-group-btn">
+                        <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
 	</div>
+
 </div>
 </div>
 
 
-<div class="container-fluid">
+<div class="container" id="toc-content">
 <div class="row">
 
 	
-	<div class="col-xs-8 col-sm-8 col-md-8 col-xs-offset-1">
+	<div class="col-md-8">
 	
 		<div id="main">
-    		
+			
 
 	<h1 class="page-title">Class: wcPlayEditor</h1>
 <section>
@@ -62,7 +79,7 @@
         wcPlayEditor
         </h2>
         
-            <div class="class-description"><p style="margin-left:20px;">Provides a visual interface for editing a Play script. Requires HTML5 canvas.</p></div>
+            <div class="class-description">Provides a visual interface for editing a Play script. Requires HTML5 canvas.</div>
         
     
 </header>
@@ -74,20 +91,20 @@
         
 <hr>
 <dt>
-    <h4 class="name" id="wcPlayEditor"><toc class="small"><i></i></toc><toc> </toc><toc>new </toc><toc><b>wcPlayEditor</b>(container, <span class="optional">options</span>)</toc>
+    <h4 class="name" id="wcPlayEditor"><toc class="attribs"><span class="type-signature"></span></toc>new <toc class="method"><b>wcPlayEditor</b>(container [, options])</toc>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
-    
 
     
 
     
+
     
+
     
     
         <h5>Parameters:</h5>
@@ -95,25 +112,25 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
-		<th>Argument</th>
-		
+        
+        <th>Argument</th>
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -130,6 +147,7 @@
 |
 
 <span class="param-type">external:domNode</span>
+
 
 
             
@@ -150,7 +168,7 @@
             <td class="description last">The container element.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -161,6 +179,7 @@
             
                 
 <span class="param-type"><a href="wcPlayEditor.html#~Options">wcPlayEditor~Options</a></span>
+
 
 
             
@@ -183,29 +202,15 @@
             <td class="description last">Custom options.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
-    
-    
-    
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -234,18 +239,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="editor.js.html">editor.js</a>,
-     <a href="editor.js.html#sunlight-1-line-20">line 20</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.js.html">editor.js</a>,
 				 <a href="editor.js.html#sunlight-1-line-20">line 20</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -255,6 +257,20 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 </dd>
 
     
@@ -279,24 +295,24 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="__drawDetailsPopup"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>__drawDetailsPopup</b>(node)</toc>
+    <h4 class="name" id="__drawDetailsPopup"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>__drawDetailsPopup</b>(node)</toc>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">Draws the detail popup box for the node.</p>
+        <p style="margin-left:20px;">Draws the detail popup box for the node.</p>
     </div>
     
 
     
 
     
-    
+
     
     
         <h5>Parameters:</h5>
@@ -304,23 +320,23 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -331,6 +347,7 @@
             
                 
 <span class="param-type"><a href="wcNode.html">wcNode</a></span>
+
 
 
             
@@ -343,29 +360,15 @@
             <td class="description last">The node to draw for.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
-    
-    
-    
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -394,18 +397,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="editor.js.html">editor.js</a>,
-     <a href="editor.js.html#sunlight-1-line-3431">line 3431</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.js.html">editor.js</a>,
 				 <a href="editor.js.html#sunlight-1-line-3431">line 3431</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -415,30 +415,44 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 </dd>
 
         
             
 <hr>
 <dt>
-    <h4 class="name" id="__handleAutoScroll"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>__handleAutoScroll</b>(active, movingNodes)</toc>
+    <h4 class="name" id="__handleAutoScroll"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>__handleAutoScroll</b>(active, movingNodes)</toc>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">Handles auto scrolling based on mouse position.</p>
+        <p style="margin-left:20px;">Handles auto scrolling based on mouse position.</p>
     </div>
     
 
     
 
     
-    
+
     
     
         <h5>Parameters:</h5>
@@ -446,23 +460,23 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -475,6 +489,7 @@
 <span class="param-type">Boolean</span>
 
 
+
             
             </td>
 
@@ -485,7 +500,7 @@
             <td class="description last">Whether the auto scroll is active.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -498,6 +513,7 @@
 <span class="param-type">Boolean</span>
 
 
+
             
             </td>
 
@@ -508,29 +524,15 @@
             <td class="description last">If true, the auto scroll will also move selected nodes.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
-    
-    
-    
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -559,18 +561,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="editor.js.html">editor.js</a>,
-     <a href="editor.js.html#sunlight-1-line-3843">line 3843</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.js.html">editor.js</a>,
 				 <a href="editor.js.html#sunlight-1-line-3843">line 3843</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -580,30 +579,44 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 </dd>
 
         
             
 <hr>
 <dt>
-    <h4 class="name" id="__onCreateNode"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>__onCreateNode</b>(node)</toc>
+    <h4 class="name" id="__onCreateNode"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>__onCreateNode</b>(node)</toc>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">Generates an undo event for a node that was created.</p>
+        <p style="margin-left:20px;">Generates an undo event for a node that was created.</p>
     </div>
     
 
     
 
     
-    
+
     
     
         <h5>Parameters:</h5>
@@ -611,23 +624,23 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -638,6 +651,7 @@
             
                 
 <span class="param-type"><a href="wcNode.html">wcNode</a></span>
+
 
 
             
@@ -650,29 +664,15 @@
             <td class="description last">The node that was created.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
-    
-    
-    
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -701,18 +701,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="editor.js.html">editor.js</a>,
-     <a href="editor.js.html#sunlight-1-line-3760">line 3760</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.js.html">editor.js</a>,
 				 <a href="editor.js.html#sunlight-1-line-3760">line 3760</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -722,30 +719,44 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 </dd>
 
         
             
 <hr>
 <dt>
-    <h4 class="name" id="__onDestroyNode"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>__onDestroyNode</b>(node)</toc>
+    <h4 class="name" id="__onDestroyNode"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>__onDestroyNode</b>(node)</toc>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">Generates an undo event for a node that is destroyed.</p>
+        <p style="margin-left:20px;">Generates an undo event for a node that is destroyed.</p>
     </div>
     
 
     
 
     
-    
+
     
     
         <h5>Parameters:</h5>
@@ -753,23 +764,23 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -782,6 +793,7 @@
 <span class="param-type"><a href="wcNode.html">wcNode</a></span>
 
 
+
             
             </td>
 
@@ -792,29 +804,15 @@
             <td class="description last">the node to destroy.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
-    
-    
-    
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -843,18 +841,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="editor.js.html">editor.js</a>,
-     <a href="editor.js.html#sunlight-1-line-3803">line 3803</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.js.html">editor.js</a>,
 				 <a href="editor.js.html#sunlight-1-line-3803">line 3803</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -864,50 +859,50 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 </dd>
 
         
             
 <hr>
 <dt>
-    <h4 class="name" id="center"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>center</b>()</toc>
+    <h4 class="name" id="center"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>center</b>()</toc>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">Positions the canvas view to the center of all nodes.</p>
+        <p style="margin-left:20px;">Positions the canvas view to the center of all nodes.</p>
     </div>
     
 
     
 
     
-    
-    
-    
-    
-    
 
-    
-
-    
-
-    
-
-    
-    
-    
     
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -936,18 +931,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="editor.js.html">editor.js</a>,
-     <a href="editor.js.html#sunlight-1-line-238">line 238</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.js.html">editor.js</a>,
 				 <a href="editor.js.html#sunlight-1-line-238">line 238</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -957,37 +949,52 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 </dd>
 
         
             
 <hr>
 <dt>
-    <h4 class="name" id="engine"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>engine</b>(<span class="optional">engine</span>)</toc>
+    <h4 class="name" id="engine"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>engine</b>( [engine])</toc>
         
-        >
+        ->
         
         <i><small>
 <span class="param-type"><a href="wcPlay.html">wcPlay</a></span>
 
+
 </small></i>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">Gets, or Sets the <a href="wcPlay.html">wcPlay</a> engine that this renderer will render.</p>
+        <p style="margin-left:20px;">Gets, or Sets the <a href="wcPlay.html">wcPlay</a> engine that this renderer will render.</p>
     </div>
     
 
     
 
     
-    
+
     
     
         <h5>Parameters:</h5>
@@ -995,25 +1002,25 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
-		<th>Argument</th>
-		
+        
+        <th>Argument</th>
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -1024,6 +1031,7 @@
             
                 
 <span class="param-type"><a href="wcPlay.html">wcPlay</a></span>
+
 
 
             
@@ -1046,41 +1054,15 @@
             <td class="description last">If supplied, will assign a new <a href="wcPlay.html">wcPlay</a> engine to render.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
-    
-    
-    
-    
-<h5>Returns: 
-<span class="param-type"><a href="wcPlay.html">wcPlay</a></span>
-
-</h5>
-    
-            <p class="param-desc" style="margin-left: 20px;">
-    
-		 The current <a href="wcPlay.html">wcPlay</a> engine.
-	</p>
-
-        
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -1109,18 +1091,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="editor.js.html">editor.js</a>,
-     <a href="editor.js.html#sunlight-1-line-194">line 194</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.js.html">editor.js</a>,
 				 <a href="editor.js.html#sunlight-1-line-194">line 194</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -1130,30 +1109,68 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    - The current <a href="wcPlay.html">wcPlay</a> engine.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="wcPlay.html">wcPlay</a></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
 </dd>
 
         
             
 <hr>
 <dt>
-    <h4 class="name" id="focus"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>focus</b>(nodes)</toc>
+    <h4 class="name" id="focus"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>focus</b>(nodes)</toc>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">Scrolls the canvas view until a given set of nodes are within view.</p>
+        <p style="margin-left:20px;">Scrolls the canvas view until a given set of nodes are within view.</p>
     </div>
     
 
     
 
     
-    
+
     
     
         <h5>Parameters:</h5>
@@ -1161,23 +1178,23 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -1190,6 +1207,7 @@
 <span class="param-type"><a href="wcNode.html">wcNode</a></span>
 
 
+
             
             </td>
 
@@ -1200,29 +1218,15 @@
             <td class="description last">A list of nodes to focus the view on.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
-    
-    
-    
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -1251,18 +1255,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="editor.js.html">editor.js</a>,
-     <a href="editor.js.html#sunlight-1-line-248">line 248</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.js.html">editor.js</a>,
 				 <a href="editor.js.html#sunlight-1-line-248">line 248</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -1272,30 +1273,44 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 </dd>
 
         
             
 <hr>
 <dt>
-    <h4 class="name" id="focusRect"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>focusRect</b>(rect)</toc>
+    <h4 class="name" id="focusRect"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>focusRect</b>(rect)</toc>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">Scrolls the canvas view and centers on a given bounding rectangle.</p>
+        <p style="margin-left:20px;">Scrolls the canvas view and centers on a given bounding rectangle.</p>
     </div>
     
 
     
 
     
-    
+
     
     
         <h5>Parameters:</h5>
@@ -1303,23 +1318,23 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -1330,6 +1345,7 @@
             
                 
 <span class="param-type"><a href="wcPlayEditor.html#~Rect">wcPlayEditor~Rect</a></span>
+
 
 
             
@@ -1342,29 +1358,15 @@
             <td class="description last">The rectangle to focus on.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
-    
-    
-    
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -1393,18 +1395,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="editor.js.html">editor.js</a>,
-     <a href="editor.js.html#sunlight-1-line-273">line 273</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.js.html">editor.js</a>,
 				 <a href="editor.js.html#sunlight-1-line-273">line 273</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -1414,66 +1413,58 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 </dd>
 
         
             
 <hr>
 <dt>
-    <h4 class="name" id="menu"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>menu</b>()</toc>
+    <h4 class="name" id="menu"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>menu</b>()</toc>
         
-        >
+        ->
         
         <i><small>
 <span class="param-type">wcMenu</span>
 
+
 </small></i>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">Retrieves the menu instance.</p>
+        <p style="margin-left:20px;">Retrieves the menu instance.</p>
     </div>
     
 
     
 
     
-    
-    
-    
-    
-    
-    
-<h5>Returns: 
-<span class="param-type">wcMenu</span>
 
-</h5>
-    
-            
-
-        
-
-    
-
-    
-
-    
-
-    
-    
-    
     
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -1502,18 +1493,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="editor.js.html">editor.js</a>,
-     <a href="editor.js.html#sunlight-1-line-229">line 229</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.js.html">editor.js</a>,
 				 <a href="editor.js.html#sunlight-1-line-229">line 229</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -1523,30 +1511,64 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">wcMenu</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
 </dd>
 
         
             
 <hr>
 <dt>
-    <h4 class="name" id="notifyPaletteNodes"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>notifyPaletteNodes</b>(func, args)</toc>
+    <h4 class="name" id="notifyPaletteNodes"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>notifyPaletteNodes</b>(func, args)</toc>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">Sends a custom notification event to all nodes.</p>
+        <p style="margin-left:20px;">Sends a custom notification event to all nodes.</p>
     </div>
     
 
     
 
     
-    
+
     
     
         <h5>Parameters:</h5>
@@ -1554,23 +1576,23 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -1581,6 +1603,7 @@
             
                 
 <span class="param-type">String</span>
+
 
 
             
@@ -1593,7 +1616,7 @@
             <td class="description last">The node function to call.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -1606,6 +1629,7 @@
 <span class="param-type">Array.&lt;Object></span>
 
 
+
             
             </td>
 
@@ -1616,29 +1640,15 @@
             <td class="description last">A list of arguments to forward into the function call.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
-    
-    
-    
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -1667,18 +1677,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="editor.js.html">editor.js</a>,
-     <a href="editor.js.html#sunlight-1-line-291">line 291</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.js.html">editor.js</a>,
 				 <a href="editor.js.html#sunlight-1-line-291">line 291</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -1688,37 +1695,52 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 </dd>
 
         
             
 <hr>
 <dt>
-    <h4 class="name" id="onBeforeImport"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onBeforeImport</b>(func)</toc>
+    <h4 class="name" id="onBeforeImport"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>onBeforeImport</b>(func)</toc>
         
-        >
+        ->
         
         <i><small>
 <span class="param-type">Boolean</span>
 
+
 </small></i>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">Binds an event handler for when we are about to save our script.</p>
+        <p style="margin-left:20px;">Binds an event handler for when we are about to save our script.</p>
     </div>
     
 
     
 
     
-    
+
     
     
         <h5>Parameters:</h5>
@@ -1726,23 +1748,23 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -1755,6 +1777,7 @@
 <span class="param-type">function</span>
 
 
+
             
             </td>
 
@@ -1765,41 +1788,15 @@
             <td class="description last">Assigns the function to handle this event.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
-    
-    
-    
-    
-<h5>Returns: 
-<span class="param-type">Boolean</span>
-
-</h5>
-    
-            <p class="param-desc" style="margin-left: 20px;">
-    
-		 Success or failure.
-	</p>
-
-        
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -1828,18 +1825,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="editor.js.html">editor.js</a>,
-     <a href="editor.js.html#sunlight-1-line-389">line 389</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.js.html">editor.js</a>,
 				 <a href="editor.js.html#sunlight-1-line-389">line 389</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -1849,37 +1843,76 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    - Success or failure.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Boolean</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
 </dd>
 
         
             
 <hr>
 <dt>
-    <h4 class="name" id="onBeforeLoad"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onBeforeLoad</b>(func)</toc>
+    <h4 class="name" id="onBeforeLoad"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>onBeforeLoad</b>(func)</toc>
         
-        >
+        ->
         
         <i><small>
 <span class="param-type">Boolean</span>
 
+
 </small></i>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">Binds an event handler for when we are about to save our script.</p>
+        <p style="margin-left:20px;">Binds an event handler for when we are about to save our script.</p>
     </div>
     
 
     
 
     
-    
+
     
     
         <h5>Parameters:</h5>
@@ -1887,23 +1920,23 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -1916,6 +1949,7 @@
 <span class="param-type">function</span>
 
 
+
             
             </td>
 
@@ -1926,41 +1960,15 @@
             <td class="description last">Assigns the function to handle this event.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
-    
-    
-    
-    
-<h5>Returns: 
-<span class="param-type">Boolean</span>
-
-</h5>
-    
-            <p class="param-desc" style="margin-left: 20px;">
-    
-		 Success or failure.
-	</p>
-
-        
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -1989,18 +1997,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="editor.js.html">editor.js</a>,
-     <a href="editor.js.html#sunlight-1-line-357">line 357</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.js.html">editor.js</a>,
 				 <a href="editor.js.html#sunlight-1-line-357">line 357</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -2010,37 +2015,76 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    - Success or failure.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Boolean</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
 </dd>
 
         
             
 <hr>
 <dt>
-    <h4 class="name" id="onBeforeSave"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onBeforeSave</b>(func)</toc>
+    <h4 class="name" id="onBeforeSave"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>onBeforeSave</b>(func)</toc>
         
-        >
+        ->
         
         <i><small>
 <span class="param-type">Boolean</span>
 
+
 </small></i>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">Binds an event handler for when we are about to save our script.</p>
+        <p style="margin-left:20px;">Binds an event handler for when we are about to save our script.</p>
     </div>
     
 
     
 
     
-    
+
     
     
         <h5>Parameters:</h5>
@@ -2048,23 +2092,23 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -2077,6 +2121,7 @@
 <span class="param-type">function</span>
 
 
+
             
             </td>
 
@@ -2087,41 +2132,15 @@
             <td class="description last">Assigns the function to handle this event.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
-    
-    
-    
-    
-<h5>Returns: 
-<span class="param-type">Boolean</span>
-
-</h5>
-    
-            <p class="param-desc" style="margin-left: 20px;">
-    
-		 Success or failure.
-	</p>
-
-        
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -2150,18 +2169,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="editor.js.html">editor.js</a>,
-     <a href="editor.js.html#sunlight-1-line-325">line 325</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.js.html">editor.js</a>,
 				 <a href="editor.js.html#sunlight-1-line-325">line 325</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -2171,30 +2187,68 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    - Success or failure.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Boolean</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
 </dd>
 
         
             
 <hr>
 <dt>
-    <h4 class="name" id="onBeginUndoGroup"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onBeginUndoGroup</b>(description)</toc>
+    <h4 class="name" id="onBeginUndoGroup"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>onBeginUndoGroup</b>(description)</toc>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">Event that is called to begin an undo manager group operation.</p>
+        <p style="margin-left:20px;">Event that is called to begin an undo manager group operation.</p>
     </div>
     
 
     
 
     
-    
+
     
     
         <h5>Parameters:</h5>
@@ -2202,23 +2256,23 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -2231,6 +2285,7 @@
 <span class="param-type">String</span>
 
 
+
             
             </td>
 
@@ -2241,29 +2296,15 @@
             <td class="description last">The description of the undo event.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
-    
-    
-    
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -2292,18 +2333,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="editor.js.html">editor.js</a>,
-     <a href="editor.js.html#sunlight-1-line-421">line 421</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.js.html">editor.js</a>,
 				 <a href="editor.js.html#sunlight-1-line-421">line 421</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -2313,30 +2351,44 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 </dd>
 
         
             
 <hr>
 <dt>
-    <h4 class="name" id="onDisconnectEntryChains"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onDisconnectEntryChains</b>(node, linkName)</toc>
+    <h4 class="name" id="onDisconnectEntryChains"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>onDisconnectEntryChains</b>(node, linkName)</toc>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">Disconnects all chains attached to a node's entry link.</p>
+        <p style="margin-left:20px;">Disconnects all chains attached to a node's entry link.</p>
     </div>
     
 
     
 
     
-    
+
     
     
         <h5>Parameters:</h5>
@@ -2344,23 +2396,23 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -2373,6 +2425,7 @@
 <span class="param-type"><a href="wcNode.html">wcNode</a></span>
 
 
+
             
             </td>
 
@@ -2383,7 +2436,7 @@
             <td class="description last">The node to disconnect from.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -2396,6 +2449,7 @@
 <span class="param-type">String</span>
 
 
+
             
             </td>
 
@@ -2406,29 +2460,15 @@
             <td class="description last">The name of the link.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
-    
-    
-    
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -2457,18 +2497,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="editor.js.html">editor.js</a>,
-     <a href="editor.js.html#sunlight-1-line-461">line 461</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.js.html">editor.js</a>,
 				 <a href="editor.js.html#sunlight-1-line-461">line 461</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -2478,30 +2515,44 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 </dd>
 
         
             
 <hr>
 <dt>
-    <h4 class="name" id="onDisconnectExitChains"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onDisconnectExitChains</b>(node, linkName)</toc>
+    <h4 class="name" id="onDisconnectExitChains"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>onDisconnectExitChains</b>(node, linkName)</toc>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">Disconnects all chains attached to a node's exit link.</p>
+        <p style="margin-left:20px;">Disconnects all chains attached to a node's exit link.</p>
     </div>
     
 
     
 
     
-    
+
     
     
         <h5>Parameters:</h5>
@@ -2509,23 +2560,23 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -2538,6 +2589,7 @@
 <span class="param-type"><a href="wcNode.html">wcNode</a></span>
 
 
+
             
             </td>
 
@@ -2548,7 +2600,7 @@
             <td class="description last">The node to disconnect from.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -2561,6 +2613,7 @@
 <span class="param-type">String</span>
 
 
+
             
             </td>
 
@@ -2571,29 +2624,15 @@
             <td class="description last">The name of the link.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
-    
-    
-    
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -2622,18 +2661,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="editor.js.html">editor.js</a>,
-     <a href="editor.js.html#sunlight-1-line-495">line 495</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.js.html">editor.js</a>,
 				 <a href="editor.js.html#sunlight-1-line-495">line 495</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -2643,30 +2679,44 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 </dd>
 
         
             
 <hr>
 <dt>
-    <h4 class="name" id="onDisconnectInputChains"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onDisconnectInputChains</b>(node, linkName)</toc>
+    <h4 class="name" id="onDisconnectInputChains"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>onDisconnectInputChains</b>(node, linkName)</toc>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">Disconnects all chains attached to a node's input link.</p>
+        <p style="margin-left:20px;">Disconnects all chains attached to a node's input link.</p>
     </div>
     
 
     
 
     
-    
+
     
     
         <h5>Parameters:</h5>
@@ -2674,23 +2724,23 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -2703,6 +2753,7 @@
 <span class="param-type"><a href="wcNode.html">wcNode</a></span>
 
 
+
             
             </td>
 
@@ -2713,7 +2764,7 @@
             <td class="description last">The node to disconnect from.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -2726,6 +2777,7 @@
 <span class="param-type">String</span>
 
 
+
             
             </td>
 
@@ -2736,29 +2788,15 @@
             <td class="description last">The name of the link.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
-    
-    
-    
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -2787,18 +2825,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="editor.js.html">editor.js</a>,
-     <a href="editor.js.html#sunlight-1-line-529">line 529</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.js.html">editor.js</a>,
 				 <a href="editor.js.html#sunlight-1-line-529">line 529</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -2808,30 +2843,44 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 </dd>
 
         
             
 <hr>
 <dt>
-    <h4 class="name" id="onDisconnectOutputChains"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onDisconnectOutputChains</b>(node, linkName)</toc>
+    <h4 class="name" id="onDisconnectOutputChains"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>onDisconnectOutputChains</b>(node, linkName)</toc>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">Disconnects all chains attached to a node's output link.</p>
+        <p style="margin-left:20px;">Disconnects all chains attached to a node's output link.</p>
     </div>
     
 
     
 
     
-    
+
     
     
         <h5>Parameters:</h5>
@@ -2839,23 +2888,23 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -2868,6 +2917,7 @@
 <span class="param-type"><a href="wcNode.html">wcNode</a></span>
 
 
+
             
             </td>
 
@@ -2878,7 +2928,7 @@
             <td class="description last">The node to disconnect from.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -2891,6 +2941,7 @@
 <span class="param-type">String</span>
 
 
+
             
             </td>
 
@@ -2901,29 +2952,15 @@
             <td class="description last">The name of the link.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
-    
-    
-    
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -2952,18 +2989,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="editor.js.html">editor.js</a>,
-     <a href="editor.js.html#sunlight-1-line-563">line 563</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.js.html">editor.js</a>,
 				 <a href="editor.js.html#sunlight-1-line-563">line 563</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -2973,50 +3007,50 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 </dd>
 
         
             
 <hr>
 <dt>
-    <h4 class="name" id="onEndUndoGroup"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onEndUndoGroup</b>()</toc>
+    <h4 class="name" id="onEndUndoGroup"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>onEndUndoGroup</b>()</toc>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">Event that is called to end an undo manager group operation.</p>
+        <p style="margin-left:20px;">Event that is called to end an undo manager group operation.</p>
     </div>
     
 
     
 
     
-    
-    
-    
-    
-    
 
-    
-
-    
-
-    
-
-    
-    
-    
     
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -3045,18 +3079,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="editor.js.html">editor.js</a>,
-     <a href="editor.js.html#sunlight-1-line-430">line 430</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.js.html">editor.js</a>,
 				 <a href="editor.js.html#sunlight-1-line-430">line 430</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -3066,37 +3097,52 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 </dd>
 
         
             
 <hr>
 <dt>
-    <h4 class="name" id="onImported"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onImported</b>(func)</toc>
+    <h4 class="name" id="onImported"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>onImported</b>(func)</toc>
         
-        >
+        ->
         
         <i><small>
 <span class="param-type">Boolean</span>
 
+
 </small></i>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">Binds an event handler for when we are about to save our script.</p>
+        <p style="margin-left:20px;">Binds an event handler for when we are about to save our script.</p>
     </div>
     
 
     
 
     
-    
+
     
     
         <h5>Parameters:</h5>
@@ -3104,23 +3150,23 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -3133,6 +3179,7 @@
 <span class="param-type">function</span>
 
 
+
             
             </td>
 
@@ -3143,41 +3190,15 @@
             <td class="description last">Assigns the function to handle this event.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
-    
-    
-    
-    
-<h5>Returns: 
-<span class="param-type">Boolean</span>
-
-</h5>
-    
-            <p class="param-desc" style="margin-left: 20px;">
-    
-		 Success or failure.
-	</p>
-
-        
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -3206,18 +3227,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="editor.js.html">editor.js</a>,
-     <a href="editor.js.html#sunlight-1-line-405">line 405</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.js.html">editor.js</a>,
 				 <a href="editor.js.html#sunlight-1-line-405">line 405</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -3227,37 +3245,76 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    - Success or failure.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Boolean</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
 </dd>
 
         
             
 <hr>
 <dt>
-    <h4 class="name" id="onLoaded"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onLoaded</b>(func)</toc>
+    <h4 class="name" id="onLoaded"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>onLoaded</b>(func)</toc>
         
-        >
+        ->
         
         <i><small>
 <span class="param-type">Boolean</span>
 
+
 </small></i>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">Binds an event handler for when we are about to save our script.</p>
+        <p style="margin-left:20px;">Binds an event handler for when we are about to save our script.</p>
     </div>
     
 
     
 
     
-    
+
     
     
         <h5>Parameters:</h5>
@@ -3265,23 +3322,23 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -3294,6 +3351,7 @@
 <span class="param-type">function</span>
 
 
+
             
             </td>
 
@@ -3304,41 +3362,15 @@
             <td class="description last">Assigns the function to handle this event.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
-    
-    
-    
-    
-<h5>Returns: 
-<span class="param-type">Boolean</span>
-
-</h5>
-    
-            <p class="param-desc" style="margin-left: 20px;">
-    
-		 Success or failure.
-	</p>
-
-        
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -3367,18 +3399,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="editor.js.html">editor.js</a>,
-     <a href="editor.js.html#sunlight-1-line-373">line 373</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.js.html">editor.js</a>,
 				 <a href="editor.js.html#sunlight-1-line-373">line 373</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -3388,50 +3417,74 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    - Success or failure.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Boolean</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
 </dd>
 
         
             
 <hr>
 <dt>
-    <h4 class="name" id="onResized"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onResized</b>()</toc>
+    <h4 class="name" id="onResized"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>onResized</b>()</toc>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">Event that is called when the container view is resized.</p>
+        <p style="margin-left:20px;">Event that is called when the container view is resized.</p>
     </div>
     
 
     
 
     
-    
-    
-    
-    
-    
 
-    
-
-    
-
-    
-
-    
-    
-    
     
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -3460,18 +3513,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="editor.js.html">editor.js</a>,
-     <a href="editor.js.html#sunlight-1-line-438">line 438</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.js.html">editor.js</a>,
 				 <a href="editor.js.html#sunlight-1-line-438">line 438</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -3481,37 +3531,52 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 </dd>
 
         
             
 <hr>
 <dt>
-    <h4 class="name" id="onSaved"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>onSaved</b>(func)</toc>
+    <h4 class="name" id="onSaved"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>onSaved</b>(func)</toc>
         
-        >
+        ->
         
         <i><small>
 <span class="param-type">Boolean</span>
 
+
 </small></i>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">Binds an event handler for when we are about to save our script.</p>
+        <p style="margin-left:20px;">Binds an event handler for when we are about to save our script.</p>
     </div>
     
 
     
 
     
-    
+
     
     
         <h5>Parameters:</h5>
@@ -3519,23 +3584,23 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -3548,6 +3613,7 @@
 <span class="param-type">function</span>
 
 
+
             
             </td>
 
@@ -3558,41 +3624,15 @@
             <td class="description last">Assigns the function to handle this event.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
-    
-    
-    
-    
-<h5>Returns: 
-<span class="param-type">Boolean</span>
-
-</h5>
-    
-            <p class="param-desc" style="margin-left: 20px;">
-    
-		 Success or failure.
-	</p>
-
-        
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -3621,18 +3661,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="editor.js.html">editor.js</a>,
-     <a href="editor.js.html#sunlight-1-line-341">line 341</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.js.html">editor.js</a>,
 				 <a href="editor.js.html#sunlight-1-line-341">line 341</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -3642,30 +3679,68 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    - Success or failure.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Boolean</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
 </dd>
 
         
             
 <hr>
 <dt>
-    <h4 class="name" id="triggerEvent"><toc class="small"><i></i></toc><toc> </toc>function <toc><b>triggerEvent</b>(eventName)</toc>
+    <h4 class="name" id="triggerEvent"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>triggerEvent</b>(eventName)</toc>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">Triggers a previously bound event handler.</p>
+        <p style="margin-left:20px;">Triggers a previously bound event handler.</p>
     </div>
     
 
     
 
     
-    
+
     
     
         <h5>Parameters:</h5>
@@ -3673,23 +3748,23 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -3702,6 +3777,7 @@
 <span class="param-type">String</span>
 
 
+
             
             </td>
 
@@ -3712,29 +3788,15 @@
             <td class="description last">The name of the event to trigger.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
-    
-    
-    
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -3763,18 +3825,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="editor.js.html">editor.js</a>,
-     <a href="editor.js.html#sunlight-1-line-312">line 312</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.js.html">editor.js</a>,
 				 <a href="editor.js.html#sunlight-1-line-312">line 312</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -3784,30 +3843,44 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 </dd>
 
         
             
 <hr>
 <dt>
-    <h4 class="name" id="~MenuDescriptionFunc"><toc class="small"><i>inner</i></toc><toc> </toc>function <toc><b>MenuDescriptionFunc</b>(editor, engine)</toc>
+    <h4 class="name" id="~MenuDescriptionFunc"><toc class="attribs"><span class="type-signature">&lt;inner> </span></toc>function <toc class="method"><b>MenuDescriptionFunc</b>(editor, engine)</toc>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">A callback that retrieves the description string for a menu option.</p>
+        <p style="margin-left:20px;">A callback that retrieves the description string for a menu option.</p>
     </div>
     
 
     
 
     
-    
+
     
     
         <h5>Parameters:</h5>
@@ -3815,23 +3888,23 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -3844,6 +3917,7 @@
 <span class="param-type"><a href="wcPlayEditor.html">wcPlayEditor</a></span>
 
 
+
             
             </td>
 
@@ -3854,7 +3928,7 @@
             <td class="description last">The instance of the editor invoking the menu option.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -3867,6 +3941,7 @@
 <span class="param-type"><a href="wcPlay.html">wcPlay</a></span>
 
 
+
             
             </td>
 
@@ -3877,29 +3952,15 @@
             <td class="description last">The instance of the script engine being viewed by the editor.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
-    
-    
-    
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -3928,18 +3989,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="editor.jsdoc.html">editor.jsdoc</a>,
-     <a href="editor.jsdoc.html#sunlight-1-line-61">line 61</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.jsdoc.html">editor.jsdoc</a>,
 				 <a href="editor.jsdoc.html#sunlight-1-line-61">line 61</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -3949,30 +4007,44 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 </dd>
 
         
             
 <hr>
 <dt>
-    <h4 class="name" id="~MenuIconFunc"><toc class="small"><i>inner</i></toc><toc> </toc>function <toc><b>MenuIconFunc</b>(editor, engine)</toc>
+    <h4 class="name" id="~MenuIconFunc"><toc class="attribs"><span class="type-signature">&lt;inner> </span></toc>function <toc class="method"><b>MenuIconFunc</b>(editor, engine)</toc>
         
     </h4>
-
+    
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
-        <p style="margin-left: 20px;">A callback that retrieves the icon class for a menu option.</p>
+        <p style="margin-left:20px;">A callback that retrieves the icon class for a menu option.</p>
     </div>
     
 
     
 
     
-    
+
     
     
         <h5>Parameters:</h5>
@@ -3980,23 +4052,23 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -4009,6 +4081,7 @@
 <span class="param-type"><a href="wcPlayEditor.html">wcPlayEditor</a></span>
 
 
+
             
             </td>
 
@@ -4019,7 +4092,7 @@
             <td class="description last">The instance of the editor invoking the menu option.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -4032,6 +4105,7 @@
 <span class="param-type"><a href="wcPlay.html">wcPlay</a></span>
 
 
+
             
             </td>
 
@@ -4042,29 +4116,15 @@
             <td class="description last">The instance of the script engine being viewed by the editor.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
-    
-    
-    
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
     
 
     
 <dl class="details">
-	
+    
 
 	
 
@@ -4093,18 +4153,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="editor.jsdoc.html">editor.jsdoc</a>,
-     <a href="editor.jsdoc.html#sunlight-1-line-54">line 54</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.jsdoc.html">editor.jsdoc</a>,
 				 <a href="editor.jsdoc.html#sunlight-1-line-54">line 54</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -4114,6 +4171,20 @@
 	
 </dl>
 
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 </dd>
 
         </dl>
@@ -4121,16 +4192,12 @@
 
     
         <h3 class="subsection-title">Type Definitions</h3>
+
         <dl>
-            <!-- List type definitions by members first, then methods -->
-            
                 
 <hr>
 <dt class="name" id="~BoundingData">
-    <h4><toc class="small"><i>inner</i></toc><toc> </toc>
-        typedef var
-        <b><toc>BoundingData</toc></b>
-    </h4>
+    <h4 id="~BoundingData"><toc class="attribs"></toc>typedef var <toc class="member"><b>BoundingData</b></toc></h4>
 
     
 </dt>
@@ -4142,40 +4209,45 @@
     
 
     
-        <h5>Type: 
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
 <span class="param-type">Object</span>
 
-</h5>
+
+
+            </li>
+        </ul>
     
 
     
 <dl class="details">
-	
+    
 
-	<h5 class="subsection-title">Properties:</h5>
+    <h5 class="subsection-title">Properties:</h5>
 
-	<dl>
+    <dl>
 
-<div class="prop-container">
 <table class="props table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -4188,6 +4260,7 @@
 <span class="param-type"><a href="wcPlayEditor.html#~Rect">wcPlayEditor~Rect</a></span>
 
 
+
             
             </td>
 
@@ -4198,7 +4271,7 @@
             <td class="description last">The bounding rectangle.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -4211,6 +4284,7 @@
 <span class="param-type"><a href="wcPlay.html#~Coordinates">wcPlay~Coordinates</a></span>
 
 
+
             
             </td>
 
@@ -4221,7 +4295,7 @@
             <td class="description last">The anchor point where lines will attach to this link.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -4234,6 +4308,7 @@
 <span class="param-type">String</span>
 
 
+
             
             </td>
 
@@ -4244,12 +4319,12 @@
             <td class="description last">The name of the bounded object.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
-</div></dl>
+</dl>
 
-	
+    
 
 	
 
@@ -4278,18 +4353,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="editor.jsdoc.html">editor.jsdoc</a>,
-     <a href="editor.jsdoc.html#sunlight-1-line-25">line 25</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.jsdoc.html">editor.jsdoc</a>,
 				 <a href="editor.jsdoc.html#sunlight-1-line-25">line 25</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -4307,10 +4379,7 @@
                 
 <hr>
 <dt class="name" id="~CategoryOptions">
-    <h4><toc class="small"><i>inner</i></toc><toc> </toc>
-        typedef var
-        <b><toc>CategoryOptions</toc></b>
-    </h4>
+    <h4 id="~CategoryOptions"><toc class="attribs"></toc>typedef var <toc class="member"><b>CategoryOptions</b></toc></h4>
 
     
 </dt>
@@ -4322,40 +4391,45 @@
     
 
     
-        <h5>Type: 
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
 <span class="param-type">Object</span>
 
-</h5>
+
+
+            </li>
+        </ul>
     
 
     
 <dl class="details">
-	
+    
 
-	<h5 class="subsection-title">Properties:</h5>
+    <h5 class="subsection-title">Properties:</h5>
 
-	<dl>
+    <dl>
 
-<div class="prop-container">
 <table class="props table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -4368,6 +4442,7 @@
 <span class="param-type">Array.&lt;String></span>
 
 
+
             
             </td>
 
@@ -4378,7 +4453,7 @@
             <td class="description last">A list of categories to show in the palette.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -4391,6 +4466,7 @@
 <span class="param-type">Boolean</span>
 
 
+
             
             </td>
 
@@ -4401,12 +4477,12 @@
             <td class="description last">If true, the items list will be treated as a blacklist of categories to hide.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
-</div></dl>
+</dl>
 
-	
+    
 
 	
 
@@ -4435,18 +4511,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="editor.jsdoc.html">editor.jsdoc</a>,
-     <a href="editor.jsdoc.html#sunlight-1-line-9">line 9</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.jsdoc.html">editor.jsdoc</a>,
 				 <a href="editor.jsdoc.html#sunlight-1-line-9">line 9</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -4464,10 +4537,7 @@
                 
 <hr>
 <dt class="name" id="~DrawNodeData">
-    <h4><toc class="small"><i>inner</i></toc><toc> </toc>
-        typedef var
-        <b><toc>DrawNodeData</toc></b>
-    </h4>
+    <h4 id="~DrawNodeData"><toc class="attribs"></toc>typedef var <toc class="member"><b>DrawNodeData</b></toc></h4>
 
     
 </dt>
@@ -4479,40 +4549,45 @@
     
 
     
-        <h5>Type: 
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
 <span class="param-type">Object</span>
 
-</h5>
+
+
+            </li>
+        </ul>
     
 
     
 <dl class="details">
-	
+    
 
-	<h5 class="subsection-title">Properties:</h5>
+    <h5 class="subsection-title">Properties:</h5>
 
-	<dl>
+    <dl>
 
-<div class="prop-container">
 <table class="props table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -4525,6 +4600,7 @@
 <span class="param-type"><a href="wcNode.html">wcNode</a></span>
 
 
+
             
             </td>
 
@@ -4535,7 +4611,7 @@
             <td class="description last">The node instance.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -4548,6 +4624,7 @@
 <span class="param-type"><a href="wcPlayEditor.html#~Rect">wcPlayEditor~Rect</a></span>
 
 
+
             
             </td>
 
@@ -4558,7 +4635,7 @@
             <td class="description last">Bounding rectangle of the node (not including links that stick out).</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -4571,6 +4648,7 @@
 <span class="param-type">Array.&lt;<a href="wcPlayEditor.html#~BoundingData">wcPlayEditor~BoundingData</a>></span>
 
 
+
             
             </td>
 
@@ -4581,7 +4659,7 @@
             <td class="description last">Bounding data of entry links.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -4594,6 +4672,7 @@
 <span class="param-type">Array.&lt;<a href="wcPlayEditor.html#~BoundingData">wcPlayEditor~BoundingData</a>></span>
 
 
+
             
             </td>
 
@@ -4604,7 +4683,7 @@
             <td class="description last">Bounding data of exit links.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -4617,6 +4696,7 @@
 <span class="param-type">Array.&lt;<a href="wcPlayEditor.html#~BoundingData">wcPlayEditor~BoundingData</a>></span>
 
 
+
             
             </td>
 
@@ -4627,7 +4707,7 @@
             <td class="description last">Bounding data of property input links.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -4640,6 +4720,7 @@
 <span class="param-type">Array.&lt;<a href="wcPlayEditor.html#~BoundingData">wcPlayEditor~BoundingData</a>></span>
 
 
+
             
             </td>
 
@@ -4650,7 +4731,7 @@
             <td class="description last">Bounding data of property output links.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -4663,6 +4744,7 @@
 <span class="param-type">Array.&lt;<a href="wcPlayEditor.html#~BoundingData">wcPlayEditor~BoundingData</a>></span>
 
 
+
             
             </td>
 
@@ -4673,7 +4755,7 @@
             <td class="description last">Bounding data of property value text.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -4686,6 +4768,7 @@
 <span class="param-type">Array.&lt;<a href="wcPlayEditor.html#~BoundingData">wcPlayEditor~BoundingData</a>></span>
 
 
+
             
             </td>
 
@@ -4696,12 +4779,12 @@
             <td class="description last">Bounding data of property initial value text.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
-</div></dl>
+</dl>
 
-	
+    
 
 	
 
@@ -4730,18 +4813,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="editor.jsdoc.html">editor.jsdoc</a>,
-     <a href="editor.jsdoc.html#sunlight-1-line-33">line 33</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.jsdoc.html">editor.jsdoc</a>,
 				 <a href="editor.jsdoc.html#sunlight-1-line-33">line 33</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -4759,10 +4839,7 @@
                 
 <hr>
 <dt class="name" id="~MenuOptions">
-    <h4><toc class="small"><i>inner</i></toc><toc> </toc>
-        typedef var
-        <b><toc>MenuOptions</toc></b>
-    </h4>
+    <h4 id="~MenuOptions"><toc class="attribs"></toc>typedef var <toc class="member"><b>MenuOptions</b></toc></h4>
 
     
 </dt>
@@ -4774,42 +4851,47 @@
     
 
     
-        <h5>Type: 
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
 <span class="param-type">Object</span>
 
-</h5>
+
+
+            </li>
+        </ul>
     
 
     
 <dl class="details">
-	
+    
 
-	<h5 class="subsection-title">Properties:</h5>
+    <h5 class="subsection-title">Properties:</h5>
 
-	<dl>
+    <dl>
 
-<div class="prop-container">
 <table class="props table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
-		<th>Argument</th>
-		
+        
+        <th>Argument</th>
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -4823,6 +4905,7 @@
 |
 
 <span class="param-type"><a href="wcPlayEditor.html#~MenuIconFunc">wcPlayEditor~MenuIconFunc</a></span>
+
 
 
             
@@ -4843,7 +4926,7 @@
             <td class="description last">A classname to apply as an icon for the option.  If this is a function, it will be called during the update call and should return the icon class.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -4854,6 +4937,7 @@
             
                 
 <span class="param-type">String</span>
+
 
 
             
@@ -4874,7 +4958,7 @@
             <td class="description last">The description to show as a tooltip for this option.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -4885,6 +4969,7 @@
             
                 
 <span class="param-type">Number</span>
+
 
 
             
@@ -4905,7 +4990,7 @@
             <td class="description last">An insertion index to insert the item within the menu category, default is to append to the end.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -4916,6 +5001,7 @@
             
                 
 <span class="param-type">Number</span>
+
 
 
             
@@ -4936,7 +5022,7 @@
             <td class="description last">If this creates a new category, it will be inserted at this index in the top level menu.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -4947,6 +5033,7 @@
             
                 
 <span class="param-type">Boolean</span>
+
 
 
             
@@ -4967,7 +5054,7 @@
             <td class="description last">If supplied, creates a toolbar button for this option and inserts it in the tab bar at the specified index. -1 will append it to the end.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -4978,6 +5065,7 @@
             
                 
 <span class="param-type">String</span>
+
 
 
             
@@ -4998,7 +5086,7 @@
             <td class="description last">A string that describes hotkeys for your control, the format is 'Ctrl+Z' or 'Alt+Shift+L,Shift+L' for multiple.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -5009,6 +5097,7 @@
             
                 
 <span class="param-type">function</span>
+
 
 
             
@@ -5029,12 +5118,12 @@
             <td class="description last">A function to call during the update to determine if the menu option should be enabled or disabled. Return false to disable the option.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
-</div></dl>
+</dl>
 
-	
+    
 
 	
 
@@ -5063,18 +5152,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="editor.jsdoc.html">editor.jsdoc</a>,
-     <a href="editor.jsdoc.html#sunlight-1-line-68">line 68</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.jsdoc.html">editor.jsdoc</a>,
 				 <a href="editor.jsdoc.html#sunlight-1-line-68">line 68</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -5091,11 +5177,196 @@
             
                 
 <hr>
-<dt class="name" id="~Options">
-    <h4><toc class="small"><i>inner</i></toc><toc> </toc>
-        typedef var
-        <b><toc>Options</toc></b>
+<dt>
+    <h4 class="name" id="~OnMenuActivated"><toc class="attribs"><span class="type-signature"></span></toc>typedef function <toc class="method"><b>OnMenuActivated</b>(event, editor, engine)</toc>
+        
     </h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p style="margin-left:20px;">On click handler for menu and toolbar options.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>event</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The mouse click event object.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>editor</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="wcPlayEditor.html">wcPlayEditor</a></span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The instance of the editor invoking the menu option.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>engine</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="wcPlay.html">wcPlay</a></span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The instance of the script engine being viewed by the editor.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="editor.jsdoc.html">editor.jsdoc</a>,
+				 <a href="editor.jsdoc.html#sunlight-1-line-46">line 46</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+            
+                
+<hr>
+<dt class="name" id="~Options">
+    <h4 id="~Options"><toc class="attribs"></toc>typedef var <toc class="member"><b>Options</b></toc></h4>
 
     
 </dt>
@@ -5107,44 +5378,49 @@
     
 
     
-        <h5>Type: 
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
 <span class="param-type">Object</span>
 
-</h5>
+
+
+            </li>
+        </ul>
     
 
     
 <dl class="details">
-	
+    
 
-	<h5 class="subsection-title">Properties:</h5>
+    <h5 class="subsection-title">Properties:</h5>
 
-	<dl>
+    <dl>
 
-<div class="prop-container">
 <table class="props table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
-		<th>Argument</th>
-		
+        
+        <th>Argument</th>
+        
 
-		
-		<th>Default</th>
-		
+        
+        <th>Default</th>
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -5155,6 +5431,7 @@
             
                 
 <span class="param-type">Boolean</span>
+
 
 
             
@@ -5181,7 +5458,7 @@
             <td class="description last">If true, the script will not be editable.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -5192,6 +5469,7 @@
             
                 
 <span class="param-type">Boolean</span>
+
 
 
             
@@ -5218,7 +5496,7 @@
             <td class="description last">Whether the script can be played using the live debugger.</td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -5229,6 +5507,7 @@
             
                 
 <span class="param-type"><a href="wcPlayEditor.html#~CategoryOptions">wcPlayEditor~CategoryOptions</a></span>
+
 
 
             
@@ -5253,12 +5532,12 @@
             <td class="description last">Options that determine what categories appear in the palette. By default, all categories are visible.</td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
-</div></dl>
+</dl>
 
-	
+    
 
 	
 
@@ -5287,18 +5566,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="editor.jsdoc.html">editor.jsdoc</a>,
-     <a href="editor.jsdoc.html#sunlight-1-line-1">line 1</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.jsdoc.html">editor.jsdoc</a>,
 				 <a href="editor.jsdoc.html#sunlight-1-line-1">line 1</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -5316,10 +5592,7 @@
                 
 <hr>
 <dt class="name" id="~Rect">
-    <h4><toc class="small"><i>inner</i></toc><toc> </toc>
-        typedef var
-        <b><toc>Rect</toc></b>
-    </h4>
+    <h4 id="~Rect"><toc class="attribs"></toc>typedef var <toc class="member"><b>Rect</b></toc></h4>
 
     
 </dt>
@@ -5331,40 +5604,45 @@
     
 
     
-        <h5>Type: 
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
 <span class="param-type">Object</span>
 
-</h5>
+
+
+            </li>
+        </ul>
     
 
     
 <dl class="details">
-	
+    
 
-	<h5 class="subsection-title">Properties:</h5>
+    <h5 class="subsection-title">Properties:</h5>
 
-	<dl>
+    <dl>
 
-<div class="prop-container">
 <table class="props table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -5377,6 +5655,7 @@
 <span class="param-type">Number</span>
 
 
+
             
             </td>
 
@@ -5387,7 +5666,7 @@
             <td class="description last"></td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -5400,6 +5679,7 @@
 <span class="param-type">Number</span>
 
 
+
             
             </td>
 
@@ -5410,7 +5690,7 @@
             <td class="description last"></td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -5423,6 +5703,7 @@
 <span class="param-type">Number</span>
 
 
+
             
             </td>
 
@@ -5433,7 +5714,7 @@
             <td class="description last"></td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -5446,6 +5727,7 @@
 <span class="param-type">Number</span>
 
 
+
             
             </td>
 
@@ -5456,12 +5738,12 @@
             <td class="description last"></td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
-</div></dl>
+</dl>
 
-	
+    
 
 	
 
@@ -5490,18 +5772,15 @@
 
 
 	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="editor.jsdoc.html">editor.jsdoc</a>,
-     <a href="editor.jsdoc.html#sunlight-1-line-16">line 16</a>
-  </dt>
-<!-- 	<dd class="tag-source">
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
 				<a href="editor.jsdoc.html">editor.jsdoc</a>,
 				 <a href="editor.jsdoc.html#sunlight-1-line-16">line 16</a>
 			</li>
 		</ul>
-	</dd> -->
+	</dd>
 	
 
 	
@@ -5515,197 +5794,7 @@
     
 </dd>
 
-            
-            
-                
-<hr>
-<dt>
-    <h4 class="name" id="~OnMenuActivated"><toc class="small"><i>inner</i></toc><toc> </toc>typedef function <toc><b>OnMenuActivated</b>(event, editor, engine)</toc>
-        
-    </h4>
-
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p style="margin-left: 20px;">On click handler for menu and toolbar options.</p>
-    </div>
-    
-
-    
-
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-
-		<th>Type</th>
-
-		
-
-		
-
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-
-	<tbody>
-	
-
-        <tr>
-            
-                <td class="name"><code>event</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The mouse click event object.</td>
-        </tr>
-
-	
-
-        <tr>
-            
-                <td class="name"><code>editor</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="wcPlayEditor.html">wcPlayEditor</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The instance of the editor invoking the menu option.</td>
-        </tr>
-
-	
-
-        <tr>
-            
-                <td class="name"><code>engine</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="wcPlay.html">wcPlay</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The instance of the script engine being viewed by the editor.</td>
-        </tr>
-
-	
-	</tbody>
-</table>
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    
-    
-    
-    
-    
-
-    
-<dl class="details">
-	
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:
-    <a href="editor.jsdoc.html">editor.jsdoc</a>,
-     <a href="editor.jsdoc.html#sunlight-1-line-46">line 46</a>
-  </dt>
-<!-- 	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="editor.jsdoc.html">editor.jsdoc</a>,
-				 <a href="editor.jsdoc.html#sunlight-1-line-46">line 46</a>
-			</li>
-		</ul>
-	</dd> -->
-	
-
-	
-
-	
-
-	
-</dl>
-
-</dd>
-
-            
-        </dl>
+            </dl>
     
 
     
@@ -5723,56 +5812,55 @@
 
 	
 		<div class="col-md-3">
-			<div id="toc" class="col-xs-3 col-sm-3 col-md-3 small"></div>
+			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
 		</div>
 	
 
 </div>
-
-<div class="row">
-	
-	<div class="col-xs-8 col-sm-8 col-md-8 col-xs-offset-1">
-	
-		<footer>
-		
-		
-		<span class="jsdoc-message">
-			Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a>
-			on 2016-03-09 using the <a
-			href="https://github.com/WebCabin/docstrap">Web Cabin DocStrap template</a>.
-		</span>
-		</footer>
-	</div>
 </div>
-<div style="height:1000px;"></div>
 
-<!--<script src="scripts/sunlight.js"></script>-->
+<div class="modal fade" id="searchResults">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Search results</h4>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div>
+
+<footer>
+
+
+	<span class="copyright">
+	2014-2016 Jeff Houde (<a href='mailto:lochemage@webcabin.org'>lochemage@webcabin.org</a>)
+	</span>
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
+	
+		on 2016-08-03
+	
+	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
 <script src="scripts/docstrap.lib.js"></script>
-<script src="scripts/bootstrap-dropdown.js"></script>
 <script src="scripts/toc.js"></script>
+<script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
 
 <script>
 $( function () {
-	// $( "[id*='$']" ).each( function () {
-	// 	var $this = $( this );
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
 
-	// 	$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
-	// } );
-
-	$( "#toc" ).toc( {
-		anchorName  : function ( i, heading, prefix ) {
-			// return $( heading ).attr( "id" ) || ( prefix + i );
-			return ( prefix + i );
-		},
-		selectors   : "h1,h2,h3,h4",
-		showAndHide : false,
-		scrollTo    : "100px"
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
 	} );
-
-	$( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
-	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
-	$( '.dropdown-toggle' ).dropdown();
-	// $( ".tutorial-section pre, .readme-section pre" ).addClass( "sunlight-highlight-javascript" ).addClass( "linenums" );
 
 	$( ".tutorial-section pre, .readme-section pre" ).each( function () {
 		var $this = $( this );
@@ -5785,7 +5873,8 @@ $( function () {
 			example.html( exampleText );
 			lang = lang[1];
 		} else {
-			lang = "javascript";
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
 		}
 
 		if ( lang ) {
@@ -5804,17 +5893,32 @@ $( function () {
 		enableDoclinks : true
 	} );
 
-	$("a[name^='sunlight-1-line-']").each(function() {
-		$(this).wrap('<div id="' + this.name + '" style="padding-top:40px;margin-top:-40px;display:inline-block;" class="sunlight-line-container"></div>');
-		this.name = '';
-	});
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			return $( heading ).attr( "id" ) || ( prefix + i );
+		},
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		showAndHide : false,
+		smoothScrolling: true
+	} );
 
-  $("h1,h2,h3,h4").each(function() {
-  	$(this).css('padding-top', 50).css('margin-top', -50);
-  });
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
+
 } );
 </script>
 
+
+
+<!--Navigation and Symbol Display-->
 
 
 
@@ -5823,6 +5927,7 @@ $( function () {
 <!-- Piwik Analytics -->
 <script type="text/javascript">
   var _paq = _paq || [];
+  
   
   
   _paq.push(['trackPageView']);
@@ -5839,6 +5944,11 @@ $( function () {
 <!-- End Piwik Code -->
 
 
+<script type="text/javascript">
+	$(document).ready(function() {
+		SearcherDisplay.init();
+	});
+</script>
 
 </body>
 </html>

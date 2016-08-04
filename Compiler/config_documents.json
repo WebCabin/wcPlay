@@ -3,8 +3,21 @@
         "allowUnknownTags": true
     },
     "source": {
+        "include": [
+            "README.md",
+            "Code",
+            "Code/nodes",
+            "Code/nodes/entry",
+            "Code/nodes/process",
+            "Code/nodes/storage"
+        ],
         "includePattern": ".+\\.js(doc)?$",
         "excludePattern": "(^|\\/|\\\\)_"
+    },
+    "opts": {
+        "recurse": false,
+        "template": "Compiler/node_modules/ink-docstrap/template",
+        "tutorials": "Code/tutorials"
     },
     "plugins": [],
     "templates": {
@@ -13,12 +26,12 @@
         "systemTitle": "wcPlay",
         "systemName": "<div style='font-size:15px;line-height:15px;margin-top:-5px;'>Web Cabin Play<br>v1.0.0</div>",
         "footer": "",
-        "copyright": "",
-        "navType": "vertical",
-        "theme": "superhero",
+        "copyright": "2014-2016 Jeff Houde (<a href='mailto:lochemage@webcabin.org'>lochemage@webcabin.org</a>)",
+        "navType": "inline",
+        "theme": "slate",
         "linenums": true,
         "collapseSymbols": false,
-        "inverseNav": true,
+        "inverseNav": false,
         "outputSourceFiles": true,
         "outputSourcePath": false,
         "dateFormat": "YYYY-MM-DD",
