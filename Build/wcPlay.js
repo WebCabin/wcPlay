@@ -62,6 +62,16 @@
         })(name, props[name]) :
         props[name];
     }
+
+    // Is a functionality.
+    prototype.isA = function(name) {
+      return name === className;
+    };
+
+    // Instance of functionality.
+    prototype.instanceOf = function(name) {
+      return this.isA(name) || (_super.instanceOf && _super.instanceOf(name));
+    };
    
     eval('window["' + className + '"]=function ' + className + '(){if(!initializing){this.init && this.init.apply(this, arguments);}else{this.classInit && this.classInit.apply(this, arguments[0])}};');
 
@@ -569,7 +579,7 @@ wcPlay.prototype = {
     }
 
     for (var i = 0; i < this._compositeNodes.length; ++i) {
-      if (this._compositeNodes[i] instanceof wcNodeCompositeScript) {
+      if (this._compositeNodes[i].instanceOf('wcNodeCompositeScript')) {
         var found = this._compositeNodes[i].nodeById(id);
         if (found) {
           return found;
@@ -609,7 +619,7 @@ wcPlay.prototype = {
     }
 
     for (var i = 0; i < this._compositeNodes.length; ++i) {
-      if (this._compositeNodes[i] instanceof wcNodeCompositeScript) {
+      if (this._compositeNodes[i].instanceOf('wcNodeCompositeScript')) {
         var found = this._compositeNodes[i].nodesByClassName(className);
         if (found.length) {
           result = result.concat(found);
@@ -649,7 +659,7 @@ wcPlay.prototype = {
     }
 
     for (var i = 0; i < this._compositeNodes.length; ++i) {
-      if (this._compositeNodes[i] instanceof wcNodeCompositeScript) {
+      if (this._compositeNodes[i].instanceOf('wcNodeCompositeScript')) {
         var found = this._compositeNodes[i].nodesBySearch(search);
         if (found.length) {
           result = result.concat(found);
@@ -942,7 +952,7 @@ wcPlay.prototype = {
     }
 
     for (var i = 0; i < this._compositeNodes.length; ++i) {
-      if (this._compositeNodes[i] instanceof wcNodeCompositeScript) {
+      if (this._compositeNodes[i].instanceOf('wcNodeCompositeScript')) {
         this._compositeNodes[i].notifyNodes(func, args);
       }
     }
@@ -1105,19 +1115,37 @@ wcPlay.prototype = {
   },
 
   /**
+   * Retrieves the class name of this object.
+   * @function wcPlay#isA
+   * @returns {String}
+   */
+  isA: function(name) {
+    return name === 'wcPlay';
+  },
+
+  /**
+   * Retrieves the class name of this object.
+   * @function wcPlay#instanceOf
+   * @returns {String}
+   */
+  instanceOf: function(name) {
+    return name === 'wcPlay';
+  },
+
+  /**
    * Adds a node into the known node stacks.
    * @function wcPlay#__addNode
    * @private
    * @param {wcNode} node - The node to add.
    */
   __addNode: function(node) {
-    if (node instanceof wcNodeComposite) {
+    if (node.instanceOf('wcNodeComposite')) {
       this._compositeNodes.push(node);
-    } else if (node instanceof wcNodeEntry) {
+    } else if (node.instanceOf('wcNodeEntry')) {
       this._entryNodes.push(node);
-    } else if (node instanceof wcNodeProcess) {
+    } else if (node.instanceOf('wcNodeProcess')) {
       this._processNodes.push(node);
-    } else if (node instanceof wcNodeStorage) {
+    } else if (node.instanceOf('wcNodeStorage')) {
       this._storageNodes.push(node);
     }
   },
@@ -1131,22 +1159,22 @@ wcPlay.prototype = {
    */
   __removeNode: function(node) {
     var index = -1;
-    if (node instanceof wcNodeComposite) {
+    if (node.instanceOf('wcNodeComposite')) {
       index = this._compositeNodes.indexOf(node);
       if (index > -1) {
         this._compositeNodes.splice(index, 1);
       }
-    } else if (node instanceof wcNodeEntry) {
+    } else if (node.instanceOf('wcNodeEntry')) {
       index = this._entryNodes.indexOf(node);
       if (index > -1) {
         this._entryNodes.splice(index, 1);
       }
-    } else if (node instanceof wcNodeProcess) {
+    } else if (node.instanceOf('wcNodeProcess')) {
       index = this._processNodes.indexOf(node);
       if (index > -1) {
         this._processNodes.splice(index, 1);
       }
-    } else if (node instanceof wcNodeStorage) {
+    } else if (node.instanceOf('wcNodeStorage')) {
       index = this._storageNodes.indexOf(node);
       if (index > -1) {
         this._storageNodes.splice(index, 1);
@@ -1156,7 +1184,7 @@ wcPlay.prototype = {
     // If the node was not found, propagate the removal to all composite nodes.
     if (index === -1) {
       for (var i = 0; i < this._compositeNodes.length; ++i) {
-        if (this._compositeNodes[i] instanceof wcNodeCompositeScript &&
+        if (this._compositeNodes[i].instanceOf('wcNodeCompositeScript') &&
             this._compositeNodes[i].__removeNode(node)) {
           return true;
         }
@@ -1443,7 +1471,7 @@ wcClass.extend('wcNode', 'Node', '', {
    */
   engine: function() {
     var play = this._parent;
-    while (play && !(play instanceof wcPlay)) {
+    while (play && !(play.instanceOf('wcPlay'))) {
       play = play._parent;
     }
     return play || null;
@@ -2024,7 +2052,7 @@ wcClass.extend('wcNode', 'Node', '', {
    * @returns {wcNode.CONNECT_RESULT} - The result.
    */
   connectEntry: function(name, targetNode, targetName) {
-    if (!(targetNode instanceof wcNode)) {
+    if (!(targetNode && targetNode.instanceOf('wcNode'))) {
       return wcNode.CONNECT_RESULT.NOT_FOUND;
     }
 
@@ -2090,7 +2118,7 @@ wcClass.extend('wcNode', 'Node', '', {
    * @returns {wcNode.CONNECT_RESULT} - The result.
    */
   connectExit: function(name, targetNode, targetName) {
-    if (!(targetNode instanceof wcNode)) {
+    if (!(targetNode && targetNode.instanceOf('wcNode'))) {
       return wcNode.CONNECT_RESULT.NOT_FOUND;
     }
 
@@ -2156,7 +2184,7 @@ wcClass.extend('wcNode', 'Node', '', {
    * @returns {wcNode.CONNECT_RESULT} - The result.
    */
   connectInput: function(name, targetNode, targetName) {
-    if (!(targetNode instanceof wcNode)) {
+    if (!(targetNode && targetNode.instanceOf('wcNode'))) {
       return wcNode.CONNECT_RESULT.NOT_FOUND;
     }
 
@@ -2222,7 +2250,7 @@ wcClass.extend('wcNode', 'Node', '', {
    * @returns {wcNode.CONNECT_RESULT} - The result.
    */
   connectOutput: function(name, targetNode, targetName) {
-    if (!(targetNode instanceof wcNode)) {
+    if (!(targetNode && targetNode.instanceOf('wcNode'))) {
       return wcNode.CONNECT_RESULT.NOT_FOUND;
     }
 
@@ -3608,7 +3636,7 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
     }
 
     for (var i = 0; i < this._compositeNodes.length; ++i) {
-      if (this._compositeNodes[i] instanceof wcNodeCompositeScript) {
+      if (this._compositeNodes[i].instanceOf('wcNodeCompositeScript')) {
         var found = this._compositeNodes[i].nodeById(id);
         if (found) {
           return found;
@@ -3648,7 +3676,7 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
     }
 
     for (var i = 0; i < this._compositeNodes.length; ++i) {
-      if (this._compositeNodes[i] instanceof wcNodeCompositeScript) {
+      if (this._compositeNodes[i].instanceOf('wcNodeCompositeScript')) {
         var found = this._compositeNodes[i].nodesByClassName(className);
         if (found.length) {
           result = result.concat(found);
@@ -3688,7 +3716,7 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
     }
 
     for (var i = 0; i < this._compositeNodes.length; ++i) {
-      if (this._compositeNodes[i] instanceof wcNodeCompositeScript) {
+      if (this._compositeNodes[i].instanceOf('wcNodeCompositeScript')) {
         var found = this._compositeNodes[i].nodesBySearch(search);
         if (found.length) {
           result = result.concat(found);
@@ -3707,7 +3735,7 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
     // Find the Composite Entry nodes and order our entry links based on their x position.
     for (var i = 0; i < this._compositeNodes.length; ++i) {
       var node = this._compositeNodes[i];
-      if (node instanceof wcNodeCompositeEntry) {
+      if (node.instanceOf('wcNodeCompositeEntry')) {
         order.push({
           name: node.name,
           pos: node.pos.x,
@@ -3754,7 +3782,7 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
     // Find the Composite Exit nodes and order our exit links based on their x position.
     for (var i = 0; i < this._compositeNodes.length; ++i) {
       var node = this._compositeNodes[i];
-      if (node instanceof wcNodeCompositeExit) {
+      if (node.instanceOf('wcNodeCompositeExit')) {
         order.push({
           name: node.name,
           pos: node.pos.x,
@@ -3801,7 +3829,7 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
     // Find the Composite Property nodes and order our property links based on their y position.
     for (var i = 0; i < this._compositeNodes.length; ++i) {
       var node = this._compositeNodes[i];
-      if (node instanceof wcNodeCompositeProperty) {
+      if (node.instanceOf('wcNodeCompositeProperty')) {
         order.push({
           name: node.name,
           pos: node.pos.y,
@@ -3874,7 +3902,7 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
       }
     }
     for (var i = 0; i < this._compositeNodes.length; ++i) {
-      if (this._compositeNodes[i] instanceof wcNodeCompositeScript) {
+      if (this._compositeNodes[i].instanceOf('wcNodeCompositeScript')) {
         this._compositeNodes[i].onDraw();
       }
 
@@ -3898,7 +3926,7 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
     // Find the Composite Entry node that matches the triggered entry.
     for (var i = 0; i < this._compositeNodes.length; ++i) {
       var node = this._compositeNodes[i];
-      if (node instanceof wcNodeCompositeEntry) {
+      if (node.instanceOf('wcNodeCompositeEntry')) {
         if (node.name === name) {
           node.activateExit('out');
           break;
@@ -3921,7 +3949,7 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
     // Find all Composite Property nodes that match the changed property.
     for (var i = 0; i < this._compositeNodes.length; ++i) {
       var node = this._compositeNodes[i];
-      if (node instanceof wcNodeCompositeProperty) {
+      if (node.instanceOf('wcNodeCompositeProperty')) {
         if (node.name === name) {
           node.property('value', newValue, true);
         }
@@ -4041,7 +4069,7 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
     }
 
     for (var i = 0; i < this._compositeNodes.length; ++i) {
-      if (this._compositeNodes[i] instanceof wcNodeCompositeScript) {
+      if (this._compositeNodes[i].instanceOf('wcNodeCompositeScript')) {
         this._compositeNodes[i].notifyNodes(func, args);
       }
     }
@@ -4054,13 +4082,13 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
    * @param {wcNode} node - The node to add.
    */
   __addNode: function(node) {
-    if (node instanceof wcNodeEntry) {
+    if (node.instanceOf('wcNodeEntry')) {
       this._entryNodes.push(node);
-    } else if (node instanceof wcNodeProcess) {
+    } else if (node.instanceOf('wcNodeProcess')) {
       this._processNodes.push(node);
-    } else if (node instanceof wcNodeStorage) {
+    } else if (node.instanceOf('wcNodeStorage')) {
       this._storageNodes.push(node);
-    } else if (node instanceof wcNodeComposite) {
+    } else if (node.instanceOf('wcNodeComposite')) {
       this._compositeNodes.push(node);
     }
   },
@@ -4074,22 +4102,22 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
    */
   __removeNode: function(node) {
     var index = -1;
-    if (node instanceof wcNodeEntry) {
+    if (node.instanceOf('wcNodeEntry')) {
       index = this._entryNodes.indexOf(node);
       if (index > -1) {
         this._entryNodes.splice(index, 1);
       }
-    } else if (node instanceof wcNodeProcess) {
+    } else if (node.instanceOf('wcNodeProcess')) {
       index = this._processNodes.indexOf(node);
       if (index > -1) {
         this._processNodes.splice(index, 1);
       }
-    } else if (node instanceof wcNodeStorage) {
+    } else if (node.instanceOf('wcNodeStorage')) {
       index = this._storageNodes.indexOf(node);
       if (index > -1) {
         this._storageNodes.splice(index, 1);
       }
-    } else if (node instanceof wcNodeComposite) {
+    } else if (node.instanceOf('wcNodeComposite')) {
       index = this._compositeNodes.indexOf(node);
       if (index > -1) {
         this._compositeNodes.splice(index, 1);
@@ -4099,7 +4127,7 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
     // If the node was not found, propagate the removal to all composite nodes.
     if (index === -1) {
       for (var i = 0; i < this._compositeNodes.length; ++i) {
-        if (this._compositeNodes[i] instanceof wcNodeCompositeScript &&
+        if (this._compositeNodes[i].instanceOf('wcNodeCompositeScript') &&
             this._compositeNodes[i].__removeNode(node)) {
           return true;
         }
@@ -4124,7 +4152,7 @@ wcNodeComposite.extend('wcNodeCompositeEntry', 'Entry', 'Linkers', {
   init: function(parent, pos, linkName) {
     this._super(parent, pos);
 
-    if (!(parent instanceof wcNodeCompositeScript)) {
+    if (!(parent && parent.instanceOf('wcNodeCompositeScript'))) {
       this._invalid = true;
     }
 
@@ -4290,7 +4318,7 @@ wcNodeComposite.extend('wcNodeCompositeExit', 'Exit', 'Linkers', {
   init: function(parent, pos, linkName) {
     this._super(parent, pos);
 
-    if (!(parent instanceof wcNodeCompositeScript)) {
+    if (!(parent && parent.instanceOf('wcNodeCompositeScript'))) {
       this._invalid = true;
     }
 
@@ -4473,7 +4501,7 @@ wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'Linkers', {
   init: function(parent, pos, linkName) {
     this._super(parent, pos);
 
-    if (!(parent instanceof wcNodeCompositeScript)) {
+    if (!(parent && parent.instanceOf('wcNodeCompositeScript'))) {
       this._invalid = true;
     }
 

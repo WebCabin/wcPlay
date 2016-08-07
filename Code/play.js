@@ -495,7 +495,7 @@ wcPlay.prototype = {
     }
 
     for (var i = 0; i < this._compositeNodes.length; ++i) {
-      if (this._compositeNodes[i] instanceof wcNodeCompositeScript) {
+      if (this._compositeNodes[i].instanceOf('wcNodeCompositeScript')) {
         var found = this._compositeNodes[i].nodeById(id);
         if (found) {
           return found;
@@ -535,7 +535,7 @@ wcPlay.prototype = {
     }
 
     for (var i = 0; i < this._compositeNodes.length; ++i) {
-      if (this._compositeNodes[i] instanceof wcNodeCompositeScript) {
+      if (this._compositeNodes[i].instanceOf('wcNodeCompositeScript')) {
         var found = this._compositeNodes[i].nodesByClassName(className);
         if (found.length) {
           result = result.concat(found);
@@ -575,7 +575,7 @@ wcPlay.prototype = {
     }
 
     for (var i = 0; i < this._compositeNodes.length; ++i) {
-      if (this._compositeNodes[i] instanceof wcNodeCompositeScript) {
+      if (this._compositeNodes[i].instanceOf('wcNodeCompositeScript')) {
         var found = this._compositeNodes[i].nodesBySearch(search);
         if (found.length) {
           result = result.concat(found);
@@ -868,7 +868,7 @@ wcPlay.prototype = {
     }
 
     for (var i = 0; i < this._compositeNodes.length; ++i) {
-      if (this._compositeNodes[i] instanceof wcNodeCompositeScript) {
+      if (this._compositeNodes[i].instanceOf('wcNodeCompositeScript')) {
         this._compositeNodes[i].notifyNodes(func, args);
       }
     }
@@ -1031,19 +1031,37 @@ wcPlay.prototype = {
   },
 
   /**
+   * Retrieves the class name of this object.
+   * @function wcPlay#isA
+   * @returns {String}
+   */
+  isA: function(name) {
+    return name === 'wcPlay';
+  },
+
+  /**
+   * Retrieves the class name of this object.
+   * @function wcPlay#instanceOf
+   * @returns {String}
+   */
+  instanceOf: function(name) {
+    return name === 'wcPlay';
+  },
+
+  /**
    * Adds a node into the known node stacks.
    * @function wcPlay#__addNode
    * @private
    * @param {wcNode} node - The node to add.
    */
   __addNode: function(node) {
-    if (node instanceof wcNodeComposite) {
+    if (node.instanceOf('wcNodeComposite')) {
       this._compositeNodes.push(node);
-    } else if (node instanceof wcNodeEntry) {
+    } else if (node.instanceOf('wcNodeEntry')) {
       this._entryNodes.push(node);
-    } else if (node instanceof wcNodeProcess) {
+    } else if (node.instanceOf('wcNodeProcess')) {
       this._processNodes.push(node);
-    } else if (node instanceof wcNodeStorage) {
+    } else if (node.instanceOf('wcNodeStorage')) {
       this._storageNodes.push(node);
     }
   },
@@ -1057,22 +1075,22 @@ wcPlay.prototype = {
    */
   __removeNode: function(node) {
     var index = -1;
-    if (node instanceof wcNodeComposite) {
+    if (node.instanceOf('wcNodeComposite')) {
       index = this._compositeNodes.indexOf(node);
       if (index > -1) {
         this._compositeNodes.splice(index, 1);
       }
-    } else if (node instanceof wcNodeEntry) {
+    } else if (node.instanceOf('wcNodeEntry')) {
       index = this._entryNodes.indexOf(node);
       if (index > -1) {
         this._entryNodes.splice(index, 1);
       }
-    } else if (node instanceof wcNodeProcess) {
+    } else if (node.instanceOf('wcNodeProcess')) {
       index = this._processNodes.indexOf(node);
       if (index > -1) {
         this._processNodes.splice(index, 1);
       }
-    } else if (node instanceof wcNodeStorage) {
+    } else if (node.instanceOf('wcNodeStorage')) {
       index = this._storageNodes.indexOf(node);
       if (index > -1) {
         this._storageNodes.splice(index, 1);
@@ -1082,7 +1100,7 @@ wcPlay.prototype = {
     // If the node was not found, propagate the removal to all composite nodes.
     if (index === -1) {
       for (var i = 0; i < this._compositeNodes.length; ++i) {
-        if (this._compositeNodes[i] instanceof wcNodeCompositeScript &&
+        if (this._compositeNodes[i].instanceOf('wcNodeCompositeScript') &&
             this._compositeNodes[i].__removeNode(node)) {
           return true;
         }

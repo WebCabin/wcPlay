@@ -62,6 +62,16 @@
         })(name, props[name]) :
         props[name];
     }
+
+    // Is a functionality.
+    prototype.isA = function(name) {
+      return name === className;
+    };
+
+    // Instance of functionality.
+    prototype.instanceOf = function(name) {
+      return this.isA(name) || (_super.instanceOf && _super.instanceOf(name));
+    };
    
     eval('window["' + className + '"]=function ' + className + '(){if(!initializing){this.init && this.init.apply(this, arguments);}else{this.classInit && this.classInit.apply(this, arguments[0])}};');
 

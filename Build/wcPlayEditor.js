@@ -906,7 +906,7 @@ wcPlayEditor.prototype = {
       var scopes = [];
       var scopeNames = [];
       var scope = this._parent;
-      while (!(scope instanceof wcPlay)) {
+      while (!(scope && scope.instanceOf('wcPlay'))) {
         scopes.unshift(scope);
         scopeNames.unshift(scope.type + (scope.name? ' (' + scope.name + ')': ''));
         scope = scope._parent;
@@ -1706,7 +1706,7 @@ wcPlayEditor.prototype = {
       toolbarIndex: -1,
       description: "Step out of this Composite Node.",
       condition: function(editor) {
-        return editor._parent instanceof wcNodeCompositeScript;
+        return editor._parent && editor._parent.instanceOf('wcNodeCompositeScript');
       },
       onActivated: function(editor) {
         var focusNode = editor._parent;
@@ -1725,7 +1725,7 @@ wcPlayEditor.prototype = {
       toolbarIndex: -1,
       description: "Step in to this Composite Node.",
       condition: function(editor) {
-        return (editor._selectedNodes.length === 1 && editor._selectedNodes[0] instanceof wcNodeCompositeScript);
+        return (editor._selectedNodes.length === 1 && editor._selectedNodes[0].instanceOf('wcNodeCompositeScript'));
       },
       onActivated: function(editor) {
         editor._parent = editor._selectedNodes[0];
@@ -3797,7 +3797,7 @@ wcPlayEditor.prototype = {
       className: node.className,
       data: node.export(),
       engine: this._engine,
-      parent: this._parent,
+      parent: this._parent.id || this._parent,
     },
     // Undo
     function() {
@@ -3806,7 +3806,7 @@ wcPlayEditor.prototype = {
       // If we are viewing a script inside the node that is being removed, re-direct our view to its parents.
       for (var i = 0; i < this.engine._editors.length; ++i) {
         var parent = this.engine._editors[i]._parent;
-        while (!(parent instanceof wcPlay)) {
+        while (!(parent && parent.instanceOf('wcPlay'))) {
           if (parent == myNode) {
             this.engine._editors[i]._parent = myNode._parent;
             this.engine._editors[i].center();
@@ -3822,7 +3822,11 @@ wcPlayEditor.prototype = {
     },
     // Redo
     function() {
-      var myNode = new window[this.className](this.parent, this.data.pos);
+      var parent = this.parent;
+      if (typeof parent === 'number') {
+        parent = this.engine.nodeById(parent);
+      }
+      var myNode = new window[this.className](parent, this.data.pos);
       myNode.id = this.id;
       myNode.import(this.data);
     });
@@ -3852,7 +3856,7 @@ wcPlayEditor.prototype = {
       // If we are viewing a script inside the node that is being removed, re-direct our view to its parents.
       for (var i = 0; i < this.engine._editors.length; ++i) {
         var parent = this.engine._editors[i]._parent;
-        while (!(parent instanceof wcPlay)) {
+        while (!(parent && parent.instanceOf('wcPlay'))) {
           if (parent == myNode) {
             this.engine._editors[i]._parent = myNode._parent;
             this.engine._editors[i].center();
@@ -5205,13 +5209,13 @@ wcPlayEditor.prototype = {
       // Center area.
       if (!hasTarget && this.__inRect(this._mouse, node._meta.bounds.inner, node.pos, this._viewportCamera)) {
         hasTarget = true;
-        if (node instanceof wcNodeCompositeScript) {
+        if (node.instanceOf('wcNodeCompositeScript')) {
           // Step into composite script nodes.
           this._parent = node;
           this._selectedNode = null;
           this._selectedNodes = [];
           this.center();
-        } else if (node instanceof wcNodeComposite && this._parent instanceof wcNodeCompositeScript) {
+        } else if (node.instanceOf('wcNodeComposite') && this._parent.instanceOf('wcNodeCompositeScript')) {
           // Step out if double clicking on an external link node.
           var focusNode = this._parent;
           this._parent = this._parent._parent;
@@ -5219,7 +5223,7 @@ wcPlayEditor.prototype = {
           this._selectedNode = focusNode;
           this._selectedNodes = [focusNode];
           this.focus(this._selectedNodes);
-        } else if (node instanceof wcNodeEntry) {
+        } else if (node.instanceOf('wcNodeEntry')) {
           node.onActivated();
         }
       }

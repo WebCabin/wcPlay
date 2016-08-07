@@ -12,7 +12,7 @@ wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'Linkers', {
   init: function(parent, pos, linkName) {
     this._super(parent, pos);
 
-    if (!(parent instanceof wcNodeCompositeScript)) {
+    if (!(parent && parent.instanceOf('wcNodeCompositeScript'))) {
       this._invalid = true;
     }
 

@@ -240,7 +240,7 @@ wcClass.extend('wcNode', 'Node', '', {
    */
   engine: function() {
     var play = this._parent;
-    while (play && !(play instanceof wcPlay)) {
+    while (play && !(play.instanceOf('wcPlay'))) {
       play = play._parent;
     }
     return play || null;
@@ -821,7 +821,7 @@ wcClass.extend('wcNode', 'Node', '', {
    * @returns {wcNode.CONNECT_RESULT} - The result.
    */
   connectEntry: function(name, targetNode, targetName) {
-    if (!(targetNode instanceof wcNode)) {
+    if (!(targetNode && targetNode.instanceOf('wcNode'))) {
       return wcNode.CONNECT_RESULT.NOT_FOUND;
     }
 
@@ -887,7 +887,7 @@ wcClass.extend('wcNode', 'Node', '', {
    * @returns {wcNode.CONNECT_RESULT} - The result.
    */
   connectExit: function(name, targetNode, targetName) {
-    if (!(targetNode instanceof wcNode)) {
+    if (!(targetNode && targetNode.instanceOf('wcNode'))) {
       return wcNode.CONNECT_RESULT.NOT_FOUND;
     }
 
@@ -953,7 +953,7 @@ wcClass.extend('wcNode', 'Node', '', {
    * @returns {wcNode.CONNECT_RESULT} - The result.
    */
   connectInput: function(name, targetNode, targetName) {
-    if (!(targetNode instanceof wcNode)) {
+    if (!(targetNode && targetNode.instanceOf('wcNode'))) {
       return wcNode.CONNECT_RESULT.NOT_FOUND;
     }
 
@@ -1019,7 +1019,7 @@ wcClass.extend('wcNode', 'Node', '', {
    * @returns {wcNode.CONNECT_RESULT} - The result.
    */
   connectOutput: function(name, targetNode, targetName) {
-    if (!(targetNode instanceof wcNode)) {
+    if (!(targetNode && targetNode.instanceOf('wcNode'))) {
       return wcNode.CONNECT_RESULT.NOT_FOUND;
     }
 
