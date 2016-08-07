@@ -192,6 +192,30 @@ function wcPlayEditor(container, options) {
 
 wcPlayEditor.prototype = {
   /**
+   * Retrieves whether unsaved changes exist in the current script.
+   * @function wcPlayEditor#isModified
+   * @returns {Boolean}
+   */
+  isModified: function() {
+    if (this._engine && this._engine._undoManager) {
+      return this._engine._undoManager.isModified();
+    }
+    return false;
+  },
+
+  /**
+   * Clears the modified state of the current script.
+   * Note, this is done automatically when saving the script,
+   * use this only under special circumstances.
+   * @function wcPlayEditor#clearModified
+   */
+  clearModified: function() {
+    if (this._engine && this._engine._undoManager) {
+      this._engine._undoManager.clearModified();
+    }
+  },
+
+  /**
    * Gets, or Sets the {@link wcPlay} engine that this renderer will render.
    * @function wcPlayEditor#engine
    * @param {wcPlay} [engine] - If supplied, will assign a new {@link wcPlay} engine to render.
@@ -225,6 +249,9 @@ wcPlayEditor.prototype = {
 
     return this._engine;
   },
+
+  /**
+   * Retrieves the current modified state of the editor.
 
   /**
    * Retrieves the menu instance.
@@ -1169,6 +1196,7 @@ wcPlayEditor.prototype = {
 
           saveAs(blob, 'script.wcplay');
 
+          editor._engine._undoManager.clearModified();
           editor.triggerEvent('onSaved', []);
         }
       }

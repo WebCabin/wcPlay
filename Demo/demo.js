@@ -45,6 +45,13 @@ $(document).ready(function() {
     console.log('onImported');
   });
 
+  var isModified = false;
+  setInterval(function() {
+    if (isModified !== myPlayEditor.isModified()) {
+      isModified = myPlayEditor.isModified();
+      document.title = 'wcPlay (Web Cabin)' + (isModified? '*': '');
+    }
+  }, 100);
 
 
   // Now initialize our little demo game view, using CraftyJS
