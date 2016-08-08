@@ -96,8 +96,10 @@ function wcPlayEditor(container, options) {
       initialWrapR: ' ',    // The right string to wrap around a property initial value.
       highlightColor: 'rgba(255, 255, 255, 0.5)',
       normalColor:    'rgba(255, 255, 255, 0.5)',
+      headerColor:    'rgba(255, 255, 255, 0.2)',
       highlightBorder: -1,
-      normalBorder: 1
+      normalBorder: 1,
+      headerBorder: -1
     }
   };
 
@@ -2678,18 +2680,35 @@ wcPlayEditor.prototype = {
     // Draw the property headers.
     upper += this._font.property.size;
 
-    context.fillStyle = "black";
-    context.textAlign = "center";
-    this.__setCanvasFont(this._font.propertyHeader, context);
-    context.fillText("Initial", node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin - node._meta.bounds.center.initialWidth/2, node.pos.y + node._meta.bounds.center.top + upper);
+    context.save();
 
-    context.fillStyle = "#444444";
-    this.__setCanvasFont(this._font.propertyHeader, context);
-    context.fillText("Current", node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin - node._meta.bounds.center.initialWidth - node._meta.bounds.center.valueWidth/2, node.pos.y + node._meta.bounds.center.top + upper);
+    // Display the Current and Initial column headers.
+    var headerBounds = {
+      top: node._meta.bounds.center.top + upper - this._font.property.size,
+      left: node._meta.bounds.center.left + this._drawStyle.node.margin,
+      height: this._font.property.size + this._drawStyle.property.spacing/2,
+      width: node._meta.bounds.center.width - this._drawStyle.node.margin*2
+    };
+    this.__drawRoundedRect(headerBounds, this._drawStyle.property.headerColor, this._drawStyle.property.headerBorder, this._font.property.size/2, context, node.pos);
+
+    if (node._meta.bounds.centerOuter.valueWidth) {
+      context.fillStyle = "black";
+      context.textAlign = "center";
+      this.__setCanvasFont(this._font.propertyHeader, context);
+      context.fillText("Initial", node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin - node._meta.bounds.center.initialWidth/2, node.pos.y + node._meta.bounds.center.top + upper);
+
+      context.fillStyle = "#444444";
+      this.__setCanvasFont(this._font.propertyHeader, context);
+      context.fillText("Current", node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin - node._meta.bounds.center.initialWidth - node._meta.bounds.center.valueWidth/2, node.pos.y + node._meta.bounds.center.top + upper);
+    } else {
+      context.fillStyle = "black";
+      context.textAlign = "center";
+      this.__setCanvasFont(this._font.propertyHeader, context);
+      context.fillText("Initial", node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin - (node._meta.bounds.center.initialWidth + node._meta.bounds.center.valueWidth)/2, node.pos.y + node._meta.bounds.center.top + upper);
+    }
 
     upper += this._drawStyle.property.spacing;
 
-    context.save();
     var props = node.properties;
     for (var i = 0; i < props.length; ++i) {
       upper += this._font.property.size;
