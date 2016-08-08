@@ -56,6 +56,7 @@ function wcPlayEditor(container, options) {
     property: {size: 9, family: 'Arial', weight: 'italic'},
     value: {size: 9, family: 'Arial', weight: 'bold'},
     initialValue: {size: 9, family: 'Arial', weight: 'bold italic'},
+    propertyHeader: {size: 8, family: 'Arial', weight: 'bold italic'}
   };
 
   this._drawStyle = {
@@ -87,6 +88,7 @@ function wcPlayEditor(container, options) {
     property: {
       spacing: 5,           // The pixel space between adjacent properties.
       strLen: 20,           // The maximum character length a property value can display.
+      longStrLen: 43,       // The maximum character length a property value can display when in expanded view.
       minLength: 30,        // The minimum length the property value can be.
       valueWrapL: ' [',     // The left string to wrap around a property value.
       valueWrapR: '] ',     // The right string to wrap around a property value.
@@ -2278,10 +2280,14 @@ wcPlayEditor.prototype = {
       bounds.height += node._viewportSize.y + this._drawStyle.property.spacing;
     }
 
+    // Measure the property headers.
+    bounds.height += this._font.property.size + this._drawStyle.property.spacing;
+
     // Measure properties.
     var propWidth = 0;
     var valueWidth = 0;
     var initialWidth = 0;
+    var joinedWidth = 0;
     var props = node.properties;
     for (var i = 0; i < props.length; ++i) {
       bounds.height += this._font.property.size + this._drawStyle.property.spacing;
@@ -2290,16 +2296,25 @@ wcPlayEditor.prototype = {
       this.__setCanvasFont(this._font.property, context);
       propWidth = Math.max(context.measureText(props[i].name + ': ').width, propWidth);
 
-      // Property value.
-      this.__setCanvasFont(this._font.value, context);
-      valueWidth = Math.max(context.measureText(this._drawStyle.property.valueWrapL + this.__drawPropertyValue(node, props[i]) + this._drawStyle.property.valueWrapR).width, this._drawStyle.property.minLength, valueWidth);
+      var showValue = this._engine.isRunning() && !props[i].options.linked;
 
-      // Property initial value.
-      this.__setCanvasFont(this._font.initialValue, context);
-      initialWidth = Math.max(context.measureText(this._drawStyle.property.initialWrapL + this.__drawPropertyValue(node, props[i], true) + this._drawStyle.property.initialWrapR).width, this._drawStyle.property.minLength, initialWidth);
+      // Property value.
+      if (showValue) {
+        this.__setCanvasFont(this._font.value, context);
+        valueWidth = Math.max(context.measureText(this._drawStyle.property.valueWrapL + this.__drawPropertyValue(node, props[i]) + this._drawStyle.property.valueWrapR).width, this._drawStyle.property.minLength, valueWidth);
+
+        // Property initial value.
+        this.__setCanvasFont(this._font.initialValue, context);
+        initialWidth = Math.max(context.measureText(this._drawStyle.property.initialWrapL + this.__drawPropertyValue(node, props[i], true) + this._drawStyle.property.initialWrapR).width, this._drawStyle.property.minLength, initialWidth);
+      } else {
+        // Property initial value.
+        this.__setCanvasFont(this._font.initialValue, context);
+        joinedWidth = Math.max(context.measureText(this._drawStyle.property.initialWrapL + this.__drawPropertyValue(node, props[i], true, true) + this._drawStyle.property.initialWrapR).width, this._drawStyle.property.minLength, initialWidth);
+      }
     }
 
-    bounds.width = Math.max(propWidth + valueWidth + initialWidth, bounds.width) + this._drawStyle.node.margin * 2;
+    joinedWidth = Math.max(joinedWidth, valueWidth + initialWidth);
+    bounds.width = Math.max(propWidth + joinedWidth, bounds.width) + this._drawStyle.node.margin * 2;
     bounds.left -= bounds.width/2;
     bounds.propWidth = propWidth;
     bounds.valueWidth = valueWidth;
@@ -2375,6 +2390,9 @@ wcPlayEditor.prototype = {
       upper += node._viewportSize.y + this._drawStyle.property.spacing;
     }
 
+    // Measure the property headers.
+    upper += this._font.property.size + this._drawStyle.property.spacing;
+
     var linkRect;
     var props = node.properties;
     for (var i = 0; i < props.length; ++i) {
@@ -2391,12 +2409,14 @@ wcPlayEditor.prototype = {
       };
       node._meta.bounds.propertyBounds.push(propertyBound);
 
+      var showValue = this._engine.isRunning() && !props[i].options.linked;
+
       // Initial property value.
       var initialBound = {
         rect: {
           top: rect.top + upper - this._font.property.size,
-          left: rect.left + rect.width - this._drawStyle.node.margin - rect.initialWidth,
-          width: rect.initialWidth,
+          left: rect.left + rect.width - this._drawStyle.node.margin - rect.initialWidth - (showValue? 0: rect.valueWidth),
+          width: rect.initialWidth + (showValue? 0: rect.valueWidth),
           height: this._font.property.size + this._drawStyle.property.spacing,
         },
         name: props[i].name,
@@ -2408,7 +2428,7 @@ wcPlayEditor.prototype = {
         rect: {
           top: rect.top + upper - this._font.property.size,
           left: rect.left + rect.width - this._drawStyle.node.margin - rect.valueWidth - rect.initialWidth,
-          width: (this._engine.isRunning()? rect.valueWidth: 0),
+          width: (showValue? rect.valueWidth: 0),
           height: this._font.property.size + this._drawStyle.property.spacing,
         },
         name: props[i].name,
@@ -2655,6 +2675,20 @@ wcPlayEditor.prototype = {
       upper += node._viewportSize.y + this._drawStyle.property.spacing;
     }
 
+    // Draw the property headers.
+    upper += this._font.property.size;
+
+    context.fillStyle = "black";
+    context.textAlign = "center";
+    this.__setCanvasFont(this._font.propertyHeader, context);
+    context.fillText("Initial", node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin - node._meta.bounds.center.initialWidth/2, node.pos.y + node._meta.bounds.center.top + upper);
+
+    context.fillStyle = "#444444";
+    this.__setCanvasFont(this._font.propertyHeader, context);
+    context.fillText("Current", node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin - node._meta.bounds.center.initialWidth - node._meta.bounds.center.valueWidth/2, node.pos.y + node._meta.bounds.center.top + upper);
+
+    upper += this._drawStyle.property.spacing;
+
     context.save();
     var props = node.properties;
     for (var i = 0; i < props.length; ++i) {
@@ -2685,10 +2719,12 @@ wcPlayEditor.prototype = {
           break;
         }
       }
+      
+      var showValue = this._engine.isRunning() && !props[i].options.linked;
 
       // Highlight hovered values.
       if (!this._options.readOnly && !isPalette) {
-        if (this._engine && this._engine.isRunning()) {
+        if (this._engine && showValue) {
           if (this._highlightNode === node && this._highlightPropertyValue && this._highlightPropertyValue.name === props[i].name) {
             this.__drawRoundedRect(valueBound.rect, this._drawStyle.property.highlightColor, this._drawStyle.property.highlightBorder, this._font.property.size/2, context, node.pos);
           } else if (this._highlightNode === node) {
@@ -2708,14 +2744,14 @@ wcPlayEditor.prototype = {
       this.__setCanvasFont(this._font.property, context);
       context.fillText(props[i].name + ': ', node.pos.x + node._meta.bounds.center.left + this._drawStyle.node.margin, node.pos.y + node._meta.bounds.center.top + upper);
 
+      context.fillStyle = "black";
       context.textAlign = "right";
       this.__setCanvasFont(this._font.initialValue, context);
-      context.fillStyle = "black";
-      context.fillText(this._drawStyle.property.initialWrapL + this.__drawPropertyValue(node, props[i], true) + this._drawStyle.property.initialWrapR, node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin, node.pos.y + node._meta.bounds.center.top + upper);
+      context.fillText(this._drawStyle.property.initialWrapL + this.__drawPropertyValue(node, props[i], true, !showValue) + this._drawStyle.property.initialWrapR, node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin, node.pos.y + node._meta.bounds.center.top + upper);
 
-      if (this._engine && this._engine.isRunning()) {
-        this.__setCanvasFont(this._font.value, context);
+      if (this._engine && showValue) {
         context.fillStyle = "#444444";
+        this.__setCanvasFont(this._font.value, context);
         context.fillText(this._drawStyle.property.valueWrapL + this.__drawPropertyValue(node, props[i]) + this._drawStyle.property.valueWrapR, node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin - node._meta.bounds.center.initialWidth, node.pos.y + node._meta.bounds.center.top + upper);
       }
 
@@ -3392,12 +3428,13 @@ wcPlayEditor.prototype = {
    * @param {wcNode} node - The node that owns this property.
    * @param {Object} property - The property data.
    * @param {Boolean} [initial] - Set true if the property being viewed is the initial value.
+   * @param {Boolean} [expanded] - For initial values, if we are not displaying the current value then we should expand the display
    * @returns {String} - A string value to print as the value.
    *
    * @see {wcNode~wcNode~PropertyOptions}
    * @see {wcNode~PropertyDisplay}
    */
-  __drawPropertyValue: function(node, property, initial) {
+  __drawPropertyValue: function(node, property, initial, expanded) {
     var value;
     if (initial) {
       value = node.initialProperty(property.name);
@@ -3453,7 +3490,7 @@ wcPlayEditor.prototype = {
       }
     }
 
-    return this.__clampString(String(value), this._drawStyle.property.strLen)
+    return this.__clampString(String(value), (expanded? this._drawStyle.property.longStrLen: this._drawStyle.property.strLen));
   },
 
   /**
@@ -3664,11 +3701,29 @@ wcPlayEditor.prototype = {
 
       case wcPlay.PROPERTY.STRING:
       case wcPlay.PROPERTY.DYNAMIC:
+        var datalistProp = '';
+        var items = property.options.items;
+        if ($.isFunction(items)) {
+          items = items.call(node);
+        }
+        if (Array.isArray(items)) {
+          datalistProp = ' list="wcDynamicSuggestionList"';
+          var $dataList = $('<datalist id="wcDynamicSuggestionList"/>');
+          for (var i = 0; i < items.length; ++i) {
+            if (typeof items[i] === 'object') {
+              $dataList.append($('<option value="' + items[i].value + '">' + items[i].name + '</option>'));
+            } else {
+              $dataList.append($('<option value="' + items[i] + '">' + items[i] + '</option>'));
+            }
+          }
+          $('body').append($dataList);
+        }
+
         if (property.options.multiline) {
-          $control = $('<textarea' + (property.options.maxlength? ' maxlength="' + property.options.maxlength + '"': '') + '>');
+          $control = $('<textarea' + (property.options.maxlength? ' maxlength="' + property.options.maxlength + '"': '') + datalistProp + '/>');
           enterConfirms = false;
         } else {
-          $control = $('<input type="text" maxlength="' + (property.options.maxlength || 524288) + '">');
+          $control = $('<input type="text" maxlength="' + (property.options.maxlength || 524288) + '"' + datalistProp + '/>');
         }
         $control.val(node[propFn](property.name).toString());
         $control.change(function() {
@@ -3691,7 +3746,7 @@ wcPlayEditor.prototype = {
           items = items.call(node);
         }
 
-        if ($.isArray(items)) {
+        if (Array.isArray(items)) {
           var noneValue = '';
           if (property.options.hasOwnProperty('noneValue')) {
             noneValue = property.options.noneValue;

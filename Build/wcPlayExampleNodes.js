@@ -195,7 +195,10 @@ wcNodeProcess.extend('wcNodeProcessExampleProperties', 'Example Properties', 'Ex
     this.createProperty('toggle', wcPlay.PROPERTY.TOGGLE, true, {description: "Demonstration of the toggle property type."});
     this.createProperty('number', wcPlay.PROPERTY.NUMBER, 3, {description: "Demonstration of the number property type with a clamped range of 1-5.", min: 1, max: 5});
     this.createProperty('string', wcPlay.PROPERTY.STRING, 'Text', {description: "Demonstration of the string property with a max character length of 10.", maxlength: 10});
+    this.createProperty('suggest string', wcPlay.PROPERTY.STRING, '', {description: "Demonstration of the string property with an item dropdown for suggestions.", items: ['Check', 'out', 'this', 'list', 'of', 'suggestions', 'like', 'a', 'select', 'property', '####', 'but', 'you', 'can', 'still', 'type', 'anything', 'you', 'want!']});
     this.createProperty('select', wcPlay.PROPERTY.SELECT, 3, {description: "Demonstration of the select property with a dynamic number of options based on the 'number' property.", items: this.selectItems});
+    // this.createProperty('linked prop', wcPlay.PROPERTY.STRING, 'Both values linked!', {description: "Demonstration of a property that has both value and initial values linked.", linked: true});
+    this.createProperty('linked prop', wcPlay.PROPERTY.STRING, 'Both values linked!', {description: "Demonstration of a property that has both value and initial values linked.", linked: true, input: true, output: true});
   },
 
   /**

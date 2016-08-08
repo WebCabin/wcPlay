@@ -176,6 +176,8 @@ wcPlay.prototype = {
    */
   stop: function() {
     this._isRunning = false;
+    
+    this.notifyNodes('onStop', []);
   },
 
   /**

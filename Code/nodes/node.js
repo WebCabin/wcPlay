@@ -1384,6 +1384,11 @@ wcClass.extend('wcNode', 'Node', '', {
             // Notify that the property has changed.
             this.onPropertyChanged(prop.name, oldValue, value);
 
+            // Linked properties must sync with their initial values as well.
+            if (prop.options.linked) {
+              this.initialProperty(prop.name, value);
+            }
+
             // Now follow any output links and assign the new value to them as well.
             if (forceOrSilent === undefined || forceOrSilent) {
               for (a = 0; a < prop.outputs.length; ++a) {
@@ -1431,6 +1436,11 @@ wcClass.extend('wcNode', 'Node', '', {
 
             // Notify that the property has changed.
             this.onInitialPropertyChanged(prop.name, oldValue, value);
+
+            // Linked properties must sync with their initial values as well.
+            if (prop.options.linked) {
+              this.property(prop.name, value);
+            }
 
             prop.outputMeta.flash = true;
             var engine = this.engine();
@@ -1797,6 +1807,20 @@ wcClass.extend('wcNode', 'Node', '', {
     // this._super();
     if (this.debugLog()) {
       console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" started!');
+    }
+  },
+
+  /**
+   * Event that is called as soon as the Play script has stopped.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onStop
+   */
+  onStop: function() {
+    // this._super();
+    this._meta.dirty = true;
+
+    if (this.debugLog()) {
+      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" stopped!');
     }
   },
 
