@@ -1357,10 +1357,12 @@ wcClass.extend('wcNode', 'Node', '', {
               }
 
               if (!found) {
-                if (prop.options.hasOwnProperty('noneValue')) {
-                  value = prop.options.noneValue;
-                } else {
-                  value = '';
+                if (!prop.options.hasOwnProperty('allowNone') || prop.options.allowNone) {
+                  if (prop.options.hasOwnProperty('noneValue')) {
+                    value = prop.options.noneValue;
+                  } else {
+                    value = '';
+                  }
                 }
               }
               break;

@@ -3580,7 +3580,7 @@ wcPlayEditor.prototype = {
             }
 
             if (!found) {
-              value = '&lt;Unknown>';
+              value = '&lt;unknown>';
             }
           }
           break;
@@ -3862,9 +3862,9 @@ wcPlayEditor.prototype = {
               if (items[i] == value) found = true;
             }
           }
-          // We did not find the current item, prepend an 'Unknown' entry and select that instead.
+          // We did not find the current item, prepend an 'unknown' entry and select that instead.
           if (!found) {
-            $control.prepend($('&lt;option value="' + value + '" selected>&amp;lt;Unknown&amp;gt;&lt;/option>'));
+            $control.prepend($('&lt;option value="' + value + '" selected>&amp;lt;unknown&amp;gt;&lt;/option>'));
           }
         } else {
           console.log("ERROR: Tried to display a Select type property when no selection list was provided.");

@@ -197,7 +197,7 @@ wcNodeProcess.extend('wcNodeProcessExampleProperties', 'Example Properties', 'Ex
     this.createProperty('string', wcPlay.PROPERTY.STRING, 'Text', {description: "Demonstration of the string property with a max character length of 10.", maxlength: 10});
     this.createProperty('suggest string', wcPlay.PROPERTY.STRING, '', {description: "Demonstration of the string property with an item dropdown for suggestions.", items: ['Check', 'out', 'this', 'list', 'of', 'suggestions', 'like', 'a', 'select', 'property', '####', 'but', 'you', 'can', 'still', 'type', 'anything', 'you', 'want!']});
     this.createProperty('select', wcPlay.PROPERTY.SELECT, 3, {description: "Demonstration of the select property with a dynamic number of options based on the 'number' property.", items: this.selectItems});
-    this.createProperty('select no none', wcPlay.PROPERTY.SELECT, 0, {description: "Demonstration of the select property with a dynamic number of options based on the 'number' property.", items: this.selectItems, allowNone: false});
+    this.createProperty('select no none', wcPlay.PROPERTY.SELECT, 'dunno', {description: "Demonstration of a select property that does not allow none as an option.", items: ['Option 1', 'Option 2', 'Option 3'], allowNone: false});
     this.createProperty('linked prop', wcPlay.PROPERTY.STRING, 'Both values linked!', {description: "Demonstration of a property that has both value and initial values linked.", linked: true, input: true, output: true});
   },
 
