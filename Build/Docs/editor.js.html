@@ -3552,7 +3552,8 @@ wcPlayEditor.prototype = {
             noneValue = property.options.noneValue;
           }
 
-          if (value == noneValue) {
+          // Display none only if we allow none.
+          if ((!property.options.hasOwnProperty('allowNone') || property.options.allowNone) &amp;&amp; value == noneValue) {
             return '&lt;none>';
           }
 
@@ -3579,7 +3580,7 @@ wcPlayEditor.prototype = {
             }
 
             if (!found) {
-              value = 'Unknown';
+              value = '&lt;Unknown>';
             }
           }
           break;
@@ -3847,13 +3848,23 @@ wcPlayEditor.prototype = {
           if (property.options.hasOwnProperty('noneValue')) {
             noneValue = property.options.noneValue;
           }
-          $control.append($('&lt;option value=""' + (noneValue == value? ' selected': '') + '>&amp;lt;none&amp;gt;&lt;/option>'));
+          var found = false;
+          if (!property.options.hasOwnProperty('allowNone') || property.options.allowNone) {
+            $control.append($('&lt;option value=""' + (noneValue == value? ' selected': '') + '>&amp;lt;none&amp;gt;&lt;/option>'));
+            if (noneValue == value) found = true;
+          }
           for (var i = 0; i &lt; items.length; ++i) {
             if (typeof items[i] === 'object') {
               $control.append($('&lt;option value="' + items[i].value + '"' + (items[i].value == value? ' selected': '') + '>' + items[i].name + '&lt;/option>'));
+              if (items[i].value == value) found = true;
             } else {
               $control.append($('&lt;option value="' + items[i] + '"' + (items[i] == value? ' selected': '') + '>' + items[i] + '&lt;/option>'));
+              if (items[i] == value) found = true;
             }
+          }
+          // We did not find the current item, prepend an 'Unknown' entry and select that instead.
+          if (!found) {
+            $control.prepend($('&lt;option value="' + value + '" selected>&amp;lt;Unknown&amp;gt;&lt;/option>'));
           }
         } else {
           console.log("ERROR: Tried to display a Select type property when no selection list was provided.");

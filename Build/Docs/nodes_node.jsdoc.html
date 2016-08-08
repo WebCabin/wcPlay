@@ -127,11 +127,12 @@
  * @property {String} [description] - An optional description to display as a tooltip for this property.
  * @property {wcNode~PropertyDisplay} [display] - An optional function that will be called to retrieve the display string for the value/initial value for this property.
  * @property {wcNode~ExportValue} [exportValue] - An optional function that will retrieve the property's value when it is about to be exported to file.
- * @property {Object} [noneValue] - If supplied, will assign the value of the '&lt;none>' option.
  * @property {Boolean} [input] - If true, this property will have an input link so its value can be changed through script.
  * @property {Boolean} [output] - If true, this property will have an output link so its value can be retrieved through script.
  * @property {Boolean} [linked] - If true, the value and initial values will be linked and can not be separated. Changing either will change them both.
  * @property {wcNode~SelectItem[]|String[]|wcNode~SelectItemFunc} items - A list of items to display in the combo box, or a callback function that can dynamically retrieve a list.
+ * @property {Boolean} [allowNone=true] - If true, will allow the user to select '&lt;none>' as an option.
+ * @property {Object} [noneValue] - If supplied, and allowNone is true, will assign the internal value of the '&lt;none>' option.
  */
 
 /**
