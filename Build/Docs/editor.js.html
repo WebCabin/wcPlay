@@ -2399,18 +2399,18 @@ wcPlayEditor.prototype = {
 
       var showValue = this._engine.isRunning() &amp;&amp; !props[i].options.linked;
 
+      this.__setCanvasFont(this._font.value, context);
+      var measuredValue = context.measureText(this._drawStyle.property.valueWrapL + this.__drawPropertyValue(node, props[i]) + this._drawStyle.property.valueWrapR).width;
+      
+      this.__setCanvasFont(this._font.initialValue, context);
+      var measuredInitial = context.measureText(this._drawStyle.property.initialWrapL + this.__drawPropertyValue(node, props[i], true) + this._drawStyle.property.initialWrapR).width;
+
       // Property value.
       if (showValue) {
-        this.__setCanvasFont(this._font.value, context);
-        valueWidth = Math.max(context.measureText(this._drawStyle.property.valueWrapL + this.__drawPropertyValue(node, props[i]) + this._drawStyle.property.valueWrapR).width, this._drawStyle.property.minLength, valueWidth);
-
-        // Property initial value.
-        this.__setCanvasFont(this._font.initialValue, context);
-        initialWidth = Math.max(context.measureText(this._drawStyle.property.initialWrapL + this.__drawPropertyValue(node, props[i], true) + this._drawStyle.property.initialWrapR).width, this._drawStyle.property.minLength, initialWidth);
+        valueWidth = Math.max(measuredValue, this._drawStyle.property.minLength, valueWidth);
+        initialWidth = Math.max(measuredInitial, this._drawStyle.property.minLength, initialWidth);
       } else {
-        // Property initial value.
-        this.__setCanvasFont(this._font.initialValue, context);
-        joinedWidth = Math.max(context.measureText(this._drawStyle.property.initialWrapL + this.__drawPropertyValue(node, props[i], true, true) + this._drawStyle.property.initialWrapR).width, this._drawStyle.property.minLength, initialWidth);
+        joinedWidth = Math.max(measuredValue + measuredInitial, this._drawStyle.property.minLength, joinedWidth);
       }
     }
 
@@ -2792,18 +2792,18 @@ wcPlayEditor.prototype = {
 
     if (node._meta.bounds.centerOuter.valueWidth) {
       context.fillStyle = "black";
-      context.textAlign = "center";
+      context.textAlign = "right";
       this.__setCanvasFont(this._font.propertyHeader, context);
-      context.fillText("Initial", node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin - node._meta.bounds.center.initialWidth/2, node.pos.y + node._meta.bounds.center.top + upper);
+      context.fillText("Initial", node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin, node.pos.y + node._meta.bounds.center.top + upper);
 
       context.fillStyle = "#444444";
       this.__setCanvasFont(this._font.propertyHeader, context);
-      context.fillText("Current", node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin - node._meta.bounds.center.initialWidth - node._meta.bounds.center.valueWidth/2, node.pos.y + node._meta.bounds.center.top + upper);
+      context.fillText("Current", node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin - node._meta.bounds.center.initialWidth, node.pos.y + node._meta.bounds.center.top + upper);
     } else {
       context.fillStyle = "black";
-      context.textAlign = "center";
+      context.textAlign = "right";
       this.__setCanvasFont(this._font.propertyHeader, context);
-      context.fillText("Initial", node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin - (node._meta.bounds.center.initialWidth + node._meta.bounds.center.valueWidth)/2, node.pos.y + node._meta.bounds.center.top + upper);
+      context.fillText("Initial", node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin, node.pos.y + node._meta.bounds.center.top + upper);
     }
 
     upper += this._drawStyle.property.spacing;
