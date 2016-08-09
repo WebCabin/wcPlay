@@ -3760,8 +3760,8 @@ wcPlayEditor.prototype = {
             var min = $(this).attr('min') !== undefined? parseFloat($(this).attr('min')): -Infinity;
             var max = $(this).attr('max') !== undefined? parseFloat($(this).attr('max')):  Infinity;
             value = Math.min(max, Math.max(min, parseFloat($control.val())));
-            undoChange(property.name, value, node[propFn](property.name));
-            node[propFn](property.name, value, true, true, this._undoManager);
+            undoChange(property.name, value, $control.val());
+            node[propFn](property.name, $control.val(), true, true, this._undoManager);
             endChange();
             // $blocker.click();
           }
@@ -3805,7 +3805,7 @@ wcPlayEditor.prototype = {
           $('#wcDynamicSuggestionList').remove();
           if (!cancelled) {
             value = node[propFn](property.name);
-            undoChange(property.name, value, node[propFn](property.name));
+            undoChange(property.name, value, $control.val());
             node[propFn](property.name, $control.val(), true, true, this._undoManager);
             endChange();
             $blocker.click();
@@ -3858,7 +3858,7 @@ wcPlayEditor.prototype = {
             if (newValue == '' && property.options.hasOwnProperty('noneValue')) {
               newValue = property.options.noneValue;
             }
-            undoChange(property.name, value, node[propFn](property.name));
+            undoChange(property.name, value, newValue);
             node[propFn](property.name, newValue, true, true, this._undoManager);
             endChange();
             $blocker.click();
@@ -3874,7 +3874,7 @@ wcPlayEditor.prototype = {
           $control = $(property.options.onCreate(node, property.name, value, initial, function(newValue) {
             if (!cancelled) {
               value = node[propFn](property.name);
-              undoChange(property.name, value, node[propFn](property.name));
+              undoChange(property.name, value, newValue);
               node[propFn](property.name, newValue, true, true, this._undoManager);
               endChange();
               $blocker.click();
