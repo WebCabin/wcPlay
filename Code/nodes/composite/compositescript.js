@@ -1,4 +1,4 @@
-wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
+wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
   /**
    * @class
    * A composite script node. These are nodes that contain additional nodes inside.<br>

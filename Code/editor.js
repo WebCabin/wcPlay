@@ -976,13 +976,18 @@ wcPlayEditor.prototype = {
 
     // Update flash state.
     var self = this;
-    function __updateFlash(meta, darkColor, lightColor, pauseColor, keepBroken, colorMul) {
-      if (meta.flash) {
+    // Options:
+    // keepBroken - Keeps the flash state alive unless engine is paused.
+    // forceActive - Forces the flash state alive unconditionally.
+    // colorMul=1 - Additional multiplier to apply to the flash alpha.
+    function __updateFlash(meta, darkColor, lightColor, pauseColor, options) {
+      options = options || {};
+      if (meta.flash || options.forceActive) {
         meta.flashDelta += elapsed * 10.0;
         if (meta.flashDelta >= 1.0) {
           meta.flashDelta = 1.0;
 
-          if (!meta.awake && (!meta.broken || (!keepBroken && !self._engine.paused()))) {
+          if (!meta.awake && (!meta.broken || (!options.keepBroken && !self._engine.paused()))) {
             meta.flash = false;
           }
         }
@@ -990,35 +995,52 @@ wcPlayEditor.prototype = {
         meta.flashDelta -= elapsed * 5.0;
         if (meta.flashDelta <= 0.0) {
           meta.flashDelta = 0;
-          meta.broken = keepBroken? meta.broken: meta.broken - 1;
+          meta.broken = options.keepBroken? meta.broken: meta.broken - 1;
         }
       }
 
-      meta.color = self.__blendColors(darkColor, meta.broken? pauseColor: lightColor, meta.flashDelta * colorMul);
+      meta.color = self.__blendColors(darkColor, meta.broken? pauseColor: lightColor, meta.flashDelta * (options.colorMul || 1));
+      return meta.flash;
+    }
+
+    var blackColor = "#000000";
+    var whiteColor = "#FFFFFF";
+    var propColor  = "#117711";
+    var propFlashColor = "#FFFF00";
+    var forceNodeActive = false;
+    if (this._engine._queuedProperties.length === 0) {
+      for (var i = 0; i < node.chain.entry.length; ++i) {
+        __updateFlash(node.chain.entry[i].meta, blackColor, propFlashColor, propFlashColor, {colorMul: 0.9});
+      }
+      for (var i = 0; i < node.chain.exit.length; ++i) {
+        __updateFlash(node.chain.exit[i].meta, blackColor, propFlashColor, propFlashColor, {colorMul: 0.9});
+      }
+    } else {
+      // If any entry links are active, keep the node highlighted.
+      for (var i = 0; i < node.chain.entry.length; ++i) {
+        if (node.chain.entry[i].meta.flash || node.chain.entry[i].meta.flashDelta > 0) {
+          forceNodeActive = true;
+          break;
+        }
+      }
+    }
+
+    for (var i = 0; i < node.properties.length; ++i) {
+      __updateFlash(node.properties[i].inputMeta, propColor, propFlashColor, propFlashColor, {colorMul: 0.9});
+      __updateFlash(node.properties[i].outputMeta, propColor, propFlashColor, propFlashColor, {colorMul: 0.9});
     }
 
     var color = node.color;
     if (this._highlightNode === node) {
-      color = this.__blendColors(node.color, "#FFFFFF", 0.25);
+      color = this.__blendColors(node.color, whiteColor, 0.25);
     }
-    __updateFlash(node._meta, color, "#FFFFFF", "#FFFFFF", true, 0.5);
+    __updateFlash(node._meta, color, whiteColor, whiteColor, {
+      keepBroken: true,
+      forceActive: forceNodeActive,
+      colorMul: 0.5
+    });
 
-    var blackColor = "#000000";
-    var propColor  = "#117711";
-    var flashColor = "#FFFF00";
-    for (var i = 0; i < node.properties.length; ++i) {
-      __updateFlash(node.properties[i].inputMeta, propColor, flashColor, flashColor, false, 0.9);
-      __updateFlash(node.properties[i].outputMeta, propColor, flashColor, flashColor, false, 0.9);
-    }
 
-    if (this._engine._queuedProperties.length === 0) {
-      for (var i = 0; i < node.chain.entry.length; ++i) {
-        __updateFlash(node.chain.entry[i].meta, blackColor, flashColor, flashColor, false, 0.9);
-      }
-      for (var i = 0; i < node.chain.exit.length; ++i) {
-        __updateFlash(node.chain.exit[i].meta, blackColor, flashColor, flashColor, false, 0.9);
-      }
-    }
 
     // Measure bounding areas for node, if it is dirty.
     if (node._meta.dirty) {
@@ -1336,7 +1358,7 @@ wcPlayEditor.prototype = {
         for (var i = 0; i < wcPlayEditorClipboard.nodes.length; ++i) {
           var data = wcPlayEditorClipboard.nodes[i];
 
-          var newNode = new window[data.className](editor._parent, data.pos);
+          var newNode = new window.wcPlayNodes[data.className](editor._parent, data.pos);
 
           idMap[data.id] = newNode.id;
           nodes.push(newNode);
@@ -1403,7 +1425,7 @@ wcPlayEditor.prototype = {
             editor._selectedNodes[i].id = ++window.wcNodeNextID;
           }
 
-          var compNode = new wcNodeCompositeScript(editor._parent, {x: 0, y: 0}, editor._selectedNodes);
+          var compNode = new wcPlayNodes.wcNodeCompositeScript(editor._parent, {x: 0, y: 0}, editor._selectedNodes);
 
           // Calculate the bounding box of all moved nodes.
           var boundList = [];
@@ -1447,7 +1469,7 @@ wcPlayEditor.prototype = {
               }
               if (!linkNode) {
                 // Create a Composite Entry Node, this acts as a surrogate entry link for the Composite node.
-                linkNode = new wcNodeCompositeEntry(compNode, {x: node.pos.x, y: bounds.top - 100}, linkName);
+                linkNode = new wcPlayNodes.wcNodeCompositeEntry(compNode, {x: node.pos.x, y: bounds.top - 100}, linkName);
                 createdLinks.push({
                   name: linkName,
                   node: linkNode,
@@ -1477,7 +1499,7 @@ wcPlayEditor.prototype = {
               }
               if (!linkNode) {
                 // Create a Composite Exit Node, this acts as a surrogate exit link for the Composite node.
-                linkNode = new wcNodeCompositeExit(compNode, {x: node.pos.x, y: bounds.top + bounds.height + 50}, linkName);
+                linkNode = new wcPlayNodes.wcNodeCompositeExit(compNode, {x: node.pos.x, y: bounds.top + bounds.height + 50}, linkName);
                 createdLinks.push({
                   name: linkName,
                   node: linkNode,
@@ -1507,7 +1529,7 @@ wcPlayEditor.prototype = {
               }
               if (!linkNode) {
                 // Create a Composite Property Node, this acts as a surrogate property link for the Composite node.
-                linkNode = new wcNodeCompositeProperty(compNode, {x: bounds.left - 200, y: node.pos.y}, linkName);
+                linkNode = new wcPlayNodes.wcNodeCompositeProperty(compNode, {x: bounds.left - 200, y: node.pos.y}, linkName);
                 createdLinks.push({
                   name: linkName,
                   node: linkNode,
@@ -1537,7 +1559,7 @@ wcPlayEditor.prototype = {
               }
               if (!linkNode) {
                 // Create a Composite Property Node, this acts as a surrogate property link for the Composite node.
-                linkNode = new wcNodeCompositeProperty(compNode, {x: bounds.left + bounds.width + 200, y: node.pos.y}, linkName);
+                linkNode = new wcPlayNodes.wcNodeCompositeProperty(compNode, {x: bounds.left + bounds.width + 200, y: node.pos.y}, linkName);
                 createdLinks.push({
                   name: linkName,
                   node: linkNode,
@@ -1579,7 +1601,7 @@ wcPlayEditor.prototype = {
         }
       },
       toolbarIndex: -1,
-      description: "Toggle debugging mode for the entire script.",
+      description: "Toggle debugging mode (does not break on breakpoints).",
       onActivated: function(editor) {
         if (editor._engine) {
           editor._engine.debugging(!editor._engine.debugging());
@@ -1598,7 +1620,7 @@ wcPlayEditor.prototype = {
         }
       },
       toolbarIndex: -1,
-      description: "Toggle silent mode for the entire script.",
+      description: "Toggle silent mode (disables console log messages).",
       onActivated: function(editor) {
         if (editor._engine) {
           editor._engine.silent(!editor._engine.silent());
@@ -1982,7 +2004,7 @@ wcPlayEditor.prototype = {
       __organize.call(this, data);
 
       // Now create an instance of the node.
-      var node = new window[data.className](null);
+      var node = new window.wcPlayNodes[data.className](null);
       this._nodeLibrary[data.category][data.nodeType].nodes.push(node);
     }
 
@@ -3450,7 +3472,7 @@ wcPlayEditor.prototype = {
    * @param {Boolean} [expanded] - For initial values, if we are not displaying the current value then we should expand the display
    * @returns {String} - A string value to print as the value.
    *
-   * @see {wcNode~wcNode~PropertyOptions}
+   * @see {wcNode~PropertyOptions}
    * @see {wcNode~PropertyDisplay}
    */
   __drawPropertyValue: function(node, property, initial, expanded) {
@@ -3557,9 +3579,25 @@ wcPlayEditor.prototype = {
     var self = this;
     var cancelled = false;
 
-    var $control = $('<input type="text">');
+    var datalistProp = '';
+    var items = node.onNameEditSuggestion();
+    if (Array.isArray(items)) {
+      datalistProp = ' list="wcDynamicSuggestionList"';
+      var $dataList = $('<datalist id="wcDynamicSuggestionList"/>');
+      for (var i = 0; i < items.length; ++i) {
+        if (typeof items[i] === 'object') {
+          $dataList.append($('<option value="' + items[i].value + '">' + items[i].name + '</option>'));
+        } else {
+          $dataList.append($('<option value="' + items[i] + '">' + items[i] + '</option>'));
+        }
+      }
+      $('body').append($dataList);
+    }
+
+    var $control = $('<input type="text" maxlength="40"' + datalistProp + '/>');
     $control.val(node.name);
     $control.change(function() {
+      $('#wcDynamicSuggestionList').remove();
       if (!cancelled) {
         self._undoManager && self._undoManager.addEvent('Title changed for Node "' + node.category + '.' + node.type + '"',
         {
@@ -3614,6 +3652,7 @@ wcPlayEditor.prototype = {
 
     // Clicking away will close the editor control.
     $control.blur(function() {
+      $('#wcDynamicSuggestionList').remove();
       $(this).remove();
     });
 
@@ -3747,6 +3786,7 @@ wcPlayEditor.prototype = {
         }
         $control.val(node[propFn](property.name).toString());
         $control.change(function() {
+          $('#wcDynamicSuggestionList').remove();
           if (!cancelled) {
             value = node[propFn](property.name);
             node[propFn](property.name, $control.val(), true, true);
@@ -3840,6 +3880,7 @@ wcPlayEditor.prototype = {
 
       // Clicking away will close the editor control.
       $blocker.click(function(event) {
+        $('#wcDynamicSuggestionList').remove();
         event.stopPropagation();
         $blocker.remove();
         $control.remove();
@@ -3911,7 +3952,7 @@ wcPlayEditor.prototype = {
       if (typeof parent === 'number') {
         parent = this.engine.nodeById(parent);
       }
-      var myNode = new window[this.className](parent, this.data.pos);
+      var myNode = new window.wcPlayNodes[this.className](parent, this.data.pos);
       myNode.id = this.id;
       myNode.import(this.data);
     });
@@ -3931,7 +3972,7 @@ wcPlayEditor.prototype = {
     },
     // Undo
     function() {
-      var myNode = new window[this.data.className](this.parent, this.data.pos);
+      var myNode = new window.wcPlayNodes[this.data.className](this.parent, this.data.pos);
       myNode.import(this.data);
     },
     // Redo
@@ -4767,7 +4808,7 @@ wcPlayEditor.prototype = {
       // Create an instance of the node and add it to the script.
       var screenOffset = this.$container.offset();
       var mouse = this.__mouse(event, this.$viewport.offset(), this._viewportCamera);
-      var newNode = new window[this._draggingNodeData.node.className](this._parent, {x: 0, y: 0});
+      var newNode = new window.wcPlayNodes[this._draggingNodeData.node.className](this._parent, {x: 0, y: 0});
       var data = this._draggingNodeData.node.export();
       data.id = newNode.id;
       data.pos.x = (mouse.x / this._viewportCamera.z) + (this._draggingNodeData.$canvas.width()/2 + this._draggingNodeData.offset.x + screenOffset.left);

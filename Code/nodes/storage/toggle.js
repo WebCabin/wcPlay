@@ -1,4 +1,4 @@
-wcNodeStorage.extend('wcNodeStorageToggle', 'Toggle', 'Local', {
+wcPlayNodes.wcNodeStorage.extend('wcNodeStorageToggle', 'Toggle', 'Local', {
   /**
    * @class
    * Stores a boolean (toggleable) value.

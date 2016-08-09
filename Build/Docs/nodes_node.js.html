@@ -33,7 +33,7 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu inline">
-					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeComposite.html">wcNodeComposite</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryCallRemote.html">wcNodeEntryCallRemote</a></li><li><a href="wcNodeEntryRemote.html">wcNodeEntryRemote</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeEntryUpdate.html">wcNodeEntryUpdate</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAJAX.html">wcNodeProcessAJAX</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeProcessStrCat.html">wcNodeProcessStrCat</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageGlobal.html">wcNodeStorageGlobal</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
+					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeComposite.html">wcNodeComposite</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryCallRemote.html">wcNodeEntryCallRemote</a></li><li><a href="wcNodeEntryRemote.html">wcNodeEntryRemote</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeEntryUpdate.html">wcNodeEntryUpdate</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAJAX.html">wcNodeProcessAJAX</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessFetch.html">wcNodeProcessFetch</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeProcessStrCat.html">wcNodeProcessStrCat</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageGlobal.html">wcNodeStorageGlobal</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
 				</ul>
 			</li>
 			
@@ -76,7 +76,7 @@
     <article>
         <pre
             class="sunlight-highlight-javascript linenums">var wcNodeNextID = 0;
-wcClass.extend('wcNode', 'Node', '', {
+wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
   /**
    * @class
    * The foundation class for all nodes.&lt;br>
@@ -197,13 +197,18 @@ wcClass.extend('wcNode', 'Node', '', {
   resetThreads: function() {
     for (var i = 0; i &lt; this._meta.threads.length; ++i) {
       if (typeof this._meta.threads[i] === 'number') {
+        // Number values indicate either a timeout or an interval, clear them both.
         clearTimeout(this._meta.threads[i]);
         clearInterval(this._meta.threads[i]);
-      } else if (this._meta.threads[i] instanceof wcNodeTimeoutEvent) {
+      } else if (typeof this._meta.threads[i].__clear === 'function') {
+        // wcNodeTimeoutEvent has a __clear method that will clear this timeout.
         this._meta.threads[i].__clear();
-      } else if (this._meta.threads[i] instanceof jqXHR) {
+      } else if (typeof this._meta.threads[i].abort === 'function') {
+        // jqXHR has an abort method that will stop the ajax call.
+        // Using the built in fetch request will also create the abort method.
         this._meta.threads[i].abort();
       } else if (typeof this._meta.threads[i] === 'function') {
+        // A function callback is simply called.
         this._meta.threads[i]();
       }
     }
@@ -350,14 +355,16 @@ wcClass.extend('wcNode', 'Node', '', {
       // Pausing the node.
       if (paused) {
         for (var i = 0; i &lt; this._meta.threads.length; ++i) {
-          if (this._meta.threads[i] instanceof wcNodeTimeoutEvent) {
+          if (typeof this._meta.threads[i].pause === 'function') {
+            // wcNodeTimeoutEvent has a pause method.
             this._meta.threads[i].pause();
           }
         }
         this._meta.paused = true;
       } else {
         for (var i = 0; i &lt; this._meta.threads.length; ++i) {
-          if (this._meta.threads[i] instanceof wcNodeTimeoutEvent) {
+          if (typeof this._meta.threads[i].resume === 'function') {
+            // wcNodeTimeoutEvent has a resume method.
             this._meta.threads[i].resume();
           }
         }
@@ -505,11 +512,12 @@ wcClass.extend('wcNode', 'Node', '', {
 
   /**
    * Utility function for performing an AJAX request in a way that is compatible with live debugging in the editor tool.&lt;br>
-   * The success, error, and complete callback functions are changed so that the 'this' object is the node instance, or the custom context if you provided a context in your options.
+   * The success, error, and complete callback functions are changed so that the 'this' object is the node instance, or the custom context if you provided a context in your options.&lt;br>
+   * Note: This method specifically uses JQuery for the ajax operation, so you will need to include that library if you intend to use this.
    * @function wcNode#ajax
    * @param {String} [url] - Option URL to send the request, if not supplied, it should be provided in the options parameter.
    * @param {Object} [options] - The options for the request, as described here: {@link http://api.jquery.com/jquery.ajax/}.
-   * @returns {jqXHR} - The jQuery XHR object generated by the ajax request.
+   * @returns {jqXHR|function} - The jQuery XHR object generated by the ajax request. If an older version of jQuery is used, you will receive a function instead.
    */
   ajax: function(url, options) {
     if (typeof url === 'object') {
@@ -527,13 +535,16 @@ wcClass.extend('wcNode', 'Node', '', {
     var cancelled = false;
     var self = this;
     var context = options.context || this;
-    function __wrapCallback(cb, isComplete) {
+    function __wrapCallbackComplete(cb) {
       return function() {
-        if (isComplete) {
-          setTimeout(function() {
-            self.finishThread(xhr);
-          }, 0);
-        }
+        setTimeout(function() {
+          self.finishThread(xhr);
+        }, 0);
+        __wrapCallback(cb)();
+      }
+    }
+    function __wrapCallback(cb) {
+      return function() {
         if (!cancelled) {
           cb &amp;&amp; cb.apply(context, arguments);
         }
@@ -542,7 +553,7 @@ wcClass.extend('wcNode', 'Node', '', {
 
     options.success  = __wrapCallback(options.success);
     options.error    = __wrapCallback(options.error);
-    options.complete = __wrapCallback(options.complete, true);
+    options.complete = __wrapCallbackComplete(options.complete);
 
     var xhr = $.ajax(options);
 
@@ -552,7 +563,62 @@ wcClass.extend('wcNode', 'Node', '', {
         cancelled = true;
       }
     }
-    this.beginThread(xhr);
+    return this.beginThread(xhr);
+  },
+
+  /**
+   * Utility function for performing a fetch request in a way that is compatible with live debugging in the editor tool.&lt;br>
+   * The success, error, and complete callback functions are changed so that the 'this' object is the node instance, or the custom context if you provided a context in your options.&lt;br>
+   * Note: This method specifically uses browsers fetch which is an experimental technology and not supported by all browsers unless a polyfill is used.
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+   * @function wcNode#fetch
+   * @param {String} url - URL to send the request.
+   * @param {Object} [options] - The options for the request, as described here: {@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch}.
+   * @returns {Promise.&lt;Object>} - The promise object that carries the response. This will throw if the response was not a success.
+   */
+  fetch: function(url, options) {
+    var cancelled = false;
+    var self = this;
+    var promise = null;
+    try {
+      promise = fetch(url, options).catch(function(err) {
+        // Something bad happened before we got a response! Perhaps invalid options?
+        setTimeout(function() {
+          self.finishThread(promise);
+        }, 0);
+        throw err;
+      }).then(function(result) {
+        // Finish the thread.
+        setTimeout(function() {
+          self.finishThread(promise);
+        }, 0);
+
+        // Check the status of the response.
+        if (!cancelled) {
+          if (result.status >= 200 &amp;&amp; result.status &lt; 300) {
+            return result.text();
+          } else {
+            var err = new Error(result.statusText);
+            err.response = result;
+            throw err;
+          }
+        } else {
+          throw new Error('Fetch operation was cancelled.');
+        }
+      });
+    } catch (err) {
+      promise = new Promise(function(resolve, reject) {
+        reject(err);
+      });
+    }
+    // Provide my own 'abort' method to call in the
+    // case we want to cancel the request.
+    // Promises can not really be cancelled, but I can
+    // at least stop the chain from reaching the caller.
+    promise.abort = function() {
+      cancelled = true;
+    };
+    return this.beginThread(promise);
   },
 
   /**
@@ -1326,6 +1392,7 @@ wcClass.extend('wcNode', 'Node', '', {
    */
   activateExit: function(name) {
     if (!this.enabled()) {
+      // Node not enabled, unable to process.
       return false;
     }
 
@@ -1355,6 +1422,7 @@ wcClass.extend('wcNode', 'Node', '', {
       }
     }
 
+    // No link exists with the name provided.
     return false;
   },
 
@@ -1949,6 +2017,18 @@ wcClass.extend('wcNode', 'Node', '', {
   },
 
   /**
+   * Event that is called when the node's name is about to be edited by the user.&lt;br>
+   * You can use this to suggest a list of names that the user can conveniently choose from.&lt;br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @see http://caniuse.com/#search=datalist
+   * @function wcNode#onNameEditSuggestion
+   * @return {wcNode~SelectItem[]|String[]|undefined} - An option list of options to display for the user as suggestions.
+   */
+  onNameEditSuggestion: function() {
+    // this._super();
+  },
+
+  /**
    * Event that is called when the name of this node is about to change.&lt;br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onNameChanging
@@ -2168,6 +2248,8 @@ wcClass.extend('wcNode', 'Node', '', {
   },
 });
 
+window.wcNode = {};
+
 /**
  * The type of node link.
  * @enum {String}
@@ -2238,7 +2320,7 @@ wcNode.PROPERTY_ENABLED = 'enabled';
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
 	
-		on 2016-08-08
+		on 2016-08-09
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>

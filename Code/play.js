@@ -303,9 +303,9 @@ wcPlay.prototype = {
       // First pass, create all nodes.
       var nodes = [];
       for (var i = 0; i < data.nodes.length; ++i) {
-        if (window[data.nodes[i].className]) {
+        if (window.wcPlayNodes[data.nodes[i].className]) {
           try {
-            var newNode = new window[data.nodes[i].className](this, data.nodes[i].pos, data.nodes[i].name);
+            var newNode = new window.wcPlayNodes[data.nodes[i].className](this, data.nodes[i].pos, data.nodes[i].name);
             newNode.id = data.nodes[i].id;
             nodes.push({
               node: newNode,
@@ -996,7 +996,11 @@ wcPlay.prototype = {
       //   this._queuedChain = [];
       // }
 
-      if (node.debugBreak() || this._isStepping) {
+      if (node.debugBreak()) {
+        node._meta.flash = true;
+      }
+
+      if (this._isStepping) {
         node._meta.flash = true;
         node._meta.broken++;
         this._isPausing = true;
@@ -1125,15 +1129,15 @@ function wcNodeTimeoutEvent(node, callback, delay) {
 
 wcNodeTimeoutEvent.prototype = {
   pause: function() {
-    window.clearTimeout(this._timerId);
+    clearTimeout(this._timerId);
     this._remaining -= new Date().getTime() - this._marker;
   },
 
   resume: function() {
     this._marker = new Date().getTime();
-    window.clearTimeout(this._timerId);
+    clearTimeout(this._timerId);
     var self = this;
-    this._timerId = window.setTimeout(function() {
+    this._timerId = setTimeout(function() {
       self._node.finishThread(self);
       self._callback && self._callback.call(self._node);
       self.__clear();
@@ -1143,6 +1147,6 @@ wcNodeTimeoutEvent.prototype = {
   __clear: function() {
     this._node = null;
     this._callback = null;
-    window.clearTimeout(this._timerId);
+    clearTimeout(this._timerId);
   },
 };

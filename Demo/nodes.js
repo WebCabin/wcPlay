@@ -1,4 +1,4 @@
-wcNodeProcess.extend('wcNodeProcessGameMove', 'Move', 'Hero', {
+wcPlayNodes.wcNodeProcess.extend('wcNodeProcessGameMove', 'Move', 'Hero', {
   init: function(parent, pos) {
     this._super(parent, pos);
 
@@ -20,7 +20,7 @@ wcNodeProcess.extend('wcNodeProcessGameMove', 'Move', 'Hero', {
   },
 });
 
-wcNodeProcess.extend('wcNodeProcessGameCanMove', 'Can Move', 'Hero', {
+wcPlayNodes.wcNodeProcess.extend('wcNodeProcessGameCanMove', 'Can Move', 'Hero', {
   init: function(parent, pos) {
     this._super(parent, pos);
 

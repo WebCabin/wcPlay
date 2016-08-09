@@ -1,4 +1,4 @@
-wcNodeEntry.extend('wcNodeEntryStart', 'Start', 'Automatic', {
+wcPlayNodes.wcNodeEntry.extend('wcNodeEntryStart', 'Start', 'Automatic', {
   /**
    * @class
    * An entry node that fires as soon as the script [starts]{@link wcPlay#start}.<br>
@@ -24,7 +24,7 @@ wcNodeEntry.extend('wcNodeEntryStart', 'Start', 'Automatic', {
     this.onActivated();
   },
 });
-wcNodeEntry.extend('wcNodeEntryUpdate', 'Update', 'Automatic', {
+wcPlayNodes.wcNodeEntry.extend('wcNodeEntryUpdate', 'Update', 'Automatic', {
   /**
    * @class
    * An entry node that fires continuously on a regular update.<br>
@@ -85,7 +85,7 @@ wcNodeEntry.extend('wcNodeEntryUpdate', 'Update', 'Automatic', {
     }
   },
 });
-wcNodeEntry.extend('wcNodeEntryRemote', 'Remote Event', 'Flow Control', {
+wcPlayNodes.wcNodeEntry.extend('wcNodeEntryRemote', 'Remote Event', 'Flow Control', {
   /**
    * @class
    * An entry node that fires when a [Call Remote Event Node]{@link wcNodeEntryCallRemote} of the same name is activated.<br>
@@ -102,7 +102,7 @@ wcNodeEntry.extend('wcNodeEntryRemote', 'Remote Event', 'Flow Control', {
     this.details("This node uses it's Title Name value as an identifier that links it with any Call Remote Event Nodes of the same name. Whenever any Call Remote Event Node of the same name is activated, this Node will become active as well. If multiple Remote Nodes exist with the same name, they will all be called in parallel.");
   },
 });
-wcNodeEntry.extend('wcNodeEntryCallRemote', 'Call Remote Event', 'Flow Control', {
+wcPlayNodes.wcNodeEntry.extend('wcNodeEntryCallRemote', 'Call Remote Event', 'Flow Control', {
   /**
    * @class
    * An entry node that fires when a [Call Remote Event Node]{@link wcNodeEntryCallRemote} of the same name is activated.<br>
@@ -147,7 +147,7 @@ wcNodeEntry.extend('wcNodeEntryCallRemote', 'Call Remote Event', 'Flow Control',
     }
   },
 });
-wcNodeProcess.extend('wcNodeProcessDelay', 'Delay', 'Flow Control', {
+wcPlayNodes.wcNodeProcess.extend('wcNodeProcessDelay', 'Delay', 'Flow Control', {
   /**
    * @class
    * Waits for a specified amount of time before continuing the flow chain.<br>
@@ -184,7 +184,7 @@ wcNodeProcess.extend('wcNodeProcessDelay', 'Delay', 'Flow Control', {
   },
 });
 
-wcNodeProcess.extend('wcNodeProcessOperation', 'Operation', 'Data Manipulation', {
+wcPlayNodes.wcNodeProcess.extend('wcNodeProcessOperation', 'Operation', 'Data Manipulation', {
   /**
    * @class
    * Performs a simple math operation on two values.
@@ -240,7 +240,7 @@ wcNodeProcess.extend('wcNodeProcessOperation', 'Operation', 'Data Manipulation',
   },
 });
 
-wcNodeProcess.extend('wcNodeProcessStrCat', 'String Concat', 'Data Manipulation', {
+wcPlayNodes.wcNodeProcess.extend('wcNodeProcessStrCat', 'String Concat', 'Data Manipulation', {
   /**
    * @class
    * Formats a templated string by replacing template commands with the value of other properties.
@@ -276,7 +276,7 @@ wcNodeProcess.extend('wcNodeProcessStrCat', 'String Concat', 'Data Manipulation'
   },
 });
 
-wcNodeProcess.extend('wcNodeProcessAJAX', 'AJAX', 'Data Retrieval', {
+wcPlayNodes.wcNodeProcess.extend('wcNodeProcessAJAX', 'AJAX', 'Data Retrieval', {
   /**
    * @class
    * Performs an AJAX request.<br>
@@ -296,7 +296,7 @@ wcNodeProcess.extend('wcNodeProcessAJAX', 'AJAX', 'Data Retrieval', {
     this.createExit('success');
     this.createExit('failure');
 
-    this.createProperty('type', wcPlay.PROPERTY.SELECT, 'GET', {items: ['GET', 'POST'], description:"The AJAX method to perform.", input: true});
+    this.createProperty('type', wcPlay.PROPERTY.SELECT, 'GET', {items: ['GET', 'POST', 'PUT', 'DELETE', 'HEAD'], description:"The AJAX method to perform.", input: true, allowNone: false});
     this.createProperty('url', wcPlay.PROPERTY.STRING, 'example.com', {description: "The URL to send the request.", input: true});
     this.createProperty('data', wcPlay.PROPERTY.STRING, 'foo=bar&bar=foo', {description: "The data to send with the request. This can be in query string form, or any object that $.ajax supports as the data parameter.", input: true});
     this.createProperty('result', wcPlay.PROPERTY.STRING, '', {description: "The result of the ajax request, if successful.", output: true});
@@ -336,7 +336,85 @@ wcNodeProcess.extend('wcNodeProcessAJAX', 'AJAX', 'Data Retrieval', {
   },
 });
 
-wcNodeProcess.extend('wcNodeProcessConsoleLog', 'Console Log', 'Debugging', {
+wcPlayNodes.wcNodeProcess.extend('wcNodeProcessFetch', 'Fetch Request', 'Data Retrieval', {
+  /**
+   * @class
+   * Performs a fetch request.<br>
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+   * When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.
+   *
+   * @constructor wcNodeProcessFetch
+   * @param {String} parent - The parent object of this node.
+   * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
+   */
+  init: function(parent, pos) {
+    this._super(parent, pos);
+
+    this.description("Performs a fetch request.");
+    this.details("Once activated, a request will be sent to the given URL. Either the success or failure exit links will activate once the operation is completed and the result will be assigned to the result property.");
+
+    this.removeExit('out');
+    this.createExit('success');
+    this.createExit('failure');
+
+    this.createProperty('type', wcPlay.PROPERTY.SELECT, 'GET', {items: ['GET', 'POST', 'PUT', 'DELETE', 'HEAD'], description:"The request method to perform.", allowNone: false});
+    this.createProperty('url', wcPlay.PROPERTY.STRING, 'http://www.example.com', {description: "The URL to send the request.", input: true});
+    this.createProperty('headers', wcPlay.PROPERTY.SELECT, 'text/plain', {items: ['text/plain'], description: "The expected response data type (for now, only support text/plain).", allowNone: false});
+    this.createProperty('mode', wcPlay.PROPERTY.SELECT, 'cors', {items: ['cors', 'no-cors', 'same-origin'], description: "The mode.", allowNone: false});
+    this.createProperty('credentials', wcPlay.PROPERTY.SELECT, 'omit', {items: ['omit', 'same-origins'], description: "Should cookies go with the request?", allowNone: false});
+    this.createProperty('redirect', wcPlay.PROPERTY.SELECT, 'follow', {items: ['follow', 'error', 'manual'], description: "What happens if the request redirects you?", allowNone: false});
+    this.createProperty('integrity', wcPlay.PROPERTY.STRING, '', {description: "Subresource integrity value."});
+    this.createProperty('cache', wcPlay.PROPERTY.SELECT, 'default', {items: ['default', 'reload', 'no-cache'], description: "Cache mode.", allowNone: false});
+    this.createProperty('data', wcPlay.PROPERTY.STRING, '{}', {description: "The data to send with the request. This should be in the form of an object or JSON string.", input: true, multiline: true});
+    this.createProperty('result', wcPlay.PROPERTY.STRING, '', {description: "The result of the fetch request.", output: true, readonly: true, multiline: true});
+  },
+
+  /**
+   * Event that is called when an entry link has been activated.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeProcessFetch#onActivated
+   * @param {String} name - The name of the entry link triggered.
+   */
+  onActivated: function(name) {
+    this._super(name);
+
+    var type = this.property('type');
+    var url  = this.property('url');
+    var headers = this.property('headers');
+    var mode = this.property('mode');
+    var credentials = this.property('credentials');
+    var redirect = this.property('redirect');
+    var integrity = this.property('integrity');
+    var cache = this.property('cache');
+    var data = this.property('data');
+
+    if (!url) {
+      this.activateExit('failure');
+      return;
+    }
+
+    var self = this;
+    var id = this.fetch(url, {
+      method: type,
+      headers: {"Content-Type": headers},
+      mode: mode,
+      credentials: credentials,
+      redirect: redirect,
+      integrity: integrity,
+      cache: cache,
+      data: JSON.stringify(data)
+    });
+    id.then(function(result) {
+      self.property('result', result);
+      self.activateExit('success');
+    }).catch(function(err) {
+      self.property('result', err.message);
+      self.activateExit('failure');
+    });
+  },
+});
+
+wcPlayNodes.wcNodeProcess.extend('wcNodeProcessConsoleLog', 'Console Log', 'Debugging', {
   /**
    * @class
    * For debugging purposes, will print out a message into the console log the moment it is activated. [Silent mode]{@link wcPlay~Options} will silence this node.<br>
@@ -378,7 +456,7 @@ wcNodeProcess.extend('wcNodeProcessConsoleLog', 'Console Log', 'Debugging', {
   },
 });
 
-wcNodeProcess.extend('wcNodeProcessAlert', 'Alert', 'Debugging', {
+wcPlayNodes.wcNodeProcess.extend('wcNodeProcessAlert', 'Alert', 'Debugging', {
   /**
    * @class
    * For debugging purposes, will popup an alert box with a message the moment it is activated. [Silent mode]{@link wcPlay~Options} will silence this node.<br>
@@ -420,7 +498,7 @@ wcNodeProcess.extend('wcNodeProcessAlert', 'Alert', 'Debugging', {
   },
 });
 
-wcNodeStorage.extend('wcNodeStorageGlobal', 'Script Value', 'Global', {
+wcPlayNodes.wcNodeStorage.extend('wcNodeStorageGlobal', 'Global Value', 'Global', {
   /**
    * @class
    * References a global property on the script.
@@ -438,6 +516,27 @@ wcNodeStorage.extend('wcNodeStorageGlobal', 'Script Value', 'Global', {
     this.details("The title name for this node becomes the name of the global property it references. Duplicate Global Nodes with the same name will all reference the same value.");
 
     this.createProperty('value', wcPlay.PROPERTY.STRING, '', {description: "The current value of the global property (Use the title to identify the property)."});
+  },
+
+  /**
+   * Event that is called when the node's name is about to be edited by the user.<br>
+   * You can use this to suggest a list of names that the user can conveniently choose from.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @see http://caniuse.com/#search=datalist
+   * @function wcNodeStorageGlobal#onNameEditSuggestion
+   * @return {wcNode~SelectItem[]|String[]|undefined} - An option list of options to display for the user as suggestions.
+   */
+  onNameEditSuggestion: function() {
+    this._super();
+    var engine = this.engine();
+    if (engine) {
+      var props = engine.listProperties();
+      var suggestions = [];
+      for (var i = 0; i < props.length; ++i) {
+        suggestions.push(props[i].name);
+      }
+      return suggestions;
+    }
   },
 
   /**
@@ -618,7 +717,7 @@ wcNodeStorage.extend('wcNodeStorageGlobal', 'Script Value', 'Global', {
   },
 });
 
-wcNodeStorage.extend('wcNodeStorageString', 'String', 'Local', {
+wcPlayNodes.wcNodeStorage.extend('wcNodeStorageString', 'String', 'Local', {
   /**
    * @class
    * Stores a string value.<br>
@@ -637,7 +736,7 @@ wcNodeStorage.extend('wcNodeStorageString', 'String', 'Local', {
   },
 });
 
-wcNodeStorage.extend('wcNodeStorageNumber', 'Number', 'Local', {
+wcPlayNodes.wcNodeStorage.extend('wcNodeStorageNumber', 'Number', 'Local', {
   /**
    * @class
    * Stores a number value.<br>
@@ -656,7 +755,7 @@ wcNodeStorage.extend('wcNodeStorageNumber', 'Number', 'Local', {
   },
 });
 
-wcNodeStorage.extend('wcNodeStorageToggle', 'Toggle', 'Local', {
+wcPlayNodes.wcNodeStorage.extend('wcNodeStorageToggle', 'Toggle', 'Local', {
   /**
    * @class
    * Stores a boolean (toggleable) value.

@@ -1,4 +1,4 @@
-wcNodeProcess.extend('wcNodeProcessExampleViewport', 'Example Viewport', 'Example', {
+wcPlayNodes.wcNodeProcess.extend('wcNodeProcessExampleViewport', 'Example Viewport', 'Example', {
   /**
    * @class
    * This node demonstrates an example of using the node's viewport for displaying graphics directly on your node. It can also receive mouse events for interactivity.
@@ -173,7 +173,7 @@ wcNodeProcess.extend('wcNodeProcessExampleViewport', 'Example Viewport', 'Exampl
   },
 });
 
-wcNodeProcess.extend('wcNodeProcessExampleProperties', 'Example Properties', 'Example', {
+wcPlayNodes.wcNodeProcess.extend('wcNodeProcessExampleProperties', 'Example Properties', 'Example', {
   /**
    * @class
    * This node demonstrates an example of the different property types and how their values can be limited.
@@ -221,7 +221,7 @@ wcNodeProcess.extend('wcNodeProcessExampleProperties', 'Example Properties', 'Ex
   },
 });
 
-wcNodeProcess.extend('wcNodeProcessExampleDynamic', 'Example Dynamic', 'Example', {
+wcPlayNodes.wcNodeProcess.extend('wcNodeProcessExampleDynamic', 'Example Dynamic', 'Example', {
   /**
    * @class
    * This node demonstrates an example of a number of possible dynamic behaviors.

@@ -1,4 +1,4 @@
-wcNodeProcess.extend('wcNodeProcessConsoleLog', 'Console Log', 'Debugging', {
+wcPlayNodes.wcNodeProcess.extend('wcNodeProcessConsoleLog', 'Console Log', 'Debugging', {
   /**
    * @class
    * For debugging purposes, will print out a message into the console log the moment it is activated. [Silent mode]{@link wcPlay~Options} will silence this node.<br>

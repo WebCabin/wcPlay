@@ -1,4 +1,4 @@
-wcNodeProcess.extend('wcNodeProcessAlert', 'Alert', 'Debugging', {
+wcPlayNodes.wcNodeProcess.extend('wcNodeProcessAlert', 'Alert', 'Debugging', {
   /**
    * @class
    * For debugging purposes, will popup an alert box with a message the moment it is activated. [Silent mode]{@link wcPlay~Options} will silence this node.<br>

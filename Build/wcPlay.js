@@ -4,15 +4,18 @@
  */
 (function(){
   // Already defined, then we can skip.
-  if (this['wcClass']) {
+  if (this.wcPlayNodes && this.wcPlayNodes['wcClass']) {
     return;
+  }
+
+  if (!this.wcPlayNodes) {
+    this.wcPlayNodes = {};
   }
 
   var initializing = false, fnTest = /xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/;
 
-  this.wcClass = function(){};
- 
-  wcClass.extend = function(className) {
+  var wcClass = function(){};
+   wcClass.extend = function(className) {
     // Validate class name.
     if (!className.match(/^[a-z]+[\w]*$/i)) {
       throw new Error('Class name contains invalid characters!');
@@ -73,14 +76,15 @@
       return this.isA(name) || (_super.instanceOf && _super.instanceOf(name));
     };
    
-    eval('window["' + className + '"]=function ' + className + '(){if(!initializing){this.init && this.init.apply(this, arguments);}else{this.classInit && this.classInit.apply(this, arguments[0])}};');
+    eval('window.wcPlayNodes["' + className + '"]=function ' + className + '(){if(!initializing){this.init && this.init.apply(this, arguments);}else{this.classInit && this.classInit.apply(this, arguments[0])}};');
 
     // Populate our constructed prototype object
-    window[className].prototype = prototype;
+    window.wcPlayNodes[className].prototype = prototype;
  
     // And make this class extendable
-    window[className].extend = arguments.callee;
+    window.wcPlayNodes[className].extend = arguments.callee;
   };
+  this.wcPlayNodes.wcClass = wcClass;
 })();
 /**
  * @class
@@ -387,9 +391,9 @@ wcPlay.prototype = {
       // First pass, create all nodes.
       var nodes = [];
       for (var i = 0; i < data.nodes.length; ++i) {
-        if (window[data.nodes[i].className]) {
+        if (window.wcPlayNodes[data.nodes[i].className]) {
           try {
-            var newNode = new window[data.nodes[i].className](this, data.nodes[i].pos, data.nodes[i].name);
+            var newNode = new window.wcPlayNodes[data.nodes[i].className](this, data.nodes[i].pos, data.nodes[i].name);
             newNode.id = data.nodes[i].id;
             nodes.push({
               node: newNode,
@@ -1080,7 +1084,11 @@ wcPlay.prototype = {
       //   this._queuedChain = [];
       // }
 
-      if (node.debugBreak() || this._isStepping) {
+      if (node.debugBreak()) {
+        node._meta.flash = true;
+      }
+
+      if (this._isStepping) {
         node._meta.flash = true;
         node._meta.broken++;
         this._isPausing = true;
@@ -1209,15 +1217,15 @@ function wcNodeTimeoutEvent(node, callback, delay) {
 
 wcNodeTimeoutEvent.prototype = {
   pause: function() {
-    window.clearTimeout(this._timerId);
+    clearTimeout(this._timerId);
     this._remaining -= new Date().getTime() - this._marker;
   },
 
   resume: function() {
     this._marker = new Date().getTime();
-    window.clearTimeout(this._timerId);
+    clearTimeout(this._timerId);
     var self = this;
-    this._timerId = window.setTimeout(function() {
+    this._timerId = setTimeout(function() {
       self._node.finishThread(self);
       self._callback && self._callback.call(self._node);
       self.__clear();
@@ -1227,12 +1235,12 @@ wcNodeTimeoutEvent.prototype = {
   __clear: function() {
     this._node = null;
     this._callback = null;
-    window.clearTimeout(this._timerId);
+    clearTimeout(this._timerId);
   },
 };
 
 var wcNodeNextID = 0;
-wcClass.extend('wcNode', 'Node', '', {
+wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
   /**
    * @class
    * The foundation class for all nodes.<br>
@@ -1353,13 +1361,18 @@ wcClass.extend('wcNode', 'Node', '', {
   resetThreads: function() {
     for (var i = 0; i < this._meta.threads.length; ++i) {
       if (typeof this._meta.threads[i] === 'number') {
+        // Number values indicate either a timeout or an interval, clear them both.
         clearTimeout(this._meta.threads[i]);
         clearInterval(this._meta.threads[i]);
-      } else if (this._meta.threads[i] instanceof wcNodeTimeoutEvent) {
+      } else if (typeof this._meta.threads[i].__clear === 'function') {
+        // wcNodeTimeoutEvent has a __clear method that will clear this timeout.
         this._meta.threads[i].__clear();
-      } else if (this._meta.threads[i] instanceof jqXHR) {
+      } else if (typeof this._meta.threads[i].abort === 'function') {
+        // jqXHR has an abort method that will stop the ajax call.
+        // Using the built in fetch request will also create the abort method.
         this._meta.threads[i].abort();
       } else if (typeof this._meta.threads[i] === 'function') {
+        // A function callback is simply called.
         this._meta.threads[i]();
       }
     }
@@ -1506,14 +1519,16 @@ wcClass.extend('wcNode', 'Node', '', {
       // Pausing the node.
       if (paused) {
         for (var i = 0; i < this._meta.threads.length; ++i) {
-          if (this._meta.threads[i] instanceof wcNodeTimeoutEvent) {
+          if (typeof this._meta.threads[i].pause === 'function') {
+            // wcNodeTimeoutEvent has a pause method.
             this._meta.threads[i].pause();
           }
         }
         this._meta.paused = true;
       } else {
         for (var i = 0; i < this._meta.threads.length; ++i) {
-          if (this._meta.threads[i] instanceof wcNodeTimeoutEvent) {
+          if (typeof this._meta.threads[i].resume === 'function') {
+            // wcNodeTimeoutEvent has a resume method.
             this._meta.threads[i].resume();
           }
         }
@@ -1661,11 +1676,12 @@ wcClass.extend('wcNode', 'Node', '', {
 
   /**
    * Utility function for performing an AJAX request in a way that is compatible with live debugging in the editor tool.<br>
-   * The success, error, and complete callback functions are changed so that the 'this' object is the node instance, or the custom context if you provided a context in your options.
+   * The success, error, and complete callback functions are changed so that the 'this' object is the node instance, or the custom context if you provided a context in your options.<br>
+   * Note: This method specifically uses JQuery for the ajax operation, so you will need to include that library if you intend to use this.
    * @function wcNode#ajax
    * @param {String} [url] - Option URL to send the request, if not supplied, it should be provided in the options parameter.
    * @param {Object} [options] - The options for the request, as described here: {@link http://api.jquery.com/jquery.ajax/}.
-   * @returns {jqXHR} - The jQuery XHR object generated by the ajax request.
+   * @returns {jqXHR|function} - The jQuery XHR object generated by the ajax request. If an older version of jQuery is used, you will receive a function instead.
    */
   ajax: function(url, options) {
     if (typeof url === 'object') {
@@ -1683,13 +1699,16 @@ wcClass.extend('wcNode', 'Node', '', {
     var cancelled = false;
     var self = this;
     var context = options.context || this;
-    function __wrapCallback(cb, isComplete) {
+    function __wrapCallbackComplete(cb) {
       return function() {
-        if (isComplete) {
-          setTimeout(function() {
-            self.finishThread(xhr);
-          }, 0);
-        }
+        setTimeout(function() {
+          self.finishThread(xhr);
+        }, 0);
+        __wrapCallback(cb)();
+      }
+    }
+    function __wrapCallback(cb) {
+      return function() {
         if (!cancelled) {
           cb && cb.apply(context, arguments);
         }
@@ -1698,7 +1717,7 @@ wcClass.extend('wcNode', 'Node', '', {
 
     options.success  = __wrapCallback(options.success);
     options.error    = __wrapCallback(options.error);
-    options.complete = __wrapCallback(options.complete, true);
+    options.complete = __wrapCallbackComplete(options.complete);
 
     var xhr = $.ajax(options);
 
@@ -1708,7 +1727,62 @@ wcClass.extend('wcNode', 'Node', '', {
         cancelled = true;
       }
     }
-    this.beginThread(xhr);
+    return this.beginThread(xhr);
+  },
+
+  /**
+   * Utility function for performing a fetch request in a way that is compatible with live debugging in the editor tool.<br>
+   * The success, error, and complete callback functions are changed so that the 'this' object is the node instance, or the custom context if you provided a context in your options.<br>
+   * Note: This method specifically uses browsers fetch which is an experimental technology and not supported by all browsers unless a polyfill is used.
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+   * @function wcNode#fetch
+   * @param {String} url - URL to send the request.
+   * @param {Object} [options] - The options for the request, as described here: {@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch}.
+   * @returns {Promise.<Object>} - The promise object that carries the response. This will throw if the response was not a success.
+   */
+  fetch: function(url, options) {
+    var cancelled = false;
+    var self = this;
+    var promise = null;
+    try {
+      promise = fetch(url, options).catch(function(err) {
+        // Something bad happened before we got a response! Perhaps invalid options?
+        setTimeout(function() {
+          self.finishThread(promise);
+        }, 0);
+        throw err;
+      }).then(function(result) {
+        // Finish the thread.
+        setTimeout(function() {
+          self.finishThread(promise);
+        }, 0);
+
+        // Check the status of the response.
+        if (!cancelled) {
+          if (result.status >= 200 && result.status < 300) {
+            return result.text();
+          } else {
+            var err = new Error(result.statusText);
+            err.response = result;
+            throw err;
+          }
+        } else {
+          throw new Error('Fetch operation was cancelled.');
+        }
+      });
+    } catch (err) {
+      promise = new Promise(function(resolve, reject) {
+        reject(err);
+      });
+    }
+    // Provide my own 'abort' method to call in the
+    // case we want to cancel the request.
+    // Promises can not really be cancelled, but I can
+    // at least stop the chain from reaching the caller.
+    promise.abort = function() {
+      cancelled = true;
+    };
+    return this.beginThread(promise);
   },
 
   /**
@@ -2482,6 +2556,7 @@ wcClass.extend('wcNode', 'Node', '', {
    */
   activateExit: function(name) {
     if (!this.enabled()) {
+      // Node not enabled, unable to process.
       return false;
     }
 
@@ -2511,6 +2586,7 @@ wcClass.extend('wcNode', 'Node', '', {
       }
     }
 
+    // No link exists with the name provided.
     return false;
   },
 
@@ -3105,6 +3181,18 @@ wcClass.extend('wcNode', 'Node', '', {
   },
 
   /**
+   * Event that is called when the node's name is about to be edited by the user.<br>
+   * You can use this to suggest a list of names that the user can conveniently choose from.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @see http://caniuse.com/#search=datalist
+   * @function wcNode#onNameEditSuggestion
+   * @return {wcNode~SelectItem[]|String[]|undefined} - An option list of options to display for the user as suggestions.
+   */
+  onNameEditSuggestion: function() {
+    // this._super();
+  },
+
+  /**
    * Event that is called when the name of this node is about to change.<br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onNameChanging
@@ -3324,6 +3412,8 @@ wcClass.extend('wcNode', 'Node', '', {
   },
 });
 
+window.wcNode = {};
+
 /**
  * The type of node link.
  * @enum {String}
@@ -3352,7 +3442,7 @@ wcNode.CONNECT_RESULT = {
  */
 wcNode.PROPERTY_ENABLED = 'enabled';
 
-wcNode.extend('wcNodeEntry', 'Entry Node', '', {
+wcPlayNodes.wcNode.extend('wcNodeEntry', 'Entry Node', '', {
   /**
    * @class
    * The base class for all entry nodes. These are nodes that start script chains.<br>
@@ -3403,7 +3493,7 @@ wcNode.extend('wcNodeEntry', 'Entry Node', '', {
 });
 
 
-wcNode.extend('wcNodeProcess', 'Node Process', '', {
+wcPlayNodes.wcNode.extend('wcNodeProcess', 'Node Process', '', {
   /**
    * @class
    * The base class for all process nodes. These are nodes that make up the bulk of script chains.<br>
@@ -3443,7 +3533,7 @@ wcNode.extend('wcNodeProcess', 'Node Process', '', {
   },
 });
 
-wcNode.extend('wcNodeStorage', 'Storage', '', {
+wcPlayNodes.wcNode.extend('wcNodeStorage', 'Storage', '', {
   /**
    * @class
    * The base class for all storage nodes. These are nodes designed solely for managing data.<br>
@@ -3490,7 +3580,7 @@ wcNode.extend('wcNodeStorage', 'Storage', '', {
   },
 });
 
-wcNode.extend('wcNodeComposite', 'Composite', '', {
+wcPlayNodes.wcNode.extend('wcNodeComposite', 'Composite', '', {
   /**
    * @class
    * The base class for all composite nodes.<br>
@@ -3526,7 +3616,7 @@ wcNode.extend('wcNodeComposite', 'Composite', '', {
   },
 });
 
-wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
+wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
   /**
    * @class
    * A composite script node. These are nodes that contain additional nodes inside.<br>
@@ -4166,7 +4256,7 @@ wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Imported', {
   },
 });
 
-wcNodeComposite.extend('wcNodeCompositeEntry', 'Entry', 'Linkers', {
+wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeEntry', 'Entry', 'Linkers', {
   /**
    * @class
    * This node acts as a connection between entry links on a composite node and the script inside.<br>
@@ -4332,7 +4422,7 @@ wcNodeComposite.extend('wcNodeCompositeEntry', 'Entry', 'Linkers', {
     this._parent.sortEntryLinks();
   },
 });
-wcNodeComposite.extend('wcNodeCompositeExit', 'Exit', 'Linkers', {
+wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeExit', 'Exit', 'Linkers', {
   /**
    * @class
    * This node acts as a connection between exit links on a composite node and the script inside.<br>
@@ -4515,7 +4605,7 @@ wcNodeComposite.extend('wcNodeCompositeExit', 'Exit', 'Linkers', {
     this._parent.sortExitLinks();
   },
 });
-wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'Linkers', {
+wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'Linkers', {
   /**
    * @class
    * This node acts as a connection between exit links on a composite node and the script inside.<br>

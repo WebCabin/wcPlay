@@ -33,7 +33,7 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu inline">
-					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeComposite.html">wcNodeComposite</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryCallRemote.html">wcNodeEntryCallRemote</a></li><li><a href="wcNodeEntryRemote.html">wcNodeEntryRemote</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeEntryUpdate.html">wcNodeEntryUpdate</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAJAX.html">wcNodeProcessAJAX</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeProcessStrCat.html">wcNodeProcessStrCat</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageGlobal.html">wcNodeStorageGlobal</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
+					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeComposite.html">wcNodeComposite</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryCallRemote.html">wcNodeEntryCallRemote</a></li><li><a href="wcNodeEntryRemote.html">wcNodeEntryRemote</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeEntryUpdate.html">wcNodeEntryUpdate</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAJAX.html">wcNodeProcessAJAX</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessFetch.html">wcNodeProcessFetch</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeProcessStrCat.html">wcNodeProcessStrCat</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageGlobal.html">wcNodeStorageGlobal</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
 				</ul>
 			</li>
 			
@@ -77,21 +77,22 @@
 </header>
 
 <article>
-    <p>The most important part of wcPlay's node based scripting system, is the node!  So let's dig into how they work, and how you will be interacting with them. Lets start with an extreme closeup of a node:</p>
+    <p>The most important part of wcPlay's node based scripting system is the node! Let's dig into how they work and how you will be interacting with them. We'll start with an extreme closeup of a node:</p>
 <p><img src="img/node.jpg" style="width:75%;margin-left:12%"/></p>
 <hr>
-<h3>Title Area</h3><p>The node type is the large bold text label near the top of the node. Any custom Title name will appear between the parenthesis '()' block, you can click on this to change it at any time.</p>
-<p>Further to the right of the title name is the information detail button, clicking on this will show a dialog that further explains what the node does.</p>
+<h3>Title Area</h3><p>The node type is the large bold text label near the top of the node. Any custom Title name will appear between the parenthesis '()' beside it, you can click on this to change it at any time. The custom title will appear in debug log messages made by that node (if any), some nodes may actually use the title for something significant.</p>
+<p>Further to the right of the title name is the information detail button, clicking on this will show a dialog that further explains what the node does (as defined by the node itself).</p>
 <hr>
-<h3>Properties</h3><p>Properties make up the center area of the node. Each property takes up a row, and are made up of three columns; their name, their current (or volatile) value, and their initial (or default) value. The current value is what the script uses throughout execution and is constantly changing, while the initial values are applied to the current value on startup and are the values recorded in your script file when you save it.</p>
+<h3>Properties</h3><p>Properties make up the center area of the node. Each property takes up a row, and are made up of three columns; their name, their current (or volatile) value, and their initial (or default) value. The current value is what the script uses throughout execution and can change. The initial value is the value that is saved to your script file, and is what the current value begins with when the script starts.</p>
 <hr>
-<h3>Chaining</h3><p>Chains determine the flow of your script as they connect nodes together into sequences. They are the curved lines that make a connection between two links. There are two types of chains, flow and property.</p>
-<h4>Flow Chains</h4><p>Flow chains make up the overall flow of your script, they are responsible for activating a new node and then continueing to the next node, or nodes, in a sequence. Conditions throughout the chain path will often cause it to redirect to alternate routes. A node connects to flow chains through their link connectors on their top and bottom. The <code>Entry links</code> on top will activate the node and cause it to perform its operation, while the <code>Exit links</code> on the bottom are activated when the node has finished a task.</p>
-<p>The example node above has four Entry links, 'add', 'sub', 'mul', and 'div'. It also has a single Exit link 'out'. The operation it does depends on which Entry link was activated, but only a single Exit link will activate once that operation is finished.</p>
-<h4>Property Chains</h4><p>Property chains handle all of the information traffic between nodes by passing data from one to another. Data always passes from the <code>Output link</code> on the right side of a node to the <code>Input link</code> on the left side.</p>
+<h3>Chaining</h3><p>Chains determine the flow of your script as they connect nodes together into sequences. They are the curved lines that make a connection between two nodes. There are two types of chains, flow and property.</p>
+<h4>Flow Chains</h4><p>Flow chains make up the overall flow of your script. They are responsible for activating new nodes and then continueing to the next. Chains can simply be linear, or can split into multiple parallel chains.</p>
+<p>A node connects to a flow chain through thier <code>Flow Links</code> located at its top and bottom.  The <code>Flow Entry Links</code> appearing at the top will trigger the activation of the node while the <code>Flow Exit Links</code> appearing at the bottom will continue the flow.</p>
+<p>The example node above has four flow entry links, 'add', 'sub', 'mul', and 'div'. It also has a single flow exit link named, 'out'. This node will perform a simple math operation, either addition, subtraction, multiplication, or division between properties 'valueA' and 'valueB'. Once it has finished, it will assign the result of the operation to the 'result' property and trigger the 'out' link.</p>
+<h4>Property Chains</h4><p>Property chains handle all of the information traffic between nodes by passing data from one to another. Data always passes from the <code>Property Output Link</code> on the right side of a node to a <code>Property Input Link</code> on the left side of another.</p>
 <p>In the example above, an operation is done between property 'valueA' and property 'valueB', and then copied into the property 'result'. When the result has been assigned its new value, it will activate its output link to send that new value to all other properties attached to it, and so on.</p>
 <hr>
-<h3>Debugging</h3><p>For debugging, each node comes with two toggle buttons that appear as squares on the left and right side of the title label. The left side enables debug logging, which will output messages to the browsers console whenever various parts of the node are activated. This can be a very useful tool for solving problems you may be having with your script. The right side toggles a breakpoint on your node, which causes the execution of the script to pause whenever that node is activated. More information about the breakpoint system can be found later in the tutorial.</p>
+<h3>Debugging</h3><p>For debugging, each node comes with two toggle buttons that appear as squares on the left and right side of the title label. The left side enables debug logging which will output messages to the browsers console log whenever various parts of the node are activated. The right side toggles a breakpoint on your node which causes the execution of the script to pause whenever that node is activated. More information about the breakpoint system can be found in the <a href="tutorial-3.0.html">Debugging</a> tutorial.</p>
 <hr>
 <p>Return to the <a href="tutorial-1.0.html">Getting Started</a> tutorial.<br>Continue to the <a href="tutorial-3.0.html">Debugging</a> tutorial.  </p>
 </article>
@@ -133,7 +134,7 @@
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
 	
-		on 2016-08-08
+		on 2016-08-09
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>

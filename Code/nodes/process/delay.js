@@ -1,4 +1,4 @@
-wcNodeProcess.extend('wcNodeProcessDelay', 'Delay', 'Flow Control', {
+wcPlayNodes.wcNodeProcess.extend('wcNodeProcessDelay', 'Delay', 'Flow Control', {
   /**
    * @class
    * Waits for a specified amount of time before continuing the flow chain.<br>

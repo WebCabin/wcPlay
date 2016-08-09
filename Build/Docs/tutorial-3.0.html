@@ -33,7 +33,7 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu inline">
-					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeComposite.html">wcNodeComposite</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryCallRemote.html">wcNodeEntryCallRemote</a></li><li><a href="wcNodeEntryRemote.html">wcNodeEntryRemote</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeEntryUpdate.html">wcNodeEntryUpdate</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAJAX.html">wcNodeProcessAJAX</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeProcessStrCat.html">wcNodeProcessStrCat</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageGlobal.html">wcNodeStorageGlobal</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
+					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeComposite.html">wcNodeComposite</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryCallRemote.html">wcNodeEntryCallRemote</a></li><li><a href="wcNodeEntryRemote.html">wcNodeEntryRemote</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeEntryUpdate.html">wcNodeEntryUpdate</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAJAX.html">wcNodeProcessAJAX</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessFetch.html">wcNodeProcessFetch</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeProcessStrCat.html">wcNodeProcessStrCat</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageGlobal.html">wcNodeStorageGlobal</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
 				</ul>
 			</li>
 			
@@ -80,18 +80,18 @@
     <p>Debugging is a very important aspect of developing. It allows the developer to closely inspect the actions of their script in order to ensure that it behaves correctly.</p>
 <p><img src="img/breakpoint.jpg" style="width:100%"/></p>
 <hr>
-<h3>Debug Log</h3><p>The first method of debugging, is the console log system. By toggling debug logging on a node, any time a link or value is activated, a console message will appear in the browsers debugger. This is a useful feature as it doesn't interrupt the execution of your script, but it may become overwhelming with too many log messages.</p>
+<h3>Debug Log</h3><p>The most basic method of debugging is to print debug logs to a console. By toggling debug logging on a node, any time a flow link is activated or property is changed, a console message will appear in the browsers console. This is a useful feature as it doesn't interrupt the execution of your script, but it may become overwhelming with too many log messages.</p>
 <hr>
-<h3>Breakpoint</h3><p>The breakpoint system is where wcPlay debugging really shines. By toggling a node's breakpoint on, any time that node becomes activated in your script, your script will automatically pause execution on that node and the editor will display that node in red. From here, you can step one update at a time to follow your scripts progress one node at a time.</p>
-<p>You can step the debugger with the <img src="img/step.jpg"/> icon on the toolbar or the <code>spacebar</code> key. Once you are finished debugging, or just want to continue running your script, press the <img src="img/play.jpg"/> icon or the <code>enter</code> key. Make sure to toggle off the breakpoint of the node unless you want it to pause again.</p>
+<h3>Breakpoints</h3><p>The breakpoint system is where wcPlay really shines! When a node is toggled as a breakpoint and it becomes activated, your script will automatically pause execution and the editor will display that node in red. From here, you can step one update at a time and follow the flow of your script at your own pace.</p>
+<p>You can step the debugger with the step (<img src="img/step.jpg"/>) button on the toolbar or with the <code>spacebar</code> key. Once you are finished debugging, or just want to continue running your script, un-toggle the pause (<img src="img/unpause.jpg"/>) button or press the <code>enter</code> key. Make sure to toggle off the breakpoint of the node unless you want it to pause again the next time it activates.</p>
 <hr>
 <h3>Debug Stepping</h3><p>The debug stepping process may seem a little confusing at first, but each step basically follows these rules:</p>
 <ul>
 <li>As soon as a node turns red, it has been activated, but not yet processed.</li>
-<li>A step of the debugger will execute the action of the node, which may change properties and activate Exit links.</li>
-<li>If properties are changed, those values are propagated through the property chain system until every property in that chain has processed. It is important that property values propagate first, as nodes next in the flow chain may need those values updated.</li>
-<li>Once all properties have been propagated, nodes activated through the flow chain will continue processing.</li>
-<li>Chains that split to multiple nodes, or multiple Entry links, will run in parallel to each other.</li>
+<li>A step of the debugger will execute the action of the node, which may change properties and/or activate flow exit links.</li>
+<li>If properties are changed, those values are propagated through the property chain system until every property in that chain has processed. It is important that property values propagate first, as nodes next in the flow chain may need to use them immediately upon activation.</li>
+<li>If flow exit links are activated, all nodes directly connected will activate.</li>
+<li>Chains that split to multiple nodes, or multiple flow entry links, will run in parallel to each other.</li>
 </ul>
 <hr>
 <p>Return to the <a href="tutorial-2.0.html">Node Anatomy</a> tutorial.<br>Continue to the <a href="tutorial-4.0.html">Custom Nodes</a> tutorial.  </p>
@@ -134,7 +134,7 @@
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
 	
-		on 2016-08-08
+		on 2016-08-09
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>

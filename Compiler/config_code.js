@@ -86,6 +86,7 @@ concat({
     '../Code/nodes/process/operation.js',
     '../Code/nodes/process/strcat.js',
     '../Code/nodes/process/ajax.js',
+    '../Code/nodes/process/fetch.js',
     '../Code/nodes/process/consolelog.js',
     '../Code/nodes/process/alert.js',
     '../Code/nodes/storage/global.js',

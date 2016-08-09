@@ -1,4 +1,4 @@
-wcNodeProcess.extend('wcNodeProcessAJAX', 'AJAX', 'Data Retrieval', {
+wcPlayNodes.wcNodeProcess.extend('wcNodeProcessAJAX', 'AJAX', 'Data Retrieval', {
   /**
    * @class
    * Performs an AJAX request.<br>
@@ -18,7 +18,7 @@ wcNodeProcess.extend('wcNodeProcessAJAX', 'AJAX', 'Data Retrieval', {
     this.createExit('success');
     this.createExit('failure');
 
-    this.createProperty('type', wcPlay.PROPERTY.SELECT, 'GET', {items: ['GET', 'POST'], description:"The AJAX method to perform.", input: true});
+    this.createProperty('type', wcPlay.PROPERTY.SELECT, 'GET', {items: ['GET', 'POST', 'PUT', 'DELETE', 'HEAD'], description:"The AJAX method to perform.", input: true, allowNone: false});
     this.createProperty('url', wcPlay.PROPERTY.STRING, 'example.com', {description: "The URL to send the request.", input: true});
     this.createProperty('data', wcPlay.PROPERTY.STRING, 'foo=bar&bar=foo', {description: "The data to send with the request. This can be in query string form, or any object that $.ajax supports as the data parameter.", input: true});
     this.createProperty('result', wcPlay.PROPERTY.STRING, '', {description: "The result of the ajax request, if successful.", output: true});

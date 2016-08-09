@@ -1,4 +1,4 @@
-wcNodeStorage.extend('wcNodeStorageNumber', 'Number', 'Local', {
+wcPlayNodes.wcNodeStorage.extend('wcNodeStorageNumber', 'Number', 'Local', {
   /**
    * @class
    * Stores a number value.<br>

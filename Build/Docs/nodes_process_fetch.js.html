@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title> Source: editor.jsdoc</title>
+	<title> Source: nodes/process/fetch.js</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -70,91 +70,88 @@
 		<div id="main">
 			
 
-		<h1 class="page-title">Source: editor.jsdoc</h1>
+		<h1 class="page-title">Source: nodes/process/fetch.js</h1>
     
 <section>
     <article>
         <pre
-            class="sunlight-highlight-javascript linenums">/**
- * Custom options available when constructing a new {@link wcPlay} instance.
- * @typedef {Object} wcPlayEditor~Options
- * @property {Boolean} [readOnly=false] - If true, the script will not be editable.
- * @property {Boolean} [playable=true] - Whether the script can be played using the live debugger.
- * @property {wcPlayEditor~CategoryOptions} [category] - Options that determine what categories appear in the palette. By default, all categories are visible.
- */
+            class="sunlight-highlight-javascript linenums">wcPlayNodes.wcNodeProcess.extend('wcNodeProcessFetch', 'Fetch Request', 'Data Retrieval', {
+  /**
+   * @class
+   * Performs a fetch request.&lt;br>
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+   * When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.
+   *
+   * @constructor wcNodeProcessFetch
+   * @param {String} parent - The parent object of this node.
+   * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
+   */
+  init: function(parent, pos) {
+    this._super(parent, pos);
 
-/**
- * Category display options.
- * @typedef {Object} wcPlayEditor~CategoryOptions
- * @property {String[]} items - A list of categories to show in the palette.
- * @property {Boolean} isBlacklist - If true, the items list will be treated as a blacklist of categories to hide.
- */
+    this.description("Performs a fetch request.");
+    this.details("Once activated, a request will be sent to the given URL. Either the success or failure exit links will activate once the operation is completed and the result will be assigned to the result property.");
 
-/**
- * The 2D bounds of a rectangle.
- * @typedef {Object} wcPlayEditor~Rect
- * @property {Number} top
- * @property {Number} left
- * @property {Number} width
- * @property {Number} height
- */
+    this.removeExit('out');
+    this.createExit('success');
+    this.createExit('failure');
 
-/**
- * Bounding information for links on a node.
- * @typedef {Object} wcPlayEditor~BoundingData
- * @property {wcPlayEditor~Rect} rect - The bounding rectangle.
- * @property {wcPlay~Coordinates} point - The anchor point where lines will attach to this link.
- * @property {String} name - The name of the bounded object.
- */
+    this.createProperty('type', wcPlay.PROPERTY.SELECT, 'GET', {items: ['GET', 'POST', 'PUT', 'DELETE', 'HEAD'], description:"The request method to perform.", allowNone: false});
+    this.createProperty('url', wcPlay.PROPERTY.STRING, 'http://www.example.com', {description: "The URL to send the request.", input: true});
+    this.createProperty('headers', wcPlay.PROPERTY.SELECT, 'text/plain', {items: ['text/plain'], description: "The expected response data type (for now, only support text/plain).", allowNone: false});
+    this.createProperty('mode', wcPlay.PROPERTY.SELECT, 'cors', {items: ['cors', 'no-cors', 'same-origin'], description: "The mode.", allowNone: false});
+    this.createProperty('credentials', wcPlay.PROPERTY.SELECT, 'omit', {items: ['omit', 'same-origins'], description: "Should cookies go with the request?", allowNone: false});
+    this.createProperty('redirect', wcPlay.PROPERTY.SELECT, 'follow', {items: ['follow', 'error', 'manual'], description: "What happens if the request redirects you?", allowNone: false});
+    this.createProperty('integrity', wcPlay.PROPERTY.STRING, '', {description: "Subresource integrity value."});
+    this.createProperty('cache', wcPlay.PROPERTY.SELECT, 'default', {items: ['default', 'reload', 'no-cache'], description: "Cache mode.", allowNone: false});
+    this.createProperty('data', wcPlay.PROPERTY.STRING, '{}', {description: "The data to send with the request. This should be in the form of an object or JSON string.", input: true, multiline: true});
+    this.createProperty('result', wcPlay.PROPERTY.STRING, '', {description: "The result of the fetch request.", output: true, readonly: true, multiline: true});
+  },
 
-/**
- * Data associated with a drawn node.
- * @typedef {Object} wcPlayEditor~DrawNodeData
- * @property {wcNode} node - The node instance.
- * @property {wcPlayEditor~Rect} rect - Bounding rectangle of the node (not including links that stick out).
- * @property {wcPlayEditor~BoundingData[]} entryBounds - Bounding data of entry links.
- * @property {wcPlayEditor~BoundingData[]} exitBounds - Bounding data of exit links.
- * @property {wcPlayEditor~BoundingData[]} inputBounds - Bounding data of property input links.
- * @property {wcPlayEditor~BoundingData[]} outputBounds - Bounding data of property output links.
- * @property {wcPlayEditor~BoundingData[]} valueBounds - Bounding data of property value text.
- * @property {wcPlayEditor~BoundingData[]} initialBounds - Bounding data of property initial value text.
- */
+  /**
+   * Event that is called when an entry link has been activated.&lt;br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeProcessFetch#onActivated
+   * @param {String} name - The name of the entry link triggered.
+   */
+  onActivated: function(name) {
+    this._super(name);
 
-/**
- * On click handler for menu and toolbar options.
- * @callback wcPlayEditor~OnMenuActivated
- * @param {Object} event - The mouse click event object.
- * @param {wcPlayEditor} editor - The instance of the editor invoking the menu option.
- * @param {wcPlay} engine - The instance of the script engine being viewed by the editor.
- */
+    var type = this.property('type');
+    var url  = this.property('url');
+    var headers = this.property('headers');
+    var mode = this.property('mode');
+    var credentials = this.property('credentials');
+    var redirect = this.property('redirect');
+    var integrity = this.property('integrity');
+    var cache = this.property('cache');
+    var data = this.property('data');
 
-/**
- * A callback that retrieves the icon class for a menu option.
- * @function wcPlayEditor~MenuIconFunc
- * @param {wcPlayEditor} editor - The instance of the editor invoking the menu option.
- * @param {wcPlay} engine - The instance of the script engine being viewed by the editor.
- */
+    if (!url) {
+      this.activateExit('failure');
+      return;
+    }
 
-/**
- * A callback that retrieves the description string for a menu option.
- * @function wcPlayEditor~MenuDescriptionFunc
- * @param {wcPlayEditor} editor - The instance of the editor invoking the menu option.
- * @param {wcPlay} engine - The instance of the script engine being viewed by the editor.
- */
-
-/**
- * Custom options for a menu option.
- * @typedef {Object} wcPlayEditor~MenuOptions
- * @property {String|wcPlayEditor~MenuIconFunc} [icon] - A classname to apply as an icon for the option.  If this is a function, it will be called during the update call and should return the icon class.
- * @property {String} [description|wcPlayEditor~MenuDescriptionFunc] - The description to show as a tooltip for this option.
- * @property {Number} [itemIndex] - An insertion index to insert the item within the menu category, default is to append to the end.
- * @property {Number} [categoryIndex] - If this creates a new category, it will be inserted at this index in the top level menu.
- * @property {Boolean} [toolbarIndex] - If supplied, creates a toolbar button for this option and inserts it in the tab bar at the specified index. -1 will append it to the end.
- * @property {String} [hotkeys] - A string that describes hotkeys for your control, the format is 'Ctrl+Z' or 'Alt+Shift+L,Shift+L' for multiple.
- * @property {Function} [condition] - A function to call during the update to determine if the menu option should be enabled or disabled. Return false to disable the option.
- * @param {wcPlayEditor~OnMenuActivated} onActivated - A handler to call when the option is activated.
- */
-
+    var self = this;
+    var id = this.fetch(url, {
+      method: type,
+      headers: {"Content-Type": headers},
+      mode: mode,
+      credentials: credentials,
+      redirect: redirect,
+      integrity: integrity,
+      cache: cache,
+      data: JSON.stringify(data)
+    });
+    id.then(function(result) {
+      self.property('result', result);
+      self.activateExit('success');
+    }).catch(function(err) {
+      self.property('result', err.message);
+      self.activateExit('failure');
+    });
+  },
+});
 </pre>
     </article>
 </section>

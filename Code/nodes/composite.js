@@ -1,4 +1,4 @@
-wcNode.extend('wcNodeComposite', 'Composite', '', {
+wcPlayNodes.wcNode.extend('wcNodeComposite', 'Composite', '', {
   /**
    * @class
    * The base class for all composite nodes.<br>

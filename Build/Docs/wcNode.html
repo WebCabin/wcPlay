@@ -33,7 +33,7 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu inline">
-					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeComposite.html">wcNodeComposite</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryCallRemote.html">wcNodeEntryCallRemote</a></li><li><a href="wcNodeEntryRemote.html">wcNodeEntryRemote</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeEntryUpdate.html">wcNodeEntryUpdate</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAJAX.html">wcNodeProcessAJAX</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeProcessStrCat.html">wcNodeProcessStrCat</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageGlobal.html">wcNodeStorageGlobal</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
+					<li><a href="wcNode.html">wcNode</a></li><li><a href="wcNodeComposite.html">wcNodeComposite</a></li><li><a href="wcNodeEntry.html">wcNodeEntry</a></li><li><a href="wcNodeEntryCallRemote.html">wcNodeEntryCallRemote</a></li><li><a href="wcNodeEntryRemote.html">wcNodeEntryRemote</a></li><li><a href="wcNodeEntryStart.html">wcNodeEntryStart</a></li><li><a href="wcNodeEntryUpdate.html">wcNodeEntryUpdate</a></li><li><a href="wcNodeProcess.html">wcNodeProcess</a></li><li><a href="wcNodeProcessAJAX.html">wcNodeProcessAJAX</a></li><li><a href="wcNodeProcessAlert.html">wcNodeProcessAlert</a></li><li><a href="wcNodeProcessConsoleLog.html">wcNodeProcessConsoleLog</a></li><li><a href="wcNodeProcessDelay.html">wcNodeProcessDelay</a></li><li><a href="wcNodeProcessFetch.html">wcNodeProcessFetch</a></li><li><a href="wcNodeProcessOperation.html">wcNodeProcessOperation</a></li><li><a href="wcNodeProcessStrCat.html">wcNodeProcessStrCat</a></li><li><a href="wcNodeStorage.html">wcNodeStorage</a></li><li><a href="wcNodeStorageGlobal.html">wcNodeStorageGlobal</a></li><li><a href="wcNodeStorageNumber.html">wcNodeStorageNumber</a></li><li><a href="wcNodeStorageString.html">wcNodeStorageString</a></li><li><a href="wcNodeStorageToggle.html">wcNodeStorageToggle</a></li><li><a href="wcPlay.html">wcPlay</a></li><li><a href="wcPlayEditor.html">wcPlayEditor</a></li>
 				</ul>
 			</li>
 			
@@ -452,7 +452,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-2109">line 2109</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-2191">line 2191</a>
 			</li>
 		</ul>
 	</dd>
@@ -684,7 +684,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-2098">line 2098</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-2180">line 2180</a>
 			</li>
 		</ul>
 	</dd>
@@ -874,7 +874,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1223">line 1223</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1289">line 1289</a>
 			</li>
 		</ul>
 	</dd>
@@ -1046,7 +1046,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1244">line 1244</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1310">line 1310</a>
 			</li>
 		</ul>
 	</dd>
@@ -1286,7 +1286,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1474">line 1474</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1542">line 1542</a>
 			</li>
 		</ul>
 	</dd>
@@ -1325,6 +1325,9 @@
         
         <i><small>
 <span class="param-type">jqXHR</span>
+|
+
+<span class="param-type">function</span>
 
 
 </small></i>
@@ -1337,7 +1340,7 @@
 
     
     <div class="description">
-        <p style="margin-left:20px;">Utility function for performing an AJAX request in a way that is compatible with live debugging in the editor tool.<br>The success, error, and complete callback functions are changed so that the 'this' object is the node instance, or the custom context if you provided a context in your options.</p>
+        <p style="margin-left:20px;">Utility function for performing an AJAX request in a way that is compatible with live debugging in the editor tool.<br>The success, error, and complete callback functions are changed so that the 'this' object is the node instance, or the custom context if you provided a context in your options.<br>Note: This method specifically uses JQuery for the ajax operation, so you will need to include that library if you intend to use this.</p>
     </div>
     
 
@@ -1480,7 +1483,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-429">line 429</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-436">line 436</a>
 			</li>
 		</ul>
 	</dd>
@@ -1509,7 +1512,7 @@
     
             
 <div class="param-desc">
-    - The jQuery XHR object generated by the ajax request.
+    - The jQuery XHR object generated by the ajax request. If an older version of jQuery is used, you will receive a function instead.
 </div>
 
 
@@ -1521,6 +1524,9 @@
     <dd>
         
 <span class="param-type">jqXHR</span>
+|
+
+<span class="param-type">function</span>
 
 
 
@@ -1655,7 +1661,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-481">line 481</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-547">line 547</a>
 			</li>
 		</ul>
 	</dd>
@@ -1881,7 +1887,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-815">line 815</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-881">line 881</a>
 			</li>
 		</ul>
 	</dd>
@@ -2101,7 +2107,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-881">line 881</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-947">line 947</a>
 			</li>
 		</ul>
 	</dd>
@@ -2321,7 +2327,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-947">line 947</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1013">line 1013</a>
 			</li>
 		</ul>
 	</dd>
@@ -2541,7 +2547,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1013">line 1013</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1079">line 1079</a>
 			</li>
 		</ul>
 	</dd>
@@ -2757,7 +2763,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-548">line 548</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-614">line 614</a>
 			</li>
 		</ul>
 	</dd>
@@ -2973,7 +2979,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-578">line 578</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-644">line 644</a>
 			</li>
 		</ul>
 	</dd>
@@ -3255,7 +3261,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-607">line 607</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-673">line 673</a>
 			</li>
 		</ul>
 	</dd>
@@ -3439,7 +3445,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-318">line 318</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-325">line 325</a>
 			</li>
 		</ul>
 	</dd>
@@ -3623,7 +3629,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-303">line 303</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-310">line 310</a>
 			</li>
 		</ul>
 	</dd>
@@ -3807,7 +3813,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-333">line 333</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-340">line 340</a>
 			</li>
 		</ul>
 	</dd>
@@ -4081,7 +4087,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-347">line 347</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-354">line 354</a>
 			</li>
 		</ul>
 	</dd>
@@ -4331,7 +4337,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1079">line 1079</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1145">line 1145</a>
 			</li>
 		</ul>
 	</dd>
@@ -4577,7 +4583,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1115">line 1115</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1181">line 1181</a>
 			</li>
 		</ul>
 	</dd>
@@ -4823,7 +4829,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1151">line 1151</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1217">line 1217</a>
 			</li>
 		</ul>
 	</dd>
@@ -5069,7 +5075,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1187">line 1187</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1253">line 1253</a>
 			</li>
 		</ul>
 	</dd>
@@ -5249,7 +5255,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-249">line 249</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-254">line 254</a>
 			</li>
 		</ul>
 	</dd>
@@ -5374,7 +5380,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-236">line 236</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-241">line 241</a>
 			</li>
 		</ul>
 	</dd>
@@ -5561,7 +5567,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-201">line 201</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-206">line 206</a>
 			</li>
 		</ul>
 	</dd>
@@ -5830,6 +5836,229 @@
             
 <hr>
 <dt>
+    <h4 class="name" id="fetch"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>fetch</b>(url [, options])</toc>
+        
+        ->
+        
+        <i><small>
+<span class="param-type">Promise.&lt;Object></span>
+
+
+</small></i>
+        
+    </h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p style="margin-left:20px;">Utility function for performing a fetch request in a way that is compatible with live debugging in the editor tool.<br>The success, error, and complete callback functions are changed so that the 'this' object is the node instance, or the custom context if you provided a context in your options.<br>Note: This method specifically uses browsers fetch which is an experimental technology and not supported by all browsers unless a polyfill is used.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Argument</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>url</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">URL to send the request.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The options for the request, as described here: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch">https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch</a>.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="nodes_node.js.html">nodes/node.js</a>,
+				 <a href="nodes_node.js.html#sunlight-1-line-492">line 492</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+	<dt class="tag-see method-doc-label method-doc-details-label">See:</dt>
+	<dd class="tag-see">
+		<ul>
+			<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch">https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch</a></li>
+			</ul>
+	</dd>
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    - The promise object that carries the response. This will throw if the response was not a success.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;Object></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
     <h4 class="name" id="finishThread"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>finishThread</b>()</toc>
         
     </h4>
@@ -5887,7 +6116,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-515">line 515</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-581">line 581</a>
 			</li>
 		</ul>
 	</dd>
@@ -6071,7 +6300,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-136">line 136</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-141">line 141</a>
 			</li>
 		</ul>
 	</dd>
@@ -6334,7 +6563,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1415">line 1415</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1483">line 1483</a>
 			</li>
 		</ul>
 	</dd>
@@ -6459,7 +6688,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-294">line 294</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-301">line 301</a>
 			</li>
 		</ul>
 	</dd>
@@ -6673,7 +6902,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1498">line 1498</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1566">line 1566</a>
 			</li>
 		</ul>
 	</dd>
@@ -6891,7 +7120,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1526">line 1526</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1594">line 1594</a>
 			</li>
 		</ul>
 	</dd>
@@ -7109,7 +7338,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1554">line 1554</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1622">line 1622</a>
 			</li>
 		</ul>
 	</dd>
@@ -7327,7 +7556,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1582">line 1582</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1650">line 1650</a>
 			</li>
 		</ul>
 	</dd>
@@ -7511,7 +7740,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1610">line 1610</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1678">line 1678</a>
 			</li>
 		</ul>
 	</dd>
@@ -7675,7 +7904,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1838">line 1838</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1906">line 1906</a>
 			</li>
 		</ul>
 	</dd>
@@ -7935,7 +8164,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1783">line 1783</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1851">line 1851</a>
 			</li>
 		</ul>
 	</dd>
@@ -8025,7 +8254,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-2084">line 2084</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-2164">line 2164</a>
 			</li>
 		</ul>
 	</dd>
@@ -8115,7 +8344,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-2075">line 2075</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-2155">line 2155</a>
 			</li>
 		</ul>
 	</dd>
@@ -8205,7 +8434,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1829">line 1829</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1897">line 1897</a>
 			</li>
 		</ul>
 	</dd>
@@ -8389,7 +8618,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-2055">line 2055</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-2135">line 2135</a>
 			</li>
 		</ul>
 	</dd>
@@ -8577,7 +8806,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-2021">line 2021</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-2101">line 2101</a>
 			</li>
 		</ul>
 	</dd>
@@ -8765,7 +8994,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1988">line 1988</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-2068">line 2068</a>
 			</li>
 		</ul>
 	</dd>
@@ -8905,7 +9134,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-2000">line 2000</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-2080">line 2080</a>
 			</li>
 		</ul>
 	</dd>
@@ -9069,7 +9298,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-2010">line 2010</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-2090">line 2090</a>
 			</li>
 		</ul>
 	</dd>
@@ -9253,7 +9482,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-2044">line 2044</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-2124">line 2124</a>
 			</li>
 		</ul>
 	</dd>
@@ -9437,7 +9666,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-2033">line 2033</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-2113">line 2113</a>
 			</li>
 		</ul>
 	</dd>
@@ -9625,7 +9854,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1959">line 1959</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-2039">line 2039</a>
 			</li>
 		</ul>
 	</dd>
@@ -9821,7 +10050,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1943">line 1943</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-2023">line 2023</a>
 			</li>
 		</ul>
 	</dd>
@@ -9996,7 +10225,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1974">line 1974</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-2054">line 2054</a>
 			</li>
 		</ul>
 	</dd>
@@ -10037,208 +10266,6 @@
     <dd>
         
 <span class="param-type">Object</span>
-|
-
-<span class="param-type">undefined</span>
-
-
-
-    </dd>
-</dl>
-
-
-        
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="onMoving"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>onMoving</b>(oldPos, newPos)</toc>
-        
-        ->
-        
-        <i><small>
-<span class="param-type"><a href="wcPlay.html#~Coordinates">wcPlay~Coordinates</a></span>
-|
-
-<span class="param-type">undefined</span>
-
-
-</small></i>
-        
-    </h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p style="margin-left:20px;">Event that is called when the node is about to change its position.Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>oldPos</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="wcPlay.html#~Coordinates">wcPlay~Coordinates</a></span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The current position of the node.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>newPos</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="wcPlay.html#~Coordinates">wcPlay~Coordinates</a></span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The new position to move the node.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1851">line 1851</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    - Return the new position of the node (usually newPos unless you are restricting the position). If no value is returned, newPos is assumed.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="wcPlay.html#~Coordinates">wcPlay~Coordinates</a></span>
 |
 
 <span class="param-type">undefined</span>
@@ -10389,7 +10416,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1863">line 1863</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1931">line 1931</a>
 			</li>
 		</ul>
 	</dd>
@@ -10414,6 +10441,208 @@
     
 
     
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="onMoving"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>onMoving</b>(oldPos, newPos)</toc>
+        
+        ->
+        
+        <i><small>
+<span class="param-type"><a href="wcPlay.html#~Coordinates">wcPlay~Coordinates</a></span>
+|
+
+<span class="param-type">undefined</span>
+
+
+</small></i>
+        
+    </h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p style="margin-left:20px;">Event that is called when the node is about to change its position.Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>oldPos</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="wcPlay.html#~Coordinates">wcPlay~Coordinates</a></span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current position of the node.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>newPos</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="wcPlay.html#~Coordinates">wcPlay~Coordinates</a></span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The new position to move the node.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="nodes_node.js.html">nodes/node.js</a>,
+				 <a href="nodes_node.js.html#sunlight-1-line-1919">line 1919</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    - Return the new position of the node (usually newPos unless you are restricting the position). If no value is returned, newPos is assumed.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="wcPlay.html#~Coordinates">wcPlay~Coordinates</a></span>
+|
+
+<span class="param-type">undefined</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
 
     
 </dd>
@@ -10553,7 +10782,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1886">line 1886</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1966">line 1966</a>
 			</li>
 		</ul>
 	</dd>
@@ -10728,7 +10957,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1874">line 1874</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1954">line 1954</a>
 			</li>
 		</ul>
 	</dd>
@@ -10769,6 +10998,147 @@
     <dd>
         
 <span class="param-type">String</span>
+|
+
+<span class="param-type">undefined</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="onNameEditSuggestion"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>onNameEditSuggestion</b>()</toc>
+        
+        ->
+        
+        <i><small>
+<span class="param-type">Array.&lt;<a href="wcNode.html#~SelectItem">wcNode~SelectItem</a>></span>
+|
+
+<span class="param-type">Array.&lt;String></span>
+|
+
+<span class="param-type">undefined</span>
+
+
+</small></i>
+        
+    </h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p style="margin-left:20px;">Event that is called when the node's name is about to be edited by the user.<br>You can use this to suggest a list of names that the user can conveniently choose from.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="nodes_node.js.html">nodes/node.js</a>,
+				 <a href="nodes_node.js.html#sunlight-1-line-1942">line 1942</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+	<dt class="tag-see method-doc-label method-doc-details-label">See:</dt>
+	<dd class="tag-see">
+		<ul>
+			<li><a href="http://caniuse.com/#search=datalist">http://caniuse.com/#search=datalist</a></li>
+			</ul>
+	</dd>
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    - An option list of options to display for the user as suggestions.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array.&lt;<a href="wcNode.html#~SelectItem">wcNode~SelectItem</a>></span>
+|
+
+<span class="param-type">Array.&lt;String></span>
 |
 
 <span class="param-type">undefined</span>
@@ -10943,7 +11313,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1914">line 1914</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1994">line 1994</a>
 			</li>
 		</ul>
 	</dd>
@@ -11139,7 +11509,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1898">line 1898</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1978">line 1978</a>
 			</li>
 		</ul>
 	</dd>
@@ -11314,7 +11684,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1929">line 1929</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-2009">line 2009</a>
 			</li>
 		</ul>
 	</dd>
@@ -11431,7 +11801,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-2066">line 2066</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-2146">line 2146</a>
 			</li>
 		</ul>
 	</dd>
@@ -11521,7 +11891,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1803">line 1803</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1871">line 1871</a>
 			</li>
 		</ul>
 	</dd>
@@ -11611,7 +11981,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1815">line 1815</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1883">line 1883</a>
 			</li>
 		</ul>
 	</dd>
@@ -11775,7 +12145,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1667">line 1667</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1735">line 1735</a>
 			</li>
 		</ul>
 	</dd>
@@ -11930,7 +12300,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-264">line 264</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-269">line 269</a>
 			</li>
 		</ul>
 	</dd>
@@ -12114,7 +12484,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-532">line 532</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-598">line 598</a>
 			</li>
 		</ul>
 	</dd>
@@ -12401,7 +12771,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1301">line 1301</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1369">line 1369</a>
 			</li>
 		</ul>
 	</dd>
@@ -12579,7 +12949,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1284">line 1284</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1352">line 1352</a>
 			</li>
 		</ul>
 	</dd>
@@ -12754,7 +13124,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-653">line 653</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-719">line 719</a>
 			</li>
 		</ul>
 	</dd>
@@ -12926,7 +13296,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-672">line 672</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-738">line 738</a>
 			</li>
 		</ul>
 	</dd>
@@ -13098,7 +13468,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-691">line 691</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-757">line 757</a>
 			</li>
 		</ul>
 	</dd>
@@ -13294,7 +13664,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-711">line 711</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-777">line 777</a>
 			</li>
 		</ul>
 	</dd>
@@ -13490,7 +13860,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-742">line 742</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-808">line 808</a>
 			</li>
 		</ul>
 	</dd>
@@ -13686,7 +14056,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-773">line 773</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-839">line 839</a>
 			</li>
 		</ul>
 	</dd>
@@ -14038,7 +14408,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-361">line 361</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-368">line 368</a>
 			</li>
 		</ul>
 	</dd>
@@ -14222,7 +14592,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-402">line 402</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-409">line 409</a>
 			</li>
 		</ul>
 	</dd>
@@ -14392,7 +14762,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-376">line 376</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-383">line 383</a>
 			</li>
 		</ul>
 	</dd>
@@ -14592,7 +14962,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1642">line 1642</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1710">line 1710</a>
 			</li>
 		</ul>
 	</dd>
@@ -14648,6 +15018,194 @@
 
 
         
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="~onViewportMouseClick"><toc class="attribs"><span class="type-signature">&lt;inner> </span></toc>function <toc class="method"><b>onViewportMouseClick</b>(event, pos, readOnly)</toc>
+        
+    </h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p style="margin-left:20px;">Event that is called when the mouse button is pressed and released in the same spot over your viewport area.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>event</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The original jquery mouse event.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>pos</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="wcPlay.html#~Coordinates">wcPlay~Coordinates</a></span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The position of the mouse relative to the viewport area (top left corner is 0,0).</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>readOnly</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The editors readonly status, when true, you should not allow changes to the node.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="nodes_node.js.html">nodes/node.js</a>,
+				 <a href="nodes_node.js.html#sunlight-1-line-1826">line 1826</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 
     
 </dd>
@@ -14822,7 +15380,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1770">line 1770</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1838">line 1838</a>
 			</li>
 		</ul>
 	</dd>
@@ -14874,194 +15432,6 @@
 
 
         
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="~onViewportMouseClick"><toc class="attribs"><span class="type-signature">&lt;inner> </span></toc>function <toc class="method"><b>onViewportMouseClick</b>(event, pos, readOnly)</toc>
-        
-    </h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p style="margin-left:20px;">Event that is called when the mouse button is pressed and released in the same spot over your viewport area.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>event</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The original jquery mouse event.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>pos</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="wcPlay.html#~Coordinates">wcPlay~Coordinates</a></span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The position of the mouse relative to the viewport area (top left corner is 0,0).</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>readOnly</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The editors readonly status, when true, you should not allow changes to the node.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1758">line 1758</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
 
     
 </dd>
@@ -15236,7 +15606,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1708">line 1708</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1776">line 1776</a>
 			</li>
 		</ul>
 	</dd>
@@ -15451,7 +15821,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1679">line 1679</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1747">line 1747</a>
 			</li>
 		</ul>
 	</dd>
@@ -15615,7 +15985,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1694">line 1694</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1762">line 1762</a>
 			</li>
 		</ul>
 	</dd>
@@ -15803,7 +16173,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1733">line 1733</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1801">line 1801</a>
 			</li>
 		</ul>
 	</dd>
@@ -15991,7 +16361,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1721">line 1721</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1789">line 1789</a>
 			</li>
 		</ul>
 	</dd>
@@ -16203,7 +16573,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-1745">line 1745</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-1813">line 1813</a>
 			</li>
 		</ul>
 	</dd>
@@ -16302,7 +16672,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="nodes_node.js.html">nodes/node.js</a>,
-				 <a href="nodes_node.js.html#sunlight-1-line-2120">line 2120</a>
+				 <a href="nodes_node.js.html#sunlight-1-line-2202">line 2202</a>
 			</li>
 		</ul>
 	</dd>
@@ -19611,7 +19981,7 @@
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
 	
-		on 2016-08-08
+		on 2016-08-09
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>

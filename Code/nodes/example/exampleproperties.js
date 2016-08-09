@@ -1,4 +1,4 @@
-wcNodeProcess.extend('wcNodeProcessExampleProperties', 'Example Properties', 'Example', {
+wcPlayNodes.wcNodeProcess.extend('wcNodeProcessExampleProperties', 'Example Properties', 'Example', {
   /**
    * @class
    * This node demonstrates an example of the different property types and how their values can be limited.

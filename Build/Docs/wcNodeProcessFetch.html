@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title> Class: wcNodeEntry</title>
+	<title> Class: wcNodeProcessFetch</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -70,16 +70,16 @@
 		<div id="main">
 			
 
-	<h1 class="page-title">Class: wcNodeEntry</h1>
+	<h1 class="page-title">Class: wcNodeProcessFetch</h1>
 <section>
 
 <header>
     
         <h2>
-        wcNodeEntry
+        wcNodeProcessFetch
         </h2>
         
-            <div class="class-description">The base class for all entry nodes. These are nodes that start script chains.<br>When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.</div>
+            <div class="class-description">Performs a fetch request.<br></div>
         
     
 </header>
@@ -91,7 +91,7 @@
         
 <hr>
 <dt>
-    <h4 class="name" id="wcNodeEntry"><toc class="attribs"><span class="type-signature"></span></toc>new <toc class="method"><b>wcNodeEntry</b>(parent, pos)</toc>
+    <h4 class="name" id="wcNodeProcessFetch"><toc class="attribs"><span class="type-signature"></span></toc>new <toc class="method"><b>wcNodeProcessFetch</b>(parent, pos)</toc>
         
     </h4>
     
@@ -99,10 +99,6 @@
 </dt>
 <dd>
 
-    
-    <div class="description">
-        <p style="margin-left:20px;"><b>Should be inherited and never constructed directly.</b></p>
-    </div>
     
 
     
@@ -221,8 +217,8 @@
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="nodes_entry.js.html">nodes/entry.js</a>,
-				 <a href="nodes_entry.js.html#sunlight-1-line-2">line 2</a>
+				<a href="nodes_process_fetch.js.html">nodes/process/fetch.js</a>,
+				 <a href="nodes_process_fetch.js.html#sunlight-1-line-2">line 2</a>
 			</li>
 		</ul>
 	</dd>
@@ -230,6 +226,13 @@
 
 	
 
+	
+	<dt class="tag-see method-doc-label method-doc-details-label">See:</dt>
+	<dd class="tag-see">
+		<ul>
+			<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch%0DWhen%20inheriting,%20make%20sure%20to%20include%20'this._super(parent,%20pos);'%20at%20the%20top%20of%20your%20init%20function.">https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_FetchWhen inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.</a></li>
+			</ul>
+	</dd>
 	
 
 	
@@ -273,194 +276,6 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="classInit"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>classInit</b>(className, type, category)</toc>
-        
-    </h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p style="margin-left:20px;">Magic function that is called whenever any new class type is extended from this one.<br>Handles initializing of the class as well as registering the new node type.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>className</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The name of the class constructor.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>type</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The type name for the node.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>category</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">A category where this node will be grouped.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="nodes_entry.js.html">nodes/entry.js</a>,
-				 <a href="nodes_entry.js.html#sunlight-1-line-21">line 21</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
     <h4 class="name" id="onActivated"><toc class="attribs"><span class="type-signature"></span></toc>function <toc class="method"><b>onActivated</b>(name)</toc>
         
     </h4>
@@ -471,7 +286,7 @@
 
     
     <div class="description">
-        <p style="margin-left:20px;">Overloading the default onActivated event handler so we can make it immediately trigger our Exit link.Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
+        <p style="margin-left:20px;">Event that is called when an entry link has been activated.<br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.</p>
     </div>
     
 
@@ -567,8 +382,8 @@
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="nodes_entry.js.html">nodes/entry.js</a>,
-				 <a href="nodes_entry.js.html#sunlight-1-line-39">line 39</a>
+				<a href="nodes_process_fetch.js.html">nodes/process/fetch.js</a>,
+				 <a href="nodes_process_fetch.js.html#sunlight-1-line-34">line 34</a>
 			</li>
 		</ul>
 	</dd>

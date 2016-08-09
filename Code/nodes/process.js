@@ -1,4 +1,4 @@
-wcNode.extend('wcNodeProcess', 'Node Process', '', {
+wcPlayNodes.wcNode.extend('wcNodeProcess', 'Node Process', '', {
   /**
    * @class
    * The base class for all process nodes. These are nodes that make up the bulk of script chains.<br>

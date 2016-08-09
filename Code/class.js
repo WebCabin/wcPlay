@@ -4,15 +4,18 @@
  */
 (function(){
   // Already defined, then we can skip.
-  if (this['wcClass']) {
+  if (this.wcPlayNodes && this.wcPlayNodes['wcClass']) {
     return;
+  }
+
+  if (!this.wcPlayNodes) {
+    this.wcPlayNodes = {};
   }
 
   var initializing = false, fnTest = /xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/;
 
-  this.wcClass = function(){};
- 
-  wcClass.extend = function(className) {
+  var wcClass = function(){};
+   wcClass.extend = function(className) {
     // Validate class name.
     if (!className.match(/^[a-z]+[\w]*$/i)) {
       throw new Error('Class name contains invalid characters!');
@@ -73,12 +76,13 @@
       return this.isA(name) || (_super.instanceOf && _super.instanceOf(name));
     };
    
-    eval('window["' + className + '"]=function ' + className + '(){if(!initializing){this.init && this.init.apply(this, arguments);}else{this.classInit && this.classInit.apply(this, arguments[0])}};');
+    eval('window.wcPlayNodes["' + className + '"]=function ' + className + '(){if(!initializing){this.init && this.init.apply(this, arguments);}else{this.classInit && this.classInit.apply(this, arguments[0])}};');
 
     // Populate our constructed prototype object
-    window[className].prototype = prototype;
+    window.wcPlayNodes[className].prototype = prototype;
  
     // And make this class extendable
-    window[className].extend = arguments.callee;
+    window.wcPlayNodes[className].extend = arguments.callee;
   };
+  this.wcPlayNodes.wcClass = wcClass;
 })();

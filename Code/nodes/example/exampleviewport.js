@@ -1,4 +1,4 @@
-wcNodeProcess.extend('wcNodeProcessExampleViewport', 'Example Viewport', 'Example', {
+wcPlayNodes.wcNodeProcess.extend('wcNodeProcessExampleViewport', 'Example Viewport', 'Example', {
   /**
    * @class
    * This node demonstrates an example of using the node's viewport for displaying graphics directly on your node. It can also receive mouse events for interactivity.

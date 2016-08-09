@@ -1,4 +1,4 @@
-wcNodeProcess.extend('wcNodeProcessExampleDynamic', 'Example Dynamic', 'Example', {
+wcPlayNodes.wcNodeProcess.extend('wcNodeProcessExampleDynamic', 'Example Dynamic', 'Example', {
   /**
    * @class
    * This node demonstrates an example of a number of possible dynamic behaviors.

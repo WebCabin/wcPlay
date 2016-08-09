@@ -1,4 +1,4 @@
-wcNode.extend('wcNodeStorage', 'Storage', '', {
+wcPlayNodes.wcNode.extend('wcNodeStorage', 'Storage', '', {
   /**
    * @class
    * The base class for all storage nodes. These are nodes designed solely for managing data.<br>

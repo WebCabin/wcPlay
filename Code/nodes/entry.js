@@ -1,4 +1,4 @@
-wcNode.extend('wcNodeEntry', 'Entry Node', '', {
+wcPlayNodes.wcNode.extend('wcNodeEntry', 'Entry Node', '', {
   /**
    * @class
    * The base class for all entry nodes. These are nodes that start script chains.<br>

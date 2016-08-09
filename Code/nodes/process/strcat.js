@@ -1,4 +1,4 @@
-wcNodeProcess.extend('wcNodeProcessStrCat', 'String Concat', 'Data Manipulation', {
+wcPlayNodes.wcNodeProcess.extend('wcNodeProcessStrCat', 'String Concat', 'Data Manipulation', {
   /**
    * @class
    * Formats a templated string by replacing template commands with the value of other properties.

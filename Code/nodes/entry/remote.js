@@ -1,4 +1,4 @@
-wcNodeEntry.extend('wcNodeEntryRemote', 'Remote Event', 'Flow Control', {
+wcPlayNodes.wcNodeEntry.extend('wcNodeEntryRemote', 'Remote Event', 'Flow Control', {
   /**
    * @class
    * An entry node that fires when a [Call Remote Event Node]{@link wcNodeEntryCallRemote} of the same name is activated.<br>

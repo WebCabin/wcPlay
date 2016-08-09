@@ -1,4 +1,4 @@
-wcNodeStorage.extend('wcNodeStorageGlobal', 'Script Value', 'Global', {
+wcPlayNodes.wcNodeStorage.extend('wcNodeStorageGlobal', 'Global Value', 'Global', {
   /**
    * @class
    * References a global property on the script.
@@ -16,6 +16,27 @@ wcNodeStorage.extend('wcNodeStorageGlobal', 'Script Value', 'Global', {
     this.details("The title name for this node becomes the name of the global property it references. Duplicate Global Nodes with the same name will all reference the same value.");
 
     this.createProperty('value', wcPlay.PROPERTY.STRING, '', {description: "The current value of the global property (Use the title to identify the property)."});
+  },
+
+  /**
+   * Event that is called when the node's name is about to be edited by the user.<br>
+   * You can use this to suggest a list of names that the user can conveniently choose from.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @see http://caniuse.com/#search=datalist
+   * @function wcNodeStorageGlobal#onNameEditSuggestion
+   * @return {wcNode~SelectItem[]|String[]|undefined} - An option list of options to display for the user as suggestions.
+   */
+  onNameEditSuggestion: function() {
+    this._super();
+    var engine = this.engine();
+    if (engine) {
+      var props = engine.listProperties();
+      var suggestions = [];
+      for (var i = 0; i < props.length; ++i) {
+        suggestions.push(props[i].name);
+      }
+      return suggestions;
+    }
   },
 
   /**
