@@ -1373,9 +1373,10 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    * @param {Object} [value] - If supplied, will assign a new value to the property.
    * @param {Boolean} [forceOrSilent] - If supplied, true will force the change event to be sent to all chained properties even if this value didn't change while false will force the change to not be chained.
    * @param {Boolean} [forceUpstream] - Contrary to normal operation, if this is true then the property change will be sent backwards, from this property's input link to any outputs connected to it.
+   * @param {external:wcUndoManager} [undo] - If the change is triggered by the user and undo management is enabled, this will be the undo manager.
    * @returns {Object|undefined} - The value of the property, or undefined if not found.
    */
-  property: function(name, value, forceOrSilent, forceUpstream) {
+  property: function(name, value, forceOrSilent, forceUpstream, undo) {
     for (var i = 0; i < this.properties.length; ++i) {
       var prop = this.properties[i];
       if (prop.name === name) {
@@ -1452,7 +1453,7 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
             prop.value = value;
 
             // Notify that the property has changed.
-            this.onPropertyChanged(prop.name, oldValue, value);
+            this.onPropertyChanged(prop.name, oldValue, value, undo);
 
             // Linked properties must sync with their initial values as well.
             if (prop.options.linked) {
@@ -1487,9 +1488,10 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    * @param {Object} [value] - If supplied, will assign a new default value to the property.
    * @param {Boolean} [forceOrSilent] - If supplied, true will force the change event to be sent to all chained properties even if this value didn't change while false will force the change to not be chained.
    * @param {Boolean} [forceUpstream] - Contrary to normal operation, if this is true then the property change will be sent backwards, from this property's input link to any outputs connected to it.
+   * @param {external:wcUndoManager} [undo] - If the change is triggered by the user and undo management is enabled, this will be the undo manager.
    * @returns {Object|undefined} - The default value of the property, or undefined if not found.
    */
-  initialProperty: function(name, value, forceOrSilent, forceUpstream) {
+  initialProperty: function(name, value, forceOrSilent, forceUpstream, undo) {
     for (var i = 0; i < this.properties.length; ++i) {
       var prop = this.properties[i];
       if (prop.name === name) {
@@ -1505,7 +1507,7 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
             prop.initialValue = value;
 
             // Notify that the property has changed.
-            this.onInitialPropertyChanged(prop.name, oldValue, value);
+            this.onInitialPropertyChanged(prop.name, oldValue, value, undo);
 
             // Linked properties must sync with their initial values as well.
             if (prop.options.linked) {
@@ -1687,7 +1689,9 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
       var myProp = this.properties[i];
       var data = {
         name: myProp.name,
+        type: myProp.type,
         initialValue: myProp.initialValue,
+        options: myProp.options
       };
 
       if (!minimal) {
@@ -1969,9 +1973,10 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    * @function wcNode#onNameChanged
    * @param {String} oldName - The current name.
    * @param {String} newName - The new name.
+   * @param {external:wcUndoManager} [undo] - If the change is triggered by the user and undo management is enabled, this will be the undo manager. Note: The value change is already recorded, use this only if you have other things to record.
    */
-  onNameChanged: function(oldName, newName) {
-    // this._super(oldName, newName);
+  onNameChanged: function(oldName, newName, undo) {
+    // this._super(oldName, newName, undo);
     this._meta.dirty = true;
   },
 
@@ -1998,9 +2003,10 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    * @param {String} name - The name of the property.
    * @param {Object} oldValue - The old value of the property.
    * @param {Object} newValue - The new value of the property.
+   * @param {external:wcUndoManager} [undo] - If the change is triggered by the user and undo management is enabled, this will be the undo manager. Note: The value change is already recorded, use this only if you have other things to record.
    */
-  onPropertyChanged: function(name, oldValue, newValue) {
-    // this._super(name, oldValue, newValue);
+  onPropertyChanged: function(name, oldValue, newValue, undo) {
+    // this._super(name, oldValue, newValue, undo);
     if (this.debugLog()) {
       console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" Changed Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
     }
@@ -2043,9 +2049,10 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    * @param {String} name - The name of the property.
    * @param {Object} oldValue - The old value of the property.
    * @param {Object} newValue - The new value of the property.
+   * @param {external:wcUndoManager} [undo] - If the change is triggered by the user and undo management is enabled, this will be the undo manager. Note: The value change is already recorded, use this only if you have other things to record.
    */
-  onInitialPropertyChanged: function(name, oldValue, newValue) {
-    // this._super(name, oldValue, newValue);
+  onInitialPropertyChanged: function(name, oldValue, newValue, undo) {
+    // this._super(name, oldValue, newValue, undo);
     if (this.debugLog()) {
       console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" Changed Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
     }

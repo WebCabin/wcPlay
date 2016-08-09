@@ -113,6 +113,8 @@
  * Basic information for a property.
  * @typedef {Object} wcNode~PropertyData
  * @property {String} name - The name of the property.
+ * @property {wcPlay.PROPERTY} type - The type of the property.
  * @property {Object} value - The current value of the property.
  * @property {Object} initialValue - The initial value of the property.
+ * @property {Object} options - The options for this property.
  */

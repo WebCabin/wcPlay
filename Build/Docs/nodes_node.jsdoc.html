@@ -44,6 +44,13 @@
 				</ul>
 			</li>
 			
+			<li class="dropdown">
+				<a href="externals.list.html" class="dropdown-toggle" data-toggle="dropdown">Externals<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="external-wcUndoManager.html">wcUndoManager</a></li>
+				</ul>
+			</li>
+			
 		</ul>
 		<div class="col-sm-3 col-md-3">
             <form class="navbar-form" role="search">
@@ -190,8 +197,10 @@
  * Basic information for a property.
  * @typedef {Object} wcNode~PropertyData
  * @property {String} name - The name of the property.
+ * @property {wcPlay.PROPERTY} type - The type of the property.
  * @property {Object} value - The current value of the property.
  * @property {Object} initialValue - The initial value of the property.
+ * @property {Object} options - The options for this property.
  */</pre>
     </article>
 </section>

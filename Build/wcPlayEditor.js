@@ -10,6 +10,12 @@ window.wcPlayEditorClipboard = {
 };
 
 /**
+ * Undo manager by WebCabin
+ * @see https://github.com/WebCabin/wcUndoManager
+ * @external wcUndoManager
+ */
+
+/**
  * @class
  * Provides a visual interface for editing a Play script. Requires HTML5 canvas.
  *
@@ -3599,35 +3605,37 @@ wcPlayEditor.prototype = {
     $control.change(function() {
       $('#wcDynamicSuggestionList').remove();
       if (!cancelled) {
-        self._undoManager && self._undoManager.addEvent('Title changed for Node "' + node.category + '.' + node.type + '"',
-        {
-          id: node.id,
-          oldValue: node.name,
-          newValue: $control.val(),
-          engine: self._engine,
-        },
-        // Undo
-        function() {
-          var myNode = this.engine.nodeById(this.id);
-          var oldName = myNode.name;
-          var newName = myNode.onNameChanging(oldName, this.oldValue);
-          if (newName === undefined) {
-            newName = this.oldValue;
-          }
-          myNode.name = newName;
-          myNode.onNameChanged(oldName, newName);
-        },
-        // Redo
-        function() {
-          var myNode = this.engine.nodeById(this.id);
-          var oldName = myNode.name;
-          var newName = myNode.onNameChanging(oldName, this.newValue);
-          if (newName === undefined) {
-            newName = this.newValue;
-          }
-          myNode.name = newName;
-          myNode.onNameChanged(oldName, newName);
-        });
+        if (self._undoManager) {
+          self._undoManager.beginGroup('Title changed for Node "' + node.category + '.' + node.type + '"');
+          self._undoManager.addEvent('', {
+            id: node.id,
+            oldValue: node.name,
+            newValue: $control.val(),
+            engine: self._engine,
+          },
+          // Undo
+          function() {
+            var myNode = this.engine.nodeById(this.id);
+            var oldName = myNode.name;
+            var newName = myNode.onNameChanging(oldName, this.oldValue);
+            if (newName === undefined) {
+              newName = this.oldValue;
+            }
+            myNode.name = newName;
+            myNode.onNameChanged(oldName, newName);
+          },
+          // Redo
+          function() {
+            var myNode = this.engine.nodeById(this.id);
+            var oldName = myNode.name;
+            var newName = myNode.onNameChanging(oldName, this.newValue);
+            if (newName === undefined) {
+              newName = this.newValue;
+            }
+            myNode.name = newName;
+            myNode.onNameChanged(oldName, newName);
+          });
+        }
 
         var oldName = node.name;
         var newName = node.onNameChanging(oldName, $control.val());
@@ -3635,7 +3643,8 @@ wcPlayEditor.prototype = {
           newName = $control.val();
         }
         node.name = newName;
-        node.onNameChanged(oldName, newName);
+        node.onNameChanged(oldName, newName, self._undoManager);
+        self._undoManager && self._undoManager.endGroup();
       }
     });
 
@@ -3698,30 +3707,35 @@ wcPlayEditor.prototype = {
     var propFn = (initial? 'initialProperty': 'property');
 
     var self = this;
-    function undoChange(node, name, oldValue, newValue) {
-      self._undoManager && self._undoManager.addEvent('Property "' + name + '" changed for Node "' + node.category + '.' + node.type + '"',
-      {
-        id: node.id,
-        name: name,
-        propFn: propFn,
-        oldValue: oldValue,
-        newValue: newValue,
-        engine: self._engine,
-      },
-      // Undo
-      function() {
-        var myNode = this.engine.nodeById(this.id);
-        if (myNode) {
-          myNode[this.propFn](this.name, this.oldValue, true, true);
-        }
-      },
-      // Redo
-      function() {
-        var myNode = this.engine.nodeById(this.id);
-        if (myNode) {
-          myNode[this.propFn](this.name, this.newValue, true, true);
-        }
-      });
+    function undoChange(name, oldValue, newValue) {
+      if (self._undoManager) {
+        self._undoManager.beginGroup('Property "' + name + '" changed for Node "' + node.category + '.' + node.type + '"');
+        self._undoManager.addEvent('', {
+          id: node.id,
+          name: name,
+          propFn: propFn,
+          oldValue: oldValue,
+          newValue: newValue,
+          engine: self._engine,
+        },
+        // Undo
+        function() {
+          var myNode = this.engine.nodeById(this.id);
+          if (myNode) {
+            myNode[this.propFn](this.name, this.oldValue, true, true);
+          }
+        },
+        // Redo
+        function() {
+          var myNode = this.engine.nodeById(this.id);
+          if (myNode) {
+            myNode[this.propFn](this.name, this.newValue, true, true);
+          }
+        });
+      }
+    }
+    function endChange() {
+      self._undoManager && self._undoManager.endGroup();
     };
 
     var $blocker = $('<div class="wcPlayEditorBlocker">');
@@ -3732,8 +3746,9 @@ wcPlayEditor.prototype = {
       case wcPlay.PROPERTY.TOGGLE:
         // Toggles do not show an editor, instead, they just toggle their state.
         var state = node[propFn](property.name);
-        node[propFn](property.name, !state, true, true);
-        undoChange(node, property.name, state, !state);
+        undoChange(property.name, state, !state);
+        node[propFn](property.name, !state, true, true, this._undoManager);
+        endChange();
         break;
 
 
@@ -3745,8 +3760,9 @@ wcPlayEditor.prototype = {
             var min = $(this).attr('min') !== undefined? parseFloat($(this).attr('min')): -Infinity;
             var max = $(this).attr('max') !== undefined? parseFloat($(this).attr('max')):  Infinity;
             value = Math.min(max, Math.max(min, parseFloat($control.val())));
-            node[propFn](property.name, value, true, true);
-            undoChange(node, property.name, value, node[propFn](property.name));
+            undoChange(property.name, value, node[propFn](property.name));
+            node[propFn](property.name, value, true, true, this._undoManager);
+            endChange();
             // $blocker.click();
           }
         });
@@ -3789,8 +3805,9 @@ wcPlayEditor.prototype = {
           $('#wcDynamicSuggestionList').remove();
           if (!cancelled) {
             value = node[propFn](property.name);
-            node[propFn](property.name, $control.val(), true, true);
-            undoChange(node, property.name, value, node[propFn](property.name));
+            undoChange(property.name, value, node[propFn](property.name));
+            node[propFn](property.name, $control.val(), true, true, this._undoManager);
+            endChange();
             $blocker.click();
           }
         });
@@ -3841,8 +3858,9 @@ wcPlayEditor.prototype = {
             if (newValue == '' && property.options.hasOwnProperty('noneValue')) {
               newValue = property.options.noneValue;
             }
-            node[propFn](property.name, newValue, true, true);
-            undoChange(node, property.name, value, node[propFn](property.name));
+            undoChange(property.name, value, node[propFn](property.name));
+            node[propFn](property.name, newValue, true, true, this._undoManager);
+            endChange();
             $blocker.click();
           }
         });
@@ -3856,8 +3874,9 @@ wcPlayEditor.prototype = {
           $control = $(property.options.onCreate(node, property.name, value, initial, function(newValue) {
             if (!cancelled) {
               value = node[propFn](property.name);
-              node[propFn](property.name, newValue, true, true);
-              undoChange(node, property.name, value, node[propFn](property.name));
+              undoChange(property.name, value, node[propFn](property.name));
+              node[propFn](property.name, newValue, true, true, this._undoManager);
+              endChange();
               $blocker.click();
             }
           }));

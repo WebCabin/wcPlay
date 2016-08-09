@@ -44,6 +44,13 @@
 				</ul>
 			</li>
 			
+			<li class="dropdown">
+				<a href="externals.list.html" class="dropdown-toggle" data-toggle="dropdown">Externals<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="external-wcUndoManager.html">wcUndoManager</a></li>
+				</ul>
+			</li>
+			
 		</ul>
 		<div class="col-sm-3 col-md-3">
             <form class="navbar-form" role="search">
@@ -887,10 +894,10 @@ wcPlay.prototype = {
       var myProp = this._properties[i];
       result.push({
         name: myProp.name,
+        type: myProp.type,
         value: myProp.value,
         initialValue: myProp.initialValue,
-        type: myProp.type,
-        options: myProp.options,
+        options: myProp.options
       });
     }
 

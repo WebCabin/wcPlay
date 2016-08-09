@@ -545,9 +545,10 @@ wcPlayNodes.wcNodeStorage.extend('wcNodeStorageGlobal', 'Global Value', 'Global'
    * @function wcNodeStorageGlobal#onNameChanged
    * @param {String} oldName - The current name.
    * @param {String} newName - The new name.
+   * @param {external:wcUndoManager} [undo] - If the change is triggered by the user and undo management is enabled, this will be the undo manager. Note: The value change is already recorded, use this only if you have other things to record.
    */
-  onNameChanged: function(oldName, newName) {
-    this._super(oldName, newName);
+  onNameChanged: function(oldName, newName, undo) {
+    this._super(oldName, newName, undo);
 
     // Attempt to create a new property if it does not exist.
     var engine = this.engine();
@@ -569,6 +570,25 @@ wcPlayNodes.wcNodeStorage.extend('wcNodeStorageGlobal', 'Global Value', 'Global'
       }
 
       for (var i = 0; i < propList.length; ++i) {
+
+        undo && undo.addEvent('', {
+          engine: engine,
+          name: propList[i].name,
+          type: propList[i].type,
+          options: propList[i].options,
+          value: propList[i].value,
+          initialValue: propList[i].initialValue
+        },
+        // Undo
+        function() {
+          this.engine.createProperty(this.name, this.type, this.initialValue, this.options);
+          this.engine.property(this.name, this.value);
+        },
+        // Redo
+        function() {
+          this.engine.removeProperty(this.name);
+        });
+
         engine.removeProperty(propList[i].name);
       }
 

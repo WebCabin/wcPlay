@@ -810,10 +810,10 @@ wcPlay.prototype = {
       var myProp = this._properties[i];
       result.push({
         name: myProp.name,
+        type: myProp.type,
         value: myProp.value,
         initialValue: myProp.initialValue,
-        type: myProp.type,
-        options: myProp.options,
+        options: myProp.options
       });
     }
 
