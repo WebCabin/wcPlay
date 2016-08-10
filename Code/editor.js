@@ -2727,12 +2727,12 @@ wcPlayEditor.prototype = {
 
       context.fillStyle = "#444444";
       this.__setCanvasFont(this._font.propertyHeader, context);
-      context.fillText("Current", node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin - node._meta.bounds.center.initialWidth, node.pos.y + node._meta.bounds.center.top + upper);
+      context.fillText("Current ", node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin - node._meta.bounds.center.initialWidth, node.pos.y + node._meta.bounds.center.top + upper);
     } else {
       context.fillStyle = "black";
       context.textAlign = "right";
       this.__setCanvasFont(this._font.propertyHeader, context);
-      context.fillText("Initial", node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin, node.pos.y + node._meta.bounds.center.top + upper);
+      context.fillText("Initial ", node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin, node.pos.y + node._meta.bounds.center.top + upper);
     }
 
     upper += this._drawStyle.property.spacing;
@@ -2770,7 +2770,7 @@ wcPlayEditor.prototype = {
       var showValue = this._engine.isRunning() && !props[i].options.linked;
 
       // Highlight hovered values.
-      if (!this._options.readOnly && !isPalette) {
+      if (!this._options.readOnly && !isPalette && !props[i].options.readOnly) {
         if (this._engine && showValue) {
           if (this._highlightNode === node && this._highlightPropertyValue && this._highlightPropertyValue.name === props[i].name) {
             this.__drawRoundedRect(valueBound.rect, this._drawStyle.property.highlightColor, this._drawStyle.property.highlightBorder, this._font.property.size/2, context, node.pos);
@@ -3697,7 +3697,7 @@ wcPlayEditor.prototype = {
    * @param {Boolean} [initial] - Set true if the property being changed is the initial value.
    */
   __drawPropertyEditor: function(node, property, bounds, initial) {
-    if (this._options.readOnly) {
+    if (this._options.readOnly || property.options.readOnly) {
       return;
     }
 
@@ -4583,7 +4583,6 @@ wcPlayEditor.prototype = {
             for (var i = 0; i < node.properties.length; ++i) {
               if (node.properties[i].name === propBounds.name) {
                 this.$viewport.attr('title', (node.properties[i].options.description? node.properties[i].options.description + '\n': ''));
-                this.$viewport.addClass('wcClickable');
                 break;
               }
             }
@@ -4604,7 +4603,9 @@ wcPlayEditor.prototype = {
                 this._highlightNode = node;
                 this._highlightPropertyValue = valueBounds;
                 this.$viewport.attr('title', (node.properties[i].options.description? node.properties[i].options.description + '\n': '') + 'Click to change the current value of this property.\nValue = "' + node.properties[i].value + '"\n');
-                this.$viewport.addClass('wcClickable');
+                if (!node.properties[i].options.readOnly) {
+                  this.$viewport.addClass('wcClickable');
+                }
                 break;
               }
             }
@@ -4625,7 +4626,9 @@ wcPlayEditor.prototype = {
                 this._highlightNode = node;
                 this._highlightPropertyInitialValue = initialBounds;
                 this.$viewport.attr('title', (node.properties[i].options.description? node.properties[i].options.description + '\n': '') + 'Click to change the initial value of this property.\nValue = "' + node.properties[i].initialValue + '"\n');
-                this.$viewport.addClass('wcClickable');
+                if (!node.properties[i].options.readOnly) {
+                  this.$viewport.addClass('wcClickable');
+                }
                 break;
               }
             }

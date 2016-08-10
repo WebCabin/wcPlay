@@ -14,6 +14,7 @@
  * @property {Boolean} [input] - If true, this property will have an input link so its value can be changed through script.
  * @property {Boolean} [output] - If true, this property will have an output link so its value can be retrieved through script.
  * @property {Boolean} [linked] - If true, the value and initial values will be linked and can not be separated. Changing either will change them both.
+ * @property {Boolean} [readOnly] - If true, clicking this property will not show an editor.
  */
 
 /**
@@ -25,6 +26,7 @@
  * @property {Boolean} [input] - If true, this property will have an input link so its value can be changed through script.
  * @property {Boolean} [output] - If true, this property will have an output link so its value can be retrieved through script.
  * @property {Boolean} [linked] - If true, the value and initial values will be linked and can not be separated. Changing either will change them both.
+ * @property {Boolean} [readOnly] - If true, clicking this property will not show an editor.
  * @property {Number} [min=-Infinity] - The minimum value of the number range.
  * @property {Number} [max=Infinity] - The maximum value of the number range.
  * @property {Number} [step=1] - The amount the value will go up or down when the user clicks the up and down arrow controls.
@@ -39,6 +41,7 @@
  * @property {Boolean} [input] - If true, this property will have an input link so its value can be changed through script.
  * @property {Boolean} [output] - If true, this property will have an output link so its value can be retrieved through script.
  * @property {Boolean} [linked] - If true, the value and initial values will be linked and can not be separated. Changing either will change them both.
+ * @property {Boolean} [readOnly] - If true, clicking this property will not show an editor.
  * @property {Number} [maxlength=Infinity] - The maximum number of characters allowed.
  * @property {Boolean} [multiline=false] - Whether to use a multi-line text editor for this property.
  * @property {wcNode~SelectItem[]|String[]|wcNode~SelectItemFunc} items - A list of items to drop down in a suggestion as the user types, or a callback function that can dynamically retrieve a list. See [here]{@link http://caniuse.com/#search=datalist} for browser compatability information.
@@ -53,6 +56,7 @@
  * @property {Boolean} [input] - If true, this property will have an input link so its value can be changed through script.
  * @property {Boolean} [output] - If true, this property will have an output link so its value can be retrieved through script.
  * @property {Boolean} [linked] - If true, the value and initial values will be linked and can not be separated. Changing either will change them both.
+ * @property {Boolean} [readOnly] - If true, clicking this property will not show an editor.
  * @property {wcNode~SelectItem[]|String[]|wcNode~SelectItemFunc} items - A list of items to display in the combo box, or a callback function that can dynamically retrieve a list.
  * @property {Boolean} [allowNone=true] - If true, will allow the user to select '<none>' as an option.
  * @property {Object} [noneValue] - If supplied, and allowNone is true, will assign the internal value of the '<none>' option.
@@ -67,6 +71,7 @@
  * @property {Boolean} [input] - If true, this property will have an input link so its value can be changed through script.
  * @property {Boolean} [output] - If true, this property will have an output link so its value can be retrieved through script.
  * @property {Boolean} [linked] - If true, the value and initial values will be linked and can not be separated. Changing either will change them both.
+ * @property {Boolean} [readOnly] - If true, clicking this property will not show an editor.
  * @property {wcNode~CustomCreateFunc} [onCreate] - If supplied, will be called when the property control is being edited and should return an element to display the control.
  */
 
