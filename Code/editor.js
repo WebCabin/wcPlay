@@ -69,7 +69,7 @@ function wcPlayEditor(container, options) {
     palette: {
       spacing: 10,          // Spacing between nodes in the palette view.
       scale: 0.7,           // Scale to draw nodes within the palette view.
-      width: 150            // The pixel width of the palette view.
+      width: 0              // The pixel width of the palette view.
     },
     node: {
       radius: 7,            // The radius to draw node corners.
@@ -170,7 +170,7 @@ function wcPlayEditor(container, options) {
   }
 
   this.$top = $('<div class="wcPlayEditorTop" tabindex="1">');
-  this.$main = $('<div class="wcPlayEditorMain" tabindex="1">');
+  this.$main = $('<div class="wcPlayEditorMain" tabindex="1" oncontextmenu="return false;">');
   this.$palette = $('<div class="wcPlayPalette wcPlayNoHighlights" tabindex="1">');
   this.$paletteScroller = $('<div class="wcPlayPaletteScroller" tabindex="1">');
   this.$paletteInner = $('<div class="wcPlayPaletteInner" tabindex="1">');
@@ -180,7 +180,7 @@ function wcPlayEditor(container, options) {
   this.$palette.append(this.$paletteScroller);
   this.$paletteScroller.append(this.$paletteInner);
 
-  this.$main.append(this.$palette);
+  // this.$main.append(this.$palette);
   this.$main.append(this.$viewport);
   this.$container.append(this.$top);
   this.$container.append(this.$main);
@@ -3575,13 +3575,35 @@ wcPlayEditor.prototype = {
 
   /**
    * Draws the popup that allows the user to select a node type.
-   * @function wcPlayEditor#__drawNodeSelectorPopup
+   * @function wcPlayEditor#__drawPalettePopup
+   * @param {wcPlay~Coordinates} pos - The position to center the popup.
    * @param {wcNode} [node] - Supply an existing node if you intend to connect the new node to it.
    * @param {wcNode.LINK_TYPE} [linkType] - If supplying a node, this is the type of link you are attaching to.
    * @param {String} [linkName] - If supplying a node, this is the name of the link you are attaching to.
    */
-  __drawNodeSelectorPopup: function(node, linkType, linkName) {
+  __drawPalettePopup: function(pos, node, linkType, linkName) {
+    if (!this._showingSelector) {
+      var self = this;
+      this._showingSelector = true;
+      var $blocker = $('<div class="wcPlayEditorBlocker">');
+      this._selectorPopup = $('<div class="wcPlayEditorNodePopup">');
 
+      this.$main.append($blocker);
+      this.$main.append(this._selectorPopup);
+      $blocker.click(function() {
+        $(this).remove();
+        self._selectorPopup.remove();
+        self._showingSelector = false;
+      });
+    }
+
+    if (this._selectorPopup) {
+      this._selectorPopup.css('left', pos.x + 'px');
+      this._selectorPopup.css('top', pos.y + 'px');
+    }
+
+    // Find the best position.
+    // if (pos.x <= )
   },
 
   /**
@@ -4546,7 +4568,7 @@ wcPlayEditor.prototype = {
           if (this.__inRect(mouse, node._meta.bounds.inputBounds[i].rect, node.pos, this._viewportCamera)) {
             this._highlightNode = node;
             this._highlightInputLink = node._meta.bounds.inputBounds[i];
-            this.$viewport.attr('title', 'Click and drag to chain this property to the output of another.');
+            this.$viewport.attr('title', 'Click and drag to chain this property to another.');
             this.$viewport.addClass('wcGrab');
             break;
           }
@@ -4559,7 +4581,7 @@ wcPlayEditor.prototype = {
           if (this.__inRect(mouse, node._meta.bounds.outputBounds[i].rect, node.pos, this._viewportCamera)) {
             this._highlightNode = node;
             this._highlightOutputLink = node._meta.bounds.outputBounds[i];
-            this.$viewport.attr('title', 'Click and drag to chain this property to the input of another. Double click to manually propagate this property through the chain.');
+            this.$viewport.attr('title', 'Click and drag to chain this property to another. Double click to send its value through the chain.');
             this.$viewport.addClass('wcGrab');
             break;
           }
@@ -4683,9 +4705,6 @@ wcPlayEditor.prototype = {
    */
   __onViewportMouseDown: function(event, elem) {
     this._mouse = this.__mouse(event, this.$viewport.offset());
-    if (this._mouse.which === 3) {
-      return;
-    }
     this._mouseMoved = false;
 
     // Control+drag or middle+drag to box select.
@@ -5133,6 +5152,11 @@ wcPlayEditor.prototype = {
         this.$viewport.removeClass('wcMoving');
       }
     }
+
+    // Right click on an empty area to show the popup.
+    if (!this._selectedNode && !this._mouseMoved && this._mouse.which === 3) {
+      this.__drawPalettePopup({x: this._mouse.x, y: this._mouse.y});
+    }
   },
 
   /**
@@ -5182,7 +5206,6 @@ wcPlayEditor.prototype = {
 
       this._mouse = this.__mouse(event, this.$viewport.offset());
 
-      var hasTarget = false;
       var node = this.__findNodeAtPos(this._mouse, this._viewportCamera);
       if (node) {
         // Debug Log button.
