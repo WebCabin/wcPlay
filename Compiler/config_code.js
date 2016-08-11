@@ -116,7 +116,7 @@ concat({
   src: [
     '../Code/nodes/example/exampleviewport.js',
     '../Code/nodes/example/exampleproperties.js',
-    '../Code/nodes/example/exampledynamic.js',
+    '../Code/nodes/example/exampledynamic.js'
   ],
   dest: '../Build/wcPlayExampleNodes.js',
 });
