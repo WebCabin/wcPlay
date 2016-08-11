@@ -1236,7 +1236,7 @@ wcPlayEditor.prototype = {
 
     // File -> Import...
     this._menu.addOption('File', 'Import...', {
-      icon: "fa fa-plus-square-o fa-lg",
+      icon: "wcPlayEditorImportIcon",
       description: "Import a script file as a Composite Node.",
       toolbarIndex: -1,
       condition: function(editor) {
@@ -1414,7 +1414,7 @@ wcPlayEditor.prototype = {
     // Edit -> Create Composite
     this._menu.addOption('Edit', 'Create Composite', {
       hotkeys: 'C',
-      icon: "fa fa-suitcase fa-lg",
+      icon: "fa fa-object-group fa-lg",
       toolbarIndex: -1,
       description: "Combine all selected nodes into a new \'Composite\' Node.",
       condition: function(editor) {
@@ -1774,6 +1774,9 @@ wcPlayEditor.prototype = {
       icon: "fa fa-sitemap fa-lg",
       toolbarIndex: -1,
       description: "Toggle the visual style of the chains.",
+      toggle: function(editor) {
+        return editor._chainStyle === 0;
+      },
       onActivated: function(editor) {
         editor._chainStyle += 1;
         if (editor._chainStyle > editor._chainStyleMax) {
@@ -3571,6 +3574,17 @@ wcPlayEditor.prototype = {
   },
 
   /**
+   * Draws the popup that allows the user to select a node type.
+   * @function wcPlayEditor#__drawNodeSelectorPopup
+   * @param {wcNode} [node] - Supply an existing node if you intend to connect the new node to it.
+   * @param {wcNode.LINK_TYPE} [linkType] - If supplying a node, this is the type of link you are attaching to.
+   * @param {String} [linkName] - If supplying a node, this is the name of the link you are attaching to.
+   */
+  __drawNodeSelectorPopup: function(node, linkType, linkName) {
+
+  },
+
+  /**
    * Draws the editor control for the title of the node.
    * @function wcPlayEditor#__drawTitleEditor
    * @private
@@ -4539,7 +4553,7 @@ wcPlayEditor.prototype = {
         }
       }
 
-        // Output links.
+      // Output links.
       if (!this._options.readOnly && !this._selectedEntryLink && !this._selectedExitLink && !this._selectedOutputLink) {
         for (var i = 0; i < node._meta.bounds.outputBounds.length; ++i) {
           if (this.__inRect(mouse, node._meta.bounds.outputBounds[i].rect, node.pos, this._viewportCamera)) {

@@ -85,8 +85,8 @@ wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Import
     if (this.compiledNodes) {
       for (var i = 0; i < this.compiledNodes.length; ++i) {
         var data = this.compiledNodes[i];
-        if (window[data.className]) {
-          var newNode = new window[data.className](this, data.pos, data.name);
+        if (wcPlayNodes[data.className]) {
+          var newNode = new wcPlayNodes[data.className](this, data.pos, data.name);
           if (idMap) {
             idMap[data.id] = newNode.id;
           } else {

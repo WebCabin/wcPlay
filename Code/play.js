@@ -372,7 +372,7 @@ wcPlay.prototype = {
 
       // TODO: Ignore properties on the script?
       data.pos = {x: 0, y: 0};
-      newNode = new wcNodeCompositeScript(this, data.pos);
+      newNode = new wcPlayNodes.wcNodeCompositeScript(this, data.pos);
       newNode.nodeType = wcPlay.NODE.COMPOSITE;
       newNode.category = "Imported";
 
@@ -394,6 +394,7 @@ wcPlay.prototype = {
       this._importedScripts.push(newNode);
       return true;
     } catch (e) {
+      console.log(e.stack);
       if (newNode) {
         newNode.destroy();
       }

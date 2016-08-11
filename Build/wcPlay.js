@@ -460,7 +460,7 @@ wcPlay.prototype = {
 
       // TODO: Ignore properties on the script?
       data.pos = {x: 0, y: 0};
-      newNode = new wcNodeCompositeScript(this, data.pos);
+      newNode = new wcPlayNodes.wcNodeCompositeScript(this, data.pos);
       newNode.nodeType = wcPlay.NODE.COMPOSITE;
       newNode.category = "Imported";
 
@@ -482,6 +482,7 @@ wcPlay.prototype = {
       this._importedScripts.push(newNode);
       return true;
     } catch (e) {
+      console.log(e.stack);
       if (newNode) {
         newNode.destroy();
       }
@@ -3710,8 +3711,8 @@ wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Import
     if (this.compiledNodes) {
       for (var i = 0; i < this.compiledNodes.length; ++i) {
         var data = this.compiledNodes[i];
-        if (window[data.className]) {
-          var newNode = new window[data.className](this, data.pos, data.name);
+        if (wcPlayNodes[data.className]) {
+          var newNode = new wcPlayNodes[data.className](this, data.pos, data.name);
           if (idMap) {
             idMap[data.id] = newNode.id;
           } else {
