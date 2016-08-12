@@ -74,6 +74,7 @@ function wcPlayEditor(container, options) {
     },
     palettePopup: {
       padding: 5,           // Padding limit between the edge of the canvas and the popup window.
+      searchOffset: 44,      // Pixel offset between top of window to the center of the search field.
       width: 300,
       height: 400
     },
@@ -3662,8 +3663,23 @@ wcPlayEditor.prototype = {
       // Clamp the popup position so it remains inside the canvas.
       var viewWidth = this.$main.width();
       var viewHeight = this.$main.height();
-      var left = Math.min(Math.max(pos.x - this._drawStyle.palettePopup.width/2, this._drawStyle.palettePopup.padding), viewWidth - this._drawStyle.palettePopup.width - this._drawStyle.palettePopup.padding);
-      var top = Math.min(Math.max(pos.y, this._drawStyle.palettePopup.padding), viewHeight - this._drawStyle.palettePopup.height - this._drawStyle.palettePopup.padding);
+      var left = pos.x - this._drawStyle.palettePopup.width/2;
+      var top = pos.y;
+      switch (linkType) {
+        case wcNode.LINK_TYPE.INPUT:
+          left = pos.x - this._drawStyle.palettePopup.width;
+          top = pos.y - this._drawStyle.palettePopup.searchOffset;
+          break;
+        case wcNode.LINK_TYPE.OUTPUT:
+          left = pos.x;
+          top = pos.y - this._drawStyle.palettePopup.searchOffset;
+          break;
+        case wcNode.LINK_TYPE.ENTRY:
+          top = pos.y - this._drawStyle.palettePopup.height;
+          break;
+      }
+      left = Math.min(Math.max(left, this._drawStyle.palettePopup.padding), viewWidth - this._drawStyle.palettePopup.width - this._drawStyle.palettePopup.padding);
+      top = Math.min(Math.max(top, this._drawStyle.palettePopup.padding), viewHeight - this._drawStyle.palettePopup.height - this._drawStyle.palettePopup.padding);
 
       $popup.css('left', left + 'px');
       $popup.css('top', top + 'px');
