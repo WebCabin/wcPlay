@@ -4430,7 +4430,8 @@ wcPlayEditor.prototype = {
 
     var width = this.$viewport.width();
     var height = this.$viewport.height();
-    var THRESHOLD = Math.min(50, width/2, height/2);
+    var THRESHOLD = Math.min(100, width/2, height/2);
+    var SPEED = 0.15;
     this._autoScrollNodes = movingNodes;
 
     if (active) {
@@ -4458,8 +4459,8 @@ wcPlayEditor.prototype = {
     if (shouldBeActive && !this._autoScrollInterval) {
       var self = this;
       this._autoScrollInterval = setInterval(function() {
-        var moveX = self._autoScrollDirection.x;
-        var moveY = self._autoScrollDirection.y;
+        var moveX = self._autoScrollDirection.x * SPEED;
+        var moveY = self._autoScrollDirection.y * SPEED;
 
         self._viewportCamera.x -= moveX;
         self._viewportCamera.y -= moveY;
