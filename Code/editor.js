@@ -3753,7 +3753,6 @@ wcPlayEditor.prototype = {
         }
       });
 
-
       var fuse = new Fuse(this._nodeLibrary, {
         caseSensitive: false,
         shouldSort: true,
@@ -3795,14 +3794,24 @@ wcPlayEditor.prototype = {
             link = ' class="wcSelectable"';
           }
 
+          var add = false;
           var $item = $('<li id="wcNode-' + data.id + '"' + link + ' title="' + data.desc + '">' + data.displayName + '</li>');
-          $list.append($item);
           if (links) {
             var $links = $('<ul>');
             $item.append($links);
             for (var a = 0; a < links.length; ++a) {
-              $links.append('<li id="wcNode-' + data.id + '-' + a + '" class="wcSelectable wcLinkItem" title="' + links[a].desc + '"><span class="wcLinkType">' + connectLink + ' -- </span><span class="wcLinkName">' + links[a].name + '</span></li>');
+              // Ensure the connection can actually be made.
+              if (linkNode.onRequestConnect(linkName, linkType, data.node, links[a].name, connectLink) &&
+                  data.node.onRequestConnect(links[a].name, connectLink, linkNode, linkName, linkType)) {
+                add = true;
+                $links.append('<li id="wcNode-' + data.id + '-' + a + '" class="wcSelectable wcLinkItem" title="' + links[a].desc + '"><span class="wcLinkType">' + connectLink + ' -- </span><span class="wcLinkName">' + links[a].name + '</span></li>');
+              }
             }
+          } else {
+            add = true;
+          }
+          if (add) {
+            $list.append($item);
           }
         }
 

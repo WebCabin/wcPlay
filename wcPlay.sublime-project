@@ -1,0 +1,18 @@
+{
+	"folders":
+	[
+		{
+			"file_exclude_patterns":
+			[
+				"*.sublime*",
+			],
+			"folder_exclude_patterns":
+			[
+				"bower_components",
+				"Build"
+			],
+			"follow_symlinks": true,
+			"path": "."
+		}
+	]
+}
