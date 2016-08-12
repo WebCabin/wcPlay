@@ -156,7 +156,7 @@ function wcPlayEditor(container, options) {
   this._selectedOutputLink = false;
   this._selectedNodeOrigins = [];
 
-  this._draggingNodeData = null;
+  // this._draggingNodeData = null;
 
   this._highlightCrumb = -1;
   this._crumbBounds = [];
@@ -3641,10 +3641,12 @@ wcPlayEditor.prototype = {
    * Draws the popup that allows the user to select a node type.
    * @function wcPlayEditor#__drawPalettePopup
    * @param {wcPlay~Coordinates} pos - The position to center the popup.
+   * @param {wcNode} [linkNode] - If supplied, the source node to link with.
+   * @param {String} [linkName] - If supplied, the name of the source link.
    * @param {wcNode.LINK_TYPE} [linkType] - If supplying a node, this is the type of link you are attaching to.
-   * @param {wcPlayEditor~OnPalettePopupFinished} onFinished - A callback function to call when the popup has resolved.
+   * @param {wcPlayEditor~OnPalettePopupFinished} [onFinished] - A callback function to call when the popup has resolved.
    */
-  __drawPalettePopup: function(pos, linkType, onFinished) {
+  __drawPalettePopup: function(pos, linkNode, linkName, linkType, onFinished) {
     if (!this._showingSelector) {
       var self = this;
       var current = null;
@@ -3875,6 +3877,44 @@ wcPlayEditor.prototype = {
           todo += ' and connect with ' + connectLink + ' link "' + data[connectLink][link].name + '"';
         }
         console.log(todo);
+
+        // Create an instance of the node and add it to the script.
+        var newNode = new window.wcPlayNodes[data.className](self._parent, {x: 0, y: 0});
+        var exportData = data.node.export();  // Export nodes default data set.
+        exportData.id = newNode.id;
+
+        // TODO: Calculate position based on link connector.
+        var screenOffset = self.$container.offset();
+        exportData.pos.x = ((pos.x - self._viewportCamera.x) / self._viewportCamera.z) + screenOffset.left;
+        exportData.pos.y = ((pos.y - self._viewportCamera.y) / self._viewportCamera.z) + screenOffset.top;
+        // if (!newNode.chain.entry.length) {
+        //   exportData.y += this._drawStyle.links.length;
+        // }
+        newNode.import(exportData, []);
+
+        // Connect nodes if possible.
+        switch (linkType) {
+          case wcNode.LINK_TYPE.ENTRY:
+            linkNode.connectEntry(linkName, newNode, data[connectLink][link].name);
+            break;
+          case wcNode.LINK_TYPE.EXIT:
+            linkNode.connectExit(linkName, newNode, data[connectLink][link].name);
+            break;
+          case wcNode.LINK_TYPE.INPUT:
+            linkNode.connectInput(linkName, newNode, data[connectLink][link].name);
+            break;
+          case wcNode.LINK_TYPE.OUTPUT:
+            linkNode.connectOutput(linkName, newNode, data[connectLink][link].name);
+            break;
+        }
+
+        self.__onCreateNode(newNode);
+
+        self._selectedNode = newNode;
+        self._selectedNodes = [newNode];
+
+        self.__updateNode(newNode, 0, self._viewportContext);
+        self.__drawNode(newNode, self._viewportContext);
       };
       __searchList('');
     }
@@ -4659,18 +4699,18 @@ wcPlayEditor.prototype = {
       this._mouseMoved = true;
     }
 
-    // Dragging a node from the palette view.
-    if (this._draggingNodeData) {
-      var pos = {
-        x: mouse.gx + this._draggingNodeData.offset.x,
-        y: mouse.gy + this._draggingNodeData.offset.y,
-      };
+    // // Dragging a node from the palette view.
+    // if (this._draggingNodeData) {
+    //   var pos = {
+    //     x: mouse.gx + this._draggingNodeData.offset.x,
+    //     y: mouse.gy + this._draggingNodeData.offset.y,
+    //   };
 
-      this._draggingNodeData.$canvas.css('left', pos.x).css('top', pos.y);
-      this._mouse = mouse;
-      this.__handleAutoScroll(true);
-      return;
-    }
+    //   this._draggingNodeData.$canvas.css('left', pos.x).css('top', pos.y);
+    //   this._mouse = mouse;
+    //   this.__handleAutoScroll(true);
+    //   return;
+    // }
 
     // Box selection.
     if (this._highlightRect && this._parent) {
@@ -5159,34 +5199,34 @@ wcPlayEditor.prototype = {
   __onViewportMouseUp: function(event, elem) {
     this.$viewport.removeClass('wcGrabbing');
 
-    if (this._draggingNodeData && event.type === 'mouseup') {
-      // Create an instance of the node and add it to the script.
-      var screenOffset = this.$container.offset();
-      var mouse = this.__mouse(event, this.$viewport.offset(), this._viewportCamera);
-      var newNode = new window.wcPlayNodes[this._draggingNodeData.node.className](this._parent, {x: 0, y: 0});
-      var data = this._draggingNodeData.node.export();
-      data.id = newNode.id;
-      data.pos.x = (mouse.x / this._viewportCamera.z) + (this._draggingNodeData.$canvas.width()/2 + this._draggingNodeData.offset.x + screenOffset.left);
-      data.pos.y = (mouse.y / this._viewportCamera.z) + (this._draggingNodeData.offset.y + 5 + screenOffset.top);
-      if (!newNode.chain.entry.length) {
-        data.y += this._drawStyle.links.length;
-      }
-      newNode.import(data, []);
+    // if (this._draggingNodeData && event.type === 'mouseup') {
+    //   // Create an instance of the node and add it to the script.
+    //   var screenOffset = this.$container.offset();
+    //   var mouse = this.__mouse(event, this.$viewport.offset(), this._viewportCamera);
+    //   var newNode = new window.wcPlayNodes[this._draggingNodeData.node.className](this._parent, {x: 0, y: 0});
+    //   var data = this._draggingNodeData.node.export();
+    //   data.id = newNode.id;
+    //   data.pos.x = (mouse.x / this._viewportCamera.z) + (this._draggingNodeData.$canvas.width()/2 + this._draggingNodeData.offset.x + screenOffset.left);
+    //   data.pos.y = (mouse.y / this._viewportCamera.z) + (this._draggingNodeData.offset.y + 5 + screenOffset.top);
+    //   if (!newNode.chain.entry.length) {
+    //     data.y += this._drawStyle.links.length;
+    //   }
+    //   newNode.import(data, []);
 
-      this.__onCreateNode(newNode);
+    //   this.__onCreateNode(newNode);
 
-      this._selectedNode = newNode;
-      this._selectedNodes = [newNode];
+    //   this._selectedNode = newNode;
+    //   this._selectedNodes = [newNode];
 
-      this.__updateNode(newNode, 0, this._viewportContext);
-      this.__drawNode(newNode, this._viewportContext);
+    //   this.__updateNode(newNode, 0, this._viewportContext);
+    //   this.__drawNode(newNode, this._viewportContext);
 
-      this._draggingNodeData.$canvas.remove();
-      this._draggingNodeData.$canvas = null;
-      this._draggingNodeData = null;
-      this.$palette.removeClass('wcMoving');
-      this.$viewport.removeClass('wcMoving');
-    }
+    //   this._draggingNodeData.$canvas.remove();
+    //   this._draggingNodeData.$canvas = null;
+    //   this._draggingNodeData = null;
+    //   this.$palette.removeClass('wcMoving');
+    //   this.$viewport.removeClass('wcMoving');
+    // }
 
     if (this._highlightRect && this._parent) {
       this._highlightRect = null;
@@ -5460,24 +5500,24 @@ wcPlayEditor.prototype = {
       var linkName = null;
       var linkType = null;
       if (this._selectedEntryLink) {
-        linkName = this._selectedEntryLink;
+        linkName = this._selectedEntryLink.name;
         linkType = wcNode.LINK_TYPE.ENTRY;
       }
       if (this._selectedExitLink) {
-        linkName = this._selectedExitLink;
+        linkName = this._selectedExitLink.name;
         linkType = wcNode.LINK_TYPE.EXIT;
       }
       if (this._selectedInputLink) {
-        linkName = this._selectedInputLink;
+        linkName = this._selectedInputLink.name;
         linkType = wcNode.LINK_TYPE.INPUT;
       }
       if (this._selectedOutputLink) {
-        linkName = this._selectedOutputLink;
+        linkName = this._selectedOutputLink.name;
         linkType = wcNode.LINK_TYPE.OUTPUT;
       }
       if (linkName && linkType) {
         var mouse = this.__mouse(event, this.$viewport.offset());
-        this.__drawPalettePopup(mouse, linkType, function(choice) {
+        this.__drawPalettePopup(mouse, this._selectedNode, linkName, linkType, function(newNode) {
           // this._selectedNode, linkName, 
           __cleanup();
         });
@@ -5489,9 +5529,7 @@ wcPlayEditor.prototype = {
 
     // Right click on an empty area to show the popup.
     if (!this._selectedNode && !this._mouseMoved && this._mouse.which === 3) {
-      this.__drawPalettePopup(this._mouse, null, function(choice) {
-
-      });
+      this.__drawPalettePopup(this._mouse);
     }
   },
 
