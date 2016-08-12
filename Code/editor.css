@@ -264,7 +264,7 @@
 #wcPlayEditorPaletteList {
   flex: 0.98;
   left: 5px;
-  width: calc(100% - 19px);
+  width: calc(100% - 10px);
   overflow-x: hidden;
   overflow-y: auto;
 }
@@ -274,12 +274,20 @@
   padding-left: 10px;
 }
 
-#wcPlayEditorPaletteList .wcLink:hover {
+#wcPlayEditorPaletteList .wcSelectable:hover {
   background-color: lightgray;
 }
 
-#wcPlayEditorPaletteList li.wcLink {
+#wcPlayEditorPaletteList li.wcSelectable {
   cursor: pointer;
+}
+
+#wcPlayEditorPaletteList .wcSelected:hover {
+  background-color: gray;
+}
+
+#wcPlayEditorPaletteList li.wcSelected {
+  background-color: gray;
 }
 
 #wcPlayEditorPaletteList li span.wcLinkType {
@@ -287,8 +295,9 @@
   font-size: 12px;
 }
 
-#wcPlayEditorPaletteList li span.wcLinkName {
-  color: black;
+#wcPlayEditorPaletteList li.wcSelected,
+#wcPlayEditorPaletteList li.wcSelected span {
+  color: white;
 }
 
 

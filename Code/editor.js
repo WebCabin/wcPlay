@@ -1924,24 +1924,29 @@ wcPlayEditor.prototype = {
       // Now create an instance of the node so we can extract further data from it.
       var node = new window.wcPlayNodes[data.className](null);
       data.entry = node.chain.entry.map(function(link) {
-        return link.name;
+        return {name: link.name, desc: ''};
       });
       data.exit = node.chain.exit.map(function(link) {
-        return link.name;
+        return {name: link.name, desc: ''};
       });
       data.input = node.properties.filter(function(prop) {
         return prop.options.input;
       }).map(function(prop) {
-        return prop.name;
+        return {name: prop.name, desc: prop.options.description};
       });
       data.output = node.properties.filter(function(prop) {
         return prop.options.output;
       }).map(function(prop) {
-        return prop.name;
+        return {name: prop.name, desc: prop.options.description};
       });
-      data.desc  = node._meta.description;
+      data.desc = node._meta.description;
+      data.node = node;
+      data.id = this._nodeLibrary.length;
 
       this._nodeLibrary.push(data);
+
+      // We need to update the node to get it's proper measurements.
+      this.__updateNode(node, 0, this._viewportContext);
     }
 
     this._fuse = new Fuse(this._nodeLibrary, {
@@ -3611,21 +3616,35 @@ wcPlayEditor.prototype = {
   },
 
   /**
+   * A callback handler when a node has been created.
+   * @typedef wcPlayEditor~OnPalettePopupFinished
+   * @param {wcNode} [node] - The node created, or null if the operation was cancelled.
+   */
+
+  /**
    * Draws the popup that allows the user to select a node type.
    * @function wcPlayEditor#__drawPalettePopup
    * @param {wcPlay~Coordinates} pos - The position to center the popup.
    * @param {wcNode.LINK_TYPE} [linkType] - If supplying a node, this is the type of link you are attaching to.
-   * @param {Function} onSelected - A callback function to call when a selection has been made, or not made.
+   * @param {wcPlayEditor~OnPalettePopupFinished} onFinished - A callback function to call when the popup has resolved.
    */
-  __drawPalettePopup: function(pos, linkType, onSelected) {
+  __drawPalettePopup: function(pos, linkType, onFinished) {
     if (!this._showingSelector) {
       var self = this;
-      var selected = null;
+      var current = null;
+      var createdNode = null;
       this._showingSelector = true;
+      var connectLink = '';
+      switch (linkType) {
+        case wcNode.LINK_TYPE.ENTRY:  connectLink = 'exit';   break;
+        case wcNode.LINK_TYPE.EXIT:   connectLink = 'entry';  break;
+        case wcNode.LINK_TYPE.INPUT:  connectLink = 'output'; break;
+        case wcNode.LINK_TYPE.OUTPUT: connectLink = 'input';  break;
+      }
 
       var header = 'Create Node';
-      if (linkType) {
-        header += ' and connect ' + linkType + ' to';
+      if (connectLink) {
+        header += ' and connect to an ' + connectLink;
       }
 
       var $blocker = $('<div class="wcPlayEditorBlocker">');
@@ -3639,7 +3658,7 @@ wcPlayEditor.prototype = {
         $(this).remove();
         $popup.remove();
         self._showingSelector = false;
-        onSelected && onSelected(selected);
+        onFinished && onFinished(createdNode);
       });
 
       // Node search input field with auto-focus.
@@ -3654,29 +3673,63 @@ wcPlayEditor.prototype = {
 
         // Cancel on escape.
         if (event.keyCode === 27) {
-          console.log('escaped');
-          selected = null;
           $blocker.click();
         }
         // Return to select the current item.
         else if (event.keyCode === 13) {
-          // TODO
-          console.log('select item');
+          // Create our node.
+          __createNode();
           $blocker.click();
           event.preventDefault();
           return true;
         }
         // Down arrow, or Tab to cycle next item.
         else if (event.keyCode === 40 || (event.keyCode === 9 && !event.shiftKey)) {
-          // TODO
-          console.log('next item');
+          if (current) {
+            var $selected = $('#'+current);
+
+            if ($selected.length) {
+
+              var $next = $selected.next('.wcSelectable');
+              // No more siblings, jump to first child of our parent instead.
+              if (!$next.length) {
+                $next = $selected.parents('li').next();
+                $next = $next.find('.wcSelectable').first();
+              }
+
+              if ($next.length) {
+                $next.addClass('wcSelected');
+                current = $next.attr('id');
+                $selected.removeClass('wcSelected');
+                __ensureVisible($next);
+              }
+            }
+          }
           event.preventDefault();
           return true;
         }
         // Up arrow, shift-tab to cycle previous item.
         else if (event.keyCode === 38 || (event.keyCode === 9 && event.shiftKey)) {
-          // TODO
-          console.log('prev item');
+          if (current) {
+            var $selected = $('#'+current);
+
+            if ($selected.length) {
+
+              var $next = $selected.prev('.wcSelectable');
+              // No more siblings, jump to first child of our parent instead.
+              if (!$next.length) {
+                $next = $selected.parents('li').prev();
+                $next = $next.find('.wcSelectable').last();
+              }
+
+              if ($next.length) {
+                $next.addClass('wcSelected');
+                current = $next.attr('id');
+                $selected.removeClass('wcSelected');
+                __ensureVisible($next);
+              }
+            }
+          }
           event.preventDefault();
           return true;
         }
@@ -3694,9 +3747,8 @@ wcPlayEditor.prototype = {
         }
       });
 
-      var $resultList = null;
-
       // Populate the node list.
+      var $resultList = null;
       function __searchList(key) {
         var result = self._fuse.search(key);
         // No results, just show the full listing.
@@ -3713,75 +3765,46 @@ wcPlayEditor.prototype = {
           var type = null;
 
           // Determine whether to filter a node based on available connection links.
-          switch (linkType) {
-            case wcNode.LINK_TYPE.ENTRY:
-              if (!data.exit.length) {
-                continue;
-              }
-              links = data.exit;
-              type = 'exit';
-              break;
-            case wcNode.LINK_TYPE.EXIT:
-              if (!data.entry.length) {
-                continue;
-              }
-              links = data.entry;
-              type = 'entry';
-              break;
-            case wcNode.LINK_TYPE.INPUT:
-              if (!data.output.length) {
-                continue;
-              }
-              links = data.output;
-              type = 'output';
-              break;
-            case wcNode.LINK_TYPE.OUTPUT:
-              if (!data.input.length) {
-                continue;
-              }
-              links = data.input;
-              type = 'input';
-              break;
+          if (connectLink) {
+            if (!data[connectLink].length) {
+              continue;
+            }
+            links = data[connectLink];
           }
 
           var link = '';
           if (!links) {
-            link = ' class="wcLink"';
+            link = ' class="wcSelectable"';
           }
 
-          var $item = $('<li' + link + '>' + data.displayName + '</li>');
+          var $item = $('<li id="wcNode-' + data.id + '"' + link + ' title="' + data.desc + '">' + data.displayName + '</li>');
           $list.append($item);
           if (links) {
             var $links = $('<ul>');
-            $list.append($links);
+            $item.append($links);
             for (var a = 0; a < links.length; ++a) {
-              $links.append('<li class="wcLink"><span class="wcLinkType">' + type + ' -- </span><span class="wcLinkName">' + links[a] + '</span></li>');
+              $links.append('<li id="wcNode-' + data.id + '-' + a + '" class="wcSelectable wcLinkItem" title="' + links[a].desc + '"><span class="wcLinkType">' + connectLink + ' -- </span><span class="wcLinkName">' + links[a].name + '</span></li>');
             }
           }
         }
 
+        // Attempt to find the currently selected item.
+        var $selected = [];
+        var found = false;
+        if (current) {
+          $selected = $list.find('#'+current);
+        }
 
-        // for (var cat in this._nodeLibrary) {
-        //   var $cat = $('<li>' + cat + '</li>');
-        //   var $catList = $('<ul>');
-        //   $cat.append($catList);
-
-        //   var found = false;
-        //   for (var type in this._nodeLibrary[cat]) {
-        //     var typeData = this._nodeLibrary[cat][type];
-
-        //     for (var i = 0; i < typeData.nodes.length; ++i) {
-        //       var node = typeData.nodes[i];
-        //       if (typeof node[func] === 'function') {
-        //         node[func].apply(node, args);
-        //       }
-        //     }
-        //   }
-
-        //   if (found) {
-        //     $list.append($cat);
-        //   }
-        // }
+        // No item found that was currently selected, try selecting the first item instead.
+        if (!$selected.length) {
+          $selected = $list.find('.wcSelectable').first();
+        }
+        
+        current = null;
+        if ($selected.length) {
+          $selected.addClass('wcSelected');
+          current = $selected.attr('id');
+        }
 
         if ($resultList) {
           $resultList.remove();
@@ -3789,8 +3812,54 @@ wcPlayEditor.prototype = {
 
         $resultList = $listContainer;
         $popup.append($resultList);
-      }
+        __ensureVisible($selected);
 
+        // Make all selection items clickable.
+        $('#wcPlayEditorPaletteList .wcSelectable').click(function() {
+          current = this.id;
+          __createNode($(this));
+          $blocker.click();
+          event.preventDefault();
+          return true;
+        });
+      };
+
+      function __ensureVisible($item) {
+        if ($item.length && $item[0].scrollIntoView) {
+          // Check if the item is visible.
+          var itemRect = $item[0].getBoundingClientRect();
+          var listRect = $resultList[0].getBoundingClientRect();
+
+          if (itemRect.top < listRect.top) {
+            if ($item.hasClass('wcLinkItem')) {
+              $item = $item.parents('li');
+            }
+            $item[0].scrollIntoView(true);
+          } else if (itemRect.bottom > listRect.bottom) {
+            $item[0].scrollIntoView(false);
+          }
+        }
+      };
+
+      function __createNode() {
+        if (!current) {
+          return;
+        }
+
+        var id   = current.split('-')[1];
+        var link = current.split('-')[2];
+
+        var data = self._nodeLibrary[id];
+        if (!data) {
+          return;
+        }
+
+        var todo = 'TODO: Create node ' + data.className + ' (' + data.displayName + ')';
+        if (link) {
+          todo += ' and connect with ' + connectLink + ' link "' + data[connectLink][link].name + '"';
+        }
+        console.log(todo);
+      };
       __searchList('');
     }
 
