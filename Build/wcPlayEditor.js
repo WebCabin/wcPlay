@@ -51,7 +51,6 @@ function wcPlayEditor(container, options) {
   this._chainStyle = 1;
   this._chainStyleMax = 1;
   this._showingSelector = false;
-  this._fuse = null;
 
   this._menu = null;
 
@@ -1985,17 +1984,6 @@ wcPlayEditor.prototype = {
       this.__updateNode(node, 0, this._viewportContext);
     }
 
-    this._fuse = new Fuse(this._nodeLibrary, {
-      caseSensitive: false,
-      shouldSort: true,
-      tokenize: false,
-      threshold: 0.2,
-      location: 0,
-      distance: 100,
-      maxPatternLength: 32,
-      keys: ['displayName', 'category']
-    });
-
     // this._paletteSize = this._options.readOnly? 0: this._drawStyle.palette.width;
     // this.onResized();
 
@@ -3785,10 +3773,21 @@ wcPlayEditor.prototype = {
         }
       });
 
+      var fuse = new Fuse(this._nodeLibrary, {
+        caseSensitive: false,
+        shouldSort: true,
+        tokenize: false,
+        threshold: 0.2,
+        location: 0,
+        distance: 100,
+        maxPatternLength: 32,
+        keys: ['displayName', 'category', connectLink + '.name']
+      });
+
       // Populate the node list.
       var $resultList = null;
       function __searchList(key) {
-        var result = self._fuse.search(key);
+        var result = fuse.search(key);
         // No results, just show the full listing.
         if (!result.length && !key) {
           result = self._nodeLibrary;
@@ -3815,14 +3814,24 @@ wcPlayEditor.prototype = {
             link = ' class="wcSelectable"';
           }
 
+          var add = false;
           var $item = $('<li id="wcNode-' + data.id + '"' + link + ' title="' + data.desc + '">' + data.displayName + '</li>');
-          $list.append($item);
           if (links) {
             var $links = $('<ul>');
             $item.append($links);
             for (var a = 0; a < links.length; ++a) {
-              $links.append('<li id="wcNode-' + data.id + '-' + a + '" class="wcSelectable wcLinkItem" title="' + links[a].desc + '"><span class="wcLinkType">' + connectLink + ' -- </span><span class="wcLinkName">' + links[a].name + '</span></li>');
+              // Ensure the connection can actually be made.
+              if (linkNode.onRequestConnect(linkName, linkType, data.node, links[a].name, connectLink) &&
+                  data.node.onRequestConnect(links[a].name, connectLink, linkNode, linkName, linkType)) {
+                add = true;
+                $links.append('<li id="wcNode-' + data.id + '-' + a + '" class="wcSelectable wcLinkItem" title="' + links[a].desc + '"><span class="wcLinkType">' + connectLink + ' -- </span><span class="wcLinkName">' + links[a].name + '</span></li>');
+              }
             }
+          } else {
+            add = true;
+          }
+          if (add) {
+            $list.append($item);
           }
         }
 
@@ -4441,7 +4450,8 @@ wcPlayEditor.prototype = {
 
     var width = this.$viewport.width();
     var height = this.$viewport.height();
-    var THRESHOLD = Math.min(50, width/2, height/2);
+    var THRESHOLD = Math.min(100, width/2, height/2);
+    var SPEED = 0.15;
     this._autoScrollNodes = movingNodes;
 
     if (active) {
@@ -4469,8 +4479,8 @@ wcPlayEditor.prototype = {
     if (shouldBeActive && !this._autoScrollInterval) {
       var self = this;
       this._autoScrollInterval = setInterval(function() {
-        var moveX = self._autoScrollDirection.x;
-        var moveY = self._autoScrollDirection.y;
+        var moveX = self._autoScrollDirection.x * SPEED;
+        var moveY = self._autoScrollDirection.y * SPEED;
 
         self._viewportCamera.x -= moveX;
         self._viewportCamera.y -= moveY;
@@ -4846,7 +4856,7 @@ wcPlayEditor.prototype = {
     var wasOverViewport = this._highlightViewport;
     this._highlightViewport = false;
 
-    this.$viewport.removeClass('wcClickable wcMoving wcGrab');
+    this.$viewport.removeClass('wcClickable wcMoving wcGrab wcNoDrop');
     this.$viewport.attr('title', '');
     
     for (var i = 0; i < this._crumbBounds.length; ++i) {
@@ -4943,10 +4953,21 @@ wcPlayEditor.prototype = {
       if (!this._options.readOnly && !this._selectedEntryLink && !this._selectedExitLink && !this._selectedInputLink) {
         for (var i = 0; i < node._meta.bounds.inputBounds.length; ++i) {
           if (this.__inRect(mouse, node._meta.bounds.inputBounds[i].rect, node.pos, this._viewportCamera)) {
+            var canConnect = true;
             this._highlightNode = node;
-            this._highlightInputLink = node._meta.bounds.inputBounds[i];
-            this.$viewport.attr('title', 'Click and drag to chain this property to another.');
-            this.$viewport.addClass('wcGrab');
+            if (this._selectedOutputLink) {
+              if (!this._selectedNode.onRequestConnect(this._selectedOutputLink.name, wcNode.LINK_TYPE.OUTPUT, node, node._meta.bounds.inputBounds[i].name, wcNode.LINK_TYPE.INPUT) ||
+                  !node.onRequestConnect(node._meta.bounds.inputBounds[i].name, wcNode.LINK_TYPE.INPUT, this._selectedNode, this._selectedOutputLink.name, wcNode.LINK_TYPE.OUTPUT)) {
+                canConnect = false;
+              }
+            }
+            if (canConnect) {
+              this._highlightInputLink = node._meta.bounds.inputBounds[i];
+              this.$viewport.attr('title', 'Click and drag to chain this property to another.');
+              this.$viewport.addClass('wcGrab');
+            } else {
+              this.$viewport.addClass('wcNoDrop');
+            }
             break;
           }
         }
@@ -4956,10 +4977,21 @@ wcPlayEditor.prototype = {
       if (!this._options.readOnly && !this._selectedEntryLink && !this._selectedExitLink && !this._selectedOutputLink) {
         for (var i = 0; i < node._meta.bounds.outputBounds.length; ++i) {
           if (this.__inRect(mouse, node._meta.bounds.outputBounds[i].rect, node.pos, this._viewportCamera)) {
+            var canConnect = true;
             this._highlightNode = node;
-            this._highlightOutputLink = node._meta.bounds.outputBounds[i];
-            this.$viewport.attr('title', 'Click and drag to chain this property to another. Double click to send its value through the chain.');
-            this.$viewport.addClass('wcGrab');
+            if (this._selectedInputLink) {
+              if (!this._selectedNode.onRequestConnect(this._selectedInputLink.name, wcNode.LINK_TYPE.INPUT, node, node._meta.bounds.inputBounds[i].name, wcNode.LINK_TYPE.OUTPUT) ||
+                  !node.onRequestConnect(node._meta.bounds.inputBounds[i].name, wcNode.LINK_TYPE.OUTPUT, this._selectedNode, this._selectedInputLink.name, wcNode.LINK_TYPE.INPUT)) {
+                canConnect = false;
+              }
+            }
+            if (canConnect) {
+              this._highlightOutputLink = node._meta.bounds.outputBounds[i];
+              this.$viewport.attr('title', 'Click and drag to chain this property to another. Double click to send its value through the chain.');
+              this.$viewport.addClass('wcGrab');
+            } else {
+              this.$viewport.addClass('wcNoDrop');
+            }
             break;
           }
         }

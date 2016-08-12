@@ -515,7 +515,7 @@ wcPlayNodes.wcNodeStorage.extend('wcNodeStorageGlobal', 'Global Value', 'Global'
     this.description("References a global property on the script.");
     this.details("The title name for this node becomes the name of the global property it references. Duplicate Global Nodes with the same name will all reference the same value.");
 
-    this.createProperty('value', wcPlay.PROPERTY.STRING, '', {description: "The current value of the global property (Use the title to identify the property)."});
+    this.createProperty('value', wcPlay.PROPERTY.STRING, '', {description: "The current value of the global property (Use the title to identify the property).", input: true, output: true});
   },
 
   /**

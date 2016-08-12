@@ -202,6 +202,11 @@
   cursor: pointer;
 }
 
+.wcNoDrop {
+  cursor: -webkit-no-drop;
+  cursor: no-drop;
+}
+
 .wcPlayEditorBlocker {
   position: absolute;
   top: 0px;

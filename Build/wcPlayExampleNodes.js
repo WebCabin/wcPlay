@@ -200,6 +200,7 @@ wcPlayNodes.wcNodeProcess.extend('wcNodeProcessExampleProperties', 'Example Prop
     this.createProperty('select no none', wcPlay.PROPERTY.SELECT, 'dunno', {description: "Demonstration of a select property that does not allow none as an option.", items: ['Option 1', 'Option 2', 'Option 3'], allowNone: false});
     this.createProperty('read only', wcPlay.PROPERTY.STRING, "Can't edit me!", {description: "Demonstration of a property that is marked as read only.", output: true, readOnly: true})
     this.createProperty('linked prop', wcPlay.PROPERTY.STRING, 'Both values linked!', {description: "Demonstration of a property that has both value and initial values linked.", linked: true, input: true, output: true});
+    this.createProperty('refuse link', wcPlay.PROPERTY.STRING, 'refuses numbers', {description: "Demonstration of a link that will not connect to any number property link.", output: true, input: true});
   },
 
   /**
@@ -220,6 +221,29 @@ wcPlayNodes.wcNodeProcess.extend('wcNodeProcessExampleProperties', 'Example Prop
 
     return result;
   },
+
+  /**
+   * Event that is called when a property connection is being requested.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeProcessExampleProperties#onRequestConnect
+   * @param {String} name - The name of the link being connected to.
+   * @param {wcNode.LINK_TYPE} type - The link's type.
+   * @param {wcNode} targetNode - The target node being connected to.
+   * @param {String} targetName - The link name on the target node being connected to.
+   * @param {wcNode.LINK_TYPE} targetType - The target link's type.
+   * @returns {Boolean} - Return true if you will allow the connection.
+   */
+  onRequestConnect: function(name, type, targetNode, targetName, targetType) {
+    this._super(name, type, targetNode, targetName, targetType);
+
+    if (name === 'refuse link') {
+      if (targetNode.propertyType(targetName) === wcPlay.PROPERTY.NUMBER) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 });
 
 wcPlayNodes.wcNodeProcess.extend('wcNodeProcessExampleDynamic', 'Example Dynamic', 'Example', {

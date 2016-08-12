@@ -1143,6 +1143,16 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
       }
     }
 
+    // Ask if this node can connect with the other.
+    if (!this.onRequestConnect(myProperty.name, wcNode.LINK_TYPE.INPUT, targetNode, targetProperty.name, wcNode.LINK_TYPE.OUTPUT)) {
+      return wcNode.CONNECT_RESULT.REFUSED;
+    }
+
+    // Ask if the other node can connect with this.
+    if (!targetNode.onRequestConnect(targetProperty.name, wcNode.LINK_TYPE.OUTPUT, this, myProperty.name, wcNode.LINK_TYPE.INPUT)) {
+      return wcNode.CONNECT_RESULT.REFUSED;
+    }
+
     // Now make the connection.
     myProperty.inputs.push({
       name: targetProperty.name,
@@ -1207,6 +1217,16 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
       if (targetProperty.inputs[i].node === this &amp;&amp; targetProperty.inputs[i].name === myProperty.name) {
         return wcNode.CONNECT_RESULT.ALREADY_CONNECTED;
       }
+    }
+
+    // Ask if this node can connect with the other.
+    if (!this.onRequestConnect(myProperty.name, wcNode.LINK_TYPE.OUTPUT, targetNode, targetProperty.name, wcNode.LINK_TYPE.INPUT)) {
+      return wcNode.CONNECT_RESULT.REFUSED;
+    }
+
+    // Ask if the other node can connect with this.
+    if (!targetNode.onRequestConnect(targetProperty.name, wcNode.LINK_TYPE.INPUT, this, myProperty.name, wcNode.LINK_TYPE.OUTPUT)) {
+      return wcNode.CONNECT_RESULT.REFUSED;
     }
 
     // Now make the connection.
@@ -1433,7 +1453,23 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
     return false;
   },
 
-  /** Gets the options assigned to a property, you may change attributes from here.
+  /**
+   * Gets the type of a property.
+   * @function wcNode#propertyType
+   * @param {String} name - The name of the property.
+   * @returns {wcPlay.PROPERTY|null} - Returns null if the property was not found.
+   */
+  propertyType: function(name) {
+    for (var i = 0; i &lt; this.properties.length; ++i) {
+      var prop = this.properties[i];
+      if (prop.name === name) {
+        return prop.type;
+      }
+    }
+  },
+
+  /**
+   * Gets the options assigned to a property, you may change attributes from here.
    * @function wcNode#propertyOptions
    * @param {String} name - The name of the property.
    * @returns {Object|null} - The options object associated with the property, or null if the property does not exist.
@@ -1937,6 +1973,22 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
   },
 
   /**
+   * Event that is called when a property connection is being requested.&lt;br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onRequestConnect
+   * @param {String} name - The name of the link being connected to.
+   * @param {wcNode.LINK_TYPE} type - The link's type.
+   * @param {wcNode} targetNode - The target node being connected to.
+   * @param {String} targetName - The link name on the target node being connected to.
+   * @param {wcNode.LINK_TYPE} targetType - The target link's type.
+   * @returns {Boolean} - Return true if you will allow the connection.
+   */
+  onRequestConnect: function(name, type, targetNode, targetName, targetType) {
+    // this._super(name, type, targetNode, targetName, targetType);
+    return true;
+  },
+
+  /**
    * Event that is called when a connection has been made.&lt;br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onConnect
@@ -2282,6 +2334,7 @@ wcNode.LINK_TYPE = {
 wcNode.CONNECT_RESULT = {
   NOT_FOUND: 'not_found',
   ALREADY_CONNECTED: 'already_connected',
+  REFUSED: 'refused',
   SUCCESS: 'success',
 };
 
