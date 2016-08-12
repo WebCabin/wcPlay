@@ -3898,9 +3898,8 @@ wcPlayEditor.prototype = {
         exportData.id = newNode.id;
 
         // Position the new node.
-        var screenOffset = self.$container.offset();
-        exportData.pos.x = ((pos.x - self._viewportCamera.x) / self._viewportCamera.z) + screenOffset.left;
-        exportData.pos.y = ((pos.y - self._viewportCamera.y) / self._viewportCamera.z) + screenOffset.top;
+        exportData.pos.x = (pos.x - self._viewportCamera.x) / self._viewportCamera.z;
+        exportData.pos.y = (pos.y - self._viewportCamera.y) / self._viewportCamera.z;
 
         // Calculate position based on link connector.
         var bounds = null;
