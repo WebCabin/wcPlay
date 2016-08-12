@@ -3892,24 +3892,42 @@ wcPlayEditor.prototype = {
           return;
         }
 
-        var todo = 'TODO: Create node ' + data.className + ' (' + data.displayName + ')';
-        if (link) {
-          todo += ' and connect with ' + connectLink + ' link "' + data[connectLink][link].name + '"';
-        }
-        console.log(todo);
-
         // Create an instance of the node and add it to the script.
         var newNode = new window.wcPlayNodes[data.className](self._parent, {x: 0, y: 0});
         var exportData = data.node.export();  // Export nodes default data set.
         exportData.id = newNode.id;
 
-        // TODO: Calculate position based on link connector.
+        // Position the new node.
         var screenOffset = self.$container.offset();
         exportData.pos.x = ((pos.x - self._viewportCamera.x) / self._viewportCamera.z) + screenOffset.left;
         exportData.pos.y = ((pos.y - self._viewportCamera.y) / self._viewportCamera.z) + screenOffset.top;
-        // if (!newNode.chain.entry.length) {
-        //   exportData.y += this._drawStyle.links.length;
-        // }
+
+        // Calculate position based on link connector.
+        var bounds = null;
+        switch (linkType) {
+          case wcNode.LINK_TYPE.ENTRY:
+            bounds = data.node._meta.bounds.exitBounds;
+            break;
+          case wcNode.LINK_TYPE.EXIT:
+            bounds = data.node._meta.bounds.entryBounds;
+            break;
+          case wcNode.LINK_TYPE.INPUT:
+            bounds = data.node._meta.bounds.outputBounds;
+            break;
+          case wcNode.LINK_TYPE.OUTPUT:
+            bounds = data.node._meta.bounds.inputBounds;
+            break;
+        }
+        if (bounds) {
+          var bound = bounds.find(function(bound) {
+            return bound.name === data[connectLink][link].name;
+          });
+          if (bound) {
+            exportData.pos.x -= bound.point.x;
+            exportData.pos.y -= bound.point.y;
+          }
+        }
+
         newNode.import(exportData, []);
 
         // Connect nodes if possible.
@@ -5538,7 +5556,6 @@ wcPlayEditor.prototype = {
       if (linkName && linkType) {
         var mouse = this.__mouse(event, this.$viewport.offset());
         this.__drawPalettePopup(mouse, this._selectedNode, linkName, linkType, function(newNode) {
-          // this._selectedNode, linkName, 
           __cleanup();
         });
         return;
