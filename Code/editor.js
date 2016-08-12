@@ -1398,6 +1398,22 @@ wcPlayEditor.prototype = {
       }
     });
 
+    // Edit -> Create Node
+    this._menu.addOption('Edit', 'Create Node', {
+      hotkeys: 'N',
+      icon: "fa fa-plus fa-lg",
+      toolbarIndex: -1,
+      description: "Create a new node.",
+      condition: function(editor) {
+        return !editor._options.readOnly;
+      },
+      onActivated: function(editor) {
+        if (editor._mouse) {
+          editor.__drawPalettePopup(editor._mouse);
+        }
+      }
+    });
+
     // Edit -> Create Composite
     this._menu.addOption('Edit', 'Create Composite', {
       hotkeys: 'C',
@@ -1405,7 +1421,7 @@ wcPlayEditor.prototype = {
       toolbarIndex: -1,
       description: "Combine all selected nodes into a new \'Composite\' Node.",
       condition: function(editor) {
-        return editor._selectedNodes.length > 0;
+        return !editor._options.readOnly && editor._selectedNodes.length > 0;
       },
       onActivated: function(editor) {
         if (editor._selectedNodes.length && editor._parent) {
