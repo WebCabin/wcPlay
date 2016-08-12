@@ -4836,7 +4836,7 @@ wcPlayEditor.prototype = {
     var wasOverViewport = this._highlightViewport;
     this._highlightViewport = false;
 
-    this.$viewport.removeClass('wcClickable wcMoving wcGrab');
+    this.$viewport.removeClass('wcClickable wcMoving wcGrab wcNoDrop');
     this.$viewport.attr('title', '');
     
     for (var i = 0; i < this._crumbBounds.length; ++i) {
@@ -4933,10 +4933,21 @@ wcPlayEditor.prototype = {
       if (!this._options.readOnly && !this._selectedEntryLink && !this._selectedExitLink && !this._selectedInputLink) {
         for (var i = 0; i < node._meta.bounds.inputBounds.length; ++i) {
           if (this.__inRect(mouse, node._meta.bounds.inputBounds[i].rect, node.pos, this._viewportCamera)) {
+            var canConnect = true;
             this._highlightNode = node;
-            this._highlightInputLink = node._meta.bounds.inputBounds[i];
-            this.$viewport.attr('title', 'Click and drag to chain this property to another.');
-            this.$viewport.addClass('wcGrab');
+            if (this._selectedOutputLink) {
+              if (!this._selectedNode.onRequestConnect(this._selectedOutputLink.name, wcNode.LINK_TYPE.OUTPUT, node, node._meta.bounds.inputBounds[i].name, wcNode.LINK_TYPE.INPUT) ||
+                  !node.onRequestConnect(node._meta.bounds.inputBounds[i].name, wcNode.LINK_TYPE.INPUT, this._selectedNode, this._selectedOutputLink.name, wcNode.LINK_TYPE.OUTPUT)) {
+                canConnect = false;
+              }
+            }
+            if (canConnect) {
+              this._highlightInputLink = node._meta.bounds.inputBounds[i];
+              this.$viewport.attr('title', 'Click and drag to chain this property to another.');
+              this.$viewport.addClass('wcGrab');
+            } else {
+              this.$viewport.addClass('wcNoDrop');
+            }
             break;
           }
         }
@@ -4946,10 +4957,21 @@ wcPlayEditor.prototype = {
       if (!this._options.readOnly && !this._selectedEntryLink && !this._selectedExitLink && !this._selectedOutputLink) {
         for (var i = 0; i < node._meta.bounds.outputBounds.length; ++i) {
           if (this.__inRect(mouse, node._meta.bounds.outputBounds[i].rect, node.pos, this._viewportCamera)) {
+            var canConnect = true;
             this._highlightNode = node;
-            this._highlightOutputLink = node._meta.bounds.outputBounds[i];
-            this.$viewport.attr('title', 'Click and drag to chain this property to another. Double click to send its value through the chain.');
-            this.$viewport.addClass('wcGrab');
+            if (this._selectedInputLink) {
+              if (!this._selectedNode.onRequestConnect(this._selectedInputLink.name, wcNode.LINK_TYPE.INPUT, node, node._meta.bounds.inputBounds[i].name, wcNode.LINK_TYPE.OUTPUT) ||
+                  !node.onRequestConnect(node._meta.bounds.inputBounds[i].name, wcNode.LINK_TYPE.OUTPUT, this._selectedNode, this._selectedInputLink.name, wcNode.LINK_TYPE.INPUT)) {
+                canConnect = false;
+              }
+            }
+            if (canConnect) {
+              this._highlightOutputLink = node._meta.bounds.outputBounds[i];
+              this.$viewport.attr('title', 'Click and drag to chain this property to another. Double click to send its value through the chain.');
+              this.$viewport.addClass('wcGrab');
+            } else {
+              this.$viewport.addClass('wcNoDrop');
+            }
             break;
           }
         }
