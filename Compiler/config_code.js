@@ -70,9 +70,9 @@ concat({
     '../Code/nodes/composite/compositescript.js',
     '../Code/nodes/composite/compositeentry.js',
     '../Code/nodes/composite/compositeexit.js',
-    '../Code/nodes/composite/compositeproperty.js',
+    '../Code/nodes/composite/compositeproperty.js'
   ],
-  dest: '../Build/wcPlay.js',
+  dest: '../Build/wcPlay.js'
 });
 
 // Common Nodes.
@@ -92,23 +92,24 @@ concat({
     '../Code/nodes/storage/global.js',
     '../Code/nodes/storage/string.js',
     '../Code/nodes/storage/number.js',
-    '../Code/nodes/storage/toggle.js',
+    '../Code/nodes/storage/toggle.js'
   ],
-  dest: '../Build/wcPlayNodes.js',
+  dest: '../Build/wcPlayNodes.js'
 });
 
 // Script editor tool.
 concat({
   src: [
-    '../Code/editor.js',
+    '../Code/fuse.min.js',
+    '../Code/editor.js'
   ],
-  dest: '../Build/wcPlayEditor.js',
+  dest: '../Build/wcPlayEditor.js'
 });
 concat({
   src: [
     '../Code/editor.css',
   ],
-  dest: '../Build/wcPlayEditor.css',
+  dest: '../Build/wcPlayEditor.css'
 });
 
 // Combine the example nodes.
@@ -118,7 +119,7 @@ concat({
     '../Code/nodes/example/exampleproperties.js',
     '../Code/nodes/example/exampledynamic.js'
   ],
-  dest: '../Build/wcPlayExampleNodes.js',
+  dest: '../Build/wcPlayExampleNodes.js'
 });
 
 // Now minify them. 

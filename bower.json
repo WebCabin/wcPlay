@@ -28,7 +28,7 @@
   ],
   "dependencies": {
     "jquery": "1.11.1",
-    "font-awesome": "4.4.0",
+    "font-awesome": "4.6.0",
     "FileSaver": "master",
     "wcUndoManager": "master",
     "wcMenu": "master"
