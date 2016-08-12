@@ -30,6 +30,7 @@ function wcPlayEditor(container, options) {
   this._paletteSize = 150;
   this._chainStyle = 1;
   this._chainStyleMax = 1;
+  this._showingSelector = false;
 
   this._menu = null;
 
@@ -70,6 +71,11 @@ function wcPlayEditor(container, options) {
       spacing: 10,          // Spacing between nodes in the palette view.
       scale: 0.7,           // Scale to draw nodes within the palette view.
       width: 0              // The pixel width of the palette view.
+    },
+    palettePopup: {
+      padding: 5,           // Padding limit between the edge of the canvas and the popup window.
+      width: 300,
+      height: 400
     },
     node: {
       radius: 7,            // The radius to draw node corners.
@@ -3586,24 +3592,78 @@ wcPlayEditor.prototype = {
       var self = this;
       this._showingSelector = true;
       var $blocker = $('<div class="wcPlayEditorBlocker">');
-      this._selectorPopup = $('<div class="wcPlayEditorNodePopup">');
+      var $popup = $('<div id="wcPlayEditorPalettePopup">');
+      $popup.css('width', this._drawStyle.palettePopup.width);
+      $popup.css('height', this._drawStyle.palettePopup.height);
 
       this.$main.append($blocker);
-      this.$main.append(this._selectorPopup);
+      this.$main.append($popup);
       $blocker.click(function() {
         $(this).remove();
-        self._selectorPopup.remove();
+        $popup.remove();
         self._showingSelector = false;
+      });
+
+      // Node search input field with auto-focus.
+      var $input = $('<input type="text" id="wcPlayEditorPaletteInput">');
+      $popup.append($input);
+      $input.focus();
+      $input.select();
+
+      $input.keydown(function(event) {
+        // Cancel on escape.
+        if (event.keyCode === 27) {
+          $blocker.click();
+        }
+        // Return to select the current item.
+        else if (event.keyCode === 13) {
+          // TODO
+          console.log('select item');
+          $blocker.click();
+          event.stopPropagation();
+          event.preventDefault();
+          return true;
+        }
+        // Down arrow, or Tab to cycle next item.
+        else if (event.keyCode === 40 || (event.keyCode === 9 && !event.shiftKey)) {
+          // TODO
+          console.log('next item');
+          event.stopPropagation();
+          event.preventDefault();
+          return true;
+        }
+        // Up arrow, shift-tab to cycle previous item.
+        else if (event.keyCode === 38 || (event.keyCode === 9 && event.shiftKey)) {
+          // TODO
+          console.log('prev item');
+          event.stopPropagation();
+          event.preventDefault();
+          return true;
+        }
+      });
+
+      var searchValue = '';
+      $input.keyup(function(event) {
+        // Re-perform the search when the search value has changed.
+        var val = $input.val().toLowerCase();
+        if (searchValue !== val) {
+          // TODO
+          searchValue = val;
+          console.log('new search');
+        }
       });
     }
 
-    if (this._selectorPopup) {
-      this._selectorPopup.css('left', pos.x + 'px');
-      this._selectorPopup.css('top', pos.y + 'px');
-    }
+    if ($popup) {
+      // Clamp the popup position so it remains inside the canvas.
+      var viewWidth = this.$main.width();
+      var viewHeight = this.$main.height();
+      var left = Math.min(Math.max(pos.x - this._drawStyle.palettePopup.width/2, this._drawStyle.palettePopup.padding), viewWidth - this._drawStyle.palettePopup.width - this._drawStyle.palettePopup.padding);
+      var top = Math.min(Math.max(pos.y, this._drawStyle.palettePopup.padding), viewHeight - this._drawStyle.palettePopup.height - this._drawStyle.palettePopup.padding);
 
-    // Find the best position.
-    // if (pos.x <= )
+      $popup.css('left', left + 'px');
+      $popup.css('top', top + 'px');
+    }
   },
 
   /**

@@ -223,13 +223,11 @@
   border-style: inset !important;
 }
 
-.wcPlayEditorNodePopup {
+#wcPlayEditorPalettePopup {
   position: absolute;
   z-index: 1001;
   top: 0px;
   left: 0px;
-  width: 300px;
-  height: 400px;
   border: 2px solid black;
   border-radius: 20px;
   background-color: white;
@@ -241,6 +239,13 @@
   -webkit-animation-duration:250ms;
   -moz-animation-duration:250ms;
   animation-duration:250ms;
+}
+
+#wcPlayEditorPaletteInput {
+  position: relative;
+  top: 5px;
+  left: 5px;
+  width: calc(100% - 14px); /* 5px for padding, 2px parent border */
 }
 
 @-webkit-keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
