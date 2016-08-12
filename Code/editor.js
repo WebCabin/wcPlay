@@ -31,7 +31,6 @@ function wcPlayEditor(container, options) {
   this._chainStyle = 1;
   this._chainStyleMax = 1;
   this._showingSelector = false;
-  this._fuse = null;
 
   this._menu = null;
 
@@ -1965,17 +1964,6 @@ wcPlayEditor.prototype = {
       this.__updateNode(node, 0, this._viewportContext);
     }
 
-    this._fuse = new Fuse(this._nodeLibrary, {
-      caseSensitive: false,
-      shouldSort: true,
-      tokenize: false,
-      threshold: 0.2,
-      location: 0,
-      distance: 100,
-      maxPatternLength: 32,
-      keys: ['displayName', 'category']
-    });
-
     // this._paletteSize = this._options.readOnly? 0: this._drawStyle.palette.width;
     // this.onResized();
 
@@ -3765,10 +3753,22 @@ wcPlayEditor.prototype = {
         }
       });
 
+
+      var fuse = new Fuse(this._nodeLibrary, {
+        caseSensitive: false,
+        shouldSort: true,
+        tokenize: false,
+        threshold: 0.2,
+        location: 0,
+        distance: 100,
+        maxPatternLength: 32,
+        keys: ['displayName', 'category', connectLink + '.name']
+      });
+
       // Populate the node list.
       var $resultList = null;
       function __searchList(key) {
-        var result = self._fuse.search(key);
+        var result = fuse.search(key);
         // No results, just show the full listing.
         if (!result.length && !key) {
           result = self._nodeLibrary;
