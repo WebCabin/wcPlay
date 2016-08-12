@@ -241,11 +241,22 @@
   animation-duration:250ms;
 }
 
+#wcPlayEditorPalettePopup > label {
+  line-height: 30px;
+  padding-left: 10px;
+  vertical-align: bottom;
+}
+
 #wcPlayEditorPaletteInput {
   position: relative;
-  top: 5px;
   left: 5px;
-  width: calc(100% - 14px); /* 5px for padding, 2px parent border */
+  width: calc(100% - 19px); /* 5px for padding, 2px parent border */
+  border-radius: 20px;
+  padding-left: 5px;
+}
+
+#wcPlayEditorPaletteInput:focus {
+  outline: none;
 }
 
 @-webkit-keyframes fadeIn { from { opacity:0; } to { opacity:1; } }

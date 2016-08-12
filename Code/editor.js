@@ -3583,16 +3583,16 @@ wcPlayEditor.prototype = {
    * Draws the popup that allows the user to select a node type.
    * @function wcPlayEditor#__drawPalettePopup
    * @param {wcPlay~Coordinates} pos - The position to center the popup.
-   * @param {wcNode} [node] - Supply an existing node if you intend to connect the new node to it.
    * @param {wcNode.LINK_TYPE} [linkType] - If supplying a node, this is the type of link you are attaching to.
-   * @param {String} [linkName] - If supplying a node, this is the name of the link you are attaching to.
+   * @param {Function} onSelected - A callback function to call when a selection has been made, or not made.
    */
-  __drawPalettePopup: function(pos, node, linkType, linkName) {
+  __drawPalettePopup: function(pos, linkType, onSelected) {
     if (!this._showingSelector) {
       var self = this;
+      var selected = null;
       this._showingSelector = true;
       var $blocker = $('<div class="wcPlayEditorBlocker">');
-      var $popup = $('<div id="wcPlayEditorPalettePopup">');
+      var $popup = $('<div id="wcPlayEditorPalettePopup"><label>Create Node:</label></div>');
       $popup.css('width', this._drawStyle.palettePopup.width);
       $popup.css('height', this._drawStyle.palettePopup.height);
 
@@ -3602,6 +3602,7 @@ wcPlayEditor.prototype = {
         $(this).remove();
         $popup.remove();
         self._showingSelector = false;
+        onSelected && onSelected(selected);
       });
 
       // Node search input field with auto-focus.
@@ -3611,8 +3612,13 @@ wcPlayEditor.prototype = {
       $input.select();
 
       $input.keydown(function(event) {
+        // Stop the key presses from triggering hotkeys
+        event.stopPropagation();
+
         // Cancel on escape.
         if (event.keyCode === 27) {
+          console.log('escaped');
+          selected = null;
           $blocker.click();
         }
         // Return to select the current item.
@@ -3620,7 +3626,6 @@ wcPlayEditor.prototype = {
           // TODO
           console.log('select item');
           $blocker.click();
-          event.stopPropagation();
           event.preventDefault();
           return true;
         }
@@ -3628,7 +3633,6 @@ wcPlayEditor.prototype = {
         else if (event.keyCode === 40 || (event.keyCode === 9 && !event.shiftKey)) {
           // TODO
           console.log('next item');
-          event.stopPropagation();
           event.preventDefault();
           return true;
         }
@@ -3636,10 +3640,10 @@ wcPlayEditor.prototype = {
         else if (event.keyCode === 38 || (event.keyCode === 9 && event.shiftKey)) {
           // TODO
           console.log('prev item');
-          event.stopPropagation();
           event.preventDefault();
           return true;
         }
+        return true;
       });
 
       var searchValue = '';
@@ -5195,27 +5199,63 @@ wcPlayEditor.prototype = {
       this._selectedNode.onViewportMouseUp(event, pos, this._options.readOnly);
     }
 
-    this._selectedEntryLink = false;
-    this._selectedExitLink = false;
-    this._selectedInputLink = false;
-    this._selectedOutputLink = false;
-    this._viewportMovingNode = false;
+    var self = this;
+    function __cleanup() {
+      self._selectedEntryLink = false;
+      self._selectedExitLink = false;
+      self._selectedInputLink = false;
+      self._selectedOutputLink = false;
+      self._viewportMovingNode = false;
 
-    if (this._viewportMoving) {
-      this._viewportMoving = false;
+      if (self._viewportMoving) {
+        self._viewportMoving = false;
 
-      if (!this._viewportMoved) {
-        this._selectedNode = null;
-        this._selectedNodes = [];
-      } else {
-        this._viewportMoved = false;
-        this.$viewport.removeClass('wcMoving');
+        if (!self._viewportMoved) {
+          self._selectedNode = null;
+          self._selectedNodes = [];
+        } else {
+          self._viewportMoved = false;
+          self.$viewport.removeClass('wcMoving');
+        }
       }
     }
 
+    if (this._selectedNode && !this._highlightNode && !this._highlightViewport) {
+      var linkName = null;
+      var linkType = null;
+      if (this._selectedEntryLink) {
+        linkName = this._selectedEntryLink;
+        linkType = wcNode.LINK_TYPE.ENTRY;
+      }
+      if (this._selectedExitLink) {
+        linkName = this._selectedExitLink;
+        linkType = wcNode.LINK_TYPE.EXIT;
+      }
+      if (this._selectedInputLink) {
+        linkName = this._selectedInputLink;
+        linkType = wcNode.LINK_TYPE.INPUT;
+      }
+      if (this._selectedOutputLink) {
+        linkName = this._selectedOutputLink;
+        linkType = wcNode.LINK_TYPE.OUTPUT;
+      }
+      if (linkName && linkType) {
+        var mouse = this.__mouse(event, this.$viewport.offset());
+        this.__drawPalettePopup(mouse, linkType, function(choice) {
+          // this._selectedNode, linkName, 
+          __cleanup();
+        });
+        return;
+      }
+    }
+
+    __cleanup();
+
     // Right click on an empty area to show the popup.
     if (!this._selectedNode && !this._mouseMoved && this._mouse.which === 3) {
-      this.__drawPalettePopup({x: this._mouse.x, y: this._mouse.y});
+      this.__drawPalettePopup(this._mouse, null, function(choice) {
+
+      });
     }
   },
 
