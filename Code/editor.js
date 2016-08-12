@@ -27,10 +27,11 @@ function wcPlayEditor(container, options) {
   this.$container = $(container);
   this.$typeButton = [];
   this.$typeArea = [];
-  this._paletteSize = 150;
+  this._paletteSize = 0;
   this._chainStyle = 1;
   this._chainStyleMax = 1;
   this._showingSelector = false;
+  this._fuse = null;
 
   this._menu = null;
 
@@ -38,7 +39,7 @@ function wcPlayEditor(container, options) {
 
   this._engine = null;
   this._parent = null;
-  this._nodeLibrary = {};
+  this._nodeLibrary = [];
 
   this._eventHandlers = {
     onBeforeSave: null,
@@ -330,27 +331,6 @@ wcPlayEditor.prototype = {
     }
     this._viewportCamera.x = -(rect.left - 50) * this._viewportCamera.z;
     this._viewportCamera.y = -(rect.top - 50) * this._viewportCamera.z;
-  },
-
-  /**
-   * Sends a custom notification event to all nodes.
-   * @function wcPlayEditor#notifyPaletteNodes
-   * @param {String} func - The node function to call.
-   * @param {Object[]} args - A list of arguments to forward into the function call.
-   */
-  notifyPaletteNodes: function(func, args) {
-    for (var cat in this._nodeLibrary) {
-      for (var type in this._nodeLibrary[cat]) {
-        var typeData = this._nodeLibrary[cat][type];
-
-        for (var i = 0; i < typeData.nodes.length; ++i) {
-          var node = typeData.nodes[i];
-          if (typeof node[func] === 'function') {
-            node[func].apply(node, args);
-          }
-        }
-      }
-    }
   },
 
   /**
@@ -869,7 +849,7 @@ wcPlayEditor.prototype = {
     if (this._parent) {
 
       // Render the palette.
-      this.__drawPalette(elapsed);
+      // this.__drawPalette(elapsed);
 
       // Setup viewport canvas.
       this._viewportContext.clearRect(0, 0, this.$viewport.width(), this.$viewport.height());
@@ -1925,84 +1905,8 @@ wcPlayEditor.prototype = {
       return;
     }
 
-    this._paletteSize = this._options.readOnly? 0: this._drawStyle.palette.width;
-    this.onResized();
-
-    if (this.$typeButton.length == 0) {
-      // Create our top bar with buttons for each node type.
-      this.$typeButton.push($('<button class="wcPlayEditorButton wcToggled" title="Show Entry Nodes.">Entry</button>'));
-      this.$typeButton.push($('<button class="wcPlayEditorButton" title="Show Process Nodes.">Process</button>'));
-      this.$typeButton.push($('<button class="wcPlayEditorButton" title="Show Storage Nodes.">Storage</button>'));
-      this.$typeButton.push($('<button class="wcPlayEditorButton" title="Show Composite Nodes.">Composite</button>'));
-      this.$palette.append(this.$typeButton[0]);
-      this.$palette.append(this.$typeButton[1]);
-      this.$palette.append(this.$typeButton[2]);
-      this.$palette.append(this.$typeButton[3]);
-
-      this.$typeArea.push($('<div class="wcPlayTypeArea">'));
-      this.$typeArea.push($('<div class="wcPlayTypeArea wcPlayHidden">'));
-      this.$typeArea.push($('<div class="wcPlayTypeArea wcPlayHidden">'));
-      this.$typeArea.push($('<div class="wcPlayTypeArea wcPlayHidden">'));
-      this.$paletteInner.append(this.$typeArea[0]);
-      this.$paletteInner.append(this.$typeArea[1]);
-      this.$paletteInner.append(this.$typeArea[2]);
-      this.$paletteInner.append(this.$typeArea[3]);
-    }
-
-    // Empty out our current node library.
-    if (this._nodeLibrary) {
-      for (var cat in this._nodeLibrary) {
-        for (var type in this._nodeLibrary[cat]) {
-          var typeData = this._nodeLibrary[cat][type];
-          typeData.$button.remove();
-          typeData.$canvas.remove();
-          typeData.$category.remove();
-          for (var i = 0; i < typeData.nodes.length; ++i) {
-            typeData.nodes[i].destroy();
-          }
-        }
-      }
-
-      this._nodeLibrary = {};
-    }
-
-    function __organize(data) {
-      // Initialize the node category if it is new.
-      if (!this._nodeLibrary.hasOwnProperty(data.category)) {
-        this._nodeLibrary[data.category] = {};
-      }
-
-      // Further categorize the node by its type.
-      if (!this._nodeLibrary[data.category].hasOwnProperty(data.nodeType)) {
-        var typeData = {
-          $category: $('<div class="wcPlayTypeCategory">'),
-          $button: $('<button class="wcPlayCategoryButton" title="Toggle visibility of this category.">' + data.category + '</button>'),
-          $canvas: $('<canvas class="wcPlayTypeCategoryArea">'),
-          context: null,
-          nodes: [],
-        };
-        typeData.context = typeData.$canvas[0].getContext('2d');
-        typeData.$category.append(typeData.$button);
-        typeData.$category.append(typeData.$canvas);
-        this.$typeArea[this.__typeIndex(data.nodeType)].append(typeData.$category);
-
-        (function __setupCollapseHandler(d) {
-          d.$button.click(function() {
-            if (!d.$button.hasClass('wcToggled')) {
-              d.$button.addClass('wcToggled');
-              d.$canvas.addClass('wcPlayHidden');
-            } else {
-              d.$button.removeClass('wcToggled');
-              d.$canvas.removeClass('wcPlayHidden');
-            }
-          });
-        })(typeData);
-
-        this._nodeLibrary[data.category][data.nodeType] = typeData;
-      }
-    }
-
-    // Initialize our node library.
+    // Compile our node listing.
+    this._nodeLibrary = [];
     for (var i = 0; i < wcPlay.NODE_LIBRARY.length; ++i) {
       var data = wcPlay.NODE_LIBRARY[i];
 
@@ -2017,125 +1921,251 @@ wcPlayEditor.prototype = {
         continue;
       }
 
-      __organize.call(this, data);
-
-      // Now create an instance of the node.
+      // Now create an instance of the node so we can extract further data from it.
       var node = new window.wcPlayNodes[data.className](null);
-      this._nodeLibrary[data.category][data.nodeType].nodes.push(node);
+      data.entry = node.chain.entry.map(function(link) {
+        return link.name;
+      });
+      data.exit = node.chain.exit.map(function(link) {
+        return link.name;
+      });
+      data.input = node.properties.filter(function(prop) {
+        return prop.options.input;
+      }).map(function(prop) {
+        return prop.name;
+      });
+      data.output = node.properties.filter(function(prop) {
+        return prop.options.output;
+      }).map(function(prop) {
+        return prop.name;
+      });
+      data.desc  = node._meta.description;
+
+      this._nodeLibrary.push(data);
     }
 
-    // Load our imported composite nodes as well.
-    var composites = this._engine.importedComposites();
-    for (var i = 0; i < composites.length; ++i) {
-      var node = composites[i];
+    this._fuse = new Fuse(this._nodeLibrary, {
+      caseSensitive: false,
+      shouldSort: true,
+      tokenize: false,
+      threshold: 0.2,
+      location: 0,
+      distance: 100,
+      maxPatternLength: 32,
+      keys: ['displayName', 'category']
+    });
+
+    // this._paletteSize = this._options.readOnly? 0: this._drawStyle.palette.width;
+    // this.onResized();
+
+    // if (this.$typeButton.length == 0) {
+    //   // Create our top bar with buttons for each node type.
+    //   this.$typeButton.push($('<button class="wcPlayEditorButton wcToggled" title="Show Entry Nodes.">Entry</button>'));
+    //   this.$typeButton.push($('<button class="wcPlayEditorButton" title="Show Process Nodes.">Process</button>'));
+    //   this.$typeButton.push($('<button class="wcPlayEditorButton" title="Show Storage Nodes.">Storage</button>'));
+    //   this.$typeButton.push($('<button class="wcPlayEditorButton" title="Show Composite Nodes.">Composite</button>'));
+    //   this.$palette.append(this.$typeButton[0]);
+    //   this.$palette.append(this.$typeButton[1]);
+    //   this.$palette.append(this.$typeButton[2]);
+    //   this.$palette.append(this.$typeButton[3]);
+
+    //   this.$typeArea.push($('<div class="wcPlayTypeArea">'));
+    //   this.$typeArea.push($('<div class="wcPlayTypeArea wcPlayHidden">'));
+    //   this.$typeArea.push($('<div class="wcPlayTypeArea wcPlayHidden">'));
+    //   this.$typeArea.push($('<div class="wcPlayTypeArea wcPlayHidden">'));
+    //   this.$paletteInner.append(this.$typeArea[0]);
+    //   this.$paletteInner.append(this.$typeArea[1]);
+    //   this.$paletteInner.append(this.$typeArea[2]);
+    //   this.$paletteInner.append(this.$typeArea[3]);
+    // }
+
+    // // Empty out our current node library.
+    // if (this._nodeLibrary) {
+    //   for (var cat in this._nodeLibrary) {
+    //     for (var type in this._nodeLibrary[cat]) {
+    //       var typeData = this._nodeLibrary[cat][type];
+    //       typeData.$button.remove();
+    //       typeData.$canvas.remove();
+    //       typeData.$category.remove();
+    //       for (var i = 0; i < typeData.nodes.length; ++i) {
+    //         typeData.nodes[i].destroy();
+    //       }
+    //     }
+    //   }
+
+    //   this._nodeLibrary = {};
+    // }
+
+    // function __organize(data) {
+    //   // Initialize the node category if it is new.
+    //   if (!this._nodeLibrary.hasOwnProperty(data.category)) {
+    //     this._nodeLibrary[data.category] = {};
+    //   }
+
+    //   // Further categorize the node by its type.
+    //   if (!this._nodeLibrary[data.category].hasOwnProperty(data.nodeType)) {
+    //     var typeData = {
+    //       $category: $('<div class="wcPlayTypeCategory">'),
+    //       $button: $('<button class="wcPlayCategoryButton" title="Toggle visibility of this category.">' + data.category + '</button>'),
+    //       $canvas: $('<canvas class="wcPlayTypeCategoryArea">'),
+    //       context: null,
+    //       nodes: [],
+    //     };
+    //     typeData.context = typeData.$canvas[0].getContext('2d');
+    //     typeData.$category.append(typeData.$button);
+    //     typeData.$category.append(typeData.$canvas);
+    //     this.$typeArea[this.__typeIndex(data.nodeType)].append(typeData.$category);
+
+    //     (function __setupCollapseHandler(d) {
+    //       d.$button.click(function() {
+    //         if (!d.$button.hasClass('wcToggled')) {
+    //           d.$button.addClass('wcToggled');
+    //           d.$canvas.addClass('wcPlayHidden');
+    //         } else {
+    //           d.$button.removeClass('wcToggled');
+    //           d.$canvas.removeClass('wcPlayHidden');
+    //         }
+    //       });
+    //     })(typeData);
+
+    //     this._nodeLibrary[data.category][data.nodeType] = typeData;
+    //   }
+    // }
+
+    // // Initialize our node library.
+    // for (var i = 0; i < wcPlay.NODE_LIBRARY.length; ++i) {
+    //   var data = wcPlay.NODE_LIBRARY[i];
+
+    //   // Skip categories we are not showing.
+    //   if (data.className !== 'wcNodeCompositeScript') {
+    //     var catIndex = this._options.category.items.indexOf(data.category);
+    //     if ((!this._options.category.isBlacklist && catIndex === -1) ||
+    //         (this._options.category.isBlacklist && catIndex > -1)) {
+    //       continue;
+    //     }
+    //   } else {
+    //     continue;
+    //   }
+
+    //   __organize.call(this, data);
+
+    //   // Now create an instance of the node.
+    //   var node = new window.wcPlayNodes[data.className](null);
+    //   this._nodeLibrary[data.category][data.nodeType].nodes.push(node);
+    // }
+
+    // // Load our imported composite nodes as well.
+    // var composites = this._engine.importedComposites();
+    // for (var i = 0; i < composites.length; ++i) {
+    //   var node = composites[i];
       
-      __organize.call(this, node);
+    //   __organize.call(this, node);
 
-      this._nodeLibrary[node.category][node.nodeType].nodes.push(node);
-    }
+    //   this._nodeLibrary[node.category][node.nodeType].nodes.push(node);
+    // }
 
-    // Now draw each of our palette nodes once so we can configure the size of the canvases.
-    for (var cat in this._nodeLibrary) {
-      for (var type in this._nodeLibrary[cat]) {
-        var typeData = this._nodeLibrary[cat][type];
-        typeData.$canvas.attr('width', this.$paletteInner.width());
-        var yPos = this._drawStyle.palette.spacing;
-        var xPos = this.$paletteInner.width() / 2;
-        for (var i = 0; i < typeData.nodes.length; ++i) {
-          this.__updateNode(typeData.nodes[i], 0, typeData.context);
-          typeData.nodes[i].pos.x = xPos;
-          typeData.nodes[i].pos.y = yPos;
-          this.__drawNode(typeData.nodes[i], typeData.context);
-          yPos += (typeData.nodes[i]._meta.bounds.rect.height * this._drawStyle.palette.scale) + this._drawStyle.palette.spacing;
-        }
-        typeData.$canvas.attr('height', yPos);
-      }
-    }
+    // // Now draw each of our palette nodes once so we can configure the size of the canvases.
+    // for (var cat in this._nodeLibrary) {
+    //   for (var type in this._nodeLibrary[cat]) {
+    //     var typeData = this._nodeLibrary[cat][type];
+    //     typeData.$canvas.attr('width', this.$paletteInner.width());
+    //     var yPos = this._drawStyle.palette.spacing;
+    //     var xPos = this.$paletteInner.width() / 2;
+    //     for (var i = 0; i < typeData.nodes.length; ++i) {
+    //       this.__updateNode(typeData.nodes[i], 0, typeData.context);
+    //       typeData.nodes[i].pos.x = xPos;
+    //       typeData.nodes[i].pos.y = yPos;
+    //       this.__drawNode(typeData.nodes[i], typeData.context);
+    //       yPos += (typeData.nodes[i]._meta.bounds.rect.height * this._drawStyle.palette.scale) + this._drawStyle.palette.spacing;
+    //     }
+    //     typeData.$canvas.attr('height', yPos);
+    //   }
+    // }
 
-    var self = this;
-    this.$typeButton[0].click(function() {
-      self.$typeButton[0].addClass('wcToggled');
-      self.$typeButton[1].removeClass('wcToggled');
-      self.$typeButton[2].removeClass('wcToggled');
-      self.$typeButton[3].removeClass('wcToggled');
+    // var self = this;
+    // this.$typeButton[0].click(function() {
+    //   self.$typeButton[0].addClass('wcToggled');
+    //   self.$typeButton[1].removeClass('wcToggled');
+    //   self.$typeButton[2].removeClass('wcToggled');
+    //   self.$typeButton[3].removeClass('wcToggled');
 
-      self.$typeArea[0].removeClass('wcPlayHidden');
-      self.$typeArea[1].addClass('wcPlayHidden');
-      self.$typeArea[2].addClass('wcPlayHidden');
-      self.$typeArea[3].addClass('wcPlayHidden');
-    });
-    this.$typeButton[1].click(function() {
-      self.$typeButton[0].removeClass('wcToggled');
-      self.$typeButton[1].addClass('wcToggled');
-      self.$typeButton[2].removeClass('wcToggled');
-      self.$typeButton[3].removeClass('wcToggled');
+    //   self.$typeArea[0].removeClass('wcPlayHidden');
+    //   self.$typeArea[1].addClass('wcPlayHidden');
+    //   self.$typeArea[2].addClass('wcPlayHidden');
+    //   self.$typeArea[3].addClass('wcPlayHidden');
+    // });
+    // this.$typeButton[1].click(function() {
+    //   self.$typeButton[0].removeClass('wcToggled');
+    //   self.$typeButton[1].addClass('wcToggled');
+    //   self.$typeButton[2].removeClass('wcToggled');
+    //   self.$typeButton[3].removeClass('wcToggled');
 
-      self.$typeArea[0].addClass('wcPlayHidden');
-      self.$typeArea[1].removeClass('wcPlayHidden');
-      self.$typeArea[2].addClass('wcPlayHidden');
-      self.$typeArea[3].addClass('wcPlayHidden');
-    });
-    this.$typeButton[2].click(function() {
-      self.$typeButton[0].removeClass('wcToggled');
-      self.$typeButton[1].removeClass('wcToggled');
-      self.$typeButton[2].addClass('wcToggled');
-      self.$typeButton[3].removeClass('wcToggled');
+    //   self.$typeArea[0].addClass('wcPlayHidden');
+    //   self.$typeArea[1].removeClass('wcPlayHidden');
+    //   self.$typeArea[2].addClass('wcPlayHidden');
+    //   self.$typeArea[3].addClass('wcPlayHidden');
+    // });
+    // this.$typeButton[2].click(function() {
+    //   self.$typeButton[0].removeClass('wcToggled');
+    //   self.$typeButton[1].removeClass('wcToggled');
+    //   self.$typeButton[2].addClass('wcToggled');
+    //   self.$typeButton[3].removeClass('wcToggled');
 
-      self.$typeArea[0].addClass('wcPlayHidden');
-      self.$typeArea[1].addClass('wcPlayHidden');
-      self.$typeArea[2].removeClass('wcPlayHidden');
-      self.$typeArea[3].addClass('wcPlayHidden');
-    });
-    this.$typeButton[3].click(function() {
-      self.$typeButton[0].removeClass('wcToggled');
-      self.$typeButton[1].removeClass('wcToggled');
-      self.$typeButton[2].removeClass('wcToggled');
-      self.$typeButton[3].addClass('wcToggled');
+    //   self.$typeArea[0].addClass('wcPlayHidden');
+    //   self.$typeArea[1].addClass('wcPlayHidden');
+    //   self.$typeArea[2].removeClass('wcPlayHidden');
+    //   self.$typeArea[3].addClass('wcPlayHidden');
+    // });
+    // this.$typeButton[3].click(function() {
+    //   self.$typeButton[0].removeClass('wcToggled');
+    //   self.$typeButton[1].removeClass('wcToggled');
+    //   self.$typeButton[2].removeClass('wcToggled');
+    //   self.$typeButton[3].addClass('wcToggled');
 
-      self.$typeArea[0].addClass('wcPlayHidden');
-      self.$typeArea[1].addClass('wcPlayHidden');
-      self.$typeArea[2].addClass('wcPlayHidden');
-      self.$typeArea[3].removeClass('wcPlayHidden');
-    });
+    //   self.$typeArea[0].addClass('wcPlayHidden');
+    //   self.$typeArea[1].addClass('wcPlayHidden');
+    //   self.$typeArea[2].addClass('wcPlayHidden');
+    //   self.$typeArea[3].removeClass('wcPlayHidden');
+    // });
   },
 
-  /**
-   * Draws each node in the palette view.
-   * @function wcPlayEditor#__drawPalette
-   * @private
-   * @param {Number} elapsed - Elapsed time since last update.
-   */
-  __drawPalette: function(elapsed) {
-    for (var cat in this._nodeLibrary) {
-      for (var type in this._nodeLibrary[cat]) {
+  // /**
+  //  * Draws each node in the palette view.
+  //  * @function wcPlayEditor#__drawPalette
+  //  * @private
+  //  * @param {Number} elapsed - Elapsed time since last update.
+  //  */
+  // __drawPalette: function(elapsed) {
+  //   for (var cat in this._nodeLibrary) {
+  //     for (var type in this._nodeLibrary[cat]) {
 
-        // Ignore types that are not visible.
-        if (!this.$typeButton[this.__typeIndex(type)].hasClass('wcToggled')) continue;
+  //       // Ignore types that are not visible.
+  //       if (!this.$typeButton[this.__typeIndex(type)].hasClass('wcToggled')) continue;
 
-        var typeData = this._nodeLibrary[cat][type];
+  //       var typeData = this._nodeLibrary[cat][type];
 
-        // Ignore categories that are not visible.
-        if (typeData.$button.hasClass('wcToggled')) continue;
+  //       // Ignore categories that are not visible.
+  //       if (typeData.$button.hasClass('wcToggled')) continue;
 
-        var yPos = this._drawStyle.palette.spacing;
-        var xPos = this.$paletteInner.width() / 2 / this._drawStyle.palette.scale;
-        typeData.$canvas.attr('width', this.$paletteInner.width());
-        typeData.context.clearRect(0, 0, typeData.$canvas.width(), typeData.$canvas.height());
-        typeData.context.save();
-        typeData.context.scale(this._drawStyle.palette.scale, this._drawStyle.palette.scale);
+  //       var yPos = this._drawStyle.palette.spacing;
+  //       var xPos = this.$paletteInner.width() / 2 / this._drawStyle.palette.scale;
+  //       typeData.$canvas.attr('width', this.$paletteInner.width());
+  //       typeData.context.clearRect(0, 0, typeData.$canvas.width(), typeData.$canvas.height());
+  //       typeData.context.save();
+  //       typeData.context.scale(this._drawStyle.palette.scale, this._drawStyle.palette.scale);
 
-        for (var i = 0; i < typeData.nodes.length; ++i) {
-          this.__updateNode(typeData.nodes[i], 0, typeData.context);
-          typeData.nodes[i].pos.x = xPos;
-          typeData.nodes[i].pos.y = yPos;
-          this.__drawNode(typeData.nodes[i], typeData.context, true);
-          yPos += typeData.nodes[i]._meta.bounds.rect.height + this._drawStyle.palette.spacing;
-        }
+  //       for (var i = 0; i < typeData.nodes.length; ++i) {
+  //         this.__updateNode(typeData.nodes[i], 0, typeData.context);
+  //         typeData.nodes[i].pos.x = xPos;
+  //         typeData.nodes[i].pos.y = yPos;
+  //         this.__drawNode(typeData.nodes[i], typeData.context, true);
+  //         yPos += typeData.nodes[i]._meta.bounds.rect.height + this._drawStyle.palette.spacing;
+  //       }
 
-        typeData.context.restore();
-      }
-    }
-  },
+  //       typeData.context.restore();
+  //     }
+  //   }
+  // },
 
   /**
    * Draws a list of nodes on the canvas.
@@ -3592,8 +3622,14 @@ wcPlayEditor.prototype = {
       var self = this;
       var selected = null;
       this._showingSelector = true;
+
+      var header = 'Create Node';
+      if (linkType) {
+        header += ' and connect ' + linkType + ' to';
+      }
+
       var $blocker = $('<div class="wcPlayEditorBlocker">');
-      var $popup = $('<div id="wcPlayEditorPalettePopup"><label>Create Node:</label></div>');
+      var $popup = $('<div id="wcPlayEditorPalettePopup"><label>' + header + ':</label></div>');
       $popup.css('width', this._drawStyle.palettePopup.width);
       $popup.css('height', this._drawStyle.palettePopup.height);
 
@@ -3652,11 +3688,110 @@ wcPlayEditor.prototype = {
         // Re-perform the search when the search value has changed.
         var val = $input.val().toLowerCase();
         if (searchValue !== val) {
-          // TODO
           searchValue = val;
           console.log('new search');
+          __searchList(val);
         }
       });
+
+      var $resultList = null;
+
+      // Populate the node list.
+      function __searchList(key) {
+        var result = self._fuse.search(key);
+        // No results, just show the full listing.
+        if (!result.length && !key) {
+          result = self._nodeLibrary;
+        }
+
+        var $listContainer = $('<div id="wcPlayEditorPaletteList">');
+        var $list = $('<ul>');
+        $listContainer.append($list);
+        for (var i = 0; i < result.length; ++i) {
+          var data = result[i];
+          var links = null;
+          var type = null;
+
+          // Determine whether to filter a node based on available connection links.
+          switch (linkType) {
+            case wcNode.LINK_TYPE.ENTRY:
+              if (!data.exit.length) {
+                continue;
+              }
+              links = data.exit;
+              type = 'exit';
+              break;
+            case wcNode.LINK_TYPE.EXIT:
+              if (!data.entry.length) {
+                continue;
+              }
+              links = data.entry;
+              type = 'entry';
+              break;
+            case wcNode.LINK_TYPE.INPUT:
+              if (!data.output.length) {
+                continue;
+              }
+              links = data.output;
+              type = 'output';
+              break;
+            case wcNode.LINK_TYPE.OUTPUT:
+              if (!data.input.length) {
+                continue;
+              }
+              links = data.input;
+              type = 'input';
+              break;
+          }
+
+          var link = '';
+          if (!links) {
+            link = ' class="wcLink"';
+          }
+
+          var $item = $('<li' + link + '>' + data.displayName + '</li>');
+          $list.append($item);
+          if (links) {
+            var $links = $('<ul>');
+            $list.append($links);
+            for (var a = 0; a < links.length; ++a) {
+              $links.append('<li class="wcLink"><span class="wcLinkType">' + type + ' -- </span><span class="wcLinkName">' + links[a] + '</span></li>');
+            }
+          }
+        }
+
+
+        // for (var cat in this._nodeLibrary) {
+        //   var $cat = $('<li>' + cat + '</li>');
+        //   var $catList = $('<ul>');
+        //   $cat.append($catList);
+
+        //   var found = false;
+        //   for (var type in this._nodeLibrary[cat]) {
+        //     var typeData = this._nodeLibrary[cat][type];
+
+        //     for (var i = 0; i < typeData.nodes.length; ++i) {
+        //       var node = typeData.nodes[i];
+        //       if (typeof node[func] === 'function') {
+        //         node[func].apply(node, args);
+        //       }
+        //     }
+        //   }
+
+        //   if (found) {
+        //     $list.append($cat);
+        //   }
+        // }
+
+        if ($resultList) {
+          $resultList.remove();
+        }
+
+        $resultList = $listContainer;
+        $popup.append($resultList);
+      }
+
+      __searchList('');
     }
 
     if ($popup) {
@@ -4218,9 +4353,9 @@ wcPlayEditor.prototype = {
     this.__bindMenuHandlers();
 
     // Palette
-    this.$palette.on('mousemove',  function(event){self.__onPaletteMouseMove(event, this);});
-    this.$palette.on('mousedown',  function(event){self.__onPaletteMouseDown(event, this);});
-    this.$palette.on('mouseup',  function(event){self.__onPaletteMouseUp(event, this);});
+    // this.$palette.on('mousemove',  function(event){self.__onPaletteMouseMove(event, this);});
+    // this.$palette.on('mousedown',  function(event){self.__onPaletteMouseDown(event, this);});
+    // this.$palette.on('mouseup',  function(event){self.__onPaletteMouseUp(event, this);});
 
     // Viewport
     this.$viewport.on('mousemove',  function(event){self.__onViewportMouseMove(event, this);});
@@ -4312,119 +4447,119 @@ wcPlayEditor.prototype = {
     });
   },
 
-  /**
-   * Handle mouse move events over the palette view.
-   * @function wcPlayEditor#__onPaletteMouseMove
-   * @private
-   * @param {Object} event - The mouse event.
-   * @param {Object} elem - The target element.
-   */
-  __onPaletteMouseMove: function(event, elem) {
-    var mouse = this.__mouse(event);
+  // /**
+  //  * Handle mouse move events over the palette view.
+  //  * @function wcPlayEditor#__onPaletteMouseMove
+  //  * @private
+  //  * @param {Object} event - The mouse event.
+  //  * @param {Object} elem - The target element.
+  //  */
+  // __onPaletteMouseMove: function(event, elem) {
+  //   var mouse = this.__mouse(event);
 
-    this._highlightTitle = false;
-    this._highlightDetails = false;
-    this._highlightDebugLog = false;
-    this._highlightBreakpoint = false;
-    this._highlightEntryLink = false;
-    this._highlightExitLink = false;
-    this._highlightInputLink = false;
-    this._highlightOutputLink = false;
-    this._highlightPropertyValue = false;
-    this._highlightPropertyInitialValue = false;
-    this._highlightViewport = false;
+  //   this._highlightTitle = false;
+  //   this._highlightDetails = false;
+  //   this._highlightDebugLog = false;
+  //   this._highlightBreakpoint = false;
+  //   this._highlightEntryLink = false;
+  //   this._highlightExitLink = false;
+  //   this._highlightInputLink = false;
+  //   this._highlightOutputLink = false;
+  //   this._highlightPropertyValue = false;
+  //   this._highlightPropertyInitialValue = false;
+  //   this._highlightViewport = false;
 
-    // Dragging a node from the palette view.
-    if (this._draggingNodeData) {
-      var pos = {
-        x: mouse.gx + this._draggingNodeData.offset.x,
-        y: mouse.gy + this._draggingNodeData.offset.y,
-      };
+  //   // Dragging a node from the palette view.
+  //   if (this._draggingNodeData) {
+  //     var pos = {
+  //       x: mouse.gx + this._draggingNodeData.offset.x,
+  //       y: mouse.gy + this._draggingNodeData.offset.y,
+  //     };
 
-      this._draggingNodeData.$canvas.css('left', pos.x).css('top', pos.y);
-      return;
-    }
+  //     this._draggingNodeData.$canvas.css('left', pos.x).css('top', pos.y);
+  //     return;
+  //   }
 
-    var categoryData = this.__findCategoryAreaAtPos(mouse);
-    if (categoryData) {
-      var offset = categoryData.$canvas.offset();
-      mouse = this.__mouse(event, offset);
-      var node = this.__findNodeAtPos(mouse, {x:0,y:0,z:this._drawStyle.palette.scale}, categoryData.nodes);
-      if (node) {
-        this._highlightNode = node;
-        this.$palette.addClass('wcClickable');
-        this.$palette.attr('title', 'Create a new instance of this node by dragging this into your script.');
-      } else {
-        this._highlightNode = null;
-        this.$palette.removeClass('wcClickable');
-        this.$palette.attr('title', '');
-      }
-    }
-  },
+  //   var categoryData = this.__findCategoryAreaAtPos(mouse);
+  //   if (categoryData) {
+  //     var offset = categoryData.$canvas.offset();
+  //     mouse = this.__mouse(event, offset);
+  //     var node = this.__findNodeAtPos(mouse, {x:0,y:0,z:this._drawStyle.palette.scale}, categoryData.nodes);
+  //     if (node) {
+  //       this._highlightNode = node;
+  //       this.$palette.addClass('wcClickable');
+  //       this.$palette.attr('title', 'Create a new instance of this node by dragging this into your script.');
+  //     } else {
+  //       this._highlightNode = null;
+  //       this.$palette.removeClass('wcClickable');
+  //       this.$palette.attr('title', '');
+  //     }
+  //   }
+  // },
 
-  /**
-   * Handle mouse down events over the palette view.
-   * @function wcPlayEditor#__onPaletteMouseDown
-   * @private
-   * @param {Object} event - The mouse event.
-   * @param {Object} elem - The target element.
-   */
-  __onPaletteMouseDown: function(event, elem) {
-    if (this._highlightNode) {
-      this.__onPaletteMouseUp(event, elem);
-      var mouse = this.__mouse(event);
-      var rect = this._highlightNode._meta.bounds.rect;
-      var categoryData = this.__findCategoryAreaAtPos(mouse);
-      if (categoryData) {
-        var offset = categoryData.$canvas.offset();
-        var screenOffset = this.$container.offset();
+  // /**
+  //  * Handle mouse down events over the palette view.
+  //  * @function wcPlayEditor#__onPaletteMouseDown
+  //  * @private
+  //  * @param {Object} event - The mouse event.
+  //  * @param {Object} elem - The target element.
+  //  */
+  // __onPaletteMouseDown: function(event, elem) {
+  //   if (this._highlightNode) {
+  //     this.__onPaletteMouseUp(event, elem);
+  //     var mouse = this.__mouse(event);
+  //     var rect = this._highlightNode._meta.bounds.rect;
+  //     var categoryData = this.__findCategoryAreaAtPos(mouse);
+  //     if (categoryData) {
+  //       var offset = categoryData.$canvas.offset();
+  //       var screenOffset = this.$container.offset();
 
-        this._draggingNodeData = {
-          node: this._highlightNode,
-          $canvas: $('<canvas class="wcPlayHoverCanvas">'),
-          offset: {x: 0, y: 0}
-        };
-        this.$container.append(this._draggingNodeData.$canvas);
+  //       this._draggingNodeData = {
+  //         node: this._highlightNode,
+  //         $canvas: $('<canvas class="wcPlayHoverCanvas">'),
+  //         offset: {x: 0, y: 0}
+  //       };
+  //       this.$container.append(this._draggingNodeData.$canvas);
 
-        this.$palette.addClass('wcMoving');
-        this.$viewport.addClass('wcMoving');
+  //       this.$palette.addClass('wcMoving');
+  //       this.$viewport.addClass('wcMoving');
 
-        this._draggingNodeData.$canvas.css('left', this._highlightNode.pos.x + rect.left + offset.left - screenOffset.left)
-          .css('top', this._highlightNode.pos.y + rect.top + offset.top - screenOffset.top);
-        this._draggingNodeData.$canvas.attr('width', rect.width).css('width', rect.width);
-        this._draggingNodeData.$canvas.attr('height', rect.height).css('height', rect.height);
+  //       this._draggingNodeData.$canvas.css('left', this._highlightNode.pos.x + rect.left + offset.left - screenOffset.left)
+  //         .css('top', this._highlightNode.pos.y + rect.top + offset.top - screenOffset.top);
+  //       this._draggingNodeData.$canvas.attr('width', rect.width).css('width', rect.width);
+  //       this._draggingNodeData.$canvas.attr('height', rect.height).css('height', rect.height);
 
-        this._draggingNodeData.offset.x = (this._highlightNode.pos.x * this._drawStyle.palette.scale + rect.left + offset.left - screenOffset.left) - mouse.x;
-        this._draggingNodeData.offset.y = (this._highlightNode.pos.y * this._drawStyle.palette.scale + rect.top + offset.top - screenOffset.top) - mouse.y;
+  //       this._draggingNodeData.offset.x = (this._highlightNode.pos.x * this._drawStyle.palette.scale + rect.left + offset.left - screenOffset.left) - mouse.x;
+  //       this._draggingNodeData.offset.y = (this._highlightNode.pos.y * this._drawStyle.palette.scale + rect.top + offset.top - screenOffset.top) - mouse.y;
 
-        var yPos = 0;
-        if (!this._highlightNode.chain.entry.length) {
-          yPos += this._drawStyle.links.length;
-        }
+  //       var yPos = 0;
+  //       if (!this._highlightNode.chain.entry.length) {
+  //         yPos += this._drawStyle.links.length;
+  //       }
 
-        this._highlightNode.pos.x = rect.width/2;
-        this._highlightNode.pos.y = yPos+3;
-        this.__drawNode(this._highlightNode, this._draggingNodeData.$canvas[0].getContext('2d'), true);
-      }
-    }
-  },
+  //       this._highlightNode.pos.x = rect.width/2;
+  //       this._highlightNode.pos.y = yPos+3;
+  //       this.__drawNode(this._highlightNode, this._draggingNodeData.$canvas[0].getContext('2d'), true);
+  //     }
+  //   }
+  // },
 
-  /**
-   * Handle mouse up events over the palette view.
-   * @function wcPlayEditor#__onPaletteMouseDown
-   * @private
-   * @param {Object} event - The mouse event.
-   * @param {Object} elem - The target element.
-   */
-  __onPaletteMouseUp: function(event, elem) {
-    if (this._draggingNodeData) {
-      this._draggingNodeData.$canvas.remove();
-      this._draggingNodeData.$canvas = null;
-      this._draggingNodeData = null;
-      this.$palette.removeClass('wcMoving');
-      this.$viewport.removeClass('wcMoving');
-    }
-  },
+  // /**
+  //  * Handle mouse up events over the palette view.
+  //  * @function wcPlayEditor#__onPaletteMouseDown
+  //  * @private
+  //  * @param {Object} event - The mouse event.
+  //  * @param {Object} elem - The target element.
+  //  */
+  // __onPaletteMouseUp: function(event, elem) {
+  //   if (this._draggingNodeData) {
+  //     this._draggingNodeData.$canvas.remove();
+  //     this._draggingNodeData.$canvas = null;
+  //     this._draggingNodeData = null;
+  //     this.$palette.removeClass('wcMoving');
+  //     this.$viewport.removeClass('wcMoving');
+  //   }
+  // },
 
   /**
    * Handle mouse move events over the viewport canvas.
@@ -5591,34 +5726,34 @@ wcPlayEditor.prototype = {
       }
     }
     return null;
-  },
+  }
 
-  /**
-   * Finds the category area of the palette at a given position.
-   * @function wcPlayEditor#__findCategoryAreaAtPos
-   * @private
-   * @param {wcPlay~Coordinates} pos - The position.
-   * @returns {Object|null} - The category data found, or null if not found.
-   */
-  __findCategoryAreaAtPos: function(pos) {
-    for (var cat in this._nodeLibrary) {
-      for (var type in this._nodeLibrary[cat]) {
+  // /**
+  //  * Finds the category area of the palette at a given position.
+  //  * @function wcPlayEditor#__findCategoryAreaAtPos
+  //  * @private
+  //  * @param {wcPlay~Coordinates} pos - The position.
+  //  * @returns {Object|null} - The category data found, or null if not found.
+  //  */
+  // __findCategoryAreaAtPos: function(pos) {
+  //   for (var cat in this._nodeLibrary) {
+  //     for (var type in this._nodeLibrary[cat]) {
 
-        // Ignore types that are not visible.
-        if (!this.$typeButton[this.__typeIndex(type)].hasClass('wcToggled')) continue;
+  //       // Ignore types that are not visible.
+  //       if (!this.$typeButton[this.__typeIndex(type)].hasClass('wcToggled')) continue;
 
-        var typeData = this._nodeLibrary[cat][type];
+  //       var typeData = this._nodeLibrary[cat][type];
 
-        // Ignore categories that are not visible.
-        if (typeData.$button.hasClass('wcToggled')) continue;
+  //       // Ignore categories that are not visible.
+  //       if (typeData.$button.hasClass('wcToggled')) continue;
 
-        var rect = typeData.$canvas.offset();
-        rect.width = typeData.$canvas.width();
-        rect.height = typeData.$canvas.height();
-        if (this.__inRect(pos, rect)) {
-          return typeData;
-        }
-      }
-    }
-  },
+  //       var rect = typeData.$canvas.offset();
+  //       rect.width = typeData.$canvas.width();
+  //       rect.height = typeData.$canvas.height();
+  //       if (this.__inRect(pos, rect)) {
+  //         return typeData;
+  //       }
+  //     }
+  //   }
+  // },
 };

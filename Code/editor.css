@@ -225,6 +225,8 @@
 
 #wcPlayEditorPalettePopup {
   position: absolute;
+  display: flex;
+  flex-direction: column;
   z-index: 1001;
   top: 0px;
   left: 0px;
@@ -248,16 +250,47 @@
 }
 
 #wcPlayEditorPaletteInput {
-  position: relative;
-  left: 5px;
   width: calc(100% - 19px); /* 5px for padding, 2px parent border */
   border-radius: 20px;
   padding-left: 5px;
+  margin-left: 5px;
+  margin-bottom: 5px;
 }
 
 #wcPlayEditorPaletteInput:focus {
   outline: none;
 }
+
+#wcPlayEditorPaletteList {
+  flex: 0.98;
+  left: 5px;
+  width: calc(100% - 19px);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+#wcPlayEditorPaletteList ul {
+  list-style-type: none;
+  padding-left: 10px;
+}
+
+#wcPlayEditorPaletteList .wcLink:hover {
+  background-color: lightgray;
+}
+
+#wcPlayEditorPaletteList li.wcLink {
+  cursor: pointer;
+}
+
+#wcPlayEditorPaletteList li span.wcLinkType {
+  color: gray;
+  font-size: 12px;
+}
+
+#wcPlayEditorPaletteList li span.wcLinkName {
+  color: black;
+}
+
 
 @-webkit-keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
 @-moz-keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
