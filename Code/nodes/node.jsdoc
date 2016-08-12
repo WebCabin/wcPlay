@@ -1,5 +1,6 @@
 /**
- * Allows for overriding the display string for a property value as displayed on the node.
+ * Allows for overriding the display string for a property value as displayed on the node.<br>
+ * The `this` object will reference the node.
  * @callback wcNode~PropertyDisplay
  * @param {Object} - The value or initial value of the property to display.
  * @returns {String} - A string value to display on the node.
