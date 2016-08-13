@@ -2568,7 +2568,7 @@ wcPlayEditor.prototype = {
       }
       longRect = {
         top: rect.top + upper - this._font.property.size/3 - this._drawStyle.links.width/2 - 5,
-        left: rect.left - this._drawStyle.links.length*2,
+        left: rect.left,
         width: rect.width + this._drawStyle.links.length,
         height: (props[i].options && props[i].options.output)? this._drawStyle.links.width + 10: 0,
       }
@@ -3855,8 +3855,9 @@ wcPlayEditor.prototype = {
             for (var a = 0; a < links.length; ++a) {
               // Ensure the connection can actually be made.
               var linkOptions = data.node.propertyOptions(links[a].name);
-              if ((!options[linkType + 'Condition'] || options[linkType + 'Condition'].call(linkNode, data.node, links[a].name)) &&
-                  (!linkOptions[connectLink + 'Condition'] || linkOptions[connectLink + 'Condition'].call(data.node, linkNode, linkName))) {
+              if (!options ||
+                  ((!options[linkType + 'Condition'] || options[linkType + 'Condition'].call(linkNode, data.node, links[a].name)) &&
+                  (!linkOptions[connectLink + 'Condition'] || linkOptions[connectLink + 'Condition'].call(data.node, linkNode, linkName)))) {
                 add = true;
                 $links.append('<li id="wcNode-' + data.id + '-' + a + '" class="wcSelectable wcLinkItem" title="' + links[a].desc + '"><span class="wcPrefix">' + connectLink + ' -- </span><span class="wcMainLabel">' + links[a].name + '</span></li>');
               }
