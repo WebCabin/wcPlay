@@ -2525,7 +2525,7 @@ wcPlayEditor.prototype = {
       longRect = {
         top: rect.top + upper - this._font.property.size/3 - this._drawStyle.links.width/2 - 5,
         left: rect.left - this._drawStyle.links.length,
-        width: rect.width + this._drawStyle.links.length*2,
+        width: rect.width + this._drawStyle.links.length,
         height: (props[i].options && props[i].options.input)? this._drawStyle.links.width + 10: 0,
       };
 
@@ -2548,8 +2548,8 @@ wcPlayEditor.prototype = {
       }
       longRect = {
         top: rect.top + upper - this._font.property.size/3 - this._drawStyle.links.width/2 - 5,
-        left: rect.left - this._drawStyle.links.length,
-        width: rect.width + this._drawStyle.links.length*2,
+        left: rect.left - this._drawStyle.links.length*2,
+        width: rect.width + this._drawStyle.links.length,
         height: (props[i].options && props[i].options.output)? this._drawStyle.links.width + 10: 0,
       }
 
@@ -2607,7 +2607,7 @@ wcPlayEditor.prototype = {
         top: rect.top,
         left: rect.left,
         width: rect.width,
-        height: node._meta.bounds.rect.height,
+        height: node._meta.bounds.center.height,
       };
 
       node._meta.bounds.entryBounds.push({
@@ -2661,10 +2661,10 @@ wcPlayEditor.prototype = {
       rect.width += 10;
 
       var longRect = {
-        top: rect.top - node._meta.bounds.rect.height,
+        top: rect.top - node._meta.bounds.center.height + this._drawStyle.links.length,
         left: rect.left,
         width: rect.width,
-        height: node._meta.bounds.rect.height,
+        height: node._meta.bounds.center.height,
       };
 
       node._meta.bounds.exitBounds.push({
