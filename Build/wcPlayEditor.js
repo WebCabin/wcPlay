@@ -1243,7 +1243,7 @@ wcPlayEditor.prototype = {
 
     // File -> Import...
     this._menu.addOption('File', 'Import...', {
-      icon: "wcPlayEditorImportIcon",
+      icon: "fa fa-link fa-lg",
       description: "Import a script file as a Composite Node.",
       toolbarIndex: -1,
       condition: function(editor) {
