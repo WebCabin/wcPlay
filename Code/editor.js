@@ -3795,8 +3795,9 @@ wcPlayEditor.prototype = {
             link = ' class="wcSelectable"';
           }
 
+          var describer = data.node.category;
           var add = false;
-          var $item = $('<li id="wcNode-' + data.id + '"' + link + ' title="' + data.desc + '">' + data.displayName + '</li>');
+          var $item = $('<li id="wcNode-' + data.id + '"' + link + ' title="' + data.desc + '"><span class="wcMainLabel">' + data.displayName + '</span><span class="wcDescriber">' + describer + '</span></li>');
           if (links) {
             var $links = $('<ul>');
             $item.append($links);
@@ -3805,7 +3806,7 @@ wcPlayEditor.prototype = {
               if (linkNode.onRequestConnect(linkName, linkType, data.node, links[a].name, connectLink) &&
                   data.node.onRequestConnect(links[a].name, connectLink, linkNode, linkName, linkType)) {
                 add = true;
-                $links.append('<li id="wcNode-' + data.id + '-' + a + '" class="wcSelectable wcLinkItem" title="' + links[a].desc + '"><span class="wcLinkType">' + connectLink + ' -- </span><span class="wcLinkName">' + links[a].name + '</span></li>');
+                $links.append('<li id="wcNode-' + data.id + '-' + a + '" class="wcSelectable wcLinkItem" title="' + links[a].desc + '"><span class="wcPrefix">' + connectLink + ' -- </span><span class="wcMainLabel">' + links[a].name + '</span></li>');
               }
             }
           } else {

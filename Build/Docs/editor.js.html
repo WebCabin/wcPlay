@@ -3879,8 +3879,9 @@ wcPlayEditor.prototype = {
             link = ' class="wcSelectable"';
           }
 
+          var describer = data.node.category;
           var add = false;
-          var $item = $('&lt;li id="wcNode-' + data.id + '"' + link + ' title="' + data.desc + '">' + data.displayName + '&lt;/li>');
+          var $item = $('&lt;li id="wcNode-' + data.id + '"' + link + ' title="' + data.desc + '">&lt;span class="wcMainLabel">' + data.displayName + '&lt;/span>&lt;span class="wcDescriber">' + describer + '&lt;/span>&lt;/li>');
           if (links) {
             var $links = $('&lt;ul>');
             $item.append($links);
@@ -3889,7 +3890,7 @@ wcPlayEditor.prototype = {
               if (linkNode.onRequestConnect(linkName, linkType, data.node, links[a].name, connectLink) &amp;&amp;
                   data.node.onRequestConnect(links[a].name, connectLink, linkNode, linkName, linkType)) {
                 add = true;
-                $links.append('&lt;li id="wcNode-' + data.id + '-' + a + '" class="wcSelectable wcLinkItem" title="' + links[a].desc + '">&lt;span class="wcLinkType">' + connectLink + ' -- &lt;/span>&lt;span class="wcLinkName">' + links[a].name + '&lt;/span>&lt;/li>');
+                $links.append('&lt;li id="wcNode-' + data.id + '-' + a + '" class="wcSelectable wcLinkItem" title="' + links[a].desc + '">&lt;span class="wcPrefix">' + connectLink + ' -- &lt;/span>&lt;span class="wcMainLabel">' + links[a].name + '&lt;/span>&lt;/li>');
               }
             }
           } else {

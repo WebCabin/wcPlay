@@ -296,7 +296,13 @@
   background-color: gray;
 }
 
-#wcPlayEditorPaletteList li span.wcLinkType {
+#wcPlayEditorPaletteList li span.wcPrefix {
+  color: gray;
+  font-size: 12px;
+}
+
+#wcPlayEditorPaletteList li span.wcDescriber {
+  float: right;
   color: gray;
   font-size: 12px;
 }
