@@ -112,7 +112,8 @@ function wcPlayEditor(container, options) {
       headerColor:    'rgba(255, 255, 255, 0.2)',
       highlightBorder: -1,
       normalBorder: 1,
-      headerBorder: -1
+      headerBorder: -1,
+      headerSpace: 5
     }
   };
 
@@ -2772,16 +2773,16 @@ wcPlayEditor.prototype = {
       context.fillStyle = "black";
       context.textAlign = "right";
       this.__setCanvasFont(this._font.propertyHeader, context);
-      context.fillText("Initial", node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin, node.pos.y + node._meta.bounds.center.top + upper);
+      context.fillText("Initial", node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin - this._drawStyle.property.headerSpace, node.pos.y + node._meta.bounds.center.top + upper);
 
       context.fillStyle = "#444444";
       this.__setCanvasFont(this._font.propertyHeader, context);
-      context.fillText("Current ", node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin - node._meta.bounds.center.initialWidth, node.pos.y + node._meta.bounds.center.top + upper);
+      context.fillText("Current", node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin - this._drawStyle.property.headerSpace - node._meta.bounds.center.initialWidth, node.pos.y + node._meta.bounds.center.top + upper);
     } else {
       context.fillStyle = "black";
       context.textAlign = "right";
       this.__setCanvasFont(this._font.propertyHeader, context);
-      context.fillText("Initial ", node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin, node.pos.y + node._meta.bounds.center.top + upper);
+      context.fillText("Initial", node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin - this._drawStyle.property.headerSpace, node.pos.y + node._meta.bounds.center.top + upper);
     }
 
     upper += this._drawStyle.property.spacing;
