@@ -47,7 +47,6 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
 
     // Give the node its default properties.
     this.createProperty(wcNode.PROPERTY_ENABLED, wcPlay.PROPERTY.TOGGLE, true, {description: "Disabled nodes will be treated as if they were not there, all connections will be ignored.", input: true, output: true});
-    // this.createProperty(wcNode.PROPERTY.DEBUG_LOG, wcPlay.PROPERTY.TOGGLE, false, {collapsible: true, description: "Output various debugging information about this node."});
 
     // Add this node to its parent.
     if (this._parent) {
@@ -1066,12 +1065,14 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
     }
 
     // Ask if this node can connect with the other.
-    if (!this.onRequestConnect(myProperty.name, wcNode.LINK_TYPE.INPUT, targetNode, targetProperty.name, wcNode.LINK_TYPE.OUTPUT)) {
+    if (myProperty.options.inputCondition &&
+        !myProperty.options.inputCondition.call(this, targetNode, targetProperty.name)) {
       return wcNode.CONNECT_RESULT.REFUSED;
     }
 
     // Ask if the other node can connect with this.
-    if (!targetNode.onRequestConnect(targetProperty.name, wcNode.LINK_TYPE.OUTPUT, this, myProperty.name, wcNode.LINK_TYPE.INPUT)) {
+    if (targetProperty.options.outputCondition &&
+        !targetProperty.options.outputCondition.call(targetNode, this, myProperty.name)) {
       return wcNode.CONNECT_RESULT.REFUSED;
     }
 
@@ -1142,12 +1143,14 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
     }
 
     // Ask if this node can connect with the other.
-    if (!this.onRequestConnect(myProperty.name, wcNode.LINK_TYPE.OUTPUT, targetNode, targetProperty.name, wcNode.LINK_TYPE.INPUT)) {
+    if (myProperty.options.outputCondition &&
+        !myProperty.options.outputCondition.call(this, targetNode, targetProperty.name)) {
       return wcNode.CONNECT_RESULT.REFUSED;
     }
 
     // Ask if the other node can connect with this.
-    if (!targetNode.onRequestConnect(targetProperty.name, wcNode.LINK_TYPE.INPUT, this, myProperty.name, wcNode.LINK_TYPE.OUTPUT)) {
+    if (targetProperty.options.inputCondition &&
+        !targetProperty.options.inputCondition.call(targetNode, this, myProperty.name)) {
       return wcNode.CONNECT_RESULT.REFUSED;
     }
 
@@ -1892,22 +1895,6 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    */
   onViewportMouseDoubleClick: function(event, pos, readOnly) {
     // this._super(event, pos, readOnly);
-  },
-
-  /**
-   * Event that is called when a property connection is being requested.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNode#onRequestConnect
-   * @param {String} name - The name of the link being connected to.
-   * @param {wcNode.LINK_TYPE} type - The link's type.
-   * @param {wcNode} targetNode - The target node being connected to.
-   * @param {String} targetName - The link name on the target node being connected to.
-   * @param {wcNode.LINK_TYPE} targetType - The target link's type.
-   * @returns {Boolean} - Return true if you will allow the connection.
-   */
-  onRequestConnect: function(name, type, targetNode, targetName, targetType) {
-    // this._super(name, type, targetNode, targetName, targetType);
-    return true;
   },
 
   /**

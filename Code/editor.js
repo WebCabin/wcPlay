@@ -3672,11 +3672,12 @@ wcPlayEditor.prototype = {
       var createdNode = null;
       this._showingSelector = true;
       var connectLink = '';
+      var options = linkNode? linkNode.propertyOptions(linkName): {};
       switch (linkType) {
-        case wcNode.LINK_TYPE.ENTRY:  connectLink = 'exit';   break;
-        case wcNode.LINK_TYPE.EXIT:   connectLink = 'entry';  break;
-        case wcNode.LINK_TYPE.INPUT:  connectLink = 'output'; break;
-        case wcNode.LINK_TYPE.OUTPUT: connectLink = 'input';  break;
+        case wcNode.LINK_TYPE.ENTRY:  connectLink = wcNode.LINK_TYPE.EXIT;   break;
+        case wcNode.LINK_TYPE.EXIT:   connectLink = wcNode.LINK_TYPE.ENTRY;  break;
+        case wcNode.LINK_TYPE.INPUT:  connectLink = wcNode.LINK_TYPE.OUTPUT; break;
+        case wcNode.LINK_TYPE.OUTPUT: connectLink = wcNode.LINK_TYPE.INPUT;  break;
       }
 
       var header = 'Create Node';
@@ -3788,7 +3789,7 @@ wcPlayEditor.prototype = {
         caseSensitive: false,
         shouldSort: true,
         tokenize: false,
-        threshold: 0.2,
+        threshold: 0.4,
         location: 0,
         distance: 100,
         maxPatternLength: 32,
@@ -3833,8 +3834,9 @@ wcPlayEditor.prototype = {
             $item.append($links);
             for (var a = 0; a < links.length; ++a) {
               // Ensure the connection can actually be made.
-              if (linkNode.onRequestConnect(linkName, linkType, data.node, links[a].name, connectLink) &&
-                  data.node.onRequestConnect(links[a].name, connectLink, linkNode, linkName, linkType)) {
+              var linkOptions = data.node.propertyOptions(links[a].name);
+              if ((!options[linkType + 'Condition'] || options[linkType + 'Condition'].call(linkNode, data.node, links[a].name)) &&
+                  (!linkOptions[connectLink + 'Condition'] || linkOptions[connectLink + 'Condition'].call(data.node, linkNode, linkName))) {
                 add = true;
                 $links.append('<li id="wcNode-' + data.id + '-' + a + '" class="wcSelectable wcLinkItem" title="' + links[a].desc + '"><span class="wcPrefix">' + connectLink + ' -- </span><span class="wcMainLabel">' + links[a].name + '</span></li>');
               }
@@ -4971,8 +4973,11 @@ wcPlayEditor.prototype = {
             var canConnect = true;
             this._highlightNode = node;
             if (this._selectedOutputLink) {
-              if (!this._selectedNode.onRequestConnect(this._selectedOutputLink.name, wcNode.LINK_TYPE.OUTPUT, node, node._meta.bounds.inputBounds[i].name, wcNode.LINK_TYPE.INPUT) ||
-                  !node.onRequestConnect(node._meta.bounds.inputBounds[i].name, wcNode.LINK_TYPE.INPUT, this._selectedNode, this._selectedOutputLink.name, wcNode.LINK_TYPE.OUTPUT)) {
+              // Test for connectivity
+              var myOptions = this._selectedNode.propertyOptions(this._selectedOutputLink.name);
+              var targetOptions = node.propertyOptions(node._meta.bounds.inputBounds[i].name);
+              if ((myOptions.outputCondition && !myOptions.outputCondition.call(this._selectedNode, node, node._meta.bounds.inputBounds[i].name)) ||
+                 (targetOptions.inputCondition && !targetOptions.inputCondition.call(node, this._selectedNode, this._selectedOutputLink.name))) {
                 canConnect = false;
               }
             }
@@ -4996,8 +5001,11 @@ wcPlayEditor.prototype = {
             var canConnect = true;
             this._highlightNode = node;
             if (this._selectedInputLink) {
-              if (!this._selectedNode.onRequestConnect(this._selectedInputLink.name, wcNode.LINK_TYPE.INPUT, node, node._meta.bounds.inputBounds[i].name, wcNode.LINK_TYPE.OUTPUT) ||
-                  !node.onRequestConnect(node._meta.bounds.inputBounds[i].name, wcNode.LINK_TYPE.OUTPUT, this._selectedNode, this._selectedInputLink.name, wcNode.LINK_TYPE.INPUT)) {
+              // Test for connectivity
+              var myOptions = this._selectedNode.propertyOptions(this._selectedInputLink.name);
+              var targetOptions = node.propertyOptions(node._meta.bounds.outputBounds[i].name);
+              if ((myOptions.inputCondition && !myOptions.inputCondition.call(this._selectedNode, node, node._meta.bounds.outputBounds[i].name)) ||
+                 (targetOptions.outputCondition && !targetOptions.outputCondition.call(node, this._selectedNode, this._selectedInputLink.name))) {
                 canConnect = false;
               }
             }

@@ -7,6 +7,15 @@
  */
 
 /**
+ * A callback handler for testing whether a property link can connect with another.<br>
+ * The `this` object will reference the node.
+ * @callback wcNode~PropertyLinkCondition
+ * @param {String} name - The name of your link being connected to.
+ * @param {wcNode} targetNode - The target node being connected with.
+ * @param {String} targetLink - The name of the targets link.
+ */
+
+/**
  * A set of options that apply to all property types.
  * @typedef {Object} wcNode~PropertyOptions
  * @property {String} [description] - An optional description to display as a tooltip for this property.
@@ -14,6 +23,8 @@
  * @property {wcNode~ExportValue} [exportValue] - An optional function that will retrieve the property's value when it is about to be exported to file.
  * @property {Boolean} [input] - If true, this property will have an input link so its value can be changed through script.
  * @property {Boolean} [output] - If true, this property will have an output link so its value can be retrieved through script.
+ * @property {wcNode~PropertyLinkCondition} [inputCondition] - If supplied, returns whether a specified connection can be made to your property input.
+ * @property {wcNode~PropertyLinkCondition} [outputCondition] - If supplied, returns whether a specified connection can be made to your property output.
  * @property {Boolean} [linked] - If true, the value and initial values will be linked and can not be separated. Changing either will change them both.
  * @property {Boolean} [readOnly] - If true, clicking this property will not show an editor.
  */
@@ -26,6 +37,8 @@
  * @property {wcNode~ExportValue} [exportValue] - An optional function that will retrieve the property's value when it is about to be exported to file.
  * @property {Boolean} [input] - If true, this property will have an input link so its value can be changed through script.
  * @property {Boolean} [output] - If true, this property will have an output link so its value can be retrieved through script.
+ * @property {wcNode~PropertyLinkCondition} [inputCondition] - If supplied, returns whether a specified connection can be made to your property input.
+ * @property {wcNode~PropertyLinkCondition} [outputCondition] - If supplied, returns whether a specified connection can be made to your property output.
  * @property {Boolean} [linked] - If true, the value and initial values will be linked and can not be separated. Changing either will change them both.
  * @property {Boolean} [readOnly] - If true, clicking this property will not show an editor.
  * @property {Number} [min=-Infinity] - The minimum value of the number range.
@@ -41,6 +54,8 @@
  * @property {wcNode~ExportValue} [exportValue] - An optional function that will retrieve the property's value when it is about to be exported to file.
  * @property {Boolean} [input] - If true, this property will have an input link so its value can be changed through script.
  * @property {Boolean} [output] - If true, this property will have an output link so its value can be retrieved through script.
+ * @property {wcNode~PropertyLinkCondition} [inputCondition] - If supplied, returns whether a specified connection can be made to your property input.
+ * @property {wcNode~PropertyLinkCondition} [outputCondition] - If supplied, returns whether a specified connection can be made to your property output.
  * @property {Boolean} [linked] - If true, the value and initial values will be linked and can not be separated. Changing either will change them both.
  * @property {Boolean} [readOnly] - If true, clicking this property will not show an editor.
  * @property {Number} [maxlength=Infinity] - The maximum number of characters allowed.
@@ -56,6 +71,8 @@
  * @property {wcNode~ExportValue} [exportValue] - An optional function that will retrieve the property's value when it is about to be exported to file.
  * @property {Boolean} [input] - If true, this property will have an input link so its value can be changed through script.
  * @property {Boolean} [output] - If true, this property will have an output link so its value can be retrieved through script.
+ * @property {wcNode~PropertyLinkCondition} [inputCondition] - If supplied, returns whether a specified connection can be made to your property input.
+ * @property {wcNode~PropertyLinkCondition} [outputCondition] - If supplied, returns whether a specified connection can be made to your property output.
  * @property {Boolean} [linked] - If true, the value and initial values will be linked and can not be separated. Changing either will change them both.
  * @property {Boolean} [readOnly] - If true, clicking this property will not show an editor.
  * @property {wcNode~SelectItem[]|String[]|wcNode~SelectItemFunc} items - A list of items to display in the combo box, or a callback function that can dynamically retrieve a list.
@@ -71,6 +88,8 @@
  * @property {wcNode~ExportValue} [exportValue] - An optional function that will retrieve the property's value when it is about to be exported to file.
  * @property {Boolean} [input] - If true, this property will have an input link so its value can be changed through script.
  * @property {Boolean} [output] - If true, this property will have an output link so its value can be retrieved through script.
+ * @property {wcNode~PropertyLinkCondition} [inputCondition] - If supplied, returns whether a specified connection can be made to your property input.
+ * @property {wcNode~PropertyLinkCondition} [outputCondition] - If supplied, returns whether a specified connection can be made to your property output.
  * @property {Boolean} [linked] - If true, the value and initial values will be linked and can not be separated. Changing either will change them both.
  * @property {Boolean} [readOnly] - If true, clicking this property will not show an editor.
  * @property {wcNode~CustomCreateFunc} [onCreate] - If supplied, will be called when the property control is being edited and should return an element to display the control.
