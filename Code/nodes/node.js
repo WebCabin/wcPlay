@@ -1,4 +1,3 @@
-var wcNodeNextID = 0;
 wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
   /**
    * @class
@@ -12,7 +11,6 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
    */
   init: function(parent, pos) {
-    this.id = ++wcNodeNextID;
     this.color = '#FFFFFF';
     if (!this.name) {
       this.name = '';
@@ -52,7 +50,15 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
     // this.createProperty(wcNode.PROPERTY.DEBUG_LOG, wcPlay.PROPERTY.TOGGLE, false, {collapsible: true, description: "Output various debugging information about this node."});
 
     // Add this node to its parent.
-    this._parent && this._parent.__addNode(this);
+    if (this._parent) {
+      this._parent.__addNode(this);
+    }
+
+    // Assign this node a unique ID if possible.
+    var engine = this.engine();
+    if (engine) {
+      this.id = engine.__nextNodeId();
+    }
   },
 
   /**
@@ -154,10 +160,6 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
     this.pos.y = data.pos.y,
     this.debugBreak(data.breakpoint);
 
-    if (this.id > wcNodeNextID) {
-      wcNodeNextID = this.id;
-    }
-
     // Restore property values.
     for (var i = 0; i < data.properties.length; ++i) {
       this.initialProperty(data.properties[i].name, data.properties[i].initialValue);
@@ -167,6 +169,10 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
     var engine = this.engine();
     if (!engine) {
       return;
+    }
+
+    if (this.id > engine.__curNodeId()) {
+      engine.__curNodeId(this.id);
     }
 
     // Re-connect all chains.

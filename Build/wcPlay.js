@@ -106,7 +106,8 @@ function wcPlay(options) {
   this._queuedProperties = [];
   this._importedScripts = [];
 
-  this._updateId = 0;
+  this._nodeId = 0;
+  this._updateInterval = 0;
   this._isRunning = false;
   this._isPaused = false;
   this._isPausing = false;
@@ -127,9 +128,9 @@ function wcPlay(options) {
     this._options[prop] = options[prop];
   }
 
-  if (!this._updateId) {
+  if (!this._updateInterval) {
     var self = this;
-    this._updateId = setInterval(function() {
+    this._updateInterval = setInterval(function() {
       self.update();
     }, this._options.updateRate);
   }
@@ -1115,8 +1116,8 @@ wcPlay.prototype = {
       this._editors[0].engine(null);
     }
 
-    if (this._updateId) {
-      clearInterval(this._updateId);
+    if (this._updateInterval) {
+      clearInterval(this._updateInterval);
     }
 
     var index = wcPlay.INSTANCE_LIBRARY.indexOf(this);
@@ -1204,6 +1205,30 @@ wcPlay.prototype = {
 
     return false;
   },
+
+  /**
+   * Retrieves the next node id.
+   * @function wcPlay#__nextNodeId
+   * @private
+   * @returns {Number}
+   */
+  __nextNodeId: function() {
+    return ++this._nodeId;
+  },
+
+  /**
+   * Sets or Gets the current node id.
+   * @function wcPlay#__curNodeId
+   * @private
+   * @param {Number} [cur] - If supplied, will assign the current node id.
+   * @returns {Number}
+   */
+  __curNodeId: function(cur) {
+    if (typeof cur === 'number') {
+      this._nodeId = cur;
+    }
+    return this._nodeId;
+  }
 };
 
 
@@ -1240,7 +1265,6 @@ wcNodeTimeoutEvent.prototype = {
   },
 };
 
-var wcNodeNextID = 0;
 wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
   /**
    * @class
@@ -1254,7 +1278,6 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
    */
   init: function(parent, pos) {
-    this.id = ++wcNodeNextID;
     this.color = '#FFFFFF';
     if (!this.name) {
       this.name = '';
@@ -1294,7 +1317,15 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
     // this.createProperty(wcNode.PROPERTY.DEBUG_LOG, wcPlay.PROPERTY.TOGGLE, false, {collapsible: true, description: "Output various debugging information about this node."});
 
     // Add this node to its parent.
-    this._parent && this._parent.__addNode(this);
+    if (this._parent) {
+      this._parent.__addNode(this);
+    }
+
+    // Assign this node a unique ID if possible.
+    var engine = this.engine();
+    if (engine) {
+      this.id = engine.__nextNodeId();
+    }
   },
 
   /**
@@ -1396,10 +1427,6 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
     this.pos.y = data.pos.y,
     this.debugBreak(data.breakpoint);
 
-    if (this.id > wcNodeNextID) {
-      wcNodeNextID = this.id;
-    }
-
     // Restore property values.
     for (var i = 0; i < data.properties.length; ++i) {
       this.initialProperty(data.properties[i].name, data.properties[i].initialValue);
@@ -1409,6 +1436,10 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
     var engine = this.engine();
     if (!engine) {
       return;
+    }
+
+    if (this.id > engine.__curNodeId()) {
+      engine.__curNodeId(this.id);
     }
 
     // Re-connect all chains.

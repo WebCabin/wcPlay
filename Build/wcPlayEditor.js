@@ -1451,7 +1451,7 @@ wcPlayEditor.prototype = {
             editor.__onDestroyNode(editor._selectedNodes[i]);
 
             // Now give this node a new ID so it is treated like a different node.
-            editor._selectedNodes[i].id = ++window.wcNodeNextID;
+            editor._selectedNodes[i].id = editor._engine.__nextNodeId();
           }
 
           var compNode = new wcPlayNodes.wcNodeCompositeScript(editor._parent, {x: 0, y: 0}, editor._selectedNodes);

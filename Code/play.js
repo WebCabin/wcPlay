@@ -18,7 +18,8 @@ function wcPlay(options) {
   this._queuedProperties = [];
   this._importedScripts = [];
 
-  this._updateId = 0;
+  this._nodeId = 0;
+  this._updateInterval = 0;
   this._isRunning = false;
   this._isPaused = false;
   this._isPausing = false;
@@ -39,9 +40,9 @@ function wcPlay(options) {
     this._options[prop] = options[prop];
   }
 
-  if (!this._updateId) {
+  if (!this._updateInterval) {
     var self = this;
-    this._updateId = setInterval(function() {
+    this._updateInterval = setInterval(function() {
       self.update();
     }, this._options.updateRate);
   }
@@ -1027,8 +1028,8 @@ wcPlay.prototype = {
       this._editors[0].engine(null);
     }
 
-    if (this._updateId) {
-      clearInterval(this._updateId);
+    if (this._updateInterval) {
+      clearInterval(this._updateInterval);
     }
 
     var index = wcPlay.INSTANCE_LIBRARY.indexOf(this);
@@ -1116,6 +1117,30 @@ wcPlay.prototype = {
 
     return false;
   },
+
+  /**
+   * Retrieves the next node id.
+   * @function wcPlay#__nextNodeId
+   * @private
+   * @returns {Number}
+   */
+  __nextNodeId: function() {
+    return ++this._nodeId;
+  },
+
+  /**
+   * Sets or Gets the current node id.
+   * @function wcPlay#__curNodeId
+   * @private
+   * @param {Number} [cur] - If supplied, will assign the current node id.
+   * @returns {Number}
+   */
+  __curNodeId: function(cur) {
+    if (typeof cur === 'number') {
+      this._nodeId = cur;
+    }
+    return this._nodeId;
+  }
 };
 
 
