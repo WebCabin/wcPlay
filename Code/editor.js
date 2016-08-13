@@ -3716,8 +3716,9 @@ wcPlayEditor.prototype = {
         // Return to select the current item.
         else if (event.keyCode === 13) {
           // Create our node.
-          __createNode();
-          $blocker.click();
+          __createNode(function() {
+            $blocker.click();
+          });
           event.preventDefault();
           return true;
         }
@@ -3879,8 +3880,9 @@ wcPlayEditor.prototype = {
         // Make all selection items clickable.
         $('#wcPlayEditorPaletteList .wcSelectable').click(function() {
           current = this.id;
-          __createNode($(this));
-          $blocker.click();
+          __createNode(function() {
+            $blocker.click();
+          });
           event.preventDefault();
           return true;
         });
@@ -3903,8 +3905,9 @@ wcPlayEditor.prototype = {
         }
       };
 
-      function __createNode() {
+      function __createNode(cb) {
         if (!current) {
+          cb();
           return;
         }
 
@@ -3976,6 +3979,7 @@ wcPlayEditor.prototype = {
 
         self.__updateNode(newNode, 0, self._viewportContext);
         self.__drawNode(newNode, self._viewportContext);
+        cb();
       };
       __searchList('');
     }
