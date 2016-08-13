@@ -2542,9 +2542,16 @@ wcPlayEditor.prototype = {
         width: this._drawStyle.links.length,
         height: (props[i].options && props[i].options.input)? this._drawStyle.links.width + 10: 0,
       };
+      longRect = {
+        top: rect.top + upper - this._font.property.size/3 - this._drawStyle.links.width/2 - 5,
+        left: rect.left - this._drawStyle.links.length,
+        width: rect.width + this._drawStyle.links.length*2,
+        height: (props[i].options && props[i].options.input)? this._drawStyle.links.width + 10: 0,
+      };
 
       node._meta.bounds.inputBounds.push({
         rect: linkRect,
+        longRect: longRect,
         point: {
           x: linkRect.left + linkRect.width/3 - 2,
           y: linkRect.top + linkRect.height/2,
@@ -2559,9 +2566,16 @@ wcPlayEditor.prototype = {
         width: this._drawStyle.links.length,
         height: (props[i].options && props[i].options.output)? this._drawStyle.links.width + 10: 0,
       }
+      longRect = {
+        top: rect.top + upper - this._font.property.size/3 - this._drawStyle.links.width/2 - 5,
+        left: rect.left - this._drawStyle.links.length,
+        width: rect.width + this._drawStyle.links.length*2,
+        height: (props[i].options && props[i].options.output)? this._drawStyle.links.width + 10: 0,
+      }
 
       node._meta.bounds.outputBounds.push({
         rect: linkRect,
+        longRect: longRect,
         point: {
           x: linkRect.left + linkRect.width + 1,
           y: linkRect.top + linkRect.height/2,
@@ -2609,8 +2623,16 @@ wcPlayEditor.prototype = {
       rect.left -= 5;
       rect.width += 10;
 
+      var longRect = {
+        top: rect.top,
+        left: rect.left,
+        width: rect.width,
+        height: node._meta.bounds.rect.height,
+      };
+
       node._meta.bounds.entryBounds.push({
         rect: rect,
+        longRect: longRect,
         point: {
           x: rect.left + rect.width/2,
           y: rect.top + rect.height/3 - 2,
@@ -2658,8 +2680,16 @@ wcPlayEditor.prototype = {
       rect.left -= 5;
       rect.width += 10;
 
+      var longRect = {
+        top: rect.top - node._meta.bounds.rect.height,
+        left: rect.left,
+        width: rect.width,
+        height: node._meta.bounds.rect.height,
+      };
+
       node._meta.bounds.exitBounds.push({
         rect: rect,
+        longRect: longRect,
         point: {
           x: rect.left + rect.width/2,
           y: rect.top + rect.height + 1,
@@ -4909,8 +4939,9 @@ wcPlayEditor.prototype = {
 
       // Entry links.
       if (!this._options.readOnly && !this._selectedEntryLink && !this._selectedInputLink && !this._selectedOutputLink) {
+        var rect = this._selectedExitLink? 'longRect': 'rect';
         for (var i = 0; i < node._meta.bounds.entryBounds.length; ++i) {
-          if (this.__inRect(mouse, node._meta.bounds.entryBounds[i].rect, node.pos, this._viewportCamera)) {
+          if (this.__inRect(mouse, node._meta.bounds.entryBounds[i][rect], node.pos, this._viewportCamera)) {
             this._highlightNode = node;
             this._highlightEntryLink = node._meta.bounds.entryBounds[i];
 
@@ -4931,8 +4962,9 @@ wcPlayEditor.prototype = {
 
       // Exit links.
       if (!this._options.readOnly && !this._selectedExitLink && !this._selectedInputLink && !this._selectedOutputLink) {
+        var rect = this._selectedEntryLink? 'longRect': 'rect';
         for (var i = 0; i < node._meta.bounds.exitBounds.length; ++i) {
-          if (this.__inRect(mouse, node._meta.bounds.exitBounds[i].rect, node.pos, this._viewportCamera)) {
+          if (this.__inRect(mouse, node._meta.bounds.exitBounds[i][rect], node.pos, this._viewportCamera)) {
             this._highlightNode = node;
             this._highlightExitLink = node._meta.bounds.exitBounds[i];
 
@@ -4953,8 +4985,9 @@ wcPlayEditor.prototype = {
 
       // Input links.
       if (!this._options.readOnly && !this._selectedEntryLink && !this._selectedExitLink && !this._selectedInputLink) {
+        var rect = this._selectedOutputLink? 'longRect': 'rect';
         for (var i = 0; i < node._meta.bounds.inputBounds.length; ++i) {
-          if (this.__inRect(mouse, node._meta.bounds.inputBounds[i].rect, node.pos, this._viewportCamera)) {
+          if (this.__inRect(mouse, node._meta.bounds.inputBounds[i][rect], node.pos, this._viewportCamera)) {
             var canConnect = true;
             this._highlightNode = node;
             if (this._selectedOutputLink) {
@@ -4977,8 +5010,9 @@ wcPlayEditor.prototype = {
 
       // Output links.
       if (!this._options.readOnly && !this._selectedEntryLink && !this._selectedExitLink && !this._selectedOutputLink) {
+        var rect = this._selectedInputLink? 'longRect': 'rect';
         for (var i = 0; i < node._meta.bounds.outputBounds.length; ++i) {
-          if (this.__inRect(mouse, node._meta.bounds.outputBounds[i].rect, node.pos, this._viewportCamera)) {
+          if (this.__inRect(mouse, node._meta.bounds.outputBounds[i][rect], node.pos, this._viewportCamera)) {
             var canConnect = true;
             this._highlightNode = node;
             if (this._selectedInputLink) {
