@@ -3570,7 +3570,7 @@ wcPlayEditor.prototype = {
     }
 
     if (typeof property.options.display === 'function') {
-      value = property.options.display.call(node, value);
+      value = property.options.display.call(node, value, initial);
     } else {
       // Handle custom display of certain property types.
       switch (property.type) {
