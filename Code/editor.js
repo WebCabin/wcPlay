@@ -4466,6 +4466,7 @@ wcPlayEditor.prototype = {
    */
   __handleAutoScroll: function(active, movingNodes) {
     var shouldBeActive = false;
+    active = active && this._mouseMoved;  // Don't scroll if user has not moved the mouse at all.
 
     var width = this.$viewport.width();
     var height = this.$viewport.height();
