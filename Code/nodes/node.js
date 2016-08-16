@@ -2036,7 +2036,7 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    * @returns {Object} - Return the new value of the property (usually newValue unless you are proposing restrictions). If no value is returned, newValue is assumed.
    */
   onPropertyChanging: function(name, oldValue, newValue, undo) {
-    // this._super(name, oldValue, newValue);
+    // this._super(name, oldValue, newValue, undo);
     // if (this.debugLog()) {
     //   console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" Changing Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
     // }
@@ -2083,7 +2083,7 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    * @returns {Object} - Return the new value of the property (usually newValue unless you are proposing restrictions). If no value is returned, newValue is assumed.
    */
   onInitialPropertyChanging: function(name, oldValue, newValue, undo) {
-    // this._super(name, oldValue, newValue);
+    // this._super(name, oldValue, newValue, undo);
     // if (this.debugLog()) {
     //   console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" Changing Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
     // }
