@@ -1078,7 +1078,7 @@ wcPlay.prototype = {
         node: node,
         name: name,
         value: value,
-        upstream: upstream,
+        upstream: upstream
       });
 
       // if (this._queuedChain.length > 0) {
@@ -2769,20 +2769,34 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
 
             // Linked properties must sync with their initial values as well.
             if (prop.options.linked) {
-              this.initialProperty(prop.name, value);
+              this.initialProperty(prop.name, value, undefined, undefined, undo);
             }
 
             // Now follow any output links and assign the new value to them as well.
             if (forceOrSilent === undefined || forceOrSilent) {
               for (a = 0; a < prop.outputs.length; ++a) {
-                prop.outputs[a].node && prop.outputs[a].node.activateProperty(prop.outputs[a].name, value);
+                if (prop.outputs[a].node) {
+                  if (undo) {
+                    // Triggered by a user through the editor, this change should propagate immediately.
+                    prop.outputs[a].node.property(prop.outputs[a].name, value, undefined, undefined, undo);
+                  } else {
+                    prop.outputs[a].node.activateProperty(prop.outputs[a].name, value, undefined);
+                  }
+                }
               }
             }
 
             // Now propagate the change upstream if necessary.
             if (forceUpstream) {
               for (a = 0; a < prop.inputs.length; ++a) {
-                prop.inputs[a].node && prop.inputs[a].node.activateProperty(prop.inputs[a].name, value, true);
+                if (prop.inputs[a].node) {
+                  if (undo) {
+                    // Triggered by a user through the editor, this change should propagate immediately.
+                    prop.outputs[a].node.property(prop.outputs[a].name, value, true, true, undo);
+                  } else {
+                    prop.inputs[a].node.activateProperty(prop.inputs[a].name, value, true);
+                  }
+                }
               }
             }
           }
@@ -2835,14 +2849,14 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
             // Now follow any output links and assign the new value to them as well.
             if (forceOrSilent === undefined || forceOrSilent) {
               for (a = 0; a < prop.outputs.length; ++a) {
-                prop.outputs[a].node && prop.outputs[a].node.initialProperty(prop.outputs[a].name, value);
+                prop.outputs[a].node && prop.outputs[a].node.initialProperty(prop.outputs[a].name, value, undefined, false, undo);
               }
             }
 
             // Now propagate the change upstream if necessary.
             if (forceUpstream) {
               for (a = 0; a < prop.inputs.length; ++a) {
-                prop.inputs[a].node && prop.inputs[a].node.initialProperty(prop.inputs[a].name, value, undefined, true);
+                prop.inputs[a].node && prop.inputs[a].node.initialProperty(prop.inputs[a].name, value, undefined, true, undo);
               }
             }
           }
@@ -3303,7 +3317,7 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    * @returns {Object} - Return the new value of the property (usually newValue unless you are proposing restrictions). If no value is returned, newValue is assumed.
    */
   onPropertyChanging: function(name, oldValue, newValue, undo) {
-    // this._super(name, oldValue, newValue);
+    // this._super(name, oldValue, newValue, undo);
     // if (this.debugLog()) {
     //   console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" Changing Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
     // }
@@ -3350,7 +3364,7 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    * @returns {Object} - Return the new value of the property (usually newValue unless you are proposing restrictions). If no value is returned, newValue is assumed.
    */
   onInitialPropertyChanging: function(name, oldValue, newValue, undo) {
-    // this._super(name, oldValue, newValue);
+    // this._super(name, oldValue, newValue, undo);
     // if (this.debugLog()) {
     //   console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" Changing Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
     // }

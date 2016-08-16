@@ -990,7 +990,7 @@ wcPlay.prototype = {
         node: node,
         name: name,
         value: value,
-        upstream: upstream,
+        upstream: upstream
       });
 
       // if (this._queuedChain.length > 0) {
