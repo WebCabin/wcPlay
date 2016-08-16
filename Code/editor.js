@@ -4202,7 +4202,7 @@ wcPlayEditor.prototype = {
             var max = $(this).attr('max') !== undefined? parseFloat($(this).attr('max')):  Infinity;
             value = Math.min(max, Math.max(min, parseFloat($control.val())));
             undoChange(property.name, value, $control.val());
-            node[propFn](property.name, $control.val(), true, true, this._undoManager);
+            node[propFn](property.name, $control.val(), true, true, self._undoManager);
             endChange();
             // $blocker.click();
           }
@@ -4247,7 +4247,7 @@ wcPlayEditor.prototype = {
           if (!cancelled) {
             value = node[propFn](property.name);
             undoChange(property.name, value, $control.val());
-            node[propFn](property.name, $control.val(), true, true, this._undoManager);
+            node[propFn](property.name, $control.val(), true, true, self._undoManager);
             endChange();
             $blocker.click();
           }
@@ -4300,7 +4300,7 @@ wcPlayEditor.prototype = {
               newValue = property.options.noneValue;
             }
             undoChange(property.name, value, newValue);
-            node[propFn](property.name, newValue, true, true, this._undoManager);
+            node[propFn](property.name, newValue, true, true, self._undoManager);
             endChange();
             $blocker.click();
           }
@@ -4316,7 +4316,7 @@ wcPlayEditor.prototype = {
             if (!cancelled) {
               value = node[propFn](property.name);
               undoChange(property.name, value, newValue);
-              node[propFn](property.name, newValue, true, true, this._undoManager);
+              node[propFn](property.name, newValue, true, true, self._undoManager);
               endChange();
               $blocker.click();
             }
