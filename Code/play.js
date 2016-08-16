@@ -19,6 +19,8 @@ function wcPlay(options) {
   this._importedScripts = [];
 
   this._nodeId = 0;
+  this._flowTrackers = 0;
+  this._hasWarnedTrackLimit = false;
   this._updateInterval = 0;
   this._isRunning = false;
   this._isPaused = false;
@@ -430,7 +432,7 @@ wcPlay.prototype = {
       for (var i = 0; i < this._waitingChain.length; ++i) {
         var item = this._waitingChain[i];
 
-        this.queueNodeEntry(item.node, item.name, item.fromNode, item.fromName, true);
+        this.queueNodeEntry(item.node, item.name, item.fromNode, item.fromName, true, item.tracker);
       }
 
       this._waitingChain = [];
@@ -460,7 +462,9 @@ wcPlay.prototype = {
         if (item.node._meta.broken > 0) {
           item.node._meta.broken--;
         }
+        item.node._activeTracker = item.tracker;
         item.node.onActivated(item.name);
+        item.node._activeTracker = null;
       }
     }
 
@@ -906,8 +910,9 @@ wcPlay.prototype = {
    * @param {wcNode} fromNode - The node causing the queue.
    * @param {String} fromName - The exit link name.
    * @param {Boolean} [forceQueue] - If true, will force the event into the queue rather than the waiting list.
+   * @param {wcPlay~FlowTracker} [tracker] - Optional flow tracker.
    */
-  queueNodeEntry: function(node, name, fromNode, fromName, forceQueue) {
+  queueNodeEntry: function(node, name, fromNode, fromName, forceQueue, tracker) {
     // Skip node queueing if the script is not even running.
     if (!this._isRunning) {
       return;
@@ -919,7 +924,8 @@ wcPlay.prototype = {
           node: node,
           name: name,
           fromNode: fromNode,
-          fromName: fromName
+          fromName: fromName,
+          tracker: tracker
         });
       }
       return;
@@ -928,7 +934,8 @@ wcPlay.prototype = {
     if (node.enabled()) {
       this._queuedChain.push({
         node: node,
-        name: name
+        name: name,
+        tracker: tracker
       });
 
       if (node.debugBreak() || this._isStepping) {
@@ -968,6 +975,8 @@ wcPlay.prototype = {
         this.paused(true);
         this._isPausing = false;
       }
+    } else {
+      this.endFlowTracker(tracker);
     }
   },
 
@@ -1011,6 +1020,76 @@ wcPlay.prototype = {
       if (this._isPausing) {
         this.paused(true);
         this._isPausing = false;
+      }
+    }
+  },
+
+  /**
+   * Creates a chain tracker for a callback method.
+   * @function wcPlay#beginFlowTracker
+   * @param {wcNode} node - The node invoking this tracker.
+   * @param {wcPlay~FlowTracker} [parent] - Parent tracker object.
+   * @param {Function} [callback] - Optional callback handler to call when this tracked chain has finished.
+   * @returns {wcPlay~FlowTracker} - A chain tracker object.
+   */
+  beginFlowTracker: function(node, parent, callback) {
+    // No need to track if we have nothing listening.
+    if (!parent && !callback) {
+      return null;
+    }
+
+    var tracker = {
+      node: node,
+      parent: parent,
+      callback: callback,
+      children: []
+    };
+
+    if (this._flowTrackers >= 1000) {
+      if (!this._hasWarnedTrackLimit) {
+        this._hasWarnedTrackLimit = true;
+        alert('Flow Trackers have exceeded the limit, please ensure that you are not creating an infinite flow loop.');
+      }
+      this.endFlowTracker(parent);
+      return null;
+    }
+
+    this._flowTrackers++;
+    if (parent) {
+      parent.children.push(tracker);
+    }
+    return tracker;
+  },
+
+  /**
+   * Finishes a chain tracker.
+   * @function wcPlay#endFlowTracker
+   * @param {wcPlay~FlowTracker} tracker
+   */
+  endFlowTracker: function(tracker) {
+    // Cannot end a tracker that still has children.
+    if (!tracker || tracker.children.length) {
+      return;
+    }
+
+    // Call any callbacks on this finished flow tracker.
+    if (tracker.callback) {
+      tracker.node._activeTracker = tracker.parent;
+      tracker.callback.call(tracker.node);
+      tracker.node._activeTracker = null;
+    }
+
+    // Now remove this tracker from its parent, if able.
+    if (tracker.parent) {
+      var index = tracker.parent.children.indexOf(tracker);
+      if (index > -1) {
+        tracker.parent.children.splice(index, 1);
+        this._flowTrackers--;
+      }
+      // If there are no more children to track for this parent,
+      // we can end this parent as well.
+      if (tracker.parent.children.length === 0) {
+        this.endFlowTracker(tracker.parent);
       }
     }
   },

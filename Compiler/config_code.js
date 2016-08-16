@@ -80,6 +80,7 @@ concat({
   src: [
     '../Code/nodes/entry/start.js',
     '../Code/nodes/entry/update.js',
+    '../Code/nodes/entry/interval.js',
     '../Code/nodes/entry/remote.js',
     '../Code/nodes/entry/callremote.js',
     '../Code/nodes/process/delay.js',

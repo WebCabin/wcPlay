@@ -16,6 +16,7 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
       this.name = '';
     }
 
+    this._activeTracker = null;
     this._viewportSize = null;
 
     this.pos = {
@@ -123,22 +124,26 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    * @function wcNode#resetThreads
    */
   resetThreads: function() {
+    var engine = this.engine();
     for (var i = 0; i < this._meta.threads.length; ++i) {
-      if (typeof this._meta.threads[i] === 'number') {
+      var thread = this._meta.threads[i];
+      if (typeof thread.id === 'number') {
         // Number values indicate either a timeout or an interval, clear them both.
-        clearTimeout(this._meta.threads[i]);
-        clearInterval(this._meta.threads[i]);
-      } else if (typeof this._meta.threads[i].__clear === 'function') {
+        clearTimeout(thread.id);
+        clearInterval(thread.id);
+      } else if (typeof thread.id.__clear === 'function') {
         // wcNodeTimeoutEvent has a __clear method that will clear this timeout.
-        this._meta.threads[i].__clear();
-      } else if (typeof this._meta.threads[i].abort === 'function') {
+        thread.id.__clear();
+      } else if (typeof thread.id.abort === 'function') {
         // jqXHR has an abort method that will stop the ajax call.
         // Using the built in fetch request will also create the abort method.
-        this._meta.threads[i].abort();
-      } else if (typeof this._meta.threads[i] === 'function') {
+        thread.id.abort();
+      } else if (typeof thread.id === 'function') {
         // A function callback is simply called.
-        this._meta.threads[i]();
+        this._activeTracker = thread.tracker;
+        thread.id();
       }
+      engine && engine.endFlowTracker(thread.tracker);
     }
     this._meta.threads = [];
   },
@@ -283,17 +288,17 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
       // Pausing the node.
       if (paused) {
         for (var i = 0; i < this._meta.threads.length; ++i) {
-          if (typeof this._meta.threads[i].pause === 'function') {
+          if (typeof this._meta.threads[i].id.pause === 'function') {
             // wcNodeTimeoutEvent has a pause method.
-            this._meta.threads[i].pause();
+            this._meta.threads[i].id.pause();
           }
         }
         this._meta.paused = true;
       } else {
         for (var i = 0; i < this._meta.threads.length; ++i) {
-          if (typeof this._meta.threads[i].resume === 'function') {
+          if (typeof this._meta.threads[i].id.resume === 'function') {
             // wcNodeTimeoutEvent has a resume method.
-            this._meta.threads[i].resume();
+            this._meta.threads[i].id.resume();
           }
         }
 
@@ -577,7 +582,12 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    *  }
    */
   beginThread: function(id) {
-    this._meta.threads.push(id);
+    var thread = {
+      id: id,
+      tracker: this._activeTracker
+    };
+
+    this._meta.threads.push(thread);
     this._meta.flash = true;
     this._meta.awake = true;
     return id;
@@ -590,13 +600,25 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    * @params {Number|Function} id - The thread ID to close, returned to you by the call to {@link wcNode#beginThread}.
    */
   finishThread: function(id) {
-    var index = this._meta.threads.indexOf(id);
+    var index = this._meta.threads.findIndex(function(thread) {
+      return thread.id === id;
+    });
+    
     if (index > -1) {
+      var tracker = this._meta.threads[index].tracker;
+
       this._meta.threads.splice(index, 1);
 
       if (!this._meta.threads.length) {
         this._meta.awake = false;
       }
+
+      // Finish any trackers.
+      var engine = this.engine();
+      setTimeout(function() {
+        engine && engine.endFlowTracker(tracker);
+      });
+      this._activeTracker = tracker;
     }
   },
 
@@ -1321,18 +1343,24 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    * @param {String} name - The name of the entry link to trigger.
    * @param {wcNode} fromNode - The node triggering the entry.
    * @param {String} fromName - The Exit link name.
+   * @param {wcPlay~FlowTracker} [tracker] - Optional flow tracker.
    * @returns {Boolean} - Fails if the entry link does not exist.
    */
-  activateEntry: function(name, fromNode, fromName) {
+  activateEntry: function(name, fromNode, fromName, tracker) {
+    var engine = this.engine();
     for (var i = 0; i < this.chain.entry.length; ++i) {
       if (this.chain.entry[i].name === name) {
         // Always queue the trigger so execution is not immediate.
-        var engine = this.engine();
-        engine && engine.queueNodeEntry(this, this.chain.entry[i].name, fromNode, fromName, false);
+        if (engine) {
+          engine.queueNodeEntry(this, this.chain.entry[i].name, fromNode, fromName, false, tracker);
+        }
         return true;
       }
     }
 
+    if (engine) {
+      engine.endFlowTracker(tracker);
+    }    
     return false;
   },
 
@@ -1340,11 +1368,13 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    * Activates an exit link.
    * @function wcNode#activateExit
    * @param {String} name - The name of the exit link to trigger.
-   * @returns {Boolean} - Fails if the exit link does not exist.
+   * @param {Function} [done] - An optional callback to call when the entire exit chain has finished.
+   * @returns {Boolean} - Fails if the exit link does not exist or this node is disabled.
    */
-  activateExit: function(name) {
+  activateExit: function(name, done) {
     if (!this.enabled()) {
       // Node not enabled, unable to process.
+      done && done();
       return false;
     }
 
@@ -1352,16 +1382,23 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
       console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" Triggered Exit link "' + name + '"');
     }
 
+    var engine = this.engine();
     for (var i = 0; i < this.chain.exit.length; ++i) {
       var exitLink = this.chain.exit[i];
       if (exitLink.name === name) {
-        // Activate all entry links chained to this exit.
         var queued = false;
-        var engine = this.engine();
+        var activeTracker = this._activeTracker;
+
+        if (done) {
+          activeTracker = engine.beginFlowTracker(this, activeTracker, done);
+          done = null;
+        }
+
+        // Activate all entry links chained to this exit.
         for (var a = 0; a < exitLink.links.length; ++a) {
           if (exitLink.links[a].node) {
             queued = true;
-            exitLink.links[a].node.activateEntry(exitLink.links[a].name, this, name);
+            exitLink.links[a].node.activateEntry(exitLink.links[a].name, this, name, engine.beginFlowTracker(exitLink.links[a].node, activeTracker, done));
           }
         }
 
@@ -1369,12 +1406,14 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
         if (!queued) {
           this.chain.exit[i].meta.flash = true;
           this._meta.flash = true;
+          done && done();
         }
         return true;
       }
     }
 
     // No link exists with the name provided.
+    done && done();
     return false;
   },
 

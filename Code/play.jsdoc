@@ -13,3 +13,12 @@
  * @property {Number} x - The horizontal coordinate.
  * @property {Number} y - The vertical coordinate.
  */
+
+/**
+ * A chain tracker object. This behaves a lot like a linked-tree.
+ * @typedef {Object} wcPlay~FlowTracker
+ * @property {wcNode} node - The node.
+ * @property {wcPlay~FlowTracker} parent - The parent tracker.
+ * @property {Function} [callback] - Optional callback handler to call when this tracked flow is finished.
+ * @property {wcPlay~FlowTracker[]} children - List of children that have spawned from this flow.
+ */

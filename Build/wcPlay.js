@@ -107,6 +107,8 @@ function wcPlay(options) {
   this._importedScripts = [];
 
   this._nodeId = 0;
+  this._flowTrackers = 0;
+  this._hasWarnedTrackLimit = false;
   this._updateInterval = 0;
   this._isRunning = false;
   this._isPaused = false;
@@ -518,7 +520,7 @@ wcPlay.prototype = {
       for (var i = 0; i < this._waitingChain.length; ++i) {
         var item = this._waitingChain[i];
 
-        this.queueNodeEntry(item.node, item.name, item.fromNode, item.fromName, true);
+        this.queueNodeEntry(item.node, item.name, item.fromNode, item.fromName, true, item.tracker);
       }
 
       this._waitingChain = [];
@@ -548,7 +550,9 @@ wcPlay.prototype = {
         if (item.node._meta.broken > 0) {
           item.node._meta.broken--;
         }
+        item.node._activeTracker = item.tracker;
         item.node.onActivated(item.name);
+        item.node._activeTracker = null;
       }
     }
 
@@ -994,8 +998,9 @@ wcPlay.prototype = {
    * @param {wcNode} fromNode - The node causing the queue.
    * @param {String} fromName - The exit link name.
    * @param {Boolean} [forceQueue] - If true, will force the event into the queue rather than the waiting list.
+   * @param {wcPlay~FlowTracker} [tracker] - Optional flow tracker.
    */
-  queueNodeEntry: function(node, name, fromNode, fromName, forceQueue) {
+  queueNodeEntry: function(node, name, fromNode, fromName, forceQueue, tracker) {
     // Skip node queueing if the script is not even running.
     if (!this._isRunning) {
       return;
@@ -1007,7 +1012,8 @@ wcPlay.prototype = {
           node: node,
           name: name,
           fromNode: fromNode,
-          fromName: fromName
+          fromName: fromName,
+          tracker: tracker
         });
       }
       return;
@@ -1016,7 +1022,8 @@ wcPlay.prototype = {
     if (node.enabled()) {
       this._queuedChain.push({
         node: node,
-        name: name
+        name: name,
+        tracker: tracker
       });
 
       if (node.debugBreak() || this._isStepping) {
@@ -1056,6 +1063,8 @@ wcPlay.prototype = {
         this.paused(true);
         this._isPausing = false;
       }
+    } else {
+      this.endFlowTracker(tracker);
     }
   },
 
@@ -1099,6 +1108,76 @@ wcPlay.prototype = {
       if (this._isPausing) {
         this.paused(true);
         this._isPausing = false;
+      }
+    }
+  },
+
+  /**
+   * Creates a chain tracker for a callback method.
+   * @function wcPlay#beginFlowTracker
+   * @param {wcNode} node - The node invoking this tracker.
+   * @param {wcPlay~FlowTracker} [parent] - Parent tracker object.
+   * @param {Function} [callback] - Optional callback handler to call when this tracked chain has finished.
+   * @returns {wcPlay~FlowTracker} - A chain tracker object.
+   */
+  beginFlowTracker: function(node, parent, callback) {
+    // No need to track if we have nothing listening.
+    if (!parent && !callback) {
+      return null;
+    }
+
+    var tracker = {
+      node: node,
+      parent: parent,
+      callback: callback,
+      children: []
+    };
+
+    if (this._flowTrackers >= 1000) {
+      if (!this._hasWarnedTrackLimit) {
+        this._hasWarnedTrackLimit = true;
+        alert('Flow Trackers have exceeded the limit, please ensure that you are not creating an infinite flow loop.');
+      }
+      this.endFlowTracker(parent);
+      return null;
+    }
+
+    this._flowTrackers++;
+    if (parent) {
+      parent.children.push(tracker);
+    }
+    return tracker;
+  },
+
+  /**
+   * Finishes a chain tracker.
+   * @function wcPlay#endFlowTracker
+   * @param {wcPlay~FlowTracker} tracker
+   */
+  endFlowTracker: function(tracker) {
+    // Cannot end a tracker that still has children.
+    if (!tracker || tracker.children.length) {
+      return;
+    }
+
+    // Call any callbacks on this finished flow tracker.
+    if (tracker.callback) {
+      tracker.node._activeTracker = tracker.parent;
+      tracker.callback.call(tracker.node);
+      tracker.node._activeTracker = null;
+    }
+
+    // Now remove this tracker from its parent, if able.
+    if (tracker.parent) {
+      var index = tracker.parent.children.indexOf(tracker);
+      if (index > -1) {
+        tracker.parent.children.splice(index, 1);
+        this._flowTrackers--;
+      }
+      // If there are no more children to track for this parent,
+      // we can end this parent as well.
+      if (tracker.parent.children.length === 0) {
+        this.endFlowTracker(tracker.parent);
       }
     }
   },
@@ -1283,6 +1362,7 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
       this.name = '';
     }
 
+    this._activeTracker = null;
     this._viewportSize = null;
 
     this.pos = {
@@ -1390,22 +1470,26 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    * @function wcNode#resetThreads
    */
   resetThreads: function() {
+    var engine = this.engine();
     for (var i = 0; i < this._meta.threads.length; ++i) {
-      if (typeof this._meta.threads[i] === 'number') {
+      var thread = this._meta.threads[i];
+      if (typeof thread.id === 'number') {
         // Number values indicate either a timeout or an interval, clear them both.
-        clearTimeout(this._meta.threads[i]);
-        clearInterval(this._meta.threads[i]);
-      } else if (typeof this._meta.threads[i].__clear === 'function') {
+        clearTimeout(thread.id);
+        clearInterval(thread.id);
+      } else if (typeof thread.id.__clear === 'function') {
         // wcNodeTimeoutEvent has a __clear method that will clear this timeout.
-        this._meta.threads[i].__clear();
-      } else if (typeof this._meta.threads[i].abort === 'function') {
+        thread.id.__clear();
+      } else if (typeof thread.id.abort === 'function') {
         // jqXHR has an abort method that will stop the ajax call.
         // Using the built in fetch request will also create the abort method.
-        this._meta.threads[i].abort();
-      } else if (typeof this._meta.threads[i] === 'function') {
+        thread.id.abort();
+      } else if (typeof thread.id === 'function') {
         // A function callback is simply called.
-        this._meta.threads[i]();
+        this._activeTracker = thread.tracker;
+        thread.id();
       }
+      engine && engine.endFlowTracker(thread.tracker);
     }
     this._meta.threads = [];
   },
@@ -1550,17 +1634,17 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
       // Pausing the node.
       if (paused) {
         for (var i = 0; i < this._meta.threads.length; ++i) {
-          if (typeof this._meta.threads[i].pause === 'function') {
+          if (typeof this._meta.threads[i].id.pause === 'function') {
             // wcNodeTimeoutEvent has a pause method.
-            this._meta.threads[i].pause();
+            this._meta.threads[i].id.pause();
           }
         }
         this._meta.paused = true;
       } else {
         for (var i = 0; i < this._meta.threads.length; ++i) {
-          if (typeof this._meta.threads[i].resume === 'function') {
+          if (typeof this._meta.threads[i].id.resume === 'function') {
             // wcNodeTimeoutEvent has a resume method.
-            this._meta.threads[i].resume();
+            this._meta.threads[i].id.resume();
           }
         }
 
@@ -1844,7 +1928,12 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    *  }
    */
   beginThread: function(id) {
-    this._meta.threads.push(id);
+    var thread = {
+      id: id,
+      tracker: this._activeTracker
+    };
+
+    this._meta.threads.push(thread);
     this._meta.flash = true;
     this._meta.awake = true;
     return id;
@@ -1857,13 +1946,25 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    * @params {Number|Function} id - The thread ID to close, returned to you by the call to {@link wcNode#beginThread}.
    */
   finishThread: function(id) {
-    var index = this._meta.threads.indexOf(id);
+    var index = this._meta.threads.findIndex(function(thread) {
+      return thread.id === id;
+    });
+    
     if (index > -1) {
+      var tracker = this._meta.threads[index].tracker;
+
       this._meta.threads.splice(index, 1);
 
       if (!this._meta.threads.length) {
         this._meta.awake = false;
       }
+
+      // Finish any trackers.
+      var engine = this.engine();
+      setTimeout(function() {
+        engine && engine.endFlowTracker(tracker);
+      });
+      this._activeTracker = tracker;
     }
   },
 
@@ -2588,18 +2689,24 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    * @param {String} name - The name of the entry link to trigger.
    * @param {wcNode} fromNode - The node triggering the entry.
    * @param {String} fromName - The Exit link name.
+   * @param {wcPlay~FlowTracker} [tracker] - Optional flow tracker.
    * @returns {Boolean} - Fails if the entry link does not exist.
    */
-  activateEntry: function(name, fromNode, fromName) {
+  activateEntry: function(name, fromNode, fromName, tracker) {
+    var engine = this.engine();
     for (var i = 0; i < this.chain.entry.length; ++i) {
       if (this.chain.entry[i].name === name) {
         // Always queue the trigger so execution is not immediate.
-        var engine = this.engine();
-        engine && engine.queueNodeEntry(this, this.chain.entry[i].name, fromNode, fromName, false);
+        if (engine) {
+          engine.queueNodeEntry(this, this.chain.entry[i].name, fromNode, fromName, false, tracker);
+        }
         return true;
       }
     }
 
+    if (engine) {
+      engine.endFlowTracker(tracker);
+    }    
     return false;
   },
 
@@ -2607,11 +2714,13 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    * Activates an exit link.
    * @function wcNode#activateExit
    * @param {String} name - The name of the exit link to trigger.
-   * @returns {Boolean} - Fails if the exit link does not exist.
+   * @param {Function} [done] - An optional callback to call when the entire exit chain has finished.
+   * @returns {Boolean} - Fails if the exit link does not exist or this node is disabled.
    */
-  activateExit: function(name) {
+  activateExit: function(name, done) {
     if (!this.enabled()) {
       // Node not enabled, unable to process.
+      done && done();
       return false;
     }
 
@@ -2619,16 +2728,23 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
       console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" Triggered Exit link "' + name + '"');
     }
 
+    var engine = this.engine();
     for (var i = 0; i < this.chain.exit.length; ++i) {
       var exitLink = this.chain.exit[i];
       if (exitLink.name === name) {
-        // Activate all entry links chained to this exit.
         var queued = false;
-        var engine = this.engine();
+        var activeTracker = this._activeTracker;
+
+        if (done) {
+          activeTracker = engine.beginFlowTracker(this, activeTracker, done);
+          done = null;
+        }
+
+        // Activate all entry links chained to this exit.
         for (var a = 0; a < exitLink.links.length; ++a) {
           if (exitLink.links[a].node) {
             queued = true;
-            exitLink.links[a].node.activateEntry(exitLink.links[a].name, this, name);
+            exitLink.links[a].node.activateEntry(exitLink.links[a].name, this, name, engine.beginFlowTracker(exitLink.links[a].node, activeTracker, done));
           }
         }
 
@@ -2636,12 +2752,14 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
         if (!queued) {
           this.chain.exit[i].meta.flash = true;
           this._meta.flash = true;
+          done && done();
         }
         return true;
       }
     }
 
     // No link exists with the name provided.
+    done && done();
     return false;
   },
 
