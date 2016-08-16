@@ -315,10 +315,10 @@ wcPlay.prototype = {
               data: data.nodes[i]
             });
           } catch (e) {
-            console.log('ERROR: Attempted to load node "' + data.nodes[i].className + '" with error :' + e);
+            console.log('wcPlay ERROR: Attempted to load node "' + data.nodes[i].className + '" with error :' + e);
           }
         } else {
-          console.log('ERROR: Attempted to load node "' + data.nodes[i].className + '", but the constructor could not be found!');
+          console.log('wcPlay ERROR: Attempted to load node "' + data.nodes[i].className + '", but the constructor could not be found!');
         }
       }
 
@@ -1038,21 +1038,23 @@ wcPlay.prototype = {
       return null;
     }
 
+    if (this._flowTrackers >= 10) {
+      if (!this._hasWarnedTrackLimit) {
+        this._hasWarnedTrackLimit = true;
+        if (this._editors.length) {
+          alert('Flow Trackers have exceeded the limit, please ensure that you are not creating an infinite flow loop.');
+        }
+      }
+      this.endFlowTracker(parent);
+      return null;
+    }
+
     var tracker = {
       node: node,
       parent: parent,
       callback: callback,
       children: []
     };
-
-    if (this._flowTrackers >= 1000) {
-      if (!this._hasWarnedTrackLimit) {
-        this._hasWarnedTrackLimit = true;
-        alert('Flow Trackers have exceeded the limit, please ensure that you are not creating an infinite flow loop.');
-      }
-      this.endFlowTracker(parent);
-      return null;
-    }
 
     this._flowTrackers++;
     if (parent) {
@@ -1067,10 +1069,27 @@ wcPlay.prototype = {
    * @param {wcPlay~FlowTracker} tracker
    */
   endFlowTracker: function(tracker) {
-    // Cannot end a tracker that still has children.
-    if (!tracker || tracker.children.length) {
+    // Ignore if there is no tracker, or the tracker is dead.
+    if (!tracker || tracker.dead) {
       return;
     }
+
+    // Cannot end a tracker that still has children.
+    if (tracker.children.length) {
+      return;
+    }
+
+    this._flowTrackers--;
+    if (this._flowTrackers < 0) {
+      console.log('what?');
+    }
+
+    if (!tracker.callback && !tracker.parent) {
+      console.log("wcPlay ERROR: Tracker was ended without having any callback or parent.");
+    }
+
+    // Kill this tracker, in case anything else is still referencing it.
+    tracker.dead = true;
 
     // Call any callbacks on this finished flow tracker.
     if (tracker.callback) {
@@ -1084,7 +1103,6 @@ wcPlay.prototype = {
       var index = tracker.parent.children.indexOf(tracker);
       if (index > -1) {
         tracker.parent.children.splice(index, 1);
-        this._flowTrackers--;
       }
       // If there are no more children to track for this parent,
       // we can end this parent as well.
