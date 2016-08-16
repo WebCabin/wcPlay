@@ -1389,7 +1389,7 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
         var queued = false;
         var activeTracker = this._activeTracker;
 
-        if (done) {
+        if (typeof done === 'function') {
           activeTracker = engine.beginFlowTracker(this, activeTracker, done);
           done = null;
         }

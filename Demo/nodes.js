@@ -48,3 +48,16 @@ wcPlayNodes.wcNodeProcess.extend('wcNodeProcessGameCanMove', 'Can Move', 'Hero',
     }
   },
 });
+
+wcPlayNodes.wcNodeEntry.extend('wcNodeProcessGameUpdate', 'Game Update', 'Hero', {
+  init: function(parent, pos) {
+    this._super(parent, pos);
+
+    this.description("Game update loop.");
+  },
+
+  onActivated: function(name) {
+    this._super(name);
+    this.activateExit('out');
+  }
+});

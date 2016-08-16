@@ -23,3 +23,12 @@
  * @property {Function} [callback] - Optional callback handler to call when this tracked flow is finished.
  * @property {wcPlay~FlowTracker[]} children - List of children that have spawned from this flow.
  */
+
+/**
+ * Options for the trigger event.
+ * @typedef wcPlay~TriggerEventOptions
+ * @property {String} [name] - The event name to trigger (as displayed in the title between the parenthesis).
+ * @property {Object} [data] - Optional data to be passed into the activation method of all entry nodes triggered.
+ * @property {Function} [done] - An optional callback handler to call when chains have executed completely.
+ */
+ 

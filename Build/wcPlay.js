@@ -919,15 +919,29 @@ wcPlay.prototype = {
    * Triggers an event into the Play script.
    * @function wcPlay#triggerEvent
    * @param {String} type - The type name of the node (as displayed in the title).
-   * @param {String} [name] - The event name to trigger (as displayed in the title between the parenthesis). Use an empty string to ignore the name.
-   * @param {Object} [data] - Any data object that will be passed into the entry node.
+   * @param {wcPlay~TriggerEventOptions} [options] - Optional parameters.
    */
-  triggerEvent: function(type, name, data) {
+  triggerEvent: function(type, options) {
+    options = options || {};
+
+    var activeTracker = null;
+    if (typeof options.done === 'function') {
+      activeTracker = this.beginFlowTracker({}, null, options.done);
+    }
+
     for (var i = 0; i < this._entryNodes.length; ++i) {
-      if (this._entryNodes[i].type === type && (!name || this._entryNodes[i].name === name)) {
-        this._entryNodes[i].onActivated(data);
+      var node = this._entryNodes[i];
+      if (node.type === type && (!options.hasOwnProperty('name') || node.name === options.name)) {
+        node._activeTracker = activeTracker;
+        node.onActivated(options.data);
+        node._activeTracker = null;
       }
     }
+
+    var self = this;
+    setTimeout(function() {
+      self.endFlowTracker(activeTracker);
+    }, 0);
   },
 
   /**
@@ -2751,7 +2765,7 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
         var queued = false;
         var activeTracker = this._activeTracker;
 
-        if (done) {
+        if (typeof done === 'function') {
           activeTracker = engine.beginFlowTracker(this, activeTracker, done);
           done = null;
         }
