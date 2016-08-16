@@ -5888,6 +5888,11 @@ wcPlayEditor.prototype = {
   },
 
   __onViewportMouseWheel: function(event, elem) {
+    // Disable zoom if we are currently highlighting
+    if (this._highlightRect) {
+      return;
+    }
+
     var oldZoom = this._viewportCamera.z;
 
     // Custom viewport area.
