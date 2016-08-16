@@ -1490,7 +1490,7 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
 
           // Notify about to change event.
           if (forceOrSilent || prop.value !== value) {
-            value = this.onPropertyChanging(prop.name, oldValue, value) || value;
+            value = this.onPropertyChanging(prop.name, oldValue, value, undo) || value;
           }
 
           if (forceOrSilent || prop.value !== value) {
@@ -1541,7 +1541,7 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
       var prop = this.properties[i];
       if (prop.name === name) {
         if (value !== undefined) {
-          value = this.onInitialPropertyChanging(prop.name, prop.initialValue, value) || value;
+          value = this.onInitialPropertyChanging(prop.name, prop.initialValue, value, undo) || value;
           if (prop.value == prop.initialValue) {
             this.property(name, value);
           }
@@ -2032,9 +2032,10 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    * @param {String} name - The name of the property.
    * @param {Object} oldValue - The current value of the property.
    * @param {Object} newValue - The new, proposed, value of the property.
+   * @param {external:wcUndoManager} [undo] - If the change is triggered by the user and undo management is enabled, this will be the undo manager. Note: The value change is already recorded, use this only if you have other things to record.
    * @returns {Object} - Return the new value of the property (usually newValue unless you are proposing restrictions). If no value is returned, newValue is assumed.
    */
-  onPropertyChanging: function(name, oldValue, newValue) {
+  onPropertyChanging: function(name, oldValue, newValue, undo) {
     // this._super(name, oldValue, newValue);
     // if (this.debugLog()) {
     //   console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" Changing Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
@@ -2078,9 +2079,10 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    * @param {String} name - The name of the property.
    * @param {Object} oldValue - The current value of the property.
    * @param {Object} newValue - The new, proposed, value of the property.
+   * @param {external:wcUndoManager} [undo] - If the change is triggered by the user and undo management is enabled, this will be the undo manager. Note: The value change is already recorded, use this only if you have other things to record.
    * @returns {Object} - Return the new value of the property (usually newValue unless you are proposing restrictions). If no value is returned, newValue is assumed.
    */
-  onInitialPropertyChanging: function(name, oldValue, newValue) {
+  onInitialPropertyChanging: function(name, oldValue, newValue, undo) {
     // this._super(name, oldValue, newValue);
     // if (this.debugLog()) {
     //   console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" Changing Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
