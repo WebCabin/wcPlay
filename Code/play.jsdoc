@@ -4,6 +4,7 @@
  * @property {Boolean} [silent=false] - If true, will disable debug logging on all nodes.
  * @property {Number} [updateRate=25] - The time, in milliseconds, between node updates.
  * @property {Number} [updateLimit=100] - The maximum number of nodes allowed to be updated in a single update. This minimizes the potential for script lock.
+ * @property {Number} [flowTrackerLimit=1000] - The maximum flow trackers allowed (tracks when flow chains have fully executed).
  * @property {Boolean} [debugging=true] - If true, debug break toggles on individual nodes will trigger the script to pause. Turn this off during production.
  */
 

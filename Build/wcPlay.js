@@ -124,6 +124,7 @@ function wcPlay(options) {
     silent: false,
     updateRate: 25,
     updateLimit: 100,
+    flowTrackerLimit: 1000,
     debugging: true,
   };
   for (var prop in options) {
@@ -1126,7 +1127,7 @@ wcPlay.prototype = {
       return null;
     }
 
-    if (this._flowTrackers >= 10) {
+    if (this._flowTrackers >= this._options.flowTrackerLimit) {
       if (!this._hasWarnedTrackLimit) {
         this._hasWarnedTrackLimit = true;
         if (this._editors.length) {
@@ -1169,11 +1170,7 @@ wcPlay.prototype = {
 
     this._flowTrackers--;
     if (this._flowTrackers < 0) {
-      console.log('what?');
-    }
-
-    if (!tracker.callback && !tracker.parent) {
-      console.log("wcPlay ERROR: Tracker was ended without having any callback or parent.");
+      console.log('wcPlay ERROR: Flow tracker count reduced below zero!');
     }
 
     // Kill this tracker, in case anything else is still referencing it.
