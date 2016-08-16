@@ -1131,9 +1131,10 @@ wcPlay.prototype = {
       if (!this._hasWarnedTrackLimit) {
         this._hasWarnedTrackLimit = true;
         if (this._editors.length) {
-          alert('Flow Trackers have exceeded the limit, please ensure that you are not creating an infinite flow loop.');
+          alert('Flow Trackers have exceeded the limit, please ensure that you are not creating an infinite flow loop.\n\nThe chain will be forced to stop.\n\nThis message will only appear once.');
         }
       }
+      console.log('wcPlay ERROR: Flow Trackers have exceeded the limit, please ensure that you are not creating an infinite flow loop. The chain will be forced to stop.');
       this.endFlowTracker(parent);
       return null;
     }
