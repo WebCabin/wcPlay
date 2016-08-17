@@ -1417,7 +1417,7 @@ wcPlayEditor.prototype = {
     // Edit -> Create Composite
     this._menu.addOption('Edit', 'Create Composite', {
       hotkeys: 'C',
-      icon: "fa fa-object-group fa-lg",
+      icon: "fa fa-suitcase fa-lg",
       toolbarIndex: -1,
       description: "Combine all selected nodes into a new \'Composite\' Node.",
       condition: function(editor) {
@@ -1600,6 +1600,19 @@ wcPlayEditor.prototype = {
       }
     });
 
+    // Edit -> Box
+    this._menu.addOption('Edit', 'Create Group Box', {
+      icon: "fa fa-object-group fa-lg",
+      toolbarIndex: -1,
+      description: "Create a group box around selected node(s).",
+      condition: function(editor) {
+        return !editor._options.readOnly && editor._selectedNodes.length > 0;
+      },
+      onActivated: function(editor) {
+
+      }
+    });
+
     // Debugging -> Toggle Debug Mode
     this._menu.addOption('Debugging', 'Toggle Debug Mode', {
       icon: function(editor) {
@@ -1718,7 +1731,7 @@ wcPlayEditor.prototype = {
       }
     });
 
-    // View -> Create Composite
+    // View -> Fit in View
     this._menu.addOption('View', 'Fit in View', {
       hotkeys: 'F',
       icon: "fa fa-crosshairs fa-lg",
@@ -1904,7 +1917,7 @@ wcPlayEditor.prototype = {
     this._menu.addToolbarSpacer('File', 'Import...');
     this._menu.addToolbarSpacer('Edit', 'Redo');
     this._menu.addToolbarSpacer('Edit', 'Delete');
-    this._menu.addToolbarSpacer('Edit', 'Create Composite');
+    this._menu.addToolbarSpacer('Edit', 'Create Group Box');
     this._menu.addToolbarSpacer('View', 'Enter Composite');
     this._menu.addToolbarSpacer('View', 'Chain Style');
     this._menu.addToolbarSpacer('Debugging', 'Toggle Silence Mode');
