@@ -31,8 +31,8 @@
     "jquery": "1.11.1",
     "font-awesome": "4.6.0",
     "FileSaver": "master",
-    "wcUndoManager": "master",
-    "wcMenu": "master"
+    "webcabin-undo-manager": "master",
+    "webcabin-menu": "master"
   },
   "license": "MIT"
 }
