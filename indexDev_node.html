@@ -1,0 +1,71 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>wcPlay (Web Cabin)</title>
+    <meta name="description" content="wcPlay is a node based visual scripting tool for the web using the MIT license.">
+
+    <!-- External Modules -->
+    <link rel="stylesheet" type="text/css" href="node_modules/font-awesome/css/font-awesome.css"/>
+    <link rel="stylesheet" type="text/css" href="node_modules/webcabin-menu/Build/wcMenu.min.css"/>
+
+    <!-- Core Modules -->
+    <link rel="stylesheet" type="text/css" href="Code/editor.css"/>
+
+  </head>
+  <body style="background-color:white;">
+    <div class="playContainer" style="position:absolute;left:0px;right:25%;top:0px;bottom:0px;border:3px solid black;"></div>
+    <div class="gameContainer" style="position:absolute;left:75%;right:0px;top:0px;bottom:0px;border:3px solid black;background-color:lightgray;overflow:hidden;">
+        <div class="game" style="background-color:black;"></div>
+    </div>
+    
+    <!-- External Modules -->
+    <script src="node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="node_modules/FileSaver/FileSaver.min.js"></script>
+    <script src="node_modules/webcabin-undo-manager/wcUndoManager.js"></script>
+    <script src="node_modules/webcabin-menu/Build/wcMenu.min.js"></script>
+
+    <!-- Core Modules -->
+    <script src="Code/class.js"></script>
+    <script src="Code/play.js"></script>
+    <script src="Code/editor.js"></script>
+    <script src="Code/nodes/node.js"></script>
+    <script src="Code/nodes/entry.js"></script>
+    <script src="Code/nodes/process.js"></script>
+    <script src="Code/nodes/storage.js"></script>
+    <script src="Code/nodes/composite.js"></script>
+    <script src="Code/nodes/composite/compositescript.js"></script>
+    <script src="Code/nodes/composite/compositeentry.js"></script>
+    <script src="Code/nodes/composite/compositeexit.js"></script>
+    <script src="Code/nodes/composite/compositeproperty.js"></script>
+    <script src="Code/fuse.min.js"></script>
+
+    <!-- Demo Specific Files -->
+    <script src="Demo/crafty-min.js"></script>
+    <script src="Demo/demo.js"></script>
+    <script src="Demo/nodes.js"></script>
+
+    <!-- Generic Nodes -->
+    <script src="Code/nodes/entry/start.js"></script>
+    <script src="Code/nodes/entry/update.js"></script>
+    <script src="Code/nodes/entry/interval.js"></script>
+    <script src="Code/nodes/entry/remote.js"></script>
+    <script src="Code/nodes/entry/callremote.js"></script>
+    <script src="Code/nodes/process/delay.js"></script>
+    <script src="Code/nodes/process/operation.js"></script>
+    <script src="Code/nodes/process/strcat.js"></script>
+    <script src="Code/nodes/process/ajax.js"></script>
+    <script src="Code/nodes/process/fetch.js"></script>
+    <script src="Code/nodes/process/consolelog.js"></script>
+    <script src="Code/nodes/process/alert.js"></script>
+    <script src="Code/nodes/storage/global.js"></script>
+    <script src="Code/nodes/storage/string.js"></script>
+    <script src="Code/nodes/storage/number.js"></script>
+    <script src="Code/nodes/storage/toggle.js"></script>
+
+    <!-- Example Node Types -->
+    <script src="Code/nodes/example/exampleviewport.js"></script>
+    <script src="Code/nodes/example/exampleproperties.js"></script>
+    <script src="Code/nodes/example/exampledynamic.js"></script>
+  </body>
+</html>

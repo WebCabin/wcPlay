@@ -1,0 +1,18 @@
+{
+  "name": "webcabin-play",
+  "author": {
+    "name": "WebCabin",
+    "url": "http://play.webcabin.org"
+  },
+  "version": "0.0.0",
+  "description": "Node based visual scripting tool.",
+  "main": "Build/wcPlay.min.js",
+  "dependencies": {
+    "FileSaver": "0.10.0",
+    "font-awesome": "4.6.3",
+    "jquery": "1.11.1",
+    "webcabin-menu": "1.0.0",
+    "webcabin-undo-manager": "1.0.1"
+  },
+  "devDependencies": {}
+}
