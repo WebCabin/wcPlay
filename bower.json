@@ -1,7 +1,7 @@
 {
-  "name": "wcPlay",
-  "description": "wcPlay (Web Cabin Play) is a node based visual scripting tool.",
-  "version": "1.0.0",
+  "name": "webcabin-play",
+  "description": "Node based visual scripting tool.",
+  "version": "1.0.1",
   "keywords": [
     "js",
     "develop",
@@ -18,20 +18,21 @@
   "ignore": [
     "/.*",
     "favicon.ico",
-    "index.html",
-    "indexDev.html",
+    "index_bower.html",
+    "indexDev_bower.html",
+    "index_node.html",
+    "indexDev_node.html",
     "demo.js",
     "Code",
     "Demo",
-    "Compiler",
-    "bower_components"
+    "Compiler"
   ],
   "dependencies": {
     "jquery": "1.11.1",
     "font-awesome": "4.6.0",
     "FileSaver": "master",
-    "wcUndoManager": "master",
-    "wcMenu": "master"
+    "webcabin-undo-manager": "master",
+    "webcabin-menu": "master"
   },
   "license": "MIT"
 }

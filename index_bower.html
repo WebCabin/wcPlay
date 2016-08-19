@@ -1,0 +1,56 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>wcPlay (Web Cabin)</title>
+    <meta name="description" content="wcPlay is a node based visual scripting tool for the web using the MIT license.">
+
+    <!-- External modules -->
+    <link rel="stylesheet" type="text/css" href="bower_components/font-awesome/css/font-awesome.css"/>
+    <link rel="stylesheet" type="text/css" href="bower_components/webcabin-menu/Build/wcMenu.min.css"/>
+
+    <!-- Core Modules -->
+    <link rel="stylesheet" type="text/css" href="Build/wcPlayEditor.min.css"/>
+  </head>
+  <body style="background-color:white;">
+    <div class="playContainer" style="position:absolute;left:0px;right:25%;top:0px;bottom:0px;border:3px solid black;"></div>
+    <div class="gameContainer" style="position:absolute;left:75%;right:0px;top:0px;bottom:0px;border:3px solid black;background-color:lightgray;overflow:hidden;">
+        <div class="game" style="background-color:black;"></div>
+    </div>
+
+    <!-- External modules -->
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="bower_components/FileSaver/FileSaver.min.js"></script>
+    <script src="bower_components/webcabin-undo-manager/wcUndoManager.js"></script>
+    <script src="bower_components/webcabin-menu/Build/wcMenu.min.js"></script>
+
+    <!-- Core Modules -->
+    <script src="Build/wcPlay.min.js"></script>
+    <script src="Build/wcPlayEditor.min.js"></script>
+
+    <!-- Demo specific files -->
+    <script src="Demo/crafty-min.js"></script>
+    <script src="Demo/demo.js"></script>
+    <script src="Demo/nodes.js"></script>
+
+    <!-- Core Nodes -->
+    <script src="Build/wcPlayNodes.min.js"></script>
+    <script src="Build/wcPlayExampleNodes.js"></script>
+
+    <!-- Piwik Analytics -->
+    <script type="text/javascript">
+      var _paq = _paq || [];
+      _paq.push(['trackPageView']);
+      _paq.push(['enableLinkTracking']);
+      (function() {
+        var u="https://analytics.webcabin.org/";
+        _paq.push(['setTrackerUrl', u+'piwik.php']);
+        _paq.push(['setSiteId', 7]);
+        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+        g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+      })();
+    </script>
+    <noscript><p><img src="https://analytics.webcabin.org/piwik.php?idsite=7" style="border:0;" alt="" /></p></noscript>
+    <!-- End Piwik Code -->
+  </body>
+</html>
