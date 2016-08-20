@@ -7,6 +7,103 @@
   "version": "1.0.1",
   "description": "Node based visual scripting tool.",
   "main": "Build/wcPlay.min.js",
+  "eslintConfig": {
+    "plugins": [
+      "jsdoc",
+      "jquery",
+      "mocha"
+    ],
+    "env": {
+      "browser": true,
+      "node": true,
+      "es6": true,
+      "mocha": true
+    },
+    "globals": {
+      "wcPlay": true,
+      "wcPlayNodes": true,
+      "wcNode": true,
+      "wcUndoManager": true,
+      "wcPlayEditorClipboard": true,
+      "wcMenu": true,
+      "saveAs": true,
+      "BlobBuilder": true,
+      "$": true
+    },
+    "extends": "eslint:recommended",
+    "rules": {
+      "indent": [
+        "error",
+        2,
+        {
+          "SwitchCase": 1
+        }
+      ],
+      "linebreak-style": [
+        "error",
+        "unix"
+      ],
+      "quotes": [
+        "error",
+        "single"
+      ],
+      "semi": [
+        "error",
+        "always"
+      ],
+      "no-console": 0,
+      "jsdoc/check-param-names": 2,
+      "jsdoc/check-tag-names": 2,
+      "jsdoc/check-types": 2,
+      "jsdoc/newline-after-description": 0,
+      "jsdoc/require-description-complete-sentence": 2,
+      "jsdoc/require-hyphen-before-param-description": 2,
+      "jsdoc/require-param": 2,
+      "jsdoc/require-param-description": 2,
+      "jsdoc/require-param-type": 2,
+      "jsdoc/require-returns-description": 2,
+      "jsdoc/require-returns-type": 2,
+      "jquery/no-ajax": 2,
+      "jquery/no-animate": 2,
+      "jquery/no-attr": 2,
+      "jquery/no-bind": 2,
+      "jquery/no-class": 2,
+      "jquery/no-clone": 2,
+      "jquery/no-closest": 2,
+      "jquery/no-css": 2,
+      "jquery/no-data": 2,
+      "jquery/no-deferred": 2,
+      "jquery/no-delegate": 2,
+      "jquery/no-each": 2,
+      "jquery/no-fade": 2,
+      "jquery/no-filter": 2,
+      "jquery/no-find": 2,
+      "jquery/no-global-eval": 2,
+      "jquery/no-has": 2,
+      "jquery/no-hide": 2,
+      "jquery/no-html": 2,
+      "jquery/no-in-array": 2,
+      "jquery/no-is": 2,
+      "jquery/no-map": 2,
+      "jquery/no-merge": 2,
+      "jquery/no-param": 2,
+      "jquery/no-parent": 2,
+      "jquery/no-parents": 2,
+      "jquery/no-parse-html": 2,
+      "jquery/no-prop": 2,
+      "jquery/no-proxy": 2,
+      "jquery/no-serialize": 2,
+      "jquery/no-show": 2,
+      "jquery/no-sizzle": 2,
+      "jquery/no-slide": 2,
+      "jquery/no-text": 2,
+      "jquery/no-toggle": 2,
+      "jquery/no-trigger": 2,
+      "jquery/no-trim": 2,
+      "jquery/no-val": 2,
+      "jquery/no-wrap": 2
+    }
+  },
   "dependencies": {
     "FileSaver": "0.10.0",
     "font-awesome": "4.6.3",
@@ -14,5 +111,10 @@
     "webcabin-menu": "1.0.0",
     "webcabin-undo-manager": "1.0.1"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "eslint": "^3.3.1",
+    "eslint-plugin-jquery": "^1.0.1",
+    "eslint-plugin-jsdoc": "^2.3.1",
+    "eslint-plugin-mocha": "^4.3.0"
+  }
 }
