@@ -84,40 +84,39 @@ wcPlayNodes.wcNodeEntry.extend('wcNodeEntryUpdate', 'Update', 'Automatic', {
 });
 wcPlayNodes.wcNodeEntry.extend('wcNodeEntryInterval', 'Interval', 'Automatic', {
   /**
-   * @class
-   * An entry node that fires continuously on a regular interval.<br>
-   * When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.
-   *
-   * @constructor wcNodeEntryInterval
-   * @param {String} parent - The parent object of this node.
+   * An entry node that fires continuously on a regular interval.
+   * <br>When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.
+   * @class wcNodeEntryInterval
+   * @param {string} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
    */
   init: function(parent, pos) {
     this._super(parent, pos);
 
-    this.description("Once the script starts, this will activate continuously on a time interval defined by the milliseconds property.");
+    this.description('Once the script starts, this will activate continuously on a time interval defined by the milliseconds property.');
 
-    this.createProperty("milliseconds", wcPlay.PROPERTY.NUMBER, 1000, {description: "The time, in milliseconds, per update.", input: true});
+    this.createProperty('milliseconds', wcPlay.PROPERTY.NUMBER, 1000, {description: 'The time, in milliseconds, per update.', input: true});
   },
 
   /**
-   * Overloading the default onActivated event handler so we can make it immediately trigger our exit link if our conditions are met.
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Overloading the default onActivated event handler so we can make it trigger our exit link on an interval.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNodeEntryInterval#onActivated
-   * @param {String} name - The name of the entry link triggered.
+   * @param {string} name - The name of the entry link triggered.
    */
   onActivated: function(name) {
-    var interval = this.property('milliseconds');
+    this._super(name);
     this.resetThreads();
 
+    var interval = this.property('milliseconds');
     this.setInterval(function() {
       this.activateExit('out');
     }, interval);
   },
 
   /**
-   * Event that is called as soon as the Play script has started.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called as soon as the Play script has started.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNodeEntryInterval#onStart
    */
   onStart: function() {
@@ -127,10 +126,10 @@ wcPlayNodes.wcNodeEntry.extend('wcNodeEntryInterval', 'Interval', 'Automatic', {
   },
 
   /**
-   * Event that is called when a property has changed.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called when a property has changed.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNodeEntryInterval#onPropertyChanged
-   * @param {String} name - The name of the property.
+   * @param {string} name - The name of the property.
    * @param {Object} oldValue - The old value of the property.
    * @param {Object} newValue - The new value of the property.
    */
@@ -138,55 +137,50 @@ wcPlayNodes.wcNodeEntry.extend('wcNodeEntryInterval', 'Interval', 'Automatic', {
     this._super(name, oldValue, newValue);
 
     if (name === 'milliseconds') {
-      this.resetThreads();
       this.onActivated();
     }
   },
 });
 wcPlayNodes.wcNodeEntry.extend('wcNodeEntryRemote', 'Remote Event', 'Flow Control', {
   /**
-   * @class
-   * An entry node that fires when a [Call Remote Event Node]{@link wcNodeEntryCallRemote} of the same name is activated.<br>
-   * When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.
-   *
-   * @constructor wcNodeEntryRemote
-   * @param {String} parent - The parent object of this node.
+   * An entry node that fires when a [Call Remote Event Node]{@link wcNodeEntryCallRemote} of the same name is activated.
+   * <br>When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.
+   * @class wcNodeEntryRemote
+   * @param {string} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
    */
   init: function(parent, pos) {
     this._super(parent, pos);
 
-    this.description("An entry node that fires when a Call Remote Event Node of the same name is activated.");
-    this.details("This node uses it's Title Name value as an identifier that links it with any Call Remote Event Nodes of the same name. Whenever any Call Remote Event Node of the same name is activated, this Node will become active as well. If multiple Remote Nodes exist with the same name, they will all be called in parallel.");
-  },
+    this.description('An entry node that fires when a Call Remote Event Node of the same name is activated.');
+    this.details('This node uses it\'s Title Name value as an identifier that links it with any Call Remote Event Nodes of the same name. Whenever any Call Remote Event Node of the same name is activated, this Node will become active as well. If multiple Remote Nodes exist with the same name, they will all be called in parallel.');
+  }
 });
 wcPlayNodes.wcNodeEntry.extend('wcNodeEntryCallRemote', 'Call Remote Event', 'Flow Control', {
   /**
-   * @class
-   * An entry node that fires when a [Call Remote Event Node]{@link wcNodeEntryCallRemote} of the same name is activated.<br>
-   * When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.
-   *
-   * @constructor wcNodeEntryCallRemote
-   * @param {String} parent - The parent object of this node.
+   * An entry node that fires when a [Call Remote Event Node]{@link wcNodeEntryCallRemote} of the same name is activated.
+   * <br>When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.
+   * @class wcNodeEntryCallRemote
+   * @param {string} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
    */
   init: function(parent, pos) {
     this._super(parent, pos);
 
-    this.description("An entry node that activates all Remote Event Nodes of the same name.");
-    this.details("This node uses it's Title Name value as an identifier that links it with any Remote Event Nodes of the same name. Whenever this Node is activated, All Remote Event Nodes of the same name will also become active as well.");
+    this.description('An entry node that activates all Remote Event Nodes of the same name.');
+    this.details('This node uses it\'s Title Name value as an identifier that links it with any Remote Event Nodes of the same name. Whenever this Node is activated, All Remote Event Nodes of the same name will also become active as well.');
 
     this.createEntry('in');
     this.removeExit('out');
 
-    this.createProperty('local', wcPlay.PROPERTY.TOGGLE, true, {description: "If true, only matching Remote Event Nodes that are within, or nested within, the same Composite Node or scope will be activated."});
+    this.createProperty('local', wcPlay.PROPERTY.TOGGLE, true, {description: 'If true, only matching Remote Event Nodes that are within, or nested within, the same Composite Node or scope will be activated.'});
   },
 
   /**
-   * Event that is called when an entry link has been activated.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called when an entry link has been activated.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNodeEntryCallRemote#onActivated
-   * @param {String} name - The name of the entry link triggered.
+   * @param {string} name - The name of the entry link triggered.
    */
   onActivated: function(name) {
     this._super(name);
@@ -200,10 +194,10 @@ wcPlayNodes.wcNodeEntry.extend('wcNodeEntryCallRemote', 'Call Remote Event', 'Fl
     var remoteNodes = scope.nodesByClassName('wcNodeEntryRemote');
     for (var i = 0; i < remoteNodes.length; ++i) {
       if (remoteNodes[i].name === this.name) {
-        engine.queueNodeEntry(remoteNodes[i], 'in', this, 'out');
+        engine.queueNodeEntry(remoteNodes[i], 'in', this, 'out', false, engine.beginFlowTracker(this, this._activeTracker));
       }
     }
-  },
+  }
 });
 wcPlayNodes.wcNodeProcess.extend('wcNodeProcessDelay', 'Delay', 'Flow Control', {
   /**

@@ -36,7 +36,7 @@ wcPlayNodes.wcNodeEntry.extend('wcNodeEntryCallRemote', 'Call Remote Event', 'Fl
     var remoteNodes = scope.nodesByClassName('wcNodeEntryRemote');
     for (var i = 0; i < remoteNodes.length; ++i) {
       if (remoteNodes[i].name === this.name) {
-        engine.queueNodeEntry(remoteNodes[i], 'in', this, 'out');
+        engine.queueNodeEntry(remoteNodes[i], 'in', this, 'out', false, engine.beginFlowTracker(this, this._activeTracker));
       }
     }
   }
