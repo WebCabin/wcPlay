@@ -6,7 +6,7 @@ window.wcPlayEditorClipboard = {
     top: 0,
     left: 0,
     width: 0,
-    height: 0,
+    height: 0
   },
   nodes: []
 };
@@ -170,8 +170,8 @@ function wcPlayEditor(container, options) {
     playable: true,
     category: {
       items: [],
-      isBlacklist: true,
-    },
+      isBlacklist: true
+    }
   };
   for (var prop in options) {
     this._options[prop] = options[prop];
@@ -495,7 +495,7 @@ wcPlayEditor.prototype = {
           id: node.id,
           name: linkName,
           chains: chains,
-          engine: this._engine,
+          engine: this._engine
         },
         // Undo
         function() {
@@ -529,7 +529,7 @@ wcPlayEditor.prototype = {
           id: node.id,
           name: linkName,
           chains: chains,
-          engine: this._engine,
+          engine: this._engine
         },
         // Undo
         function() {
@@ -563,7 +563,7 @@ wcPlayEditor.prototype = {
           id: node.id,
           name: linkName,
           chains: chains,
-          engine: this._engine,
+          engine: this._engine
         },
         // Undo
         function() {
@@ -597,7 +597,7 @@ wcPlayEditor.prototype = {
           id: node.id,
           name: linkName,
           chains: chains,
-          engine: this._engine,
+          engine: this._engine
         },
         // Undo
         function() {
@@ -634,7 +634,7 @@ wcPlayEditor.prototype = {
         y: touch.clientY - (offset? offset.top: 0) - (translation? translation.y: 0),
         gx: touch.clientX,
         gy: touch.clientY,
-        which: 1,
+        which: 1
       };
     }
 
@@ -643,7 +643,7 @@ wcPlayEditor.prototype = {
       y: (event.clientY || event.pageY) - (offset? offset.top: 0) - (translation? translation.y: 0),
       gx: (event.clientX || event.pageX),
       gy: (event.clientY || event.pageY),
-      which: event.which || 1,
+      which: event.which || 1
     };
   },
 
@@ -705,7 +705,7 @@ wcPlayEditor.prototype = {
       top: rects[0].top + (offsets? offsets[0].y: 0),
       left: rects[0].left + (offsets? offsets[0].x: 0),
       width: rects[0].width,
-      height: rects[0].height,
+      height: rects[0].height
     };
     var i = 0;
     var offsetX = 0;
@@ -759,14 +759,14 @@ wcPlayEditor.prototype = {
     if (offset === undefined) {
       offset = {
         x: 0,
-        y: 0,
+        y: 0
       };
     }
     if (trans === undefined) {
       trans = {
         x: 0,
         y: 0,
-        z: 1,
+        z: 1
       };
     }
 
@@ -792,7 +792,7 @@ wcPlayEditor.prototype = {
     if (offsetA === undefined) {
       offsetA = {
         x: 0,
-        y: 0,
+        y: 0
       };
     }
 
@@ -926,9 +926,9 @@ wcPlayEditor.prototype = {
             top: 0,
             left: left,
             width: w + 6,
-            height: this._font.breadcrumbs.size + this._drawStyle.property.spacing,
+            height: this._font.breadcrumbs.size + this._drawStyle.property.spacing
           },
-          parent: scopes[i],
+          parent: scopes[i]
         };
         this._crumbBounds.push(boundData);
         left += w + w2;
@@ -1042,7 +1042,7 @@ wcPlayEditor.prototype = {
       node._meta.dirty = false;
 
       node._meta.bounds = {
-        node: node,
+        node: node
       };
 
       var entryBounds = this.__measureEntryLinkOuter(node, context);
@@ -1097,7 +1097,7 @@ wcPlayEditor.prototype = {
         top: node._meta.bounds.inner.top - 30,
         left: node._meta.bounds.inner.left - 30,
         width: node._meta.bounds.inner.width + 60,
-        height: node._meta.bounds.inner.height + 60,
+        height: node._meta.bounds.inner.height + 60
       };
 
       // Add a collapse button to the node in the left margin of the title.
@@ -1105,7 +1105,7 @@ wcPlayEditor.prototype = {
         left: node._meta.bounds.inner.left + 4,
         top: node._meta.bounds.inner.top + 4 + (node.chain.entry.length? this._font.links.size + this._drawStyle.links.padding: 0),
         width: this._drawStyle.node.margin - 5,
-        height: this._font.title.size - 4,
+        height: this._font.title.size - 4
       };
 
       // Add breakpoint button to the node in the right margin of the title.
@@ -1113,7 +1113,7 @@ wcPlayEditor.prototype = {
         left: node._meta.bounds.inner.left + node._meta.bounds.inner.width - this._drawStyle.node.margin + 2,
         top: node._meta.bounds.inner.top + 4 + (node.chain.entry.length? this._font.links.size + this._drawStyle.links.padding: 0),
         width: this._drawStyle.node.margin - 5,
-        height: this._font.title.size - 4,
+        height: this._font.title.size - 4
       };
     }
   },
@@ -1338,7 +1338,7 @@ wcPlayEditor.prototype = {
         var i = 0;
         var mouse = {
           x: editor._mouse.x,
-          y: editor._mouse.y,
+          y: editor._mouse.y
         };
         if (!editor._mouseInViewport) {
           mouse.x = editor.$viewport.width()/2;
@@ -1494,7 +1494,7 @@ wcPlayEditor.prototype = {
                 linkNode = new wcPlayNodes.wcNodeCompositeEntry(compNode, {x: node.pos.x, y: bounds.top - 100}, linkName);
                 createdLinks.push({
                   name: linkName,
-                  node: linkNode,
+                  node: linkNode
                 });
               }
 
@@ -1524,7 +1524,7 @@ wcPlayEditor.prototype = {
                 linkNode = new wcPlayNodes.wcNodeCompositeExit(compNode, {x: node.pos.x, y: bounds.top + bounds.height + 50}, linkName);
                 createdLinks.push({
                   name: linkName,
-                  node: linkNode,
+                  node: linkNode
                 });
               }
 
@@ -1554,7 +1554,7 @@ wcPlayEditor.prototype = {
                 linkNode = new wcPlayNodes.wcNodeCompositeProperty(compNode, {x: bounds.left - 200, y: node.pos.y}, linkName);
                 createdLinks.push({
                   name: linkName,
-                  node: linkNode,
+                  node: linkNode
                 });
               }
 
@@ -1584,7 +1584,7 @@ wcPlayEditor.prototype = {
                 linkNode = new wcPlayNodes.wcNodeCompositeProperty(compNode, {x: bounds.left + bounds.width + 200, y: node.pos.y}, linkName);
                 createdLinks.push({
                   name: linkName,
-                  node: linkNode,
+                  node: linkNode
                 });
               }
 
@@ -2291,7 +2291,7 @@ wcPlayEditor.prototype = {
       top: 0,
       left: 0,
       width: 0,
-      height: 0,
+      height: 0
     };
 
     this.__setCanvasFont(this._font.links, context);
@@ -2323,7 +2323,7 @@ wcPlayEditor.prototype = {
       top: offset,
       left: 0,
       width: 0,
-      height: 0,
+      height: 0
     };
 
     this.__setCanvasFont(this._font.links, context);
@@ -2355,7 +2355,7 @@ wcPlayEditor.prototype = {
       top: offset,
       left: 0,
       width: 0,
-      height: this._font.title.size + this._drawStyle.title.spacing + this._drawStyle.links.padding,
+      height: this._font.title.size + this._drawStyle.title.spacing + this._drawStyle.links.padding
     };
 
     // Measure the title bar area.
@@ -2457,14 +2457,14 @@ wcPlayEditor.prototype = {
 
       typeWidth: titleTypeWidth,
       wrapRWidth: titleWrapRWidth,
-      textWidth: titleTextWidth,
+      textWidth: titleTextWidth
     };
 
     node._meta.bounds.detailsBounds = {
       top: rect.top,
       left: rect.left + rect.width - this._drawStyle.node.margin - titleDetailsWidth,
       width: titleDetailsWidth,
-      height: this._font.details.size + this._drawStyle.title.spacing - 1,
+      height: this._font.details.size + this._drawStyle.title.spacing - 1
     };
 
     // Title Lower Bar
@@ -2478,7 +2478,7 @@ wcPlayEditor.prototype = {
         top: rect.top + upper,
         left: rect.left + (rect.width/2 - node._viewportSize.x/2),
         width: node._viewportSize.x,
-        height: node._viewportSize.y,
+        height: node._viewportSize.y
       };
 
       upper += node._viewportSize.y + this._drawStyle.property.spacing;
@@ -2498,9 +2498,9 @@ wcPlayEditor.prototype = {
           top: rect.top + upper - this._font.property.size,
           left: rect.left + this._drawStyle.node.margin,
           width: rect.width - this._drawStyle.node.margin * 2,
-          height: this._font.property.size + this._drawStyle.property.spacing,
+          height: this._font.property.size + this._drawStyle.property.spacing
         },
-        name: props[i].name,
+        name: props[i].name
       };
       node._meta.bounds.propertyBounds.push(propertyBound);
 
@@ -2512,9 +2512,9 @@ wcPlayEditor.prototype = {
           top: rect.top + upper - this._font.property.size,
           left: rect.left + rect.width - this._drawStyle.node.margin - rect.initialWidth - (showValue? 0: rect.valueWidth),
           width: rect.initialWidth + (showValue? 0: rect.valueWidth),
-          height: this._font.property.size + this._drawStyle.property.spacing,
+          height: this._font.property.size + this._drawStyle.property.spacing
         },
-        name: props[i].name,
+        name: props[i].name
       };
       node._meta.bounds.initialBounds.push(initialBound);
 
@@ -2524,9 +2524,9 @@ wcPlayEditor.prototype = {
           top: rect.top + upper - this._font.property.size,
           left: rect.left + rect.width - this._drawStyle.node.margin - rect.valueWidth - rect.initialWidth,
           width: (showValue? rect.valueWidth: 0),
-          height: this._font.property.size + this._drawStyle.property.spacing,
+          height: this._font.property.size + this._drawStyle.property.spacing
         },
-        name: props[i].name,
+        name: props[i].name
       };
       node._meta.bounds.valueBounds.push(valueBound);
 
@@ -2535,13 +2535,13 @@ wcPlayEditor.prototype = {
         top: rect.top + upper - this._font.property.size/3 - this._drawStyle.links.width/2 - 5,
         left: rect.left - this._drawStyle.links.length,
         width: this._drawStyle.links.length,
-        height: (props[i].options && props[i].options.input)? this._drawStyle.links.width + 10: 0,
+        height: (props[i].options && props[i].options.input)? this._drawStyle.links.width + 10: 0
       };
       longRect = {
         top: rect.top + upper - this._font.property.size/3 - this._drawStyle.links.width/2 - 5,
         left: rect.left - this._drawStyle.links.length,
         width: rect.width + this._drawStyle.links.length,
-        height: (props[i].options && props[i].options.input)? this._drawStyle.links.width + 10: 0,
+        height: (props[i].options && props[i].options.input)? this._drawStyle.links.width + 10: 0
       };
 
       node._meta.bounds.inputBounds.push({
@@ -2549,9 +2549,9 @@ wcPlayEditor.prototype = {
         longRect: longRect,
         point: {
           x: linkRect.left + linkRect.width/3 - 2,
-          y: linkRect.top + linkRect.height/2,
+          y: linkRect.top + linkRect.height/2
         },
-        name: props[i].name,
+        name: props[i].name
       });
 
       // Property output.
@@ -2559,13 +2559,13 @@ wcPlayEditor.prototype = {
         top: rect.top + upper - this._font.property.size/3 - this._drawStyle.links.width/2 - 5,
         left: rect.left + rect.width,
         width: this._drawStyle.links.length,
-        height: (props[i].options && props[i].options.output)? this._drawStyle.links.width + 10: 0,
+        height: (props[i].options && props[i].options.output)? this._drawStyle.links.width + 10: 0
       };
       longRect = {
         top: rect.top + upper - this._font.property.size/3 - this._drawStyle.links.width/2 - 5,
         left: rect.left,
         width: rect.width + this._drawStyle.links.length,
-        height: (props[i].options && props[i].options.output)? this._drawStyle.links.width + 10: 0,
+        height: (props[i].options && props[i].options.output)? this._drawStyle.links.width + 10: 0
       };
 
       node._meta.bounds.outputBounds.push({
@@ -2573,9 +2573,9 @@ wcPlayEditor.prototype = {
         longRect: longRect,
         point: {
           x: linkRect.left + linkRect.width + 1,
-          y: linkRect.top + linkRect.height/2,
+          y: linkRect.top + linkRect.height/2
         },
-        name: props[i].name,
+        name: props[i].name
       });
 
       upper += this._drawStyle.property.spacing;
@@ -2611,7 +2611,7 @@ wcPlayEditor.prototype = {
         top: yPos - this._drawStyle.links.length - this._font.links.size,
         left: xPos + w/2 - this._drawStyle.links.width/2,
         width: this._drawStyle.links.width,
-        height: this._drawStyle.links.length,
+        height: this._drawStyle.links.length
       };
 
       // Expand the bounding rect just a little so it is easier to click.
@@ -2622,7 +2622,7 @@ wcPlayEditor.prototype = {
         top: rect.top,
         left: rect.left,
         width: rect.width,
-        height: node._meta.bounds.center.height,
+        height: node._meta.bounds.center.height
       };
 
       node._meta.bounds.entryBounds.push({
@@ -2630,9 +2630,9 @@ wcPlayEditor.prototype = {
         longRect: longRect,
         point: {
           x: rect.left + rect.width/2,
-          y: rect.top + rect.height/3 - 2,
+          y: rect.top + rect.height/3 - 2
         },
-        name: links[i].name,
+        name: links[i].name
       });
 
       xPos += w;
@@ -2668,7 +2668,7 @@ wcPlayEditor.prototype = {
         top: yPos + this._drawStyle.links.padding,
         left: xPos + w/2 - this._drawStyle.links.width/2,
         width: this._drawStyle.links.width,
-        height: this._drawStyle.links.length,
+        height: this._drawStyle.links.length
       };
 
       // Expand the bounding rect just a little so it is easier to click.
@@ -2679,7 +2679,7 @@ wcPlayEditor.prototype = {
         top: rect.top - node._meta.bounds.center.height + this._drawStyle.links.length,
         left: rect.left,
         width: rect.width,
-        height: node._meta.bounds.center.height,
+        height: node._meta.bounds.center.height
       };
 
       node._meta.bounds.exitBounds.push({
@@ -2687,9 +2687,9 @@ wcPlayEditor.prototype = {
         longRect: longRect,
         point: {
           x: rect.left + rect.width/2,
-          y: rect.top + rect.height + 1,
+          y: rect.top + rect.height + 1
         },
-        name: links[i].name,
+        name: links[i].name
       });
 
       xPos += w;
@@ -3249,13 +3249,13 @@ wcPlayEditor.prototype = {
       } else {
         targetPos = {
           x: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z,
-          y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z,
+          y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z
         };
         targetRect = {
           left: targetPos.x,
           top: targetPos.y,
           width: 1,
-          height: 1,
+          height: 1
         };
         targetOffset = {x: 0, y: 0};
       }
@@ -3283,13 +3283,13 @@ wcPlayEditor.prototype = {
       } else {
         targetPos = {
           x: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z,
-          y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z,
+          y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z
         };
         targetRect = {
           left: targetPos.x,
           top: targetPos.y,
           width: 1,
-          height: 1,
+          height: 1
         };
         targetOffset = {x: 0, y: 0};
       }
@@ -3318,13 +3318,13 @@ wcPlayEditor.prototype = {
       } else {
         targetPos = {
           x: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z,
-          y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z,
+          y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z
         };
         targetRect = {
           left: targetPos.x,
           top: targetPos.y,
           width: 1,
-          height: 1,
+          height: 1
         };
         targetOffset = {x: 0, y: 0};
       }
@@ -3352,13 +3352,13 @@ wcPlayEditor.prototype = {
       } else {
         targetPos = {
           x: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z,
-          y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z,
+          y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z
         };
         targetRect = {
           left: targetPos.x,
           top: targetPos.y,
           width: 1,
-          height: 1,
+          height: 1
         };
         targetOffset = {x: 0, y: 0};
       }
@@ -3428,45 +3428,45 @@ wcPlayEditor.prototype = {
     if (isProperty) {
       start = {
         x: startOffset.y + startPos.y,
-        y: startOffset.x + startPos.x,
+        y: startOffset.x + startPos.x
       };
       end = {
         x: endOffset.y + endPos.y,
-        y: endOffset.x + endPos.x,
+        y: endOffset.x + endPos.x
       };
       startBounds = {
         top: startRect.left + startOffset.x,
         left: startRect.top + startOffset.y,
         width: startRect.height,
-        height: startRect.width,
+        height: startRect.width
       };
       endBounds = {
         top: endRect.left + endOffset.x,
         left: endRect.top + endOffset.y,
         width: endRect.height,
-        height: endRect.width,
+        height: endRect.width
       };
       context.strokeStyle = (highlight? 'cyan': (flash? '#CCCC00': '#33CC33'));
     } else {
       start = {
         x: startOffset.x + startPos.x,
-        y: startOffset.y + startPos.y,
+        y: startOffset.y + startPos.y
       };
       end = {
         x: endOffset.x + endPos.x,
-        y: endOffset.y + endPos.y,
+        y: endOffset.y + endPos.y
       };
       startBounds = {
         top: startRect.top + startOffset.y,
         left: startRect.left + startOffset.x,
         width: startRect.width,
-        height: startRect.height,
+        height: startRect.height
       };
       endBounds = {
         top: endRect.top + endOffset.y,
         left: endRect.left + endOffset.x,
         width: endRect.width,
-        height: endRect.height,
+        height: endRect.height
       };
       context.strokeStyle = (highlight? 'cyan': (flash? '#CCCC00': '#000000'));
     }
@@ -4083,7 +4083,7 @@ wcPlayEditor.prototype = {
             id: node.id,
             oldValue: node.name,
             newValue: $control.val(),
-            engine: self._engine,
+            engine: self._engine
           },
           // Undo
           function() {
@@ -4122,7 +4122,7 @@ wcPlayEditor.prototype = {
 
     var offset = {
       top: 0,
-      left: this.$palette.width(),
+      left: this.$palette.width()
     };
 
     this.$main.append($control);
@@ -4188,7 +4188,7 @@ wcPlayEditor.prototype = {
           propFn: propFn,
           oldValue: oldValue,
           newValue: newValue,
-          engine: self._engine,
+          engine: self._engine
         },
         // Undo
         function() {
@@ -4362,7 +4362,7 @@ wcPlayEditor.prototype = {
     if ($control) {
       var offset = {
         top: 0,
-        left: this.$palette.width(),
+        left: this.$palette.width()
       };
 
       this.$main.append($blocker);
@@ -4416,7 +4416,7 @@ wcPlayEditor.prototype = {
       className: node.className,
       data: node.export(),
       engine: this._engine,
-      parent: this._parent.id || this._parent,
+      parent: this._parent.id || this._parent
     },
     // Undo
     function() {
@@ -4460,7 +4460,7 @@ wcPlayEditor.prototype = {
     this._undoManager && this._undoManager.addEvent('', {
       data: node.export(),
       parent: this._parent,
-      engine: this._engine,
+      engine: this._engine
     },
     // Undo
     function() {
@@ -4542,11 +4542,11 @@ wcPlayEditor.prototype = {
             var node = self._selectedNodes[i];
             var oldPos = {
               x: node.pos.x,
-              y: node.pos.y,
+              y: node.pos.y
             };
             var newPos = {
               x: node.pos.x + (moveX / self._viewportCamera.z),
-              y: node.pos.y + (moveY / self._viewportCamera.z),
+              y: node.pos.y + (moveY / self._viewportCamera.z)
             };
 
             newPos = node.onMoving(oldPos, newPos) || newPos;
@@ -4872,11 +4872,11 @@ wcPlayEditor.prototype = {
         node = this._selectedNodes[i];
         var oldPos = {
           x: node.pos.x,
-          y: node.pos.y,
+          y: node.pos.y
         };
         var newPos = {
           x: node.pos.x + (moveX / this._viewportCamera.z),
-          y: node.pos.y + (moveY / this._viewportCamera.z),
+          y: node.pos.y + (moveY / this._viewportCamera.z)
         };
 
         newPos = node.onMoving(oldPos, newPos) || newPos;
@@ -5149,7 +5149,7 @@ wcPlayEditor.prototype = {
         if (node._meta.bounds.viewportBounds) {
           var pos = {
             x: (mouse.x - this._viewportCamera.x) / this._viewportCamera.z - (node.pos.x + node._meta.bounds.viewportBounds.left),
-            y: (mouse.y - this._viewportCamera.y) / this._viewportCamera.z - (node.pos.y + node._meta.bounds.viewportBounds.top),
+            y: (mouse.y - this._viewportCamera.y) / this._viewportCamera.z - (node.pos.y + node._meta.bounds.viewportBounds.top)
           };
 
           if (this.__inRect(this._mouse, node._meta.bounds.viewportBounds, node.pos, this._viewportCamera)) {
@@ -5193,7 +5193,7 @@ wcPlayEditor.prototype = {
         x: 0,
         y: 0,
         width: 0,
-        height: 0,
+        height: 0
       };
       return;
     }
@@ -5286,7 +5286,7 @@ wcPlayEditor.prototype = {
       if (!hasTarget && node._meta.bounds.viewportBounds) {
         var pos = {
           x: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z - node._meta.bounds.viewportBounds.left,
-          y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z - node._meta.bounds.viewportBounds.top,
+          y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z - node._meta.bounds.viewportBounds.top
         };
 
         if (this.__inRect(this._mouse, node._meta.bounds.viewportBounds, node.pos, this._viewportCamera)) {
@@ -5312,7 +5312,7 @@ wcPlayEditor.prototype = {
           var myNode = this._selectedNodes[i];
           this._selectedNodeOrigins.push({
             x: myNode.pos.x,
-            y: myNode.pos.y,
+            y: myNode.pos.y
           });
         }
       }
@@ -5384,13 +5384,13 @@ wcPlayEditor.prototype = {
             id: node.id,
             start: {
               x: this._selectedNodeOrigins[i].x,
-              y: this._selectedNodeOrigins[i].y,
+              y: this._selectedNodeOrigins[i].y
             },
             end: {
               x: node.pos.x,
-              y: node.pos.y,
+              y: node.pos.y
             },
-            engine: this._engine,
+            engine: this._engine
           },
           // Undo
           function() {
@@ -5424,7 +5424,7 @@ wcPlayEditor.prototype = {
           name: this._selectedEntryLink.name,
           targetId: this._highlightNode.id,
           targetName: this._highlightExitLink.name,
-          engine: this._engine,
+          engine: this._engine
         },
         // Undo
         function() {
@@ -5444,7 +5444,7 @@ wcPlayEditor.prototype = {
           name: this._selectedEntryLink.name,
           targetId: this._highlightNode.id,
           targetName: this._highlightExitLink.name,
-          engine: this._engine,
+          engine: this._engine
         },
         // Undo
         function() {
@@ -5468,7 +5468,7 @@ wcPlayEditor.prototype = {
           name: this._selectedExitLink.name,
           targetId: this._highlightNode.id,
           targetName: this._highlightEntryLink.name,
-          engine: this._engine,
+          engine: this._engine
         },
         // Undo
         function() {
@@ -5488,7 +5488,7 @@ wcPlayEditor.prototype = {
           name: this._selectedExitLink.name,
           targetId: this._highlightNode.id,
           targetName: this._highlightEntryLink.name,
-          engine: this._engine,
+          engine: this._engine
         },
         // Undo
         function() {
@@ -5512,7 +5512,7 @@ wcPlayEditor.prototype = {
           name: this._selectedInputLink.name,
           targetId: this._highlightNode.id,
           targetName: this._highlightOutputLink.name,
-          engine: this._engine,
+          engine: this._engine
         },
         // Undo
         function() {
@@ -5532,7 +5532,7 @@ wcPlayEditor.prototype = {
           name: this._selectedInputLink.name,
           targetId: this._highlightNode.id,
           targetName: this._highlightOutputLink.name,
-          engine: this._engine,
+          engine: this._engine
         },
         // Undo
         function() {
@@ -5556,7 +5556,7 @@ wcPlayEditor.prototype = {
           name: this._selectedOutputLink.name,
           targetId: this._highlightNode.id,
           targetName: this._highlightInputLink.name,
-          engine: this._engine,
+          engine: this._engine
         },
         // Undo
         function() {
@@ -5576,7 +5576,7 @@ wcPlayEditor.prototype = {
           name: this._selectedOutputLink.name,
           targetId: this._highlightNode.id,
           targetName: this._highlightInputLink.name,
-          engine: this._engine,
+          engine: this._engine
         },
         // Undo
         function() {
@@ -5599,7 +5599,7 @@ wcPlayEditor.prototype = {
       mouse = this.__mouse(event, this.$viewport.offset());
       var pos = {
         x: (mouse.x - this._viewportCamera.x) / this._viewportCamera.z - this._selectedNode._meta.bounds.viewportBounds.left,
-        y: (mouse.y - this._viewportCamera.y) / this._viewportCamera.z - this._selectedNode._meta.bounds.viewportBounds.top,
+        y: (mouse.y - this._viewportCamera.y) / this._viewportCamera.z - this._selectedNode._meta.bounds.viewportBounds.top
       };
 
       this._selectedNode.onViewportMouseUp(event, pos, this._options.readOnly);
@@ -5722,7 +5722,7 @@ wcPlayEditor.prototype = {
           this._undoManager && this._undoManager.addEvent((state? 'Enabled': 'Disabled') + ' Debug Logging for Node "' + node.category + '.' + node.type + '"', {
             id: node.id,
             state: state,
-            engine: this._engine,
+            engine: this._engine
           },
           // Undo
           function() {
@@ -5743,7 +5743,7 @@ wcPlayEditor.prototype = {
           this._undoManager && this._undoManager.addEvent((state? 'Enabled': 'Disabled') + ' Breakpoint on Node "' + node.category + '.' + node.type + '"', {
             id: node.id,
             state: state,
-            engine: this._engine,
+            engine: this._engine
           },
           // Undo
           function() {
@@ -5806,7 +5806,7 @@ wcPlayEditor.prototype = {
         if (node._meta.bounds.viewportBounds) {
           var pos = {
             x: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z - node._meta.bounds.viewportBounds.left,
-            y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z - node._meta.bounds.viewportBounds.top,
+            y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z - node._meta.bounds.viewportBounds.top
           };
 
           if (this.__inRect(this._mouse, node._meta.bounds.viewportBounds, node.pos, this._viewportCamera)) {
@@ -5890,7 +5890,7 @@ wcPlayEditor.prototype = {
       if (!hasTarget && node._meta.bounds.viewportBounds) {
         var pos = {
           x: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z - node._meta.bounds.viewportBounds.left,
-          y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z - node._meta.bounds.viewportBounds.top,
+          y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z - node._meta.bounds.viewportBounds.top
         };
 
         if (this.__inRect(this._mouse, node._meta.bounds.viewportBounds, node.pos, this._viewportCamera)) {
@@ -5935,7 +5935,7 @@ wcPlayEditor.prototype = {
     if (this._highlightNode && this._highlightNode._meta.bounds.viewportBounds) {
       var pos = {
         x: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z - this._highlightNode._meta.bounds.viewportBounds.left,
-        y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z - this._highlightNode._meta.bounds.viewportBounds.top,
+        y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z - this._highlightNode._meta.bounds.viewportBounds.top
       };
 
       if (this.__inRect(this._mouse, this._highlightNode._meta.bounds.viewportBounds, this._highlightNode.pos, this._viewportCamera) &&

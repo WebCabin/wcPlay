@@ -237,7 +237,7 @@ wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Import
       if (node.instanceOf('wcNodeCompositeEntry')) {
         order.push({
           name: node.name,
-          pos: node.pos.x,
+          pos: node.pos.x
         });
       }
     }
@@ -284,7 +284,7 @@ wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Import
       if (node.instanceOf('wcNodeCompositeExit')) {
         order.push({
           name: node.name,
-          pos: node.pos.x,
+          pos: node.pos.x
         });
       }
     }
@@ -331,7 +331,7 @@ wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Import
       if (node.instanceOf('wcNodeCompositeProperty')) {
         order.push({
           name: node.name,
-          pos: node.pos.y,
+          pos: node.pos.y
         });
       }
     }
@@ -639,5 +639,5 @@ wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Import
     }
 
     return false;
-  },
+  }
 });

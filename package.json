@@ -54,6 +54,7 @@
         "error",
         "always"
       ],
+      "comma-dangle": 2,
       "no-console": 0,
       "jsdoc/check-param-names": 2,
       "jsdoc/check-tag-names": 2,

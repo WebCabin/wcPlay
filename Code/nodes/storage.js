@@ -40,5 +40,5 @@ wcPlayNodes.wcNode.extend('wcNodeStorage', 'Storage', '', {
 
     // Force a property change event so all connected nodes receive our value.
     this.property('value', this.property('value'), true);
-  },
+  }
 });

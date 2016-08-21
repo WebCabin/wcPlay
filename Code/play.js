@@ -37,7 +37,7 @@ function wcPlay(options) {
     updateRate: 25,
     updateLimit: 100,
     flowTrackerLimit: 1000,
-    debugging: true,
+    debugging: true
   };
   for (var prop in options) {
     this._options[prop] = options[prop];
@@ -69,7 +69,7 @@ wcPlay.PROPERTY = {
   /** Displays the property as a combo box control. [Select options]{@link wcNode~SelectOptions} are used. */
   SELECT: 'select',
   /** Displays the property as a custom control. [Custom options]{@link wcNode~CustomOptions} are used. */
-  CUSTOM: 'custom',
+  CUSTOM: 'custom'
 };
 
 /**
@@ -84,7 +84,7 @@ wcPlay.NODE = {
   /** Storage nodes are designed with a single purpose of storing data for use within the script. */
   STORAGE: 'storage',
   /** Composite nodes are a group of nodes combined into a single visible node. They appear in the composite section of the node palette for easy duplication within your script. */
-  COMPOSITE: 'composite',
+  COMPOSITE: 'composite'
 };
 
 /**
@@ -112,7 +112,7 @@ wcPlay.registerNodeType = function(name, displayName, category, nodeType) {
     className: name,
     displayName: displayName,
     category: category,
-    nodeType: nodeType,
+    nodeType: nodeType
   };
 
   for (var i = 0; i < wcPlay.NODE_LIBRARY.length; ++i) {
@@ -703,7 +703,7 @@ wcPlay.prototype = {
       value: initialValue,
       initialValue: initialValue,
       type: type,
-      options: options || {},
+      options: options || {}
     });
     return true;
   },
@@ -1296,5 +1296,5 @@ wcNodeTimeoutEvent.prototype = {
     this._node = null;
     this._callback = null;
     clearTimeout(this._timerId);
-  },
+  }
 };

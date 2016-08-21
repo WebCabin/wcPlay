@@ -19,12 +19,12 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
 
     this.pos = {
       x: pos && pos.x || 0,
-      y: pos && pos.y || 0,
+      y: pos && pos.y || 0
     };
 
     this.chain = {
       entry: [],
-      exit: [],
+      exit: []
     };
     this.properties = [];
 
@@ -37,7 +37,7 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
       dirty: true,
       threads: [],
       description: '',
-      details: '',
+      details: ''
     };
     this._break = false;
     this._log = false;
@@ -232,7 +232,7 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
       breakpoint: this._break,
       properties: this.listProperties(minimal),
       exitChains: this.listExitChains(),
-      outputChains: this.listOutputChains(),
+      outputChains: this.listOutputChains()
     };
 
     // Include additional info if we aren't minimal
@@ -662,8 +662,8 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
         flashDelta: 0,
         broken: 0,
         color: '#000000',
-        description: description,
-      },
+        description: description
+      }
     });
     this._meta.dirty = true;
     return true;
@@ -691,8 +691,8 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
         flashDelta: 0,
         broken: 0,
         color: '#000000',
-        description: description,
-      },
+        description: description
+      }
     });
     this._meta.dirty = true;
     return true;
@@ -731,13 +731,13 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
         flash: false,
         flashDelta: 0,
         broken: 0,
-        color: '#000000',
+        color: '#000000'
       },
       outputMeta: {
         flash: false,
         flashDelta: 0,
         broken: 0,
-        color: '#000000',
+        color: '#000000'
       }
     });
     this._meta.dirty = true;
@@ -959,12 +959,12 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
     // Now make the connection.
     myLink.links.push({
       name: targetLink.name,
-      node: targetNode,
+      node: targetNode
     });
 
     targetLink.links.push({
       name: myLink.name,
-      node: this,
+      node: this
     });
 
     // Notify of the connection change.
@@ -1026,12 +1026,12 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
     // Now make the connection.
     myLink.links.push({
       name: targetLink.name,
-      node: targetNode,
+      node: targetNode
     });
 
     targetLink.links.push({
       name: myLink.name,
-      node: this,
+      node: this
     });
 
     // Notify of the connection change.
@@ -1105,12 +1105,12 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
     // Now make the connection.
     myProperty.inputs.push({
       name: targetProperty.name,
-      node: targetNode,
+      node: targetNode
     });
 
     targetProperty.outputs.push({
       name: myProperty.name,
-      node: this,
+      node: this
     });
 
     // Notify of the connection change.
@@ -1184,12 +1184,12 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
     // Now make the connection.
     myProperty.outputs.push({
       name: targetProperty.name,
-      node: targetNode,
+      node: targetNode
     });
 
     targetProperty.inputs.push({
       name: myProperty.name,
-      node: this,
+      node: this
     });
 
     // Notify of the connection change.
@@ -1697,7 +1697,7 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
               inName: myLink.name,
               inNodeId: this.id,
               outName: myLink.links[a].name,
-              outNodeId: myLink.links[a].node.id,
+              outNodeId: myLink.links[a].node.id
             });
           }
         }
@@ -1725,7 +1725,7 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
               inName: myLink.links[a].name,
               inNodeId: myLink.links[a].node.id,
               outName: myLink.name,
-              outNodeId: this.id,
+              outNodeId: this.id
             });
           }
         }
@@ -1753,7 +1753,7 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
               inName: myProp.name,
               inNodeId: this.id,
               outName: myProp.inputs[a].name,
-              outNodeId: myProp.inputs[a].node.id,
+              outNodeId: myProp.inputs[a].node.id
             });
           }
         }
@@ -1781,7 +1781,7 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
               inName: myProp.outputs[a].name,
               inNodeId: myProp.outputs[a].node.id,
               outName: myProp.name,
-              outNodeId: this.id,
+              outNodeId: this.id
             });
           }
         }
@@ -1842,7 +1842,7 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
       } else {
         this._viewportSize = {
           x: width,
-          y: height,
+          y: height
         };
       }
     }
@@ -2295,7 +2295,7 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    */
   onDestroyed: function() {
     this._super();
-  },
+  }
 });
 
 window.wcNode = {};
@@ -2308,7 +2308,7 @@ wcNode.LINK_TYPE = {
   ENTRY: 'entry',
   EXIT: 'exit',
   INPUT: 'input',
-  OUTPUT: 'output',
+  OUTPUT: 'output'
 };
 
 /**
@@ -2319,7 +2319,7 @@ wcNode.CONNECT_RESULT = {
   NOT_FOUND: 'not_found',
   ALREADY_CONNECTED: 'already_connected',
   REFUSED: 'refused',
-  SUCCESS: 'success',
+  SUCCESS: 'success'
 };
 
 

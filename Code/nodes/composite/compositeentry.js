@@ -166,5 +166,5 @@ wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeEntry', 'Entry', 'Linkers', {
     }
 
     this._parent.sortEntryLinks();
-  },
+  }
 });

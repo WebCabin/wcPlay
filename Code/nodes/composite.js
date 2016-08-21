@@ -29,5 +29,5 @@ wcPlayNodes.wcNode.extend('wcNodeComposite', 'Composite', '', {
       this.category = category;
       wcPlay.registerNodeType(className, type, category, wcPlay.NODE.COMPOSITE);
     }
-  },
+  }
 });

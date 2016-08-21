@@ -32,5 +32,5 @@ wcPlayNodes.wcNode.extend('wcNodeProcess', 'Node Process', '', {
       this.category = category;
       wcPlay.registerNodeType(className, type, category, wcPlay.NODE.PROCESS);
     }
-  },
+  }
 });

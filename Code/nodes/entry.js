@@ -42,6 +42,6 @@ wcPlayNodes.wcNode.extend('wcNodeEntry', 'Entry Node', '', {
   onActivated: function(name) {
     this._super(name);
     this.activateExit('out');
-  },
+  }
 });
 

@@ -55,5 +55,5 @@ wcPlayNodes.wcNodeEntry.extend('wcNodeEntryInterval', 'Interval', 'Automatic', {
     if (name === 'milliseconds') {
       this.onActivated();
     }
-  },
+  }
 });

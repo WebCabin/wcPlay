@@ -171,5 +171,5 @@ wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeExit', 'Exit', 'Linkers', {
     }
 
     this._parent.sortExitLinks();
-  },
+  }
 });
