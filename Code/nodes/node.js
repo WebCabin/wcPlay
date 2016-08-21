@@ -8,6 +8,7 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
    */
   init: function(parent, pos) {
+    this._super(parent, pos);
     this.color = '#FFFFFF';
     if (!this.name) {
       this.name = '';
@@ -1241,12 +1242,12 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    * @param {string} name - The name of the exit link.
    * @param {wcNode} [targetNode] - If supplied, will only remove links to the specified target node.
    * @param {string} [targetName] - If supplied, will only remove links to the specified named entry links.
-   * @returns {wcNode.CONNECT_RESULT}
+   * @returns {wcNode.CONNECT_RESULT} - The result of the disconnection.
    */
   disconnectExit: function(name, targetNode, targetName) {
     // Find my exit link.
-    var myLink = null;
-    for (var i = 0; i < this.chain.exit.length; ++i) {
+    var myLink = null, i = 0;
+    for (i = 0; i < this.chain.exit.length; ++i) {
       if (this.chain.exit[i].name === name) {
         myLink = this.chain.exit[i];
         break;
@@ -1258,7 +1259,7 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
     }
 
     // Iterate through all chained links and disconnect as necessary.
-    for (var i = 0; i < myLink.links.length; ++i) {
+    for (i = 0; i < myLink.links.length; ++i) {
       var targetLink = myLink.links[i];
       if ((!targetNode || targetNode === targetLink.node) && (!targetName || targetName === targetLink.name)) {
         // Remove this link.
@@ -1277,12 +1278,12 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    * @param {string} name - The name of the property.
    * @param {wcNode} [targetNode] - If supplied, will only remove links to the specified target node.
    * @param {string} [targetName] - If supplied, will only remove links to the specified named property output links.
-   * @returns {wcNode.CONNECT_RESULT}
+   * @returns {wcNode.CONNECT_RESULT} - The result of the disconnection.
    */
   disconnectInput: function(name, targetNode, targetName) {
     // Find my property.
-    var myProperty = null;
-    for (var i = 0; i < this.properties.length; ++i) {
+    var myProperty = null, i = 0;
+    for (i = 0; i < this.properties.length; ++i) {
       if (this.properties[i].name === name) {
         myProperty = this.properties[i];
         break;
@@ -1294,7 +1295,7 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
     }
 
     // Iterate through all chained links and disconnect as necessary.
-    for (var i = 0; i < myProperty.inputs.length; ++i) {
+    for (i = 0; i < myProperty.inputs.length; ++i) {
       var targetProperty = myProperty.inputs[i];
       if ((!targetNode || targetNode === targetProperty.node) && (!targetName || targetName === targetProperty.name)) {
         // Remove this link.
@@ -1313,12 +1314,12 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    * @param {string} name - The name of the property.
    * @param {wcNode} [targetNode] - If supplied, will only remove links to the specified target node.
    * @param {string} [targetName] - If supplied, will only remove links to the specified named property input links.
-   * @returns {wcNode.CONNECT_RESULT}
+   * @returns {wcNode.CONNECT_RESULT} - The result of the disconnection.
    */
   disconnectOutput: function(name, targetNode, targetName) {
     // Find my property.
-    var myProperty = null;
-    for (var i = 0; i < this.properties.length; ++i) {
+    var myProperty = null, i = 0;
+    for (i = 0; i < this.properties.length; ++i) {
       if (this.properties[i].name === name) {
         myProperty = this.properties[i];
         break;
@@ -1330,7 +1331,7 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
     }
 
     // Iterate through all chained links and disconnect as necessary.
-    for (var i = 0; i < myProperty.outputs.length; ++i) {
+    for (i = 0; i < myProperty.outputs.length; ++i) {
       var targetProperty = myProperty.outputs[i];
       if ((!targetNode || targetNode === targetProperty.node) && (!targetName || targetName === targetProperty.name)) {
         // Remove this link.
@@ -1474,7 +1475,8 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    * @returns {Object|undefined} - The value of the property, or undefined if not found.
    */
   property: function(name, value, forceOrSilent, forceUpstream, undo) {
-    for (var i = 0; i < this.properties.length; ++i) {
+    var i = 0, a = 0;
+    for (i = 0; i < this.properties.length; ++i) {
       var prop = this.properties[i];
       if (prop.name === name) {
         if (value !== undefined) {
@@ -1507,14 +1509,14 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
               }
               var found = false;
               if (Array.isArray(items)) {
-                for (var i = 0; i < items.length; ++i) {
-                  if (typeof items[i] === 'object') {
-                    if (items[i].value == value) {
+                for (a = 0; a < items.length; ++a) {
+                  if (typeof items[a] === 'object') {
+                    if (items[a].value == value) {
                       found = true;
                       break;
                     }
                   } else {
-                    if (items[i] == value) {
+                    if (items[a] == value) {
                       found = true;
                       break;
                     }
@@ -1603,7 +1605,8 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    * @returns {Object|undefined} - The default value of the property, or undefined if not found.
    */
   initialProperty: function(name, value, forceOrSilent, forceUpstream, undo) {
-    for (var i = 0; i < this.properties.length; ++i) {
+    var i = 0, a = 0;
+    for (i = 0; i < this.properties.length; ++i) {
       var prop = this.properties[i];
       if (prop.name === name) {
         if (value !== undefined) {
@@ -1823,8 +1826,8 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
   },
 
   /**
-   * Sets a size for the custom viewport.<br>
-   * The custom viewport is a rectangular area embedded into the node's visual display in which you can 'draw' whatever you wish. It appears below the title text and above properties.
+   * Sets a size for the custom viewport.
+   * <br>The custom viewport is a rectangular area embedded into the node's visual display in which you can 'draw' whatever you wish. It appears below the title text and above properties.
    * @function wcNode#viewportSize
    * @param {number} [width] - If supplied, assigns the width of the viewport desired. Use 0 or null to disable the viewport.
    * @param {number} [height] - If supplied, assigns the height of the viewport desired. Use 0 or null to disable the viewport.
@@ -1848,124 +1851,124 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
   },
 
   /**
-   * Event that is called when it is time to draw the contents of your custom viewport. It is up to you to stay within the [wcNode.viewportSize]{@link wcNode~viewportSize} you've specified.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called when it is time to draw the contents of your custom viewport. It is up to you to stay within the [wcNode.viewportSize]{@link wcNode#viewportSize} you've specified.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onViewportDraw
    * @param {external:Canvas~Context} context - The canvas context to draw on, coordinates 0,0 will be the top left corner of your viewport. It is up to you to stay within the [viewport bounds]{@link wcNode#viewportSize} you have assigned.
    * @param {boolean} readOnly - The editors readonly status, when true, you should not allow changes to the node.
    * @see wcNode#viewportSize
    */
   onViewportDraw: function(context, readOnly) {
-    // this._super(context, readOnly);
+    this._super(context, readOnly);
   },
 
   /**
-   * Event that is called when the mouse has entered the viewport area.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNode~onViewportMouseEnter
+   * Event that is called when the mouse has entered the viewport area.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onViewportMouseEnter
    * @param {Object} event - The original jquery mouse event.
    * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
    * @param {boolean} readOnly - The editors readonly status, when true, you should not allow changes to the node.
    */
   onViewportMouseEnter: function(event, pos, readOnly) {
-    // this._super(event, pos, readOnly);
+    this._super(event, pos, readOnly);
     if (this.debugLog()) {
       console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" mouse entered custom viewport!');
     }
   },
 
   /**
-   * Event that is called when the mouse has left the viewport area.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNode~onViewportMouseLeave
+   * Event that is called when the mouse has left the viewport area.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onViewportMouseLeave
    * @param {Object} event - The original jquery mouse event.
    * @param {boolean} readOnly - The editors readonly status, when true, you should not allow changes to the node.
    */
   onViewportMouseLeave: function(event, readOnly) {
-    // this._super(event, readOnly);
+    this._super(event, readOnly);
     if (this.debugLog()) {
       console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" mouse left custom viewport!');
     }
   },
 
   /**
-   * Event that is called when the mouse button is pressed over your viewport area.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNode~onViewportMouseDown
+   * Event that is called when the mouse button is pressed over your viewport area.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onViewportMouseDown
    * @param {Object} event - The original jquery mouse event.
    * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
    * @param {boolean} readOnly - The editors readonly status, when true, you should not allow changes to the node.
    * @returns {Boolean|undefined} - Return true if you want to disable node dragging during mouse down within your viewport.
    */
   onViewportMouseDown: function(event, pos, readOnly) {
-    // this._super(event, pos, readOnly);
+    this._super(event, pos, readOnly);
   },
 
   /**
-   * Event that is called when the mouse button is released over your viewport area.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNode~onViewportMouseUp
+   * Event that is called when the mouse button is released over your viewport area.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onViewportMouseUp
    * @param {Object} event - The original jquery mouse event.
    * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
    * @param {boolean} readOnly - The editors readonly status, when true, you should not allow changes to the node.
    */
   onViewportMouseUp: function(event, pos, readOnly) {
-    // this._super(event, pos, readOnly);
+    this._super(event, pos, readOnly);
   },
 
   /**
-   * Event that is called when the mouse has moved over your viewport area.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNode~onViewportMouseMove
+   * Event that is called when the mouse has moved over your viewport area.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onViewportMouseMove
    * @param {Object} event - The original jquery mouse event.
    * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
    * @param {boolean} readOnly - The editors readonly status, when true, you should not allow changes to the node.
    */
   onViewportMouseMove: function(event, pos, readOnly) {
-    // this._super(event, pos, readOnly);
+    this._super(event, pos, readOnly);
   },
 
   /**
-   * Event that is called when the mouse wheel is used over your viewport area.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNode~onViewportMouseWheel
+   * Event that is called when the mouse wheel is used over your viewport area.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onViewportMouseWheel
    * @param {Object} event - The original jquery mouse event.
    * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
    * @param {number} scrollDelta - The scroll amount and direction.
    * @param {boolean} readOnly - The editors readonly status, when true, you should not allow changes to the node.
    */
   onViewportMouseWheel: function(event, pos, scrollDelta, readOnly) {
-    // this._super(event, pos, scrollDelta, readOnly);
+    this._super(event, pos, scrollDelta, readOnly);
   },
 
   /**
-   * Event that is called when the mouse button is pressed and released in the same spot over your viewport area.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNode~onViewportMouseClick
+   * Event that is called when the mouse button is pressed and released in the same spot over your viewport area.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onViewportMouseClick
    * @param {Object} event - The original jquery mouse event.
    * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
    * @param {boolean} readOnly - The editors readonly status, when true, you should not allow changes to the node.
    */
   onViewportMouseClick: function(event, pos, readOnly) {
-    // this._super(event, pos, readOnly);
+    this._super(event, pos, readOnly);
   },
 
   /**
-   * Event that is called when the mouse button is double clicked in the same spot over your viewport area.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNode~onViewportMouseClick
+   * Event that is called when the mouse button is double clicked in the same spot over your viewport area.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onViewportMouseDoubleClick
    * @param {Object} event - The original jquery mouse event.
    * @param {wcPlay~Coordinates} pos - The position of the mouse relative to the viewport area (top left corner is 0,0).
    * @param {boolean} readOnly - The editors readonly status, when true, you should not allow changes to the node.
    * @returns {Boolean|undefined} - Return true if you want to disable node auto-collapse when double clicking.
    */
   onViewportMouseDoubleClick: function(event, pos, readOnly) {
-    // this._super(event, pos, readOnly);
+    this._super(event, pos, readOnly);
   },
 
   /**
-   * Event that is called when a connection has been made.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called when a connection has been made.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onConnect
    * @param {boolean} isConnecting - True if a connection is being made, false if it is a disconnection.
    * @param {string} name - The name of the link being connected to.
@@ -1975,7 +1978,7 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    * @param {wcNode.LINK_TYPE} targetType - The target link's type.
    */
   onConnect: function(isConnecting, name, type, targetNode, targetName, targetType) {
-    // this._super(isConnecting, name, type, targetNode, targetName, targetType);
+    this._super(isConnecting, name, type, targetNode, targetName, targetType);
     // If we are connecting one of our property outputs to another property, alert them and send your value to them.
     if (isConnecting && type === wcNode.LINK_TYPE.OUTPUT) {
       targetNode.activateProperty(targetName, this.property(name));
@@ -1984,24 +1987,24 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
   },
 
   /**
-   * Event that is called as soon as the Play script has started.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called as soon as the Play script has started.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onStart
    */
   onStart: function() {
-    // this._super();
+    this._super();
     if (this.debugLog()) {
       console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" started!');
     }
   },
 
   /**
-   * Event that is called as soon as the Play script has stopped.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called as soon as the Play script has stopped.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onStop
    */
   onStop: function() {
-    // this._super();
+    this._super();
     this._meta.dirty = true;
 
     if (this.debugLog()) {
@@ -2010,22 +2013,22 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
   },
 
   /**
-   * Event that is called when this node is about to be drawn.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called when this node is about to be drawn.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onDraw
    */
   onDraw: function() {
-    // this._super();
+    this._super();
   },
 
   /**
-   * Event that is called when an entry link has been activated.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called when an entry link has been activated.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onActivated
    * @param {string} name - The name of the entry link triggered.
    */
   onActivated: function(name) {
-    // this._super(name);
+    this._super(name);
     if (this.debugLog()) {
       console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" Triggered Entry link "' + name + '"');
     }
@@ -2033,67 +2036,67 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
 
   /**
    * Event that is called when the node is about to change its position.
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onMoving
    * @param {wcPlay~Coordinates} oldPos - The current position of the node.
    * @param {wcPlay~Coordinates} newPos - The new position to move the node.
    * @returns {wcPlay~Coordinates|undefined} - Return the new position of the node (usually newPos unless you are restricting the position). If no value is returned, newPos is assumed.
    */
   onMoving: function(oldPos, newPos) {
-    // this._super(oldPos, newPos);
+    this._super(oldPos, newPos);
   },
 
   /**
    * Event that is called after the node has changed its position.
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
-   * @function wcNode#onMoving
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNode#onMoved
    * @param {wcPlay~Coordinates} oldPos - The old position of the node.
    * @param {wcPlay~Coordinates} newPos - The new position of the node.
    */
   onMoved: function(oldPos, newPos) {
-    // this._super(oldPos, newPos);
+    this._super(oldPos, newPos);
   },
 
   /**
-   * Event that is called when the node's name is about to be edited by the user.<br>
-   * You can use this to suggest a list of names that the user can conveniently choose from.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called when the node's name is about to be edited by the user.
+   * <br>You can use this to suggest a list of names that the user can conveniently choose from.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @see http://caniuse.com/#search=datalist
    * @function wcNode#onNameEditSuggestion
-   * @return {wcNode~SelectItem[]|String[]|undefined} - An option list of options to display for the user as suggestions.
+   * @returns {wcNode~SelectItem[]|String[]|undefined} - An option list of options to display for the user as suggestions.
    */
   onNameEditSuggestion: function() {
-    // this._super();
+    this._super();
   },
 
   /**
-   * Event that is called when the name of this node is about to change.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called when the name of this node is about to change.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onNameChanging
    * @param {string} oldName - The current name.
    * @param {string} newName - The new name.
-   * @return {String|undefined} - Return the new value of the name (usually newValue unless you are restricting the name). If no value is returned, newValue is assumed.
+   * @returns {string|undefined} - Return the new value of the name (usually newValue unless you are restricting the name). If no value is returned, newValue is assumed.
    */
   onNameChanging: function(oldName, newName) {
-    // this._super(oldName, newName);
+    this._super(oldName, newName);
   },
 
   /**
-   * Event that is called when the name of this node has changed.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called when the name of this node has changed.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onNameChanged
    * @param {string} oldName - The current name.
    * @param {string} newName - The new name.
    * @param {external:wcUndoManager} [undo] - If the change is triggered by the user and undo management is enabled, this will be the undo manager. Note: The value change is already recorded, use this only if you have other things to record.
    */
   onNameChanged: function(oldName, newName, undo) {
-    // this._super(oldName, newName, undo);
+    this._super(oldName, newName, undo);
     this._meta.dirty = true;
   },
 
   /**
-   * Event that is called when a property is about to be changed.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called when a property is about to be changed.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onPropertyChanging
    * @param {string} name - The name of the property.
    * @param {Object} oldValue - The current value of the property.
@@ -2102,15 +2105,15 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    * @returns {Object} - Return the new value of the property (usually newValue unless you are proposing restrictions). If no value is returned, newValue is assumed.
    */
   onPropertyChanging: function(name, oldValue, newValue, undo) {
-    // this._super(name, oldValue, newValue, undo);
-    // if (this.debugLog()) {
-    //   console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" Changing Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
-    // }
+    this._super(name, oldValue, newValue, undo);
+    if (this.debugLog()) {
+      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" Changing Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
+    }
   },
 
   /**
-   * Event that is called when a property has changed.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called when a property has changed.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onPropertyChanged
    * @param {string} name - The name of the property.
    * @param {Object} oldValue - The old value of the property.
@@ -2118,29 +2121,29 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    * @param {external:wcUndoManager} [undo] - If the change is triggered by the user and undo management is enabled, this will be the undo manager. Note: The value change is already recorded, use this only if you have other things to record.
    */
   onPropertyChanged: function(name, oldValue, newValue, undo) {
-    // this._super(name, oldValue, newValue, undo);
+    this._super(name, oldValue, newValue, undo);
     if (this.debugLog()) {
       console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" Changed Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
     }
   },
 
   /**
-   * Event that is called when the property is being asked its value, before the value is actually retrieved.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called when the property is being asked its value, before the value is actually retrieved.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onPropertyGet
    * @param {string} name - The name of the property.
    * @returns {Object|undefined} - If a value is returned, that value is what will be retrieved from the get.
    */
   onPropertyGet: function(name) {
-    // this._super(name);
+    this._super(name);
     // if (this.debugLog()) {
     //   console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" Requested Property "' + name + '"');
     // }
   },
 
   /**
-   * Event that is called when a property initial value is about to be changed.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called when a property initial value is about to be changed.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onInitialPropertyChanging
    * @param {string} name - The name of the property.
    * @param {Object} oldValue - The current value of the property.
@@ -2149,15 +2152,15 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    * @returns {Object} - Return the new value of the property (usually newValue unless you are proposing restrictions). If no value is returned, newValue is assumed.
    */
   onInitialPropertyChanging: function(name, oldValue, newValue, undo) {
-    // this._super(name, oldValue, newValue, undo);
-    // if (this.debugLog()) {
-    //   console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" Changing Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
-    // }
+    this._super(name, oldValue, newValue, undo);
+    if (this.debugLog()) {
+      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" Changing Initial Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
+    }
   },
 
   /**
-   * Event that is called when a property initial value has changed.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called when a property initial value has changed.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onInitialPropertyChanged
    * @param {string} name - The name of the property.
    * @param {Object} oldValue - The old value of the property.
@@ -2165,129 +2168,133 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
    * @param {external:wcUndoManager} [undo] - If the change is triggered by the user and undo management is enabled, this will be the undo manager. Note: The value change is already recorded, use this only if you have other things to record.
    */
   onInitialPropertyChanged: function(name, oldValue, newValue, undo) {
-    // this._super(name, oldValue, newValue, undo);
+    this._super(name, oldValue, newValue, undo);
     if (this.debugLog()) {
-      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" Changed Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
+      console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" Changed Initial Property "' + name + '" from "' + oldValue + '" to "' + newValue + '"');
     }
   },
 
   /**
-   * Event that is called when the property initial value is being asked its value, before the value is actually retrieved.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called when the property initial value is being asked its value, before the value is actually retrieved.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onInitialPropertyGet
    * @param {string} name - The name of the property.
    * @returns {Object|undefined} - If a value is returned, that value is what will be retrieved from the get.
    */
   onInitialPropertyGet: function(name) {
-    // this._super(name);
+    this._super(name);
     // if (this.debugLog()) {
-    //   console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" Requested Property "' + name + '"');
+    //   console.log('DEBUG: Node "' + this.category + '.' + this.type + (this.name? ' (' + this.name + ')': '') + '" Requested Initial Property "' + name + '"');
     // }
   },
 
   /**
    * Event that is called when a global property value has changed.
-   * Overload this in inherited nodes.<br>
-   * <b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.
+   * Overload this in inherited nodes.
+   * <br><b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.
    * @function wcNode#onGlobalPropertyChanged
    * @param {string} name - The name of the global property.
    * @param {Object} oldValue - The old value of the global property.
    * @param {Object} newValue - The new value of the global property.
    */
-  // onGlobalPropertyChanged: function(name, oldValue, newValue) {
-  // },
+  onGlobalPropertyChanged: function(name, oldValue, newValue) {
+    this._super(name, oldValue, newValue);
+  },
 
   /**
    * Event that is called when a global property has been removed.
-   * Overload this in inherited nodes.<br>
-   * <b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.
+   * Overload this in inherited nodes.
+   * <br><b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.
    * @function wcNode#onGlobalPropertyRemoved
    * @param {string} name - The name of the global property.
    */
-  // onGlobalPropertyRemoved: function(name) {
-  // },
+  onGlobalPropertyRemoved: function(name) {
+    this._super(name);
+  },
 
   /**
    * Event that is called when a global property has been renamed.
-   * Overload this in inherited nodes.<br>
-   * <b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.
+   * Overload this in inherited nodes.
+   * <br><b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.
    * @function wcNode#onGlobalPropertyRenamed
    * @param {string} oldName - The old name of the global property.
    * @param {string} newName - The new name of the global property.
    */
-  // onGlobalPropertyRenamed: function(oldName, newName) {
-  // },
+  onGlobalPropertyRenamed: function(oldName, newName) {
+    this._super(oldName, newName);
+  },
 
   /**
    * Event that is called when a global property initial value has changed.
-   * Overload this in inherited nodes.<br>
-   * <b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.
+   * Overload this in inherited nodes.
+   * <br><b>Note:</b> Do not call 'this._super(..)' for this function, as the parent does not implement it.
    * @function wcNode#onGlobalInitialPropertyChanged
    * @param {string} name - The name of the global property.
    * @param {Object} oldValue - The old value of the global property.
    * @param {Object} newValue - The new value of the global property.
    */
-  // onGlobalInitialPropertyChanged: function(name, oldValue, newValue) {
-  // },
+  onGlobalInitialPropertyChanged: function(name, oldValue, newValue) {
+    this._super(name, oldValue, newValue);
+  },
 
   /**
-   * Event that is called when the node is about to be imported. This is your chance to prepare the node for import, or possibly modify the import data.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called when the node is about to be imported. This is your chance to prepare the node for import, or possibly modify the import data.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onImporting
    * @param {Object} data - The data being imported.
    * @param {Number[]} [idMap] - If supplied, identifies a mapping of old ID's to new ID's, any not found in this list will be unchanged.
    */
   onImporting: function(data, idMap) {
-    // this._super(data, idMap);
+    this._super(data, idMap);
   },
 
   /**
-   * Event that is called after the node has imported.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called after the node has imported.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onImported
    * @param {Object} data - The data being imported.
    * @param {Number[]} [idMap] - If supplied, identifies a mapping of old ID's to new ID's, any not found in this list will be unchanged.
    */
   onImported: function(data, idMap) {
-    // this._super(data, idMap);
+    this._super(data, idMap);
   },
 
   /**
-   * Event that is called when the node is being exported, after the export data has been configured.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called when the node is being exported, after the export data has been configured.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onExport
    * @param {Object} data - The export data for this node.
    * @param {boolean} [minimal] - If true, only the most important data should be exported, this means current values and redundant link connections are omitted.
    */
   onExport: function(data, minimal) {
-    // this._super(data, minimal);
+    this._super(data, minimal);
   },
 
   /**
-   * Event that is called when the node is about to be reset.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called when the node is about to be reset.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onReset
    */
   onReset: function() {
-    // this._super();
+    this._super();
   },
 
   /**
-   * Event that is called when the node is about to be destroyed.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called when the node is about to be destroyed.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onDestroying
    */
   onDestroying: function() {
-    // this._super();
+    this._super();
   },
 
   /**
-   * Event that is called after the node has been destroyed.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called after the node has been destroyed.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNode#onDestroyed
    */
   onDestroyed: function() {
-    // this._super();
+    this._super();
   },
 });
 

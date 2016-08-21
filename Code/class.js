@@ -60,33 +60,45 @@
 
     var _super = this.prototype;
 
+    // Create a bound super class object that contains all of the
+    // parent methods, but bound to the current object.
+    var _boundSuper = {};
+    for (var key in _super) {
+      if (typeof _super[key] === 'function') {
+        _boundSuper[key] = _super[key].bind(prototype);
+      }
+    }
+
+
     // Instantiate a base class (but only create the instance,
     // don't run the init constructor)
     initializing = true;
     var prototype = new this(arguments);
     initializing = false;
 
-    function BindSuper(owner, superObj, name) {
-      var bound = superObj[name].bind(owner);
-      for (var key in superObj) {
-        if (typeof superObj[key] === 'function') {
-          bound[key] = superObj[key].bind(owner);
-        }
+    function BindSuper(owner, name) {
+      var bound = null;
+      if (_super && typeof _super[name] === 'function') {
+        bound = _super[name].bind(owner);
+      } else {
+        bound = function(){};
       }
+      bound.prototype = _boundSuper;
       return bound;
     }
 
     // Copy the properties over onto the new prototype
     for (var name in props) {
       // Check if we're overwriting an existing function
-      prototype[name] = typeof props[name] === 'function' && typeof _super[name] === 'function'?
+      // prototype[name] = typeof props[name] === 'function' && typeof _super[name] === 'function'?
+      prototype[name] = typeof props[name] === 'function'?
         (function(name, fn){
           return function() {
             var tmp = this._super;
            
-            // Add a new ._super() method that is the same method
+            // Add a new this._super() method that is the same method
             // but on the super-class
-            this._super = BindSuper(this, _super, name);
+            this._super = BindSuper(this, name);
            
             // The method only need to be bound temporarily, so we
             // remove it when we're done executing

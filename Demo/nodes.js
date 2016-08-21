@@ -16,6 +16,7 @@ wcPlayNodes.wcNodeProcess.extend('wcNodeProcessGameMove', 'Move', 'Hero', {
 
     Crafty.trigger('Slide', direction);
 
+    // A small delay to account for the character movement animation.
     this.setTimeout(function() {
       this.activateExit('out');
     }, 125);
