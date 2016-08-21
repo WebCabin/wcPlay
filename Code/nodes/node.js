@@ -1401,7 +1401,7 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
         for (var a = 0; a < exitLink.links.length; ++a) {
           if (exitLink.links[a].node) {
             queued = true;
-            exitLink.links[a].node.activateEntry(exitLink.links[a].name, this, name, engine.beginFlowTracker(exitLink.links[a].node, activeTracker, done));
+            exitLink.links[a].node.activateEntry(exitLink.links[a].name, this, name, engine.beginFlowTracker(exitLink.links[a].node, activeTracker));
           }
         }
 
