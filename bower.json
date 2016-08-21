@@ -1,7 +1,7 @@
 {
   "name": "webcabin-play",
   "description": "Node based visual scripting tool.",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "keywords": [
     "js",
     "develop",
