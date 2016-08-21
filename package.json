@@ -22,8 +22,9 @@
     },
     "globals": {
       "wcPlay": true,
-      "wcPlayNodes": true,
       "wcNode": true,
+      "wcPlayNodes": true,
+      "wcPlayEditor": true,
       "wcUndoManager": true,
       "wcPlayEditorClipboard": true,
       "wcMenu": true,
