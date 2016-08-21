@@ -428,7 +428,9 @@ wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Import
       var node = this._compositeNodes[i];
       if (node.instanceOf('wcNodeCompositeEntry')) {
         if (node.name === name) {
-          node.activateExit('out');
+          node._activeTracker = this._activeTracker;
+          node.onActivated();
+          node._activeTracker = null;
           break;
         }
       }
