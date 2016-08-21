@@ -1,13 +1,11 @@
 wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeExit', 'Exit', 'Linkers', {
   /**
-   * @class
-   * This node acts as a connection between exit links on a composite node and the script inside.<br>
-   * When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.
-   *
-   * @constructor wcNodeCompositeExit
-   * @param {String} parent - The parent object of this node.
+   * This node acts as a connection between exit links on a composite node and the script inside.
+   * <br>When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.
+   * @class wcNodeCompositeExit
+   * @param {string} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
-   * @param {String} linkName - The name of the exit link.
+   * @param {string} linkName - The name of the exit link.
    */
   init: function(parent, pos, linkName) {
     this._super(parent, pos);
@@ -16,19 +14,16 @@ wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeExit', 'Exit', 'Linkers', {
       this._invalid = true;
     }
 
-    this.description("Activates the corresponding Exit link of the parent Composite node when it has been activated.");
-    this.details("The title name for this node becomes the name of the Exit link in the parent Composite Node.\n\nAlthough this node does nothing while it is outside of a Composite Node, it can be placed within the Root level of the script. Doing so is useful if you intend to 'File->Import' this script into another.");
+    this.description('Activates the corresponding Exit link of the parent Composite node when it has been activated.');
+    this.details('The title name for this node becomes the name of the Exit link in the parent Composite Node.\n\nAlthough this node does nothing while it is outside of a Composite Node, it can be placed within the Root level of the script. Doing so is useful if you intend to "File->Import" this script into another.');
 
     // Prevent duplicate link names.
-    linkName = linkName || 'out'
+    linkName = linkName || 'out';
     var name = linkName;
 
     if (!this._invalid) {
       var index = 0;
-      while (true) {
-        if (this._parent.createExit(name)) {
-          break;
-        }
+      while (!this._parent.createExit(name)) {
         index++;
         name = linkName + index;
       }
@@ -45,10 +40,10 @@ wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeExit', 'Exit', 'Linkers', {
   },
 
   /**
-   * Event that is called when an entry link has been activated.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called when an entry link has been activated.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNodeCompositeExit#onActivated
-   * @param {String} name - The name of the entry link triggered.
+   * @param {string} name - The name of the entry link triggered.
    */
   onActivated: function(name) {
     this._super(name);
@@ -62,12 +57,12 @@ wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeExit', 'Exit', 'Linkers', {
   },
 
   /**
-   * Event that is called when the name of this node is about to change.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called when the name of this node is about to change.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNodeCompositeEntry#onNameChanging
-   * @param {String} oldName - The current name.
-   * @param {String} newName - The new name.
-   * @return {String|undefined} - Return the new value of the name (usually newValue unless you are restricting the name). If no value is returned, newValue is assumed.
+   * @param {string} oldName - The current name.
+   * @param {string} newName - The new name.
+   * @returns {string|undefined} - Return the new value of the name (usually newValue unless you are restricting the name). If no value is returned, newValue is assumed.
    */
   onNameChanging: function(oldName, newName) {
     this._super(oldName, newName);
@@ -85,11 +80,11 @@ wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeExit', 'Exit', 'Linkers', {
   },
 
   /**
-   * Event that is called when the name of this node has changed.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called when the name of this node has changed.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNodeCompositeExit#onNameChanged
-   * @param {String} oldName - The current name.
-   * @param {String} newName - The new name.
+   * @param {string} oldName - The current name.
+   * @param {string} newName - The new name.
    */
   onNameChanged: function(oldName, newName) {
     this._super(oldName, newName);
@@ -105,7 +100,7 @@ wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeExit', 'Exit', 'Linkers', {
 
   /**
    * Event that is called after the node has changed its position.
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNodeCompositeExit#onMoving
    * @param {wcPlay~Coordinates} oldPos - The old position of the node.
    * @param {wcPlay~Coordinates} newPos - The new position of the node.
@@ -121,8 +116,8 @@ wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeExit', 'Exit', 'Linkers', {
   },
 
   /**
-   * Event that is called after the node has been destroyed.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called after the node has been destroyed.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNodeCompositeExit#onDestroyed
    */
   onDestroyed: function() {
@@ -136,8 +131,8 @@ wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeExit', 'Exit', 'Linkers', {
   },
 
   /**
-   * Event that is called when the node is about to be imported. This is your chance to prepare the node for import, or possibly modify the import data.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called when the node is about to be imported. This is your chance to prepare the node for import, or possibly modify the import data.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNodeCompositeExit#onImporting
    * @param {Object} data - The data being imported.
    * @param {Number[]} [idMap] - If supplied, identifies a mapping of old ID's to new ID's, any not found in this list will be unchanged.
@@ -152,10 +147,7 @@ wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeExit', 'Exit', 'Linkers', {
 
         this._parent.removeExit(this.name);
         var index = 0;
-        while (true) {
-          if (this._parent.createExit(name)) {
-            break;
-          }
+        while (!this._parent.createExit(name)) {
           index++;
           name = data.name + index;
         }
@@ -165,8 +157,8 @@ wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeExit', 'Exit', 'Linkers', {
   },
 
   /**
-   * Event that is called after the node has imported.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called after the node has imported.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNodeCompositeExit#onImported
    * @param {Object} data - The data being imported.
    * @param {Number[]} [idMap] - If supplied, identifies a mapping of old ID's to new ID's, any not found in this list will be unchanged.

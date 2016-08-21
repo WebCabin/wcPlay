@@ -41,10 +41,10 @@ wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeEntry', 'Entry', 'Linkers', {
   },
 
   /**
-   * Event that is called when an entry link has been activated.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called when an entry link has been activated.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNodeCompositeScript#onActivated
-   * @param {String} name - The name of the entry link triggered.
+   * @param {string} name - The name of the entry link triggered.
    */
   onActivated: function(name) {
     name;
@@ -52,12 +52,12 @@ wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeEntry', 'Entry', 'Linkers', {
   },
 
   /**
-   * Event that is called when the name of this node is about to change.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called when the name of this node is about to change.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNodeCompositeEntry#onNameChanging
    * @param {string} oldName - The current name.
    * @param {string} newName - The new name.
-   * @return {String|undefined} - Return the new value of the name (usually newValue unless you are restricting the name). If no value is returned, newValue is assumed.
+   * @returns {string|undefined} - Return the new value of the name (usually newValue unless you are restricting the name). If no value is returned, newValue is assumed.
    */
   onNameChanging: function(oldName, newName) {
     this._super(oldName, newName);
@@ -75,8 +75,8 @@ wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeEntry', 'Entry', 'Linkers', {
   },
 
   /**
-   * Event that is called when the name of this node has changed.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called when the name of this node has changed.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNodeCompositeEntry#onNameChanged
    * @param {string} oldName - The current name.
    * @param {string} newName - The new name.
@@ -95,7 +95,7 @@ wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeEntry', 'Entry', 'Linkers', {
 
   /**
    * Event that is called after the node has changed its position.
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNodeCompositeEntry#onMoving
    * @param {wcPlay~Coordinates} oldPos - The old position of the node.
    * @param {wcPlay~Coordinates} newPos - The new position of the node.
@@ -111,8 +111,8 @@ wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeEntry', 'Entry', 'Linkers', {
   },
 
   /**
-   * Event that is called after the node has been destroyed.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called after the node has been destroyed.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNodeCompositeEntry#onDestroyed
    */
   onDestroyed: function() {
@@ -126,8 +126,8 @@ wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeEntry', 'Entry', 'Linkers', {
   },
 
   /**
-   * Event that is called when the node is about to be imported. This is your chance to prepare the node for import, or possibly modify the import data.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called when the node is about to be imported. This is your chance to prepare the node for import, or possibly modify the import data.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNodeCompositeEntry#onImporting
    * @param {Object} data - The data being imported.
    * @param {Number[]} [idMap] - If supplied, identifies a mapping of old ID's to new ID's, any not found in this list will be unchanged.
@@ -142,10 +142,7 @@ wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeEntry', 'Entry', 'Linkers', {
 
         this._parent.removeEntry(this.name);
         var index = 0;
-        while (true) {
-          if (this._parent.createEntry(name)) {
-            break;
-          }
+        while (!this._parent.createEntry(name)) {
           index++;
           name = data.name + index;
         }
@@ -155,8 +152,8 @@ wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeEntry', 'Entry', 'Linkers', {
   },
 
   /**
-   * Event that is called after the node has imported.<br>
-   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * Event that is called after the node has imported.
+   * <br>Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNodeCompositeEntry#onImported
    * @param {Object} data - The data being imported.
    * @param {Number[]} [idMap] - If supplied, identifies a mapping of old ID's to new ID's, any not found in this list will be unchanged.
