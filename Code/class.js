@@ -1,7 +1,3 @@
-/**
- * @class wcClass
- * JavaScript class inheritance system.
- */
 (function(){
   // Already defined, then we can skip.
   if (this.wcPlayNodes && this.wcPlayNodes['wcClass']) {
@@ -12,15 +8,53 @@
     this.wcPlayNodes = {};
   }
 
-  var initializing = false, fnTest = /xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/;
+  if (!Function.prototype.bind) {
+    Function.prototype.bind = function(oThis) {
+      if (typeof this !== 'function') {
+        // closest thing possible to the ECMAScript 5
+        // internal IsCallable function
+        throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
+      }
 
+      var aArgs   = Array.prototype.slice.call(arguments, 1),
+        fToBind = this,
+        fNOP    = function() {},
+        fBound  = function() {
+          return fToBind.apply(this instanceof fNOP? this : oThis, aArgs.concat(Array.prototype.slice.call(arguments)));
+        };
+
+      if (this.prototype) {
+        // Function.prototype doesn't have a prototype property
+        fNOP.prototype = this.prototype; 
+      }
+      fBound.prototype = new fNOP();
+
+      return fBound;
+    };
+  }
+
+  var initializing = false;
+
+  /**
+   * JavaScript class inheritance system.
+   * @class wcClass
+   */
   var wcClass = function(){};
-   wcClass.extend = function(className) {
+
+  /**
+   * Extends the class object.
+   * @function wcClass.extend
+   * @param {string} className - The name of the class to define.
+   * @param {...Object} _args - Any parameters to pass on to the class constructor.
+   * @returns {Object} - The new inherited class object.
+   */
+  wcClass.extend = function(className, _args) {
     // Validate class name.
     if (!className.match(/^[a-z]+[\w]*$/i)) {
       throw new Error('Class name contains invalid characters!');
     }
 
+    _args;
     // Last argument is always the class definition.
     var props = arguments[arguments.length-1];
 
@@ -40,13 +74,12 @@
         }
       }
       return bound;
-    };
-   
+    }
+
     // Copy the properties over onto the new prototype
     for (var name in props) {
       // Check if we're overwriting an existing function
-      prototype[name] = typeof props[name] == "function" &&
-        typeof _super[name] == "function" && fnTest.test(props[name]) ?
+      prototype[name] = typeof props[name] === 'function' && typeof _super[name] === 'function'?
         (function(name, fn){
           return function() {
             var tmp = this._super;
@@ -62,8 +95,16 @@
            
             return ret;
           };
-        })(name, props[name]) :
+        })(name, props[name]):
         props[name];
+    }
+
+    function __init() {
+      if(!initializing) {
+        this.init && this.init.apply(this, arguments);
+      } else {
+        this.classInit && this.classInit.apply(this, arguments[0]);
+      }
     }
 
     // Is a functionality.
@@ -75,14 +116,28 @@
     prototype.instanceOf = function(name) {
       return this.isA(name) || (_super.instanceOf && _super.instanceOf(name));
     };
-   
-    eval('window.wcPlayNodes["' + className + '"]=function ' + className + '(){if(!initializing){this.init && this.init.apply(this, arguments);}else{this.classInit && this.classInit.apply(this, arguments[0])}};');
+
+    // Converts __init to a new function that is named after className
+    var Class = 'wcPlayNodes.' + className + ' = function ' + className + '() {' + __init.toString().match(/function[^{]+\{([\s\S]*)\}$/)[1] + '};';
+    eval(Class);
 
     // Populate our constructed prototype object
-    window.wcPlayNodes[className].prototype = prototype;
- 
+    wcPlayNodes[className].prototype = prototype;
+
     // And make this class extendable
-    window.wcPlayNodes[className].extend = arguments.callee;
+    wcPlayNodes[className].extend = arguments.callee;
+    return Class;
   };
   this.wcPlayNodes.wcClass = wcClass;
+
+  /**
+   * Class constructor.
+   * @function wcClass#init
+   * @params {..Object} Any parameters to pass on to the class constructor.
+   */
+  /**
+   * Initializes a class type.
+   * @function wcClass#classInit
+   * @params {..Object} Any parameters to pass on to the class constructor.
+   */
 })();

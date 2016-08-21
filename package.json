@@ -24,6 +24,7 @@
       "wcPlay": true,
       "wcNode": true,
       "wcPlayNodes": true,
+      "wcNodeTimeoutEvent": true,
       "wcPlayEditor": true,
       "wcUndoManager": true,
       "wcPlayEditorClipboard": true,
