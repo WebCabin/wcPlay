@@ -56,11 +56,6 @@ wcPlayNodes.wcNodeEntry.extend('wcNodeEntryGameUpdate', 'Game Update', 'Hero', {
     this._super(parent, pos);
 
     this.description('Game update loop.');
-  },
-
-  onActivated: function(name) {
-    this._super(name);
-    this.activateExit('out');
   }
 });
 
@@ -69,10 +64,5 @@ wcPlayNodes.wcNodeEntry.extend('wcNodeEntryGameWin', 'Game Win', 'Hero', {
     this._super(parent, pos);
 
     this.description('Game has won event.');
-  },
-
-  onActivated: function(name) {
-    this._super(name);
-    this.activateExit('out');
   }
 });
