@@ -5595,14 +5595,14 @@ wcPlayEditor.prototype = {
 
     // Custom viewport area.
     var mouse = null;
-    if (this._selectedNode && this._highlightViewport) {
+    if (this._highlightNode && this._highlightViewport) {
       mouse = this.__mouse(event, this.$viewport.offset());
       var pos = {
-        x: (mouse.x - this._viewportCamera.x) / this._viewportCamera.z - this._selectedNode._meta.bounds.viewportBounds.left,
-        y: (mouse.y - this._viewportCamera.y) / this._viewportCamera.z - this._selectedNode._meta.bounds.viewportBounds.top
+        x: (mouse.x - this._viewportCamera.x) / this._viewportCamera.z - this._highlightNode._meta.bounds.viewportBounds.left,
+        y: (mouse.y - this._viewportCamera.y) / this._viewportCamera.z - this._highlightNode._meta.bounds.viewportBounds.top
       };
 
-      this._selectedNode.onViewportMouseUp(event, pos, this._options.readOnly);
+      this._highlightNode.onViewportMouseUp(event, pos, this._options.readOnly);
     }
 
     var self = this;
