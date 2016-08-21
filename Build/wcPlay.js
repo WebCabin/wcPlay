@@ -2735,7 +2735,10 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
     }
 
     if (engine) {
-      engine.endFlowTracker(tracker);
+      // Timeout one frame before attempting to close this tracker.
+      setTimeout(function() {
+        engine.endFlowTracker(tracker);
+      }, 0);
     }    
     return false;
   },
@@ -2782,6 +2785,10 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
         if (!queued) {
           this.chain.exit[i].meta.flash = true;
           this._meta.flash = true;
+          // Timeout one frame before attempting to close this tracker.
+          setTimeout(function() {
+            engine.endFlowTracker(activeTracker);
+          }, 0);
           done && done();
         }
         return true;
