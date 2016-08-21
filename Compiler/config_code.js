@@ -3,56 +3,57 @@ var _uglifyJS  = require('uglify-js');
 var _uglifyCSS = require('uglifycss');
 
 function concat(opts) {
-    var fileList = opts.src;
-    var distPath = opts.dest;
-    var out = fileList.map(function(filePath){
-            return _fs.readFileSync(filePath).toString();
-        });
-    _fs.writeFileSync(distPath, out.join('\n'));
-    console.log(' '+ distPath +' built.');
+  var fileList = opts.src;
+  var distPath = opts.dest;
+  var out = fileList.map(function(filePath){
+    return _fs.readFileSync(filePath).toString();
+  });
+  _fs.writeFileSync(distPath, out.join('\n'));
+  console.log(' '+ distPath +' built.');
 }
 
 function uglifyJS(srcPath, distPath) {
-    var
-      jsp = _uglifyJS.parser,
-      pro = _uglifyJS.uglify,
-      ast = jsp.parse( _fs.readFileSync(srcPath).toString() );
- 
-    ast = pro.ast_mangle(ast);
-    ast = pro.ast_squeeze(ast);
+  var
+    jsp = _uglifyJS.parser,
+    pro = _uglifyJS.uglify,
+    ast = jsp.parse( _fs.readFileSync(srcPath).toString() );
 
-var header = '\
-/*!\n\
- * Web Cabin Play - Node based visual scripting tool.\n\
- *\n\
- * Dependancies:\n\
- *  JQuery 1.11.1\n\
- *  font-awesome 4.2.0\n\
- *  wcMenu\n\
- * Optional Dependencies:\n\
- *  FileSaver.js\n\
- *  wcUndoManager\n\
- *\n\
- * Author: Jeff Houde (lochemage@webcabin.org)\n\
- * Web: http://play.webcabin.org/\n\
- * API: http://play.api.webcabin.org/\n\
- *\n\
- * Licensed under\n\
- *   MIT License http://www.opensource.org/licenses/mit-license\n\
- *\n\
- */\n';
+  ast = pro.ast_mangle(ast);
+  ast = pro.ast_squeeze(ast);
 
-     _fs.writeFileSync(distPath, header + pro.gen_code(ast));
-    console.log(' '+ distPath +' built.');
+  var header = `
+/*!
+ * Web Cabin Play - Node based visual scripting tool.
+ *
+ * Dependancies:
+ *  JQuery 1.11.1
+ *  font-awesome 4.2.0
+ *  wcMenu
+ * Optional Dependencies:
+ *  FileSaver.js
+ *  wcUndoManager
+ *
+ * Author: Jeff Houde (lochemage@webcabin.org)
+ * Web: http://play.webcabin.org/
+ * API: http://play.api.webcabin.org/
+ *
+ * Licensed under
+ *   MIT License http://www.opensource.org/licenses/mit-license
+ *
+ */
+`;
+
+  _fs.writeFileSync(distPath, header + pro.gen_code(ast));
+  console.log(' '+ distPath +' built.');
 }
 
 function uglifyCSS(srcPath, distPath) {
-    var
-      pro = _uglifyCSS.processString,
-      ast = _fs.readFileSync(srcPath).toString();
- 
-    _fs.writeFileSync(distPath, pro(ast, {uglyComments:false}));
-    console.log(' '+ distPath +' built.');
+  var
+    pro = _uglifyCSS.processString,
+    ast = _fs.readFileSync(srcPath).toString();
+
+  _fs.writeFileSync(distPath, pro(ast, {uglyComments:false}));
+  console.log(' '+ distPath +' built.');
 }
 
 

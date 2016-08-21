@@ -86,11 +86,11 @@
   };
   this.wcPlayNodes.wcClass = wcClass;
 })();
+'use strict';
+
 /**
- * @class
  * The main scripting engine.
- *
- * @constructor
+ * @class
  * @param {wcPlay~Options} [options] - Custom options.
  */
 function wcPlay(options) {
@@ -139,11 +139,11 @@ function wcPlay(options) {
   }
 
   wcPlay.INSTANCE_LIBRARY.push(this);
-};
+}
 
 /**
  * Determines how a property's control should be rendered within the editor view.
- * @enum {String}
+ * @enum {string}
  */
 wcPlay.PROPERTY = {
   /** Displays the property as a string, but does not enforce or convert its type. [String options]{@link wcNode~StringOptions} are used. */
@@ -162,7 +162,7 @@ wcPlay.PROPERTY = {
 
 /**
  * The different types of nodes.
- * @enum {String}
+ * @enum {string}
  */
 wcPlay.NODE = {
   /** Entry nodes mark the beginning of an execution flow chain and are usually triggered by some type of event that happens outside of the script. */
@@ -189,11 +189,11 @@ wcPlay.INSTANCE_LIBRARY = [];
 
 /**
  * A global function that registers a new node type into the library. This is called automatically when a new extended node type is defined, you should not have to do this manually.
- * @param {String} name - The name of the node constructor.
- * @param {String} displayName - The display name.
- * @param {String} category - The display category name.
+ * @param {string} name - The name of the node constructor.
+ * @param {string} displayName - The display name.
+ * @param {string} category - The display category name.
  * @param {wcPlay.NODE} nodeType - The node's type.
- * @returns {Boolean} - Success or failure.
+ * @returns {boolean} - Success or failure.
  */
 wcPlay.registerNodeType = function(name, displayName, category, nodeType) {
   var data = {
@@ -224,8 +224,8 @@ wcPlay.registerNodeType = function(name, displayName, category, nodeType) {
 
 /**
  * A global function that unregisters a node type from the library.
- * @param {String} name - The name of the node constructor.
- * @returns {Boolean} - True if the node type has been found and removed.
+ * @param {string} name - The name of the node constructor.
+ * @returns {boolean} - True if the node type has been found and removed.
  */
 wcPlay.unregisterNodeType = function(name) {
   for (var i = 0; i < wcPlay.NODE_LIBRARY.length; ++i) {
@@ -273,9 +273,9 @@ wcPlay.prototype = {
   },
 
   /**
-   * Retrieves whether the script is running.
+   * Retrieves whether the script engine is running.
    * @function wcPlay#isRunning
-   * @returns {Boolean}
+   * @returns {boolean} - Whether the script engine is running.
    */
   isRunning: function() {
     return this._isRunning;
@@ -286,23 +286,24 @@ wcPlay.prototype = {
    * @function wcPlay#reset
    */
   reset: function() {
-    for (var i = 0; i < this._compositeNodes.length; ++i) {
+    var i = 0;
+    for (i = 0; i < this._compositeNodes.length; ++i) {
       this._compositeNodes[i].reset();
     }
-    for (var i = 0; i < this._entryNodes.length; ++i) {
+    for (i = 0; i < this._entryNodes.length; ++i) {
       this._entryNodes[i].reset();
     }
-    for (var i = 0; i < this._processNodes.length; ++i) {
+    for (i = 0; i < this._processNodes.length; ++i) {
       this._processNodes[i].reset();
     }
-    for (var i = 0; i < this._storageNodes.length; ++i) {
+    for (i = 0; i < this._storageNodes.length; ++i) {
       this._storageNodes[i].reset();
     }
 
     this._queuedChain = [];
     this._queuedProperties = [];
 
-    for (var i = 0; i < this._properties.length; ++i) {
+    for (i = 0; i < this._properties.length; ++i) {
       this.property(this._properties[i].name, this._properties[i].initialValue, true);
     }
   },
@@ -335,7 +336,7 @@ wcPlay.prototype = {
   /**
    * Serializes the script into a string that can be saved into a file and [restored]{@link wcPlay#load}.
    * @function wcPlay#save
-   * @returns {String} - A serialized string with the entire script.
+   * @returns {string} - A serialized string with the entire script.
    */
   save: function() {
     var data = {
@@ -344,24 +345,25 @@ wcPlay.prototype = {
 
     data.custom = this.customData();
     data.properties = this.listProperties();
+    var i = 0;
 
     data.nodes = [];
-    for (var i = 0; i < this._compositeNodes.length; ++i) {
+    for (i = 0; i < this._compositeNodes.length; ++i) {
       data.nodes.push(this._compositeNodes[i].export(true));
     }
-    for (var i = 0; i < this._entryNodes.length; ++i) {
+    for (i = 0; i < this._entryNodes.length; ++i) {
       data.nodes.push(this._entryNodes[i].export(true));
     }
-    for (var i = 0; i < this._processNodes.length; ++i) {
+    for (i = 0; i < this._processNodes.length; ++i) {
       data.nodes.push(this._processNodes[i].export(true));
     }
-    for (var i = 0; i < this._storageNodes.length; ++i) {
+    for (i = 0; i < this._storageNodes.length; ++i) {
       data.nodes.push(this._storageNodes[i].export(true));
     }
 
     return JSON.stringify(data, function(key, value) {
       if (value == Infinity) {
-        return "Infinity";
+        return 'Infinity';
       }
       return value;
     });
@@ -370,12 +372,13 @@ wcPlay.prototype = {
   /**
    * Loads a script from previously serialized data generated by [save]{@link wcPlay#save}.
    * @function wcPlay#load
-   * @param {String} serialData - The serialized data to load.
-   * @returns {Boolean} - Success or failure.
+   * @param {string} serialData - The serialized data to load.
+   * @returns {boolean} - Success or failure.
    */
   load: function(serialData) {
     // For safety in case the imported file does not load property, save the current state of the script so we can restore it if necessary.
     var saveData = this.save();
+    var i = 0;
 
     try {
       var data = JSON.parse(serialData, function(key, value) {
@@ -388,13 +391,13 @@ wcPlay.prototype = {
       this.customData(data.custom);
 
       this.clear();
-      for (var i = 0; i < data.properties.length; ++i) {
+      for (i = 0; i < data.properties.length; ++i) {
         this.createProperty(data.properties[i].name, data.properties[i].type, data.properties[i].initialValue, data.properties[i].options);
       }
 
       // First pass, create all nodes.
       var nodes = [];
-      for (var i = 0; i < data.nodes.length; ++i) {
+      for (i = 0; i < data.nodes.length; ++i) {
         if (window.wcPlayNodes[data.nodes[i].className]) {
           try {
             var newNode = new window.wcPlayNodes[data.nodes[i].className](this, data.nodes[i].pos, data.nodes[i].name);
@@ -412,7 +415,7 @@ wcPlay.prototype = {
       }
 
       // Second pass, import each node's serialized data.
-      for (var i = 0; i < nodes.length; ++i) {
+      for (i = 0; i < nodes.length; ++i) {
         nodes[i].node.import(nodes[i].data);
       }
 
@@ -427,8 +430,8 @@ wcPlay.prototype = {
   },
 
   /**
-   * Gets, or Sets a custom data object to the script that will be saved and restored with the output file data.<br>
-   * NOTE: Binding new data will always replace any data that may have been previously bound.
+   * Gets, or Sets, a custom data object to the script that will be saved and restored with the output file data.
+   * <br>NOTE: Binding new data will always replace any data that may have been previously bound.
    * @function wcPlay#customData
    * @param {Object|Function} [data] - If supplied, will assign a new custom data. If you supply a function, it will be invoked when retrieving the data. If not supplied, will retrieve the currently bound data.
    * @returns {Object} - The current custom data object.
@@ -448,8 +451,9 @@ wcPlay.prototype = {
   /**
    * Imports a script as a new composite node that can be retrieved with {@link wcPlay#importedComposites}.
    * @function wcPlay#import
-   * @param {String} serialData - The serialized data to import.
-   * @returns {Boolean} - Whether the new composite node was created.
+   * @param {string} serialData - The serialized data to import.
+   * @param {string} name - The name of the composite node to create.
+   * @returns {boolean} - Whether the new composite node was created.
    */
   import: function(serialData, name) {
     var newNode = null;
@@ -466,7 +470,7 @@ wcPlay.prototype = {
       data.pos = {x: 0, y: 0};
       newNode = new wcPlayNodes.wcNodeCompositeScript(this, data.pos);
       newNode.nodeType = wcPlay.NODE.COMPOSITE;
-      newNode.category = "Imported";
+      newNode.category = 'Imported';
 
       data.id = newNode.id;
       data.name = name;
@@ -515,11 +519,12 @@ wcPlay.prototype = {
       return;
     }
 
+    var item = null;
     var count = Math.min(this._queuedProperties.length, this._options.updateLimit);
     if (this._isRunning && !count && this._waitingChain.length) {
       // If no properties are queued, but we have waiting flow nodes, add them to the queue for next update.
       for (var i = 0; i < this._waitingChain.length; ++i) {
-        var item = this._waitingChain[i];
+        item = this._waitingChain[i];
 
         this.queueNodeEntry(item.node, item.name, item.fromNode, item.fromName, true, item.tracker);
       }
@@ -532,7 +537,7 @@ wcPlay.prototype = {
     var index = count;
     while (index) {
       index--;
-      var item = this._queuedProperties.shift();
+      item = this._queuedProperties.shift();
       item.node._meta.flash = true;
       if (item.node._meta.broken > 0) {
         item.node._meta.broken--;
@@ -546,7 +551,7 @@ wcPlay.prototype = {
       index = count;
       while (index) {
         index--;
-        var item = this._queuedChain.shift();
+        item = this._queuedChain.shift();
         item.node._meta.flash = true;
         if (item.node._meta.broken > 0) {
           item.node._meta.broken--;
@@ -566,32 +571,33 @@ wcPlay.prototype = {
   /**
    * Retrieves a node from a given ID, if it exists in this script.
    * @function wcPlay#nodeById
-   * @param {Number} id - The ID of the node.
+   * @param {number} id - The ID of the node.
    * @returns {wcNode|null} - Either the found node, or null.
    */
   nodeById: function(id) {
-    for (var i = 0; i < this._compositeNodes.length; ++i) {
+    var i = 0;
+    for (i = 0; i < this._compositeNodes.length; ++i) {
       if (this._compositeNodes[i].id === id) {
         return this._compositeNodes[i];
       }
     }
-    for (var i = 0; i < this._entryNodes.length; ++i) {
+    for (i = 0; i < this._entryNodes.length; ++i) {
       if (this._entryNodes[i].id === id) {
         return this._entryNodes[i];
       }
     }
-    for (var i = 0; i < this._processNodes.length; ++i) {
+    for (i = 0; i < this._processNodes.length; ++i) {
       if (this._processNodes[i].id === id) {
         return this._processNodes[i];
       }
     }
-    for (var i = 0; i < this._storageNodes.length; ++i) {
+    for (i = 0; i < this._storageNodes.length; ++i) {
       if (this._storageNodes[i].id === id) {
         return this._storageNodes[i];
       }
     }
 
-    for (var i = 0; i < this._compositeNodes.length; ++i) {
+    for (i = 0; i < this._compositeNodes.length; ++i) {
       if (this._compositeNodes[i].instanceOf('wcNodeCompositeScript')) {
         var found = this._compositeNodes[i].nodeById(id);
         if (found) {
@@ -605,33 +611,34 @@ wcPlay.prototype = {
   /**
    * Retrieves a list of nodes that match a given class name, if they exists in this script.
    * @function wcPlay#nodesByClassName
-   * @param {String} className - The className of the nodes to retrieve.
+   * @param {string} className - The className of the nodes to retrieve.
    * @returns {wcNode[]} - A list of all found nodes.
    */
   nodesByClassName: function(className) {
+    var i = 0;
     var result = [];
-    for (var i = 0; i < this._compositeNodes.length; ++i) {
+    for (i = 0; i < this._compositeNodes.length; ++i) {
       if (this._compositeNodes[i].className === className) {
         result.push(this._compositeNodes[i]);
       }
     }
-    for (var i = 0; i < this._entryNodes.length; ++i) {
+    for (i = 0; i < this._entryNodes.length; ++i) {
       if (this._entryNodes[i].className === className) {
         result.push(this._entryNodes[i]);
       }
     }
-    for (var i = 0; i < this._processNodes.length; ++i) {
+    for (i = 0; i < this._processNodes.length; ++i) {
       if (this._processNodes[i].className === className) {
         result.push(this._processNodes[i]);
       }
     }
-    for (var i = 0; i < this._storageNodes.length; ++i) {
+    for (i = 0; i < this._storageNodes.length; ++i) {
       if (this._storageNodes[i].className === className) {
         result.push(this._storageNodes[i]);
       }
     }
 
-    for (var i = 0; i < this._compositeNodes.length; ++i) {
+    for (i = 0; i < this._compositeNodes.length; ++i) {
       if (this._compositeNodes[i].instanceOf('wcNodeCompositeScript')) {
         var found = this._compositeNodes[i].nodesByClassName(className);
         if (found.length) {
@@ -645,33 +652,34 @@ wcPlay.prototype = {
   /**
    * Retrieves a list of nodes that match a given search filter.
    * @function wcPlay#nodesBySearch
-   * @param {String} search - The search value.
+   * @param {string} search - The search value.
    * @returns {wcNode[]} - A list of all found nodes.
    */
   nodesBySearch: function(search) {
+    var i = 0;
     var result = [];
-    for (var i = 0; i < this._compositeNodes.length; ++i) {
+    for (i = 0; i < this._compositeNodes.length; ++i) {
       if (this._compositeNodes[i].search(search)) {
         result.push(this._compositeNodes[i]);
       }
     }
-    for (var i = 0; i < this._entryNodes.length; ++i) {
+    for (i = 0; i < this._entryNodes.length; ++i) {
       if (this._entryNodes[i].search(search)) {
         result.push(this._entryNodes[i]);
       }
     }
-    for (var i = 0; i < this._processNodes.length; ++i) {
+    for (i = 0; i < this._processNodes.length; ++i) {
       if (this._processNodes[i].search(search)) {
         result.push(this._processNodes[i]);
       }
     }
-    for (var i = 0; i < this._storageNodes.length; ++i) {
+    for (i = 0; i < this._storageNodes.length; ++i) {
       if (this._storageNodes[i].search(search)) {
         result.push(this._storageNodes[i]);
       }
     }
 
-    for (var i = 0; i < this._compositeNodes.length; ++i) {
+    for (i = 0; i < this._compositeNodes.length; ++i) {
       if (this._compositeNodes[i].instanceOf('wcNodeCompositeScript')) {
         var found = this._compositeNodes[i].nodesBySearch(search);
         if (found.length) {
@@ -685,8 +693,8 @@ wcPlay.prototype = {
   /**
    * Gets, or Sets whether the script is running in [silent mode]{@link wcPlay~Options}.
    * @function wcPlay#silent
-   * @param {Boolean} silent - If supplied, assigns a new silent state of the script.
-   * @returns {Boolean} - The current silent state of the script.
+   * @param {boolean} silent - If supplied, assigns a new silent state of the script.
+   * @returns {boolean} - The current silent state of the script.
    */
   silent: function(silent) {
     if (silent !== undefined) {
@@ -699,8 +707,8 @@ wcPlay.prototype = {
   /**
    * Gets, or Sets the debugging state of the script.
    * @function wcPlay#debugging
-   * @param {Boolean} [debug] - If supplied, will assign the debugging state of the script.
-   * @returns {Boolean} - The current debugging state of the script.
+   * @param {boolean} [debug] - If supplied, will assign the debugging state of the script.
+   * @returns {boolean} - The current debugging state of the script.
    */
   debugging: function(debug) {
     if (debug !== undefined) {
@@ -713,24 +721,25 @@ wcPlay.prototype = {
   /**
    * Gets, or Sets the pause state of the script.
    * @function wcPlay#paused
-   * @param {Boolean} [paused] - If supplied, will assign the paused state of the script.
-   * @returns {Boolean} - The current pause state of the script.
+   * @param {boolean} [paused] - If supplied, will assign the paused state of the script.
+   * @returns {boolean} - The current pause state of the script.
    */
   paused: function(paused) {
     if (paused !== undefined) {
       paused = paused? true: false;
+      var i = 0;
 
       if (this._isPaused !== paused) {
-        for (var i = 0; i < this._compositeNodes.length; ++i) {
+        for (i = 0; i < this._compositeNodes.length; ++i) {
           this._compositeNodes[i].paused(paused);
         }
-        for (var i = 0; i < this._entryNodes.length; ++i) {
+        for (i = 0; i < this._entryNodes.length; ++i) {
           this._entryNodes[i].paused(paused);
         }
-        for (var i = 0; i < this._processNodes.length; ++i) {
+        for (i = 0; i < this._processNodes.length; ++i) {
           this._processNodes[i].paused(paused);
         }
-        for (var i = 0; i < this._storageNodes.length; ++i) {
+        for (i = 0; i < this._storageNodes.length; ++i) {
           this._storageNodes[i].paused(paused);
         }
 
@@ -745,8 +754,8 @@ wcPlay.prototype = {
   /**
    * Gets, or Sets the stepping state of the script.
    * @function wcPlay#stepping
-   * @param {Boolean} [stepping] - If supplied, will assign the stepping state of the script.
-   * @returns {Boolean} - The current stepping state of the script.
+   * @param {boolean} [stepping] - If supplied, will assign the stepping state of the script.
+   * @returns {boolean} - The current stepping state of the script.
    */
   stepping: function(stepping) {
     if (stepping !== undefined) {
@@ -759,11 +768,11 @@ wcPlay.prototype = {
   /**
    * Creates a new global property (can be used with the global storage node).
    * @function wcPlay#createProperty
-   * @param {String} name - The name of the property.
+   * @param {string} name - The name of the property.
    * @param {wcPlay.PROPERTY} type - The type of property.
    * @param {Object} [initialValue] - A default value for this property.
    * @param {Object} [options] - Additional options for this property, see {@link wcPlay.PROPERTY}.
-   * @returns {Boolean} - Fails if the property does not exist.
+   * @returns {boolean} - Fails if the property does not exist.
    */
   createProperty: function(name, type, initialValue, options) {
     // Make sure this property doesn't already exist.
@@ -790,9 +799,9 @@ wcPlay.prototype = {
   /**
    * Renames an existing global property.
    * @function wcPlay#renameProperty
-   * @param {String} name - The current name of the global property to rename.
-   * @param {String} newName - The new desired name of the global property.
-   * @returns {Boolean} - Fails if the property was not found or if the new name is already used.
+   * @param {string} name - The current name of the global property to rename.
+   * @param {string} newName - The new desired name of the global property.
+   * @returns {boolean} - Fails if the property was not found or if the new name is already used.
    */
   renameProperty: function(name, newName) {
     var prop = null;
@@ -817,8 +826,8 @@ wcPlay.prototype = {
   /**
    * Removes a global property.
    * @function wcPlay#removeProperty
-   * @param {String} name - The name of the property to remove.
-   * @returns {Boolean} - Fails if the property does not exist.
+   * @param {string} name - The name of the property to remove.
+   * @returns {boolean} - Fails if the property does not exist.
    */
   removeProperty: function(name) {
     for (var i = 0; i < this._properties.length; ++i) {
@@ -834,7 +843,7 @@ wcPlay.prototype = {
   /**
    * Gets, or Sets a global property value.
    * @function wcPlay#property
-   * @param {String} name - The name of the property.
+   * @param {string} name - The name of the property.
    * @param {Object} [value] - If supplied, will assign a new value to the property.
    * @returns {Object} - The current value of the property, or undefined if not found.
    */
@@ -863,7 +872,7 @@ wcPlay.prototype = {
   /**
    * Gets, or Sets a global property initial value.
    * @function wcPlay#initialProperty
-   * @param {String} name - The name of the property.
+   * @param {string} name - The name of the property.
    * @param {Object} [value] - If supplied, will assign a new value to the property.
    * @returns {Object} - The current value of the property, or undefined if not found.
    */
@@ -918,7 +927,7 @@ wcPlay.prototype = {
   /**
    * Triggers an event into the Play script.
    * @function wcPlay#triggerEvent
-   * @param {String} type - The type name of the node (as displayed in the title).
+   * @param {string} type - The type name of the node (as displayed in the title).
    * @param {wcPlay~TriggerEventOptions} [options] - Optional parameters.
    */
   triggerEvent: function(type, options) {
@@ -947,38 +956,39 @@ wcPlay.prototype = {
   /**
    * Sends a custom notification event to all nodes.
    * @function wcPlay#notifyNodes
-   * @param {String} func - The node function to call.
+   * @param {string} func - The node function to call.
    * @param {Object[]} args - A list of arguments to forward into the function call.
-   * @param {Boolean} [includeEditorPalette] - If true, will also notify all nodes generated for use with editor palette views.
+   * @param {boolean} [includeEditorPalette] - If true, will also notify all nodes generated for use with editor palette views.
    */
   notifyNodes: function(func, args, includeEditorPalette) {
-    var self;
-    for (var i = 0; i < this._compositeNodes.length; ++i) {
+    var i = 0;
+    var self = null;
+    for (i = 0; i < this._compositeNodes.length; ++i) {
       self = this._compositeNodes[i];
       if (typeof self[func] === 'function') {
         self[func].apply(self, args);
       }
     }
-    for (var i = 0; i < this._entryNodes.length; ++i) {
+    for (i = 0; i < this._entryNodes.length; ++i) {
       self = this._entryNodes[i];
       if (typeof self[func] === 'function') {
         self[func].apply(self, args);
       }
     }
-    for (var i = 0; i < this._processNodes.length; ++i) {
+    for (i = 0; i < this._processNodes.length; ++i) {
       self = this._processNodes[i];
       if (typeof self[func] === 'function') {
         self[func].apply(self, args);
       }
     }
-    for (var i = 0; i < this._storageNodes.length; ++i) {
+    for (i = 0; i < this._storageNodes.length; ++i) {
       self = this._storageNodes[i];
       if (typeof self[func] === 'function') {
         self[func].apply(self, args);
       }
     }
 
-    for (var i = 0; i < this._compositeNodes.length; ++i) {
+    for (i = 0; i < this._compositeNodes.length; ++i) {
       if (this._compositeNodes[i].instanceOf('wcNodeCompositeScript')) {
         this._compositeNodes[i].notifyNodes(func, args);
       }
@@ -992,11 +1002,11 @@ wcPlay.prototype = {
   /**
    * Sends a custom notification event to all renderers.
    * @function wcPlay#notifyEditors
-   * @param {String} func - The renderer function to call.
+   * @param {string} func - The renderer function to call.
    * @param {Object[]} args - A list of arguments to forward into the function call.
    */
   notifyEditors: function(func, args) {
-    var self;
+    var self = null;
     for (var i = 0; i < this._editors.length; ++i) {
       self = this._editors[i];
       if (typeof self[func] === 'function') {
@@ -1009,10 +1019,10 @@ wcPlay.prototype = {
    * Queues a node entry link to trigger on the next update.
    * @function wcPlay#queueNodeEntry
    * @param {wcNode} node - The node being queued.
-   * @param {String} name - The entry link name.
+   * @param {string} name - The entry link name.
    * @param {wcNode} fromNode - The node causing the queue.
-   * @param {String} fromName - The exit link name.
-   * @param {Boolean} [forceQueue] - If true, will force the event into the queue rather than the waiting list.
+   * @param {string} fromName - The exit link name.
+   * @param {boolean} [forceQueue] - If true, will force the event into the queue rather than the waiting list.
    * @param {wcPlay~FlowTracker} [tracker] - Optional flow tracker.
    */
   queueNodeEntry: function(node, name, fromNode, fromName, forceQueue, tracker) {
@@ -1048,7 +1058,8 @@ wcPlay.prototype = {
       }
 
       // Flash the entry link.
-      for (var i = 0; i < node.chain.entry.length; ++i) {
+      var i = 0;
+      for (i = 0; i < node.chain.entry.length; ++i) {
         if (node.chain.entry[i].name == name) {
           node.chain.entry[i].meta.flash = true;
           if (node.debugBreak() || this._isStepping) {
@@ -1060,7 +1071,7 @@ wcPlay.prototype = {
 
       // Flash the exit link.
       if (fromNode && fromName) {
-        for (var i = 0; i < fromNode.chain.exit.length; ++i) {
+        for (i = 0; i < fromNode.chain.exit.length; ++i) {
           var exitLink = fromNode.chain.exit[i];
           if (exitLink.name == fromName) {
             fromNode.chain.exit[i].meta.flash = true;
@@ -1087,9 +1098,9 @@ wcPlay.prototype = {
    * Queues a node property value change to trigger on the next update.
    * @function wcPlay#queueNodeProperty
    * @param {wcNode} node - The node being queued.
-   * @param {String} name - The property name.
+   * @param {string} name - The property name.
    * @param {Object} value - The property value.
-   * @param {Boolean} [upstream] - If true, we are propagating the property change in reverse.
+   * @param {boolean} [upstream] - If true, we are propagating the property change in reverse.
    */
   queueNodeProperty: function(node, name, value, upstream) {
     // Skip node queueing if the script is not even running.
@@ -1170,7 +1181,7 @@ wcPlay.prototype = {
   /**
    * Finishes a chain tracker.
    * @function wcPlay#endFlowTracker
-   * @param {wcPlay~FlowTracker} tracker
+   * @param {wcPlay~FlowTracker} tracker - The tracker to finish.
    */
   endFlowTracker: function(tracker) {
     // Ignore if there is no tracker, or the tracker is dead.
@@ -1238,7 +1249,8 @@ wcPlay.prototype = {
   /**
    * Retrieves the class name of this object.
    * @function wcPlay#isA
-   * @returns {String}
+   * @param {string} name - The class name to test.
+   * @returns {boolean} - True if this named class is this class.
    */
   isA: function(name) {
     return name === 'wcPlay';
@@ -1247,7 +1259,8 @@ wcPlay.prototype = {
   /**
    * Retrieves the class name of this object.
    * @function wcPlay#instanceOf
-   * @returns {String}
+   * @param {string} name - The class name to test.
+   * @returns {boolean} - True if the named class is an instanced of this class.
    */
   instanceOf: function(name) {
     return name === 'wcPlay';
@@ -1276,7 +1289,7 @@ wcPlay.prototype = {
    * @function wcPlay#__removeNode
    * @private
    * @param {wcNode} node - The node to remove.
-   * @returns {Boolean} - Fails if the node was not found in this script.
+   * @returns {boolean} - Fails if the node was not found in this script.
    */
   __removeNode: function(node) {
     var index = -1;
@@ -1319,18 +1332,18 @@ wcPlay.prototype = {
    * Retrieves the next node id.
    * @function wcPlay#__nextNodeId
    * @private
-   * @returns {Number}
+   * @returns {number} - The next available node id.
    */
   __nextNodeId: function() {
     return ++this._nodeId;
   },
 
   /**
-   * Sets or Gets the current node id.
+   * Gets or sets the current node id.
    * @function wcPlay#__curNodeId
    * @private
-   * @param {Number} [cur] - If supplied, will assign the current node id.
-   * @returns {Number}
+   * @param {number} [cur] - If supplied, will assign the current node id.
+   * @returns {number} - The current node id.
    */
   __curNodeId: function(cur) {
     if (typeof cur === 'number') {
@@ -1348,7 +1361,7 @@ function wcNodeTimeoutEvent(node, callback, delay) {
   this._callback = callback;
   this._remaining = delay;
   this._marker = 0;
-};
+}
 
 wcNodeTimeoutEvent.prototype = {
   pause: function() {
