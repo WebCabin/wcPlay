@@ -4,7 +4,7 @@
     "name": "WebCabin",
     "url": "http://play.webcabin.org"
   },
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Node based visual scripting tool.",
   "main": "Build/wcPlay.min.js",
   "eslintConfig": {
@@ -67,7 +67,7 @@
     }
   },
   "dependencies": {
-    "FileSaver": "0.10.0",
+    "file-saver": "1.3.2",
     "font-awesome": "4.6.3",
     "jquery": "1.11.1",
     "webcabin-menu": "1.0.0",
