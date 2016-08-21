@@ -1,13 +1,12 @@
 wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeEntry', 'Entry', 'Linkers', {
   /**
    * @class
-   * This node acts as a connection between entry links on a composite node and the script inside.<br>
-   * When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.
-   *
-   * @constructor wcNodeCompositeEntry
-   * @param {String} parent - The parent object of this node.
+   * This node acts as a connection between entry links on a composite node and the script inside.
+   * <br>When inheriting, make sure to include 'this._super(parent, pos);' at the top of your init function.
+   * @class wcNodeCompositeEntry
+   * @param {string} parent - The parent object of this node.
    * @param {wcPlay~Coordinates} pos - The position of this node in the visual editor.
-   * @param {String} linkName - The name of the entry link.
+   * @param {string} linkName - The name of the entry link.
    */
   init: function(parent, pos, linkName) {
     this._super(parent, pos);
@@ -16,19 +15,16 @@ wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeEntry', 'Entry', 'Linkers', {
       this._invalid = true;
     }
 
-    this.description("Activates when the corresponding Entry link of the parent Composite node has been activated.");
-    this.details("The title name for this node becomes the name of the Entry link in the parent Composite Node.\n\nAlthough this node does nothing while it is outside of a Composite Node, it can be placed within the Root level of the script. Doing so is useful if you intend to 'File->Import' this script into another.");
+    this.description('Activates when the corresponding Entry link of the parent Composite node has been activated.');
+    this.details('The title name for this node becomes the name of the Entry link in the parent Composite Node.\n\nAlthough this node does nothing while it is outside of a Composite Node, it can be placed within the Root level of the script. Doing so is useful if you intend to "File->Import" this script into another.');
 
     // Prevent duplicate link names.
-    linkName = linkName || 'in'
+    linkName = linkName || 'in';
     var name = linkName;
 
     if (!this._invalid) {
       var index = 0;
-      while (true) {
-        if (this._parent.createEntry(name)) {
-          break;
-        }
+      while (!this._parent.createEntry(name)) {
         index++;
         name = linkName + index;
       }
@@ -48,8 +44,8 @@ wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeEntry', 'Entry', 'Linkers', {
    * Event that is called when the name of this node is about to change.<br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNodeCompositeEntry#onNameChanging
-   * @param {String} oldName - The current name.
-   * @param {String} newName - The new name.
+   * @param {string} oldName - The current name.
+   * @param {string} newName - The new name.
    * @return {String|undefined} - Return the new value of the name (usually newValue unless you are restricting the name). If no value is returned, newValue is assumed.
    */
   onNameChanging: function(oldName, newName) {
@@ -71,8 +67,8 @@ wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeEntry', 'Entry', 'Linkers', {
    * Event that is called when the name of this node has changed.<br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNodeCompositeEntry#onNameChanged
-   * @param {String} oldName - The current name.
-   * @param {String} newName - The new name.
+   * @param {string} oldName - The current name.
+   * @param {string} newName - The new name.
    */
   onNameChanged: function(oldName, newName) {
     this._super(oldName, newName);
