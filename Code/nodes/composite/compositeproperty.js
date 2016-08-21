@@ -226,5 +226,5 @@ wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeProperty', 'Property', 'Linke
     }
 
     this._parent.sortPropertyLinks();
-  },
+  }
 });

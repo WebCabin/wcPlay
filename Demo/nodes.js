@@ -20,7 +20,7 @@ wcPlayNodes.wcNodeProcess.extend('wcNodeProcessGameMove', 'Move', 'Hero', {
     this.setTimeout(function() {
       this.activateExit('out');
     }, 125);
-  },
+  }
 });
 
 wcPlayNodes.wcNodeProcess.extend('wcNodeProcessGameCanMove', 'Can Move', 'Hero', {
@@ -49,7 +49,7 @@ wcPlayNodes.wcNodeProcess.extend('wcNodeProcessGameCanMove', 'Can Move', 'Hero',
     } else {
       this.activateExit('no');
     }
-  },
+  }
 });
 
 wcPlayNodes.wcNodeEntry.extend('wcNodeEntryGameUpdate', 'Game Update', 'Hero', {
