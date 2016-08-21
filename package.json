@@ -7,6 +7,68 @@
   "version": "1.0.3",
   "description": "Node based visual scripting tool.",
   "main": "Build/wcPlay.min.js",
+  "eslintConfig": {
+    "plugins": [
+      "jsdoc",
+      "jquery",
+      "mocha"
+    ],
+    "env": {
+      "browser": true,
+      "node": true,
+      "es6": true,
+      "mocha": true,
+      "jquery": true
+    },
+    "globals": {
+      "wcPlay": true,
+      "wcNode": true,
+      "wcPlayNodes": true,
+      "wcNodeTimeoutEvent": true,
+      "wcPlayEditor": true,
+      "wcUndoManager": true,
+      "wcPlayEditorClipboard": true,
+      "wcMenu": true,
+      "saveAs": false,
+      "BlobBuilder": false,
+      "Fuse": true
+    },
+    "extends": "eslint:recommended",
+    "rules": {
+      "indent": [
+        "error",
+        2,
+        {
+          "SwitchCase": 1
+        }
+      ],
+      "linebreak-style": [
+        "error",
+        "unix"
+      ],
+      "quotes": [
+        "error",
+        "single"
+      ],
+      "semi": [
+        "error",
+        "always"
+      ],
+      "comma-dangle": 2,
+      "no-console": 0,
+      "jsdoc/check-param-names": 2,
+      "jsdoc/check-tag-names": 2,
+      "jsdoc/check-types": 2,
+      "jsdoc/newline-after-description": 0,
+      "jsdoc/require-description-complete-sentence": 2,
+      "jsdoc/require-hyphen-before-param-description": 2,
+      "jsdoc/require-param": 2,
+      "jsdoc/require-param-description": 2,
+      "jsdoc/require-param-type": 2,
+      "jsdoc/require-returns-description": 2,
+      "jsdoc/require-returns-type": 2
+    }
+  },
   "dependencies": {
     "file-saver": "1.3.2",
     "font-awesome": "4.6.3",
@@ -14,5 +76,10 @@
     "webcabin-menu": "1.0.0",
     "webcabin-undo-manager": "1.0.1"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "eslint": "^3.3.1",
+    "eslint-plugin-jquery": "^1.0.1",
+    "eslint-plugin-jsdoc": "^2.3.1",
+    "eslint-plugin-mocha": "^4.3.0"
+  }
 }

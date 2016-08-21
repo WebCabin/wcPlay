@@ -1,10 +1,12 @@
+'use strict';
+
 // Create a global clipboard that can be shared between all instances of the editor tool.
 window.wcPlayEditorClipboard = {
   bounds: {
     top: 0,
     left: 0,
     width: 0,
-    height: 0,
+    height: 0
   },
   nodes: []
 };
@@ -16,10 +18,8 @@ window.wcPlayEditorClipboard = {
  */
 
 /**
- * @class
  * Provides a visual interface for editing a Play script. Requires HTML5 canvas.
- *
- * @constructor
+ * @class
  * @param {external:jQuery~Object|external:jQuery~Selector|external:domNode} container - The container element.
  * @param {wcPlayEditor~Options} [options] - Custom options.
  */
@@ -170,8 +170,8 @@ function wcPlayEditor(container, options) {
     playable: true,
     category: {
       items: [],
-      isBlacklist: true,
-    },
+      isBlacklist: true
+    }
   };
   for (var prop in options) {
     this._options[prop] = options[prop];
@@ -212,7 +212,7 @@ wcPlayEditor.prototype = {
   /**
    * Retrieves whether unsaved changes exist in the current script.
    * @function wcPlayEditor#isModified
-   * @returns {Boolean}
+   * @returns {boolean} - Whether the script has unsaved changes.
    */
   isModified: function() {
     if (this._engine && this._engine._undoManager) {
@@ -269,12 +269,9 @@ wcPlayEditor.prototype = {
   },
 
   /**
-   * Retrieves the current modified state of the editor.
-
-  /**
    * Retrieves the menu instance.
    * @function wcPlayEditor#menu
-   * @returns {wcMenu}
+   * @returns {wcMenu} - The wcMenu object.
    */
   menu: function() {
     return this._menu;
@@ -336,7 +333,9 @@ wcPlayEditor.prototype = {
   /**
    * Triggers a previously bound event handler.
    * @function wcPlayEditor#triggerEvent
-   * @param {String} eventName - The name of the event to trigger.
+   * @param {string} eventName - The name of the event to trigger.
+   * @param {Object[]} args - Any parameter arguments you wish to send to the triggered event nodes.
+   *                          These parameters are based on the node being triggered.
    */
   triggerEvent: function(eventName, args) {
     if (this._eventHandlers.hasOwnProperty(eventName)) {
@@ -350,7 +349,7 @@ wcPlayEditor.prototype = {
    * Binds an event handler for when we are about to save our script.
    * @function wcPlayEditor#onBeforeSave
    * @param {Function} func - Assigns the function to handle this event.
-   * @returns {Boolean} - Success or failure.
+   * @returns {boolean} - Success or failure.
    */
   onBeforeSave: function(func) {
     if (typeof func !== 'function') {
@@ -366,7 +365,7 @@ wcPlayEditor.prototype = {
    * Binds an event handler for when we are about to save our script.
    * @function wcPlayEditor#onSaved
    * @param {Function} func - Assigns the function to handle this event.
-   * @returns {Boolean} - Success or failure.
+   * @returns {boolean} - Success or failure.
    */
   onSaved: function(func) {
     if (typeof func !== 'function') {
@@ -382,7 +381,7 @@ wcPlayEditor.prototype = {
    * Binds an event handler for when we are about to save our script.
    * @function wcPlayEditor#onBeforeLoad
    * @param {Function} func - Assigns the function to handle this event.
-   * @returns {Boolean} - Success or failure.
+   * @returns {boolean} - Success or failure.
    */
   onBeforeLoad: function(func) {
     if (typeof func !== 'function') {
@@ -398,7 +397,7 @@ wcPlayEditor.prototype = {
    * Binds an event handler for when we are about to save our script.
    * @function wcPlayEditor#onLoaded
    * @param {Function} func - Assigns the function to handle this event.
-   * @returns {Boolean} - Success or failure.
+   * @returns {boolean} - Success or failure.
    */
   onLoaded: function(func) {
     if (typeof func !== 'function') {
@@ -414,7 +413,7 @@ wcPlayEditor.prototype = {
    * Binds an event handler for when we are about to save our script.
    * @function wcPlayEditor#onBeforeImport
    * @param {Function} func - Assigns the function to handle this event.
-   * @returns {Boolean} - Success or failure.
+   * @returns {boolean} - Success or failure.
    */
   onBeforeImport: function(func) {
     if (typeof func !== 'function') {
@@ -430,7 +429,7 @@ wcPlayEditor.prototype = {
    * Binds an event handler for when we are about to save our script.
    * @function wcPlayEditor#onImported
    * @param {Function} func - Assigns the function to handle this event.
-   * @returns {Boolean} - Success or failure.
+   * @returns {boolean} - Success or failure.
    */
   onImported: function(func) {
     if (typeof func !== 'function') {
@@ -445,7 +444,7 @@ wcPlayEditor.prototype = {
   /**
    * Event that is called to begin an undo manager group operation.
    * @function wcPlayEditor#onBeginUndoGroup
-   * @param {String} description - The description of the undo event.
+   * @param {string} description - The description of the undo event.
    */
   onBeginUndoGroup: function(description) {
     this._undoManager && this._undoManager.beginGroup(description);
@@ -486,41 +485,41 @@ wcPlayEditor.prototype = {
    * Disconnects all chains attached to a node's entry link.
    * @function wcPlayEditor#onDisconnectEntryChains
    * @param {wcNode} node - The node to disconnect from.
-   * @param {String} linkName - The name of the link.
+   * @param {string} linkName - The name of the link.
    */
   onDisconnectEntryChains: function(node, linkName) {
-      var chains = node.listEntryChains(linkName);
-      if (chains.length) {
-        this._undoManager && this._undoManager.addEvent('Disconnected Entry Links for "' + node.category + '.' + node.type + '.' + linkName + '"',
-          {
-            id: node.id,
-            name: linkName,
-            chains: chains,
-            engine: this._engine,
-          },
-          // Undo
-          function() {
-            var myNode = this.engine.nodeById(this.id);
-            for (var i = 0; i < this.chains.length; ++i) {
-              var targetNode = this.engine.nodeById(this.chains[i].outNodeId);
-              var targetName = this.chains[i].outName;
-              myNode.connectEntry(this.name, targetNode, targetName);
-            }
-          },
-          // Redo
-          function() {
-            var myNode = this.engine.nodeById(this.id);
-            myNode.disconnectEntry(this.name);
-          });
-      }
-      node.disconnectEntry(linkName);
+    var chains = node.listEntryChains(linkName);
+    if (chains.length) {
+      this._undoManager && this._undoManager.addEvent('Disconnected Entry Links for "' + node.category + '.' + node.type + '.' + linkName + '"',
+        {
+          id: node.id,
+          name: linkName,
+          chains: chains,
+          engine: this._engine
+        },
+        // Undo
+        function() {
+          var myNode = this.engine.nodeById(this.id);
+          for (var i = 0; i < this.chains.length; ++i) {
+            var targetNode = this.engine.nodeById(this.chains[i].outNodeId);
+            var targetName = this.chains[i].outName;
+            myNode.connectEntry(this.name, targetNode, targetName);
+          }
+        },
+        // Redo
+        function() {
+          var myNode = this.engine.nodeById(this.id);
+          myNode.disconnectEntry(this.name);
+        });
+    }
+    node.disconnectEntry(linkName);
   },
 
   /**
    * Disconnects all chains attached to a node's exit link.
    * @function wcPlayEditor#onDisconnectExitChains
    * @param {wcNode} node - The node to disconnect from.
-   * @param {String} linkName - The name of the link.
+   * @param {string} linkName - The name of the link.
    */
   onDisconnectExitChains: function(node, linkName) {
     var chains = node.listExitChains(linkName);
@@ -530,7 +529,7 @@ wcPlayEditor.prototype = {
           id: node.id,
           name: linkName,
           chains: chains,
-          engine: this._engine,
+          engine: this._engine
         },
         // Undo
         function() {
@@ -554,7 +553,7 @@ wcPlayEditor.prototype = {
    * Disconnects all chains attached to a node's input link.
    * @function wcPlayEditor#onDisconnectInputChains
    * @param {wcNode} node - The node to disconnect from.
-   * @param {String} linkName - The name of the link.
+   * @param {string} linkName - The name of the link.
    */
   onDisconnectInputChains: function(node, linkName) {
     var chains = node.listInputChains(linkName);
@@ -564,7 +563,7 @@ wcPlayEditor.prototype = {
           id: node.id,
           name: linkName,
           chains: chains,
-          engine: this._engine,
+          engine: this._engine
         },
         // Undo
         function() {
@@ -588,7 +587,7 @@ wcPlayEditor.prototype = {
    * Disconnects all chains attached to a node's output link.
    * @function wcPlayEditor#onDisconnectOutputChains
    * @param {wcNode} node - The node to disconnect from.
-   * @param {String} linkName - The name of the link.
+   * @param {string} linkName - The name of the link.
    */
   onDisconnectOutputChains: function(node, linkName) {
     var chains = node.listOutputChains(linkName);
@@ -598,7 +597,7 @@ wcPlayEditor.prototype = {
           id: node.id,
           name: linkName,
           chains: chains,
-          engine: this._engine,
+          engine: this._engine
         },
         // Undo
         function() {
@@ -625,7 +624,7 @@ wcPlayEditor.prototype = {
    * @param {Object} event - The mouse event.
    * @param {wcPlayEditor~Offset} [offset] - An optional screen offset to apply to the pos.
    * @param {wcPlay~Coordinates} [translation] - An optional camera translation to apply to the pos.
-   * @return {wcPlay~Coordinates} - The mouse position.
+   * @returns {wcPlay~Coordinates} - The mouse position.
    */
   __mouse: function(event, offset, translation) {
     if (event.originalEvent && (event.originalEvent.touches || event.originalEvent.changedTouches)) {
@@ -635,7 +634,7 @@ wcPlayEditor.prototype = {
         y: touch.clientY - (offset? offset.top: 0) - (translation? translation.y: 0),
         gx: touch.clientX,
         gy: touch.clientY,
-        which: 1,
+        which: 1
       };
     }
 
@@ -644,7 +643,7 @@ wcPlayEditor.prototype = {
       y: (event.clientY || event.pageY) - (offset? offset.top: 0) - (translation? translation.y: 0),
       gx: (event.clientX || event.pageX),
       gy: (event.clientY || event.pageY),
-      which: event.which || 1,
+      which: event.which || 1
     };
   },
 
@@ -663,9 +662,9 @@ wcPlayEditor.prototype = {
    * Clamps a given string value to a specific number of characters and appends a '...' if necessary.
    * @function wcPlayEditor#__clampString
    * @private
-   * @param {String} str - The string to clamp.
-   * @param {Number} len - The number of characters to allow.
-   * @returns {String} - A clamped string.
+   * @param {string} str - The string to clamp.
+   * @param {number} len - The number of characters to allow.
+   * @returns {string} - A clamped string.
    */
   __clampString: function(str, len) {
     if (str.length > len) {
@@ -678,19 +677,19 @@ wcPlayEditor.prototype = {
    * Blends two colors together. Color strings can be in hex string {'#ffffff'} or rgb string {'rgb(250,250,250)'} formats.
    * @function wcPlayEditor#__blendColors
    * @private
-   * @param {String} c0 - The first color string.
-   * @param {String} c1 - The second color string.
-   * @param {Number} p - a multiplier to blend the colors by.
+   * @param {string} c0 - The first color string.
+   * @param {string} c1 - The second color string.
+   * @param {number} p - A multiplier to blend the colors by.
    */
   __blendColors: function(c0, c1, p) {
-      var n=p<0?p*-1:p,u=Math.round,w=parseInt;
-      if(c0.length>7){
-          var f=c0.split(","),t=(c1?c1:p<0?"rgb(0,0,0)":"rgb(255,255,255)").split(","),R=w(f[0].slice(4)),G=w(f[1]),B=w(f[2]);
-          return "rgb("+(u((w(t[0].slice(4))-R)*n)+R)+","+(u((w(t[1])-G)*n)+G)+","+(u((w(t[2])-B)*n)+B)+")"
-      }else{
-          var f=w(c0.slice(1),16),t=w((c1?c1:p<0?"#000000":"#FFFFFF").slice(1),16),R1=f>>16,G1=f>>8&0x00FF,B1=f&0x0000FF;
-          return "#"+(0x1000000+(u(((t>>16)-R1)*n)+R1)*0x10000+(u(((t>>8&0x00FF)-G1)*n)+G1)*0x100+(u(((t&0x0000FF)-B1)*n)+B1)).toString(16).slice(1)
-      }
+    var n=p<0?p*-1:p,u=Math.round,w=parseInt,f=0,t=0,R=0,G=0,B=0,R1=0,G1=0,B1=0;
+    if(c0.length>7){
+      f=c0.split(','),t=(c1?c1:p<0?'rgb(0,0,0)':'rgb(255,255,255)').split(','),R=w(f[0].slice(4)),G=w(f[1]),B=w(f[2]);
+      return 'rgb('+(u((w(t[0].slice(4))-R)*n)+R)+','+(u((w(t[1])-G)*n)+G)+','+(u((w(t[2])-B)*n)+B)+')';
+    } else {
+      f=w(c0.slice(1),16),t=w((c1?c1:p<0?'#000000':'#FFFFFF').slice(1),16),R1=f>>16,G1=f>>8&0x00FF,B1=f&0x0000FF;
+      return '#'+(0x1000000+(u(((t>>16)-R1)*n)+R1)*0x10000+(u(((t>>8&0x00FF)-G1)*n)+G1)*0x100+(u(((t&0x0000FF)-B1)*n)+B1)).toString(16).slice(1);
+    }
   },
 
   /**
@@ -706,12 +705,14 @@ wcPlayEditor.prototype = {
       top: rects[0].top + (offsets? offsets[0].y: 0),
       left: rects[0].left + (offsets? offsets[0].x: 0),
       width: rects[0].width,
-      height: rects[0].height,
+      height: rects[0].height
     };
-
-    for (var i = 1; i < rects.length; ++i) {
-      var offsetX = 0;
-      var offsetY = 0;
+    var i = 0;
+    var offsetX = 0;
+    var offsetY = 0;
+    for (i = 1; i < rects.length; ++i) {
+      offsetX = 0;
+      offsetY = 0;
       if (offsets) {
         offsetX = offsets[i].x;
         offsetY = offsets[i].y;
@@ -725,9 +726,9 @@ wcPlayEditor.prototype = {
       }
     }
 
-    for (var i = 0; i < rects.length; ++i) {
-      var offsetX = 0;
-      var offsetY = 0;
+    for (i = 0; i < rects.length; ++i) {
+      offsetX = 0;
+      offsetY = 0;
       if (offsets) {
         offsetX = offsets[i].x;
         offsetY = offsets[i].y;
@@ -752,20 +753,20 @@ wcPlayEditor.prototype = {
    * @param {wcPlayEditor~Rect} rect - The bounding rectangle.
    * @param {wcPlay~Coordinates} [offset] - An optional offset to apply to the rect.
    * @param {wcPlay~Coordinates} [trans] - An optional camera translation to apply to the pos.
-   * @returns {Boolean} - Whether there is a collision.
+   * @returns {boolean} - Whether there is a collision.
    */
   __inRect: function(pos, rect, offset, trans) {
     if (offset === undefined) {
       offset = {
         x: 0,
-        y: 0,
+        y: 0
       };
     }
     if (trans === undefined) {
       trans = {
         x: 0,
         y: 0,
-        z: 1,
+        z: 1
       };
     }
 
@@ -785,13 +786,13 @@ wcPlayEditor.prototype = {
    * @param {wcPlayEditor~Rect} rectA - The first rectangle.
    * @param {wcPlayEditor~Rect} rectB - The second rectangle.
    * @param {wcPlay~Coordinates} [offsetA] - An optional offset to apply to the rectA.
-   * @returns {Boolean} - Whether there is a collision.
+   * @returns {boolean} - Whether there is a collision.
    */
   __rectOnRect: function(rectA, rectB, offsetA) {
     if (offsetA === undefined) {
       offsetA = {
         x: 0,
-        y: 0,
+        y: 0
       };
     }
 
@@ -806,9 +807,9 @@ wcPlayEditor.prototype = {
    * @function wcPlayEditor#__drawRoundedRect
    * @private
    * @param {wcPlayEditor~Rect} rect - The rectangle bounds to draw.
-   * @param {String} color - The color of the line.
-   * @param {Number} lineWidth - The thickness of the line, -1 will fill the shape.
-   * @param {Number} radius - The radius of the rounded corners.
+   * @param {string} color - The color of the line.
+   * @param {number} lineWidth - The thickness of the line, -1 will fill the shape.
+   * @param {number} radius - The radius of the rounded corners.
    * @param {external:Canvas~Context} context - The canvas context to render on.
    * @param {wcPlay~Coordinates} [pos] - An option positional offset to draw the rect.
    */
@@ -834,6 +835,7 @@ wcPlayEditor.prototype = {
   /**
    * Renders a new frame.
    * @function wcPlayEditor#__update
+   * @param {number} timestamp - The current timestamp.
    * @private
    */
   __update: function(timestamp) {
@@ -878,8 +880,8 @@ wcPlayEditor.prototype = {
 
       if (this._highlightRect) {
         var radius = Math.min(10, this._highlightRect.width/2, this._highlightRect.height/2);
-        this.__drawRoundedRect(this._highlightRect, "rgba(0, 255, 255, 0.25)", -1, radius, this._viewportContext);
-        this.__drawRoundedRect(this._highlightRect, "darkcyan", 2, radius, this._viewportContext);
+        this.__drawRoundedRect(this._highlightRect, 'rgba(0, 255, 255, 0.25)', -1, radius, this._viewportContext);
+        this.__drawRoundedRect(this._highlightRect, 'darkcyan', 2, radius, this._viewportContext);
       }
 
       // console.log('Draw count - Nodes: ' + this._nodeDrawCount + ', Chains: ' + this._chainDrawCount);
@@ -924,16 +926,16 @@ wcPlayEditor.prototype = {
             top: 0,
             left: left,
             width: w + 6,
-            height: this._font.breadcrumbs.size + this._drawStyle.property.spacing,
+            height: this._font.breadcrumbs.size + this._drawStyle.property.spacing
           },
-          parent: scopes[i],
+          parent: scopes[i]
         };
         this._crumbBounds.push(boundData);
         left += w + w2;
 
         if (this._highlightCrumb === i) {
-          this.__drawRoundedRect(boundData.rect, "rgba(0, 255, 255, 0.25)", -1, 3, this._viewportContext);
-          this.__drawRoundedRect(boundData.rect, "darkcyan", 2, 3, this._viewportContext);
+          this.__drawRoundedRect(boundData.rect, 'rgba(0, 255, 255, 0.25)', -1, 3, this._viewportContext);
+          this.__drawRoundedRect(boundData.rect, 'darkcyan', 2, 3, this._viewportContext);
         }
       }
       this._viewportContext.fillText(scopeNames.join(' / '), 5, this._font.breadcrumbs.size);
@@ -947,7 +949,7 @@ wcPlayEditor.prototype = {
    * @function wcPlayEditor#__updateNodes
    * @private
    * @param {wcNode[]} nodes - The nodes to update.
-   * @param {Number} elapsed - Elapsed time since last update.
+   * @param {number} elapsed - Elapsed time since last update.
    * @param {external:Canvas~Context} context - The canvas context to render on.
    */
   __updateNodes: function(nodes, elapsed, context) {
@@ -961,7 +963,7 @@ wcPlayEditor.prototype = {
    * @function wcPlayEditor#__updateNode
    * @private
    * @param {wcNode} node - The Node to update.
-   * @param {Number} elapsed - Elapsed time since last update.
+   * @param {number} elapsed - Elapsed time since last update.
    * @param {external:Canvas~Context} context - The canvas context to render on.
    */
   __updateNode: function(node, elapsed, context) {
@@ -996,21 +998,22 @@ wcPlayEditor.prototype = {
       return meta.flash;
     }
 
-    var blackColor = "#000000";
-    var whiteColor = "#FFFFFF";
-    var propColor  = "#117711";
-    var propFlashColor = "#FFFF00";
+    var blackColor = '#000000';
+    var whiteColor = '#FFFFFF';
+    var propColor  = '#117711';
+    var propFlashColor = '#FFFF00';
     var forceNodeActive = false;
+    var i = 0;
     if (this._engine._queuedProperties.length === 0) {
-      for (var i = 0; i < node.chain.entry.length; ++i) {
+      for (i = 0; i < node.chain.entry.length; ++i) {
         __updateFlash(node.chain.entry[i].meta, blackColor, propFlashColor, propFlashColor, {colorMul: 0.9});
       }
-      for (var i = 0; i < node.chain.exit.length; ++i) {
+      for (i = 0; i < node.chain.exit.length; ++i) {
         __updateFlash(node.chain.exit[i].meta, blackColor, propFlashColor, propFlashColor, {colorMul: 0.9});
       }
     } else {
       // If any entry links are active, keep the node highlighted.
-      for (var i = 0; i < node.chain.entry.length; ++i) {
+      for (i = 0; i < node.chain.entry.length; ++i) {
         if (node.chain.entry[i].meta.flash || node.chain.entry[i].meta.flashDelta > 0) {
           forceNodeActive = true;
           break;
@@ -1018,7 +1021,7 @@ wcPlayEditor.prototype = {
       }
     }
 
-    for (var i = 0; i < node.properties.length; ++i) {
+    for (i = 0; i < node.properties.length; ++i) {
       __updateFlash(node.properties[i].inputMeta, propColor, propFlashColor, propFlashColor, {colorMul: 0.9});
       __updateFlash(node.properties[i].outputMeta, propColor, propFlashColor, propFlashColor, {colorMul: 0.9});
     }
@@ -1034,13 +1037,12 @@ wcPlayEditor.prototype = {
     });
 
 
-
     // Measure bounding areas for node, if it is dirty.
     if (node._meta.dirty) {
       node._meta.dirty = false;
 
       node._meta.bounds = {
-        node: node,
+        node: node
       };
 
       var entryBounds = this.__measureEntryLinkOuter(node, context);
@@ -1095,7 +1097,7 @@ wcPlayEditor.prototype = {
         top: node._meta.bounds.inner.top - 30,
         left: node._meta.bounds.inner.left - 30,
         width: node._meta.bounds.inner.width + 60,
-        height: node._meta.bounds.inner.height + 60,
+        height: node._meta.bounds.inner.height + 60
       };
 
       // Add a collapse button to the node in the left margin of the title.
@@ -1103,7 +1105,7 @@ wcPlayEditor.prototype = {
         left: node._meta.bounds.inner.left + 4,
         top: node._meta.bounds.inner.top + 4 + (node.chain.entry.length? this._font.links.size + this._drawStyle.links.padding: 0),
         width: this._drawStyle.node.margin - 5,
-        height: this._font.title.size - 4,
+        height: this._font.title.size - 4
       };
 
       // Add breakpoint button to the node in the right margin of the title.
@@ -1111,7 +1113,7 @@ wcPlayEditor.prototype = {
         left: node._meta.bounds.inner.left + node._meta.bounds.inner.width - this._drawStyle.node.margin + 2,
         top: node._meta.bounds.inner.top + 4 + (node.chain.entry.length? this._font.links.size + this._drawStyle.links.padding: 0),
         width: this._drawStyle.node.margin - 5,
-        height: this._font.title.size - 4,
+        height: this._font.title.size - 4
       };
     }
   },
@@ -1121,7 +1123,7 @@ wcPlayEditor.prototype = {
    * @function wcPlayEditor#__typeIndex
    * @private
    * @param {wcPlay.NODE} type - The node type.
-   * @returns {Number} - The type index.
+   * @returns {number} - The type index.
    */
   __typeIndex: function(type) {
     switch (type) {
@@ -1142,14 +1144,14 @@ wcPlayEditor.prototype = {
       outer: this.$main,
       manualUpdate: true,
       data: this,
-      version: "v1.0.0"
+      version: 'v1.0.0'
     });
 
     // File -> New Script...
     this._menu.addOption('File', 'New Script', {
-      hotkeys: "Alt+N",
-      icon: "fa fa-file-o fa-lg",
-      description: "Start a new script...",
+      hotkeys: 'Alt+N',
+      icon: 'fa fa-file-o fa-lg',
+      description: 'Start a new script...',
       toolbarIndex: -1,
       condition: function(editor) {
         return !editor._options.readOnly;
@@ -1165,9 +1167,9 @@ wcPlayEditor.prototype = {
 
     // File -> Open Script...
     this._menu.addOption('File', 'Open Script...', {
-      hotkeys: "Ctrl+O",
-      icon: "fa fa-folder-open-o fa-lg",
-      description: "Open a script file...",
+      hotkeys: 'Ctrl+O',
+      icon: 'fa fa-folder-open-o fa-lg',
+      description: 'Open a script file...',
       toolbarIndex: -1,
       condition: function(editor) {
         return !editor._options.readOnly;
@@ -1175,8 +1177,8 @@ wcPlayEditor.prototype = {
       onActivated: function(editor) {
         if (editor._engine) {
           if (document.createEvent) {
-            var evt = document.createEvent("MouseEvents");
-            evt.initEvent("click", true, false);
+            var evt = document.createEvent('MouseEvents');
+            evt.initEvent('click', true, false);
             editor.$container.prepend(editor.$hiddenFileLoader);
             editor.$hiddenFileLoader[0].dispatchEvent(evt);
           }
@@ -1186,9 +1188,9 @@ wcPlayEditor.prototype = {
 
     // File -> Save Script
     this._menu.addOption('File', 'Save Script', {
-      hotkeys: "Ctrl+S",
-      icon: "fa fa-save fa-lg",
-      description: "Save this script...",
+      hotkeys: 'Ctrl+S',
+      icon: 'fa fa-save fa-lg',
+      description: 'Save this script...',
       toolbarIndex: -1,
       condition: function(editor) {
         return !editor._options.readOnly;
@@ -1196,7 +1198,7 @@ wcPlayEditor.prototype = {
       onActivated: function(editor) {
         if (editor._engine) {
           if (!saveAs) {
-            console.log("ERROR: Attempted to save the script when external dependency 'FileSaver' was not included.");
+            console.log('ERROR: Attempted to save the script when external dependency "FileSaver" was not included.');
             return;
           }
 
@@ -1223,8 +1225,8 @@ wcPlayEditor.prototype = {
 
     // File -> Import...
     this._menu.addOption('File', 'Import...', {
-      icon: "fa fa-link fa-lg",
-      description: "Import a script file as a Composite Node.",
+      icon: 'fa fa-link fa-lg',
+      description: 'Import a script file as a Composite Node.',
       toolbarIndex: -1,
       condition: function(editor) {
         return !editor._options.readOnly;
@@ -1232,8 +1234,8 @@ wcPlayEditor.prototype = {
       onActivated: function(editor) {
         if (editor._engine) {
           if (document.createEvent) {
-            var evt = document.createEvent("MouseEvents");
-            evt.initEvent("click", true, false);
+            var evt = document.createEvent('MouseEvents');
+            evt.initEvent('click', true, false);
             editor.$container.prepend(editor.$hiddenFileImporter);
             editor.$hiddenFileImporter[0].dispatchEvent(evt);
           }
@@ -1243,8 +1245,8 @@ wcPlayEditor.prototype = {
 
     // Edit -> Undo
     this._menu.addOption('Edit', 'Undo', {
-      hotkeys: "Ctrl+Z",
-      icon: "fa fa-undo fa-lg",
+      hotkeys: 'Ctrl+Z',
+      icon: 'fa fa-undo fa-lg',
       toolbarIndex: -1,
       description: function(editor) {
         return 'Undo ' + ((editor._undoManager && editor._undoManager.undoInfo()) || 'Event');
@@ -1259,8 +1261,8 @@ wcPlayEditor.prototype = {
 
     // Edit -> Redo
     this._menu.addOption('Edit', 'Redo', {
-      hotkeys: "Ctrl+Y,Ctrl+Shift+Z",
-      icon: "fa fa-undo fa-flip-horizontal fa-lg",
+      hotkeys: 'Ctrl+Y,Ctrl+Shift+Z',
+      icon: 'fa fa-undo fa-flip-horizontal fa-lg',
       toolbarIndex: -1,
       description: function(editor) {
         return 'Redo ' + ((editor._undoManager && editor._undoManager.redoInfo()) || 'Event');
@@ -1290,10 +1292,10 @@ wcPlayEditor.prototype = {
 
     // Edit -> Cut
     this._menu.addOption('Edit', 'Cut', {
-      hotkeys: "Ctrl+X",
-      icon: "fa fa-cut fa-lg",
+      hotkeys: 'Ctrl+X',
+      icon: 'fa fa-cut fa-lg',
       toolbarIndex: -1,
-      description: "Cut selected node(s) out of your script and into the clipboard.",
+      description: 'Cut selected node(s) out of your script and into the clipboard.',
       condition: function(editor) {
         return editor._selectedNodes.length > 0;
       },
@@ -1312,10 +1314,10 @@ wcPlayEditor.prototype = {
 
     // Edit -> Copy
     this._menu.addOption('Edit', 'Copy', {
-      hotkeys: "Ctrl+C",
-      icon: "fa fa-copy fa-lg",
+      hotkeys: 'Ctrl+C',
+      icon: 'fa fa-copy fa-lg',
       toolbarIndex: -1,
-      description: "Copy selected node(s) to your clipboard.",
+      description: 'Copy selected node(s) to your clipboard.',
       condition: function(editor) {
         return editor._selectedNodes.length > 0;
       },
@@ -1324,17 +1326,19 @@ wcPlayEditor.prototype = {
 
     // Edit -> Paste
     this._menu.addOption('Edit', 'Paste', {
-      hotkeys: "Ctrl+V",
-      icon: "fa fa-paste fa-lg",
+      hotkeys: 'Ctrl+V',
+      icon: 'fa fa-paste fa-lg',
       toolbarIndex: -1,
-      description: "Paste node(s) in clipboard into your script.",
+      description: 'Paste node(s) in clipboard into your script.',
       condition: function(editor) {
+        editor;
         return wcPlayEditorClipboard.nodes.length > 0;
       },
       onActivated: function(editor) {
+        var i = 0;
         var mouse = {
           x: editor._mouse.x,
-          y: editor._mouse.y,
+          y: editor._mouse.y
         };
         if (!editor._mouseInViewport) {
           mouse.x = editor.$viewport.width()/2;
@@ -1346,20 +1350,22 @@ wcPlayEditor.prototype = {
 
         var idMap = [];
         var nodes = [];
+        var data = null;
+        var newNode = null;
         editor._undoManager && editor._undoManager.beginGroup('Paste Nodes from clipboard');
         var bounds = wcPlayEditorClipboard.bounds;
-        for (var i = 0; i < wcPlayEditorClipboard.nodes.length; ++i) {
-          var data = wcPlayEditorClipboard.nodes[i];
+        for (i = 0; i < wcPlayEditorClipboard.nodes.length; ++i) {
+          data = wcPlayEditorClipboard.nodes[i];
 
-          var newNode = new window.wcPlayNodes[data.className](editor._parent, data.pos);
+          newNode = new window.wcPlayNodes[data.className](editor._parent, data.pos);
 
           idMap[data.id] = newNode.id;
           nodes.push(newNode);
         }
 
-        for (var i = 0; i < wcPlayEditorClipboard.nodes.length; ++i) {
-          var data = wcPlayEditorClipboard.nodes[i];
-          var newNode = nodes[i];
+        for (i = 0; i < wcPlayEditorClipboard.nodes.length; ++i) {
+          data = wcPlayEditorClipboard.nodes[i];
+          newNode = nodes[i];
           editor._selectedNodes.push(newNode);
           if (!editor._selectedNode) {
             editor._selectedNode = newNode;
@@ -1377,10 +1383,10 @@ wcPlayEditor.prototype = {
 
     // Edit -> Delete
     this._menu.addOption('Edit', 'Delete', {
-      hotkeys: "Delete",
-      icon: "fa fa-trash fa-lg",
+      hotkeys: 'Delete',
+      icon: 'fa fa-trash fa-lg',
       toolbarIndex: -1,
-      description: "Delete selected node(s).",
+      description: 'Delete selected node(s).',
       condition: function(editor) {
         return editor._selectedNodes.length > 0;
       },
@@ -1401,9 +1407,9 @@ wcPlayEditor.prototype = {
     // Edit -> Create Node
     this._menu.addOption('Edit', 'Create Node', {
       hotkeys: 'N',
-      icon: "fa fa-plus fa-lg",
+      icon: 'fa fa-plus fa-lg',
       toolbarIndex: -1,
-      description: "Create a new node.",
+      description: 'Create a new node.',
       condition: function(editor) {
         return !editor._options.readOnly;
       },
@@ -1417,39 +1423,46 @@ wcPlayEditor.prototype = {
     // Edit -> Create Composite
     this._menu.addOption('Edit', 'Create Composite', {
       hotkeys: 'C',
-      icon: "fa fa-object-group fa-lg",
+      icon: 'fa fa-object-group fa-lg',
       toolbarIndex: -1,
-      description: "Combine all selected nodes into a new \'Composite\' Node.",
+      description: 'Combine all selected nodes into a new "Composite" Node.',
       condition: function(editor) {
         return !editor._options.readOnly && editor._selectedNodes.length > 0;
       },
       onActivated: function(editor) {
         if (editor._selectedNodes.length && editor._parent) {
-          editor._undoManager && editor._undoManager.beginGroup("Combined Nodes into Composite");
+          var i = 0;
+          var a = 0;
+          var b = 0;
+          editor._undoManager && editor._undoManager.beginGroup('Combined Nodes into Composite');
+
           // Create undo events for removing the selected nodes.
-          for (var i = 0; i < editor._selectedNodes.length; ++i) {
+          for (i = 0; i < editor._selectedNodes.length; ++i) {
             editor.__onDestroyNode(editor._selectedNodes[i]);
 
             // Now give this node a new ID so it is treated like a different node.
             editor._selectedNodes[i].id = editor._engine.__nextNodeId();
           }
-
           var compNode = new wcPlayNodes.wcNodeCompositeScript(editor._parent, {x: 0, y: 0}, editor._selectedNodes);
 
           // Calculate the bounding box of all moved nodes.
           var boundList = [];
           var offsetList = [];
-          for (var i = 0; i < editor._selectedNodes.length; ++i) {
-            var node = editor._selectedNodes[i];
+          var targetNode = null;
+          var targetName = null;
+          var linkName = null;
+          var linkNode = null;
+          var node = null;
+          for (i = 0; i < editor._selectedNodes.length; ++i) {
+            node = editor._selectedNodes[i];
 
             boundList.push(node._meta.bounds.farRect);
             offsetList.push(node.pos);
           }
           var bounds = editor.__expandRect(boundList, offsetList);
 
-          var exportedNodes = [];
-          for (var i = 0; i < editor._selectedNodes.length; ++i) {
-            var node = editor._selectedNodes[i];
+          for (i = 0; i < editor._selectedNodes.length; ++i) {
+            node = editor._selectedNodes[i];
 
             // The node was already moved to the composite node, now remove it from the parent object.
             editor._parent.__removeNode(node);
@@ -1462,15 +1475,15 @@ wcPlayEditor.prototype = {
 
             // External entry chains.
             var createdLinks = [];
-            for (var a = 0; a < entryChains.length; ++a) {
-              var targetNode = editor._engine.nodeById(entryChains[a].outNodeId);
-              var targetName = entryChains[a].outName;
-              var node = editor._engine.nodeById(entryChains[a].inNodeId);
-              var linkName = entryChains[a].inName;
+            for (a = 0; a < entryChains.length; ++a) {
+              targetNode = editor._engine.nodeById(entryChains[a].outNodeId);
+              targetName = entryChains[a].outName;
+              linkName = entryChains[a].inName;
+              node = editor._engine.nodeById(entryChains[a].inNodeId);
 
               // Make sure we only create one Composite Entry per link.
-              var linkNode = null;
-              for (var b = 0; b < createdLinks.length; ++b) {
+              linkNode = null;
+              for (b = 0; b < createdLinks.length; ++b) {
                 if (createdLinks[b].name === linkName) {
                   linkNode = createdLinks[b].node;
                   break;
@@ -1481,7 +1494,7 @@ wcPlayEditor.prototype = {
                 linkNode = new wcPlayNodes.wcNodeCompositeEntry(compNode, {x: node.pos.x, y: bounds.top - 100}, linkName);
                 createdLinks.push({
                   name: linkName,
-                  node: linkNode,
+                  node: linkNode
                 });
               }
 
@@ -1492,15 +1505,15 @@ wcPlayEditor.prototype = {
 
             // External exit chains.
             createdLinks = [];
-            for (var a = 0; a < exitChains.length; ++a) {
-              var targetNode = editor._engine.nodeById(exitChains[a].inNodeId);
-              var targetName = exitChains[a].inName;
-              var node = editor._engine.nodeById(exitChains[a].outNodeId);
-              var linkName = exitChains[a].outName;
+            for (a = 0; a < exitChains.length; ++a) {
+              targetNode = editor._engine.nodeById(exitChains[a].inNodeId);
+              targetName = exitChains[a].inName;
+              linkName = exitChains[a].outName;
+              node = editor._engine.nodeById(exitChains[a].outNodeId);
 
               // Make sure we only create one Composite Entry per link.
-              var linkNode = null;
-              for (var b = 0; b < createdLinks.length; ++b) {
+              linkNode = null;
+              for (b = 0; b < createdLinks.length; ++b) {
                 if (createdLinks[b].name === linkName) {
                   linkNode = createdLinks[b].node;
                   break;
@@ -1511,7 +1524,7 @@ wcPlayEditor.prototype = {
                 linkNode = new wcPlayNodes.wcNodeCompositeExit(compNode, {x: node.pos.x, y: bounds.top + bounds.height + 50}, linkName);
                 createdLinks.push({
                   name: linkName,
-                  node: linkNode,
+                  node: linkNode
                 });
               }
 
@@ -1522,15 +1535,15 @@ wcPlayEditor.prototype = {
 
             // External property input chains.
             createdLinks = [];
-            for (var a = 0; a < inputChains.length; ++a) {
-              var targetNode = editor._engine.nodeById(inputChains[a].outNodeId);
-              var targetName = inputChains[a].outName;
-              var node = editor._engine.nodeById(inputChains[a].inNodeId);
-              var linkName = inputChains[a].inName;
+            for (a = 0; a < inputChains.length; ++a) {
+              targetNode = editor._engine.nodeById(inputChains[a].outNodeId);
+              targetName = inputChains[a].outName;
+              linkName = inputChains[a].inName;
+              node = editor._engine.nodeById(inputChains[a].inNodeId);
 
               // Make sure we only create one Composite Entry per link.
-              var linkNode = null;
-              for (var b = 0; b < createdLinks.length; ++b) {
+              linkNode = null;
+              for (b = 0; b < createdLinks.length; ++b) {
                 if (createdLinks[b].name === linkName) {
                   linkNode = createdLinks[b].node;
                   break;
@@ -1541,7 +1554,7 @@ wcPlayEditor.prototype = {
                 linkNode = new wcPlayNodes.wcNodeCompositeProperty(compNode, {x: bounds.left - 200, y: node.pos.y}, linkName);
                 createdLinks.push({
                   name: linkName,
-                  node: linkNode,
+                  node: linkNode
                 });
               }
 
@@ -1552,15 +1565,15 @@ wcPlayEditor.prototype = {
 
             // External property output chains.
             createdLinks = [];
-            for (var a = 0; a < outputChains.length; ++a) {
-              var targetNode = editor._engine.nodeById(outputChains[a].inNodeId);
-              var targetName = outputChains[a].inName;
-              var node = editor._engine.nodeById(outputChains[a].outNodeId);
-              var linkName = outputChains[a].outName;
+            for (a = 0; a < outputChains.length; ++a) {
+              targetNode = editor._engine.nodeById(outputChains[a].inNodeId);
+              targetName = outputChains[a].inName;
+              linkName = outputChains[a].outName;
+              node = editor._engine.nodeById(outputChains[a].outNodeId);
 
               // Make sure we only create one Composite Entry per link.
-              var linkNode = null;
-              for (var b = 0; b < createdLinks.length; ++b) {
+              linkNode = null;
+              for (b = 0; b < createdLinks.length; ++b) {
                 if (createdLinks[b].name === linkName) {
                   linkNode = createdLinks[b].node;
                   break;
@@ -1571,7 +1584,7 @@ wcPlayEditor.prototype = {
                 linkNode = new wcPlayNodes.wcNodeCompositeProperty(compNode, {x: bounds.left + bounds.width + 200, y: node.pos.y}, linkName);
                 createdLinks.push({
                   name: linkName,
-                  node: linkNode,
+                  node: linkNode
                 });
               }
 
@@ -1604,13 +1617,13 @@ wcPlayEditor.prototype = {
     this._menu.addOption('Debugging', 'Toggle Debug Mode', {
       icon: function(editor) {
         if (editor._engine && editor._engine.debugging()) {
-          return "fa fa-dot-circle-o fa-lg";
+          return 'fa fa-dot-circle-o fa-lg';
         } else {
-          return "fa fa-circle-o fa-lg";
+          return 'fa fa-circle-o fa-lg';
         }
       },
       toolbarIndex: -1,
-      description: "Toggle debugging mode (does not break on breakpoints).",
+      description: 'Toggle debugging mode (does not break on breakpoints).',
       onActivated: function(editor) {
         if (editor._engine) {
           editor._engine.debugging(!editor._engine.debugging());
@@ -1623,13 +1636,13 @@ wcPlayEditor.prototype = {
     this._menu.addOption('Debugging', 'Toggle Silence Mode', {
       icon: function(editor) {
         if (editor._engine && editor._engine.silent()) {
-          return "fa fa-volume-off fa-lg";
+          return 'fa fa-volume-off fa-lg';
         } else {
-          return "fa fa-volume-up fa-lg";
+          return 'fa fa-volume-up fa-lg';
         }
       },
       toolbarIndex: -1,
-      description: "Toggle silent mode (disables console log messages).",
+      description: 'Toggle silent mode (disables console log messages).',
       onActivated: function(editor) {
         if (editor._engine) {
           editor._engine.silent(!editor._engine.silent());
@@ -1639,23 +1652,23 @@ wcPlayEditor.prototype = {
 
     // Debugging -> Restart Script
     this._menu.addOption('Debugging', 'Start Script', {
-      hotkeys: "Shift+Enter",
+      hotkeys: 'Shift+Enter',
       icon: function(editor) {
         if (editor._engine && editor._engine.isRunning()) {
-          return "fa fa-stop fa-lg";
+          return 'fa fa-stop fa-lg';
         } else {
-          return "fa fa-play fa-lg";
+          return 'fa fa-play fa-lg';
         }
       },
       toolbarIndex: -1,
       display: function(editor) {
         if (editor._engine && editor._engine.isRunning()) {
-          return "Stop Script";
+          return 'Stop Script';
         } else {
-          return "Start Script";
+          return 'Start Script';
         }
       },
-      description: "Starts or Stops execution of the script.",
+      description: 'Starts or Stops execution of the script.',
       condition: function(editor) {
         return !editor._options.readOnly && editor._options.playable;
       },
@@ -1673,7 +1686,7 @@ wcPlayEditor.prototype = {
     // Debugging -> Pause/Continue Script
     this._menu.addOption('Debugging', 'Pause Script', {
       hotkeys: 'Return',
-      icon: "fa fa-pause fa-lg",
+      icon: 'fa fa-pause fa-lg',
       toggle: function(editor) {
         return editor._engine && editor._engine.paused();
       },
@@ -1685,7 +1698,7 @@ wcPlayEditor.prototype = {
         }
       },
       toolbarIndex: -1,
-      description: "Pause or Continue the script.",
+      description: 'Pause or Continue the script.',
       condition: function(editor) {
         return !editor._options.readOnly && (editor._engine && editor._engine.isRunning());
       },
@@ -1704,9 +1717,9 @@ wcPlayEditor.prototype = {
     // Debugging -> Step Script
     this._menu.addOption('Debugging', 'Step Script', {
       hotkeys: 'Spacebar',
-      icon: "fa fa-fast-forward fa-lg",
+      icon: 'fa fa-fast-forward fa-lg',
       toolbarIndex: -1,
-      description: "Perform a single script update.",
+      description: 'Perform a single script update.',
       condition: function(editor) {
         return !editor._options.readOnly && (editor._engine && editor._engine.isRunning());
       },
@@ -1721,10 +1734,10 @@ wcPlayEditor.prototype = {
     // View -> Create Composite
     this._menu.addOption('View', 'Fit in View', {
       hotkeys: 'F',
-      icon: "fa fa-crosshairs fa-lg",
+      icon: 'fa fa-crosshairs fa-lg',
       categoryIndex: 2,
       toolbarIndex: -1,
-      description: "Center view on selected node(s).",
+      description: 'Center view on selected node(s).',
       onActivated: function(editor) {
         if (editor._selectedNodes.length) {
           editor.focus(editor._selectedNodes);
@@ -1737,9 +1750,9 @@ wcPlayEditor.prototype = {
     // View -> Exit Composite
     this._menu.addOption('View', 'Exit Composite', {
       hotkeys: 'O',
-      icon: "fa fa-level-up fa-lg",
+      icon: 'fa fa-level-up fa-lg',
       toolbarIndex: -1,
-      description: "Step out of this Composite Node.",
+      description: 'Step out of this Composite Node.',
       condition: function(editor) {
         return editor._parent && editor._parent.instanceOf('wcNodeCompositeScript');
       },
@@ -1756,9 +1769,9 @@ wcPlayEditor.prototype = {
     // View -> Enter Composite
     this._menu.addOption('View', 'Enter Composite', {
       hotkeys: 'I',
-      icon: "fa fa-level-down fa-lg",
+      icon: 'fa fa-level-down fa-lg',
       toolbarIndex: -1,
-      description: "Step in to this Composite Node.",
+      description: 'Step in to this Composite Node.',
       condition: function(editor) {
         return (editor._selectedNodes.length === 1 && editor._selectedNodes[0].instanceOf('wcNodeCompositeScript'));
       },
@@ -1774,9 +1787,9 @@ wcPlayEditor.prototype = {
     // View -> Chain Style
     this._menu.addOption('View', 'Chain Style', {
       hotkeys: 'V',
-      icon: "fa fa-sitemap fa-lg",
+      icon: 'fa fa-sitemap fa-lg',
       toolbarIndex: -1,
-      description: "Toggle the visual style of the chains.",
+      description: 'Toggle the visual style of the chains.',
       toggle: function(editor) {
         return editor._chainStyle === 0;
       },
@@ -1805,7 +1818,7 @@ wcPlayEditor.prototype = {
           self._selectedNodes = searchResults;
         }
       }
-    };
+    }
 
     function __searchPrev() {
       if (searchResults.length) {
@@ -1817,7 +1830,7 @@ wcPlayEditor.prototype = {
         self.focus([searchResults[searchIndex]]);
         self._selectedNodes = searchResults;
       }
-    };
+    }
 
     function __searchNext() {
       if (searchResults.length) {
@@ -1829,7 +1842,7 @@ wcPlayEditor.prototype = {
         self.focus([searchResults[searchIndex]]);
         self._selectedNodes = searchResults;
       }
-    };
+    }
 
     this.$search.children('.wcPlayEditorSearchPrev').click(__searchPrev);
     this.$search.children('.wcPlayEditorSearchNext').click(__searchNext);
@@ -1856,9 +1869,9 @@ wcPlayEditor.prototype = {
       }
     });
 
-    this.$search.keyup(function(event) {
+    this.$search.keyup(function() {
       // Re-perform the search when the search value has changed.
-      var val = $field.val().toLowerCase();
+      var val = $field.value().toLowerCase();
       if (searchValue !== val) {
         searchIndex = 0;
         searchParent = self._parent;
@@ -1870,9 +1883,9 @@ wcPlayEditor.prototype = {
     // View -> Search...
     this._menu.addOption('View', 'Search...', {
       hotkeys: 'Ctrl+F',
-      icon: "fa fa-search fa-lg",
+      icon: 'fa fa-search fa-lg',
       toolbarIndex: -1,
-      description: "Toggle the visual style of the chains.",
+      description: 'Toggle the visual style of the chains.',
       onActivated: function(editor) {
         editor.$search.removeClass('wcPlayHidden');
         $field.focus();
@@ -1886,9 +1899,10 @@ wcPlayEditor.prototype = {
 
     // Help -> Documentation...
     this._menu.addOption('Help', 'Documentation...', {
-      icon: "fa fa-file-pdf-o fa-lg",
-      description: "Open the documentation for wcPlay in another window.",
+      icon: 'fa fa-file-pdf-o fa-lg',
+      description: 'Open the documentation for wcPlay in another window.',
       onActivated: function(editor) {
+        editor;
         window.open('http://play.api.webcabin.org/', '_blank');
       }
     });
@@ -2143,7 +2157,7 @@ wcPlayEditor.prototype = {
   //  * Draws each node in the palette view.
   //  * @function wcPlayEditor#__drawPalette
   //  * @private
-  //  * @param {Number} elapsed - Elapsed time since last update.
+  //  * @param {number} elapsed - Elapsed time since last update.
   //  */
   // __drawPalette: function(elapsed) {
   //   for (var cat in this._nodeLibrary) {
@@ -2196,7 +2210,7 @@ wcPlayEditor.prototype = {
    * @private
    * @param {wcNode} node - The node to render.
    * @param {external:Canvas~Context} context - The canvas context to render on.
-   * @param {Boolean} [isPalette] - If true, this node will be rendered for the palette view. 
+   * @param {boolean} [isPalette] - If true, this node will be rendered for the palette view. 
    */
   __drawNode: function(node, context, isPalette) {
     // Ignore drawing if the node is outside of view.
@@ -2210,8 +2224,8 @@ wcPlayEditor.prototype = {
 
     // Show an additional bounding rect around selected nodes.
     if (this._selectedNodes.indexOf(node) > -1) {
-      this.__drawRoundedRect(node._meta.bounds.rect, "rgba(0, 255, 255, 0.25)", -1, 10, context, node.pos);
-      this.__drawRoundedRect(node._meta.bounds.rect, "darkcyan", 2, 10, context, node.pos);
+      this.__drawRoundedRect(node._meta.bounds.rect, 'rgba(0, 255, 255, 0.25)', -1, 10, context, node.pos);
+      this.__drawRoundedRect(node._meta.bounds.rect, 'darkcyan', 2, 10, context, node.pos);
     }
 
     // Now use our measurements to draw our node.
@@ -2221,13 +2235,13 @@ wcPlayEditor.prototype = {
 
     // Add a collapse button to the node in the left margin of the title.
     context.save();
-    context.fillStyle = (this._highlightDebugLog && this._highlightNode === node? "black": "white");
-    context.strokeStyle = "black";
+    context.fillStyle = (this._highlightDebugLog && this._highlightNode === node? 'black': 'white');
+    context.strokeStyle = 'black';
     context.lineWidth = 1;
     context.fillRect(node.pos.x + node._meta.bounds.debugLog.left, node.pos.y + node._meta.bounds.debugLog.top, node._meta.bounds.debugLog.width, node._meta.bounds.debugLog.height);
     context.strokeRect(node.pos.x + node._meta.bounds.debugLog.left, node.pos.y + node._meta.bounds.debugLog.top, node._meta.bounds.debugLog.width, node._meta.bounds.debugLog.height);
 
-    context.strokeStyle = (node._log? "red": (this._highlightDebugLog && this._highlightNode === node? "white": "black"));
+    context.strokeStyle = (node._log? 'red': (this._highlightDebugLog && this._highlightNode === node? 'white': 'black'));
     context.lineWidth = 2;
     context.beginPath();
     context.moveTo(node.pos.x + node._meta.bounds.debugLog.left + 1, node.pos.y + node._meta.bounds.debugLog.top + 1);
@@ -2240,27 +2254,27 @@ wcPlayEditor.prototype = {
 
     // Add breakpoint button to the node in the right margin of the title.
     context.save();
-    context.fillStyle = (this._highlightBreakpoint && this._highlightNode === node? "black": "white");
+    context.fillStyle = (this._highlightBreakpoint && this._highlightNode === node? 'black': 'white');
     context.fillRect(node.pos.x + node._meta.bounds.breakpoint.left, node.pos.y + node._meta.bounds.breakpoint.top, node._meta.bounds.breakpoint.width, node._meta.bounds.breakpoint.height);
 
-    context.strokeStyle = (node._break? "red": (this._highlightBreakpoint && this._highlightNode === node? "white": "black"));
-    context.fillStyle = "red";
+    context.strokeStyle = (node._break? 'red': (this._highlightBreakpoint && this._highlightNode === node? 'white': 'black'));
+    context.fillStyle = 'red';
     context.lineWidth = 2;
     context.beginPath();
     context.arc(node.pos.x + node._meta.bounds.breakpoint.left + node._meta.bounds.breakpoint.width/2, node.pos.y + node._meta.bounds.breakpoint.top + node._meta.bounds.breakpoint.height/2, Math.min(node._meta.bounds.breakpoint.width/2-2, node._meta.bounds.breakpoint.height/2-2), 0, 2 * Math.PI);
     node._break && context.fill();
     context.stroke();
 
-    context.strokeStyle = "black";
+    context.strokeStyle = 'black';
     context.lineWidth = 1;
     context.strokeRect(node.pos.x + node._meta.bounds.breakpoint.left, node.pos.y + node._meta.bounds.breakpoint.top, node._meta.bounds.breakpoint.width, node._meta.bounds.breakpoint.height);
     context.restore();
 
     // Increase the nodes border thickness when flashing.
     if (node.isBroken()) {
-      this.__drawRoundedRect(node._meta.bounds.inner, "#CC0000", 5, this._drawStyle.node.radius, context, node.pos);
+      this.__drawRoundedRect(node._meta.bounds.inner, '#CC0000', 5, this._drawStyle.node.radius, context, node.pos);
     } else if (node._meta.flashDelta) {
-      this.__drawRoundedRect(node._meta.bounds.inner, "yellow", 2, this._drawStyle.node.radius, context, node.pos);
+      this.__drawRoundedRect(node._meta.bounds.inner, 'yellow', 2, this._drawStyle.node.radius, context, node.pos);
     }
   },
 
@@ -2277,7 +2291,7 @@ wcPlayEditor.prototype = {
       top: 0,
       left: 0,
       width: 0,
-      height: 0,
+      height: 0
     };
 
     this.__setCanvasFont(this._font.links, context);
@@ -2301,7 +2315,7 @@ wcPlayEditor.prototype = {
    * @private
    * @param {wcNode} node - The node to measure.
    * @param {external:Canvas~Context} context - The canvas context.
-   * @param {Number} offset - The top position to measure the links.
+   * @param {number} offset - The top position to measure the links.
    * @returns {wcPlayEditor~Rect} - A bounding rectangle.
    */
   __measureExitLinkOuter: function(node, context, offset) {
@@ -2309,7 +2323,7 @@ wcPlayEditor.prototype = {
       top: offset,
       left: 0,
       width: 0,
-      height: 0,
+      height: 0
     };
 
     this.__setCanvasFont(this._font.links, context);
@@ -2333,7 +2347,7 @@ wcPlayEditor.prototype = {
    * @private
    * @param {wcNode} node - The node to measure.
    * @param {external:Canvas~Context} context - The canvas context.
-   * @param {Number} offset - The upper offset.
+   * @param {number} offset - The upper offset.
    * @returns {wcPlayEditor~Rect} - A bounding rectangle. The height is only the amount of space rendered within the node bounds (links stick out).
    */
   __measureOuter: function(node, context, offset) {
@@ -2341,7 +2355,7 @@ wcPlayEditor.prototype = {
       top: offset,
       left: 0,
       width: 0,
-      height: this._font.title.size + this._drawStyle.title.spacing + this._drawStyle.links.padding,
+      height: this._font.title.size + this._drawStyle.title.spacing + this._drawStyle.links.padding
     };
 
     // Measure the title bar area.
@@ -2412,7 +2426,7 @@ wcPlayEditor.prototype = {
    */
   __measureCenter: function(node, context, rect) {
     var upper = node.chain.entry.length? this._font.links.size + this._drawStyle.links.padding: 0;
-    var lower = node.chain.exit.length? this._font.links.size + this._drawStyle.links.padding: 0;
+    // var lower = node.chain.exit.length? this._font.links.size + this._drawStyle.links.padding: 0;
 
     node._meta.bounds.center = rect;
     node._meta.bounds.inputBounds = [];
@@ -2443,14 +2457,14 @@ wcPlayEditor.prototype = {
 
       typeWidth: titleTypeWidth,
       wrapRWidth: titleWrapRWidth,
-      textWidth: titleTextWidth,
+      textWidth: titleTextWidth
     };
 
     node._meta.bounds.detailsBounds = {
       top: rect.top,
       left: rect.left + rect.width - this._drawStyle.node.margin - titleDetailsWidth,
       width: titleDetailsWidth,
-      height: this._font.details.size + this._drawStyle.title.spacing - 1,
+      height: this._font.details.size + this._drawStyle.title.spacing - 1
     };
 
     // Title Lower Bar
@@ -2464,7 +2478,7 @@ wcPlayEditor.prototype = {
         top: rect.top + upper,
         left: rect.left + (rect.width/2 - node._viewportSize.x/2),
         width: node._viewportSize.x,
-        height: node._viewportSize.y,
+        height: node._viewportSize.y
       };
 
       upper += node._viewportSize.y + this._drawStyle.property.spacing;
@@ -2473,7 +2487,8 @@ wcPlayEditor.prototype = {
     // Measure the property headers.
     upper += this._font.property.size + this._drawStyle.property.spacing;
 
-    var linkRect;
+    var linkRect = null;
+    var longRect = null;
     var props = node.properties;
     for (var i = 0; i < props.length; ++i) {
       upper += this._font.property.size;
@@ -2483,9 +2498,9 @@ wcPlayEditor.prototype = {
           top: rect.top + upper - this._font.property.size,
           left: rect.left + this._drawStyle.node.margin,
           width: rect.width - this._drawStyle.node.margin * 2,
-          height: this._font.property.size + this._drawStyle.property.spacing,
+          height: this._font.property.size + this._drawStyle.property.spacing
         },
-        name: props[i].name,
+        name: props[i].name
       };
       node._meta.bounds.propertyBounds.push(propertyBound);
 
@@ -2497,9 +2512,9 @@ wcPlayEditor.prototype = {
           top: rect.top + upper - this._font.property.size,
           left: rect.left + rect.width - this._drawStyle.node.margin - rect.initialWidth - (showValue? 0: rect.valueWidth),
           width: rect.initialWidth + (showValue? 0: rect.valueWidth),
-          height: this._font.property.size + this._drawStyle.property.spacing,
+          height: this._font.property.size + this._drawStyle.property.spacing
         },
-        name: props[i].name,
+        name: props[i].name
       };
       node._meta.bounds.initialBounds.push(initialBound);
 
@@ -2509,9 +2524,9 @@ wcPlayEditor.prototype = {
           top: rect.top + upper - this._font.property.size,
           left: rect.left + rect.width - this._drawStyle.node.margin - rect.valueWidth - rect.initialWidth,
           width: (showValue? rect.valueWidth: 0),
-          height: this._font.property.size + this._drawStyle.property.spacing,
+          height: this._font.property.size + this._drawStyle.property.spacing
         },
-        name: props[i].name,
+        name: props[i].name
       };
       node._meta.bounds.valueBounds.push(valueBound);
 
@@ -2520,13 +2535,13 @@ wcPlayEditor.prototype = {
         top: rect.top + upper - this._font.property.size/3 - this._drawStyle.links.width/2 - 5,
         left: rect.left - this._drawStyle.links.length,
         width: this._drawStyle.links.length,
-        height: (props[i].options && props[i].options.input)? this._drawStyle.links.width + 10: 0,
+        height: (props[i].options && props[i].options.input)? this._drawStyle.links.width + 10: 0
       };
       longRect = {
         top: rect.top + upper - this._font.property.size/3 - this._drawStyle.links.width/2 - 5,
         left: rect.left - this._drawStyle.links.length,
         width: rect.width + this._drawStyle.links.length,
-        height: (props[i].options && props[i].options.input)? this._drawStyle.links.width + 10: 0,
+        height: (props[i].options && props[i].options.input)? this._drawStyle.links.width + 10: 0
       };
 
       node._meta.bounds.inputBounds.push({
@@ -2534,9 +2549,9 @@ wcPlayEditor.prototype = {
         longRect: longRect,
         point: {
           x: linkRect.left + linkRect.width/3 - 2,
-          y: linkRect.top + linkRect.height/2,
+          y: linkRect.top + linkRect.height/2
         },
-        name: props[i].name,
+        name: props[i].name
       });
 
       // Property output.
@@ -2544,23 +2559,23 @@ wcPlayEditor.prototype = {
         top: rect.top + upper - this._font.property.size/3 - this._drawStyle.links.width/2 - 5,
         left: rect.left + rect.width,
         width: this._drawStyle.links.length,
-        height: (props[i].options && props[i].options.output)? this._drawStyle.links.width + 10: 0,
-      }
+        height: (props[i].options && props[i].options.output)? this._drawStyle.links.width + 10: 0
+      };
       longRect = {
         top: rect.top + upper - this._font.property.size/3 - this._drawStyle.links.width/2 - 5,
         left: rect.left,
         width: rect.width + this._drawStyle.links.length,
-        height: (props[i].options && props[i].options.output)? this._drawStyle.links.width + 10: 0,
-      }
+        height: (props[i].options && props[i].options.output)? this._drawStyle.links.width + 10: 0
+      };
 
       node._meta.bounds.outputBounds.push({
         rect: linkRect,
         longRect: longRect,
         point: {
           x: linkRect.left + linkRect.width + 1,
-          y: linkRect.top + linkRect.height/2,
+          y: linkRect.top + linkRect.height/2
         },
-        name: props[i].name,
+        name: props[i].name
       });
 
       upper += this._drawStyle.property.spacing;
@@ -2575,7 +2590,7 @@ wcPlayEditor.prototype = {
    * @private
    * @param {wcNode} node - The node to draw.
    * @param {external:Canvas~Context} context - The canvas context.
-   * @param {Number} width - The width of the area to draw in.
+   * @param {number} width - The width of the area to draw in.
    */
   __measureEntryLinks: function(node, context, width) {
     node._meta.bounds.entryBounds = [];
@@ -2596,7 +2611,7 @@ wcPlayEditor.prototype = {
         top: yPos - this._drawStyle.links.length - this._font.links.size,
         left: xPos + w/2 - this._drawStyle.links.width/2,
         width: this._drawStyle.links.width,
-        height: this._drawStyle.links.length,
+        height: this._drawStyle.links.length
       };
 
       // Expand the bounding rect just a little so it is easier to click.
@@ -2607,7 +2622,7 @@ wcPlayEditor.prototype = {
         top: rect.top,
         left: rect.left,
         width: rect.width,
-        height: node._meta.bounds.center.height,
+        height: node._meta.bounds.center.height
       };
 
       node._meta.bounds.entryBounds.push({
@@ -2615,9 +2630,9 @@ wcPlayEditor.prototype = {
         longRect: longRect,
         point: {
           x: rect.left + rect.width/2,
-          y: rect.top + rect.height/3 - 2,
+          y: rect.top + rect.height/3 - 2
         },
-        name: links[i].name,
+        name: links[i].name
       });
 
       xPos += w;
@@ -2631,8 +2646,8 @@ wcPlayEditor.prototype = {
    * @private
    * @param {wcNode} node - The node to draw.
    * @param {external:Canvas~Context} context - The canvas context.
-   * @param {Number} offset - The upper offset.
-   * @param {Number} width - The width of the area to draw in.
+   * @param {number} offset - The upper offset.
+   * @param {number} width - The width of the area to draw in.
    */
   __measureExitLinks: function(node, context, offset, width) {
     node._meta.bounds.exitBounds = [];
@@ -2653,7 +2668,7 @@ wcPlayEditor.prototype = {
         top: yPos + this._drawStyle.links.padding,
         left: xPos + w/2 - this._drawStyle.links.width/2,
         width: this._drawStyle.links.width,
-        height: this._drawStyle.links.length,
+        height: this._drawStyle.links.length
       };
 
       // Expand the bounding rect just a little so it is easier to click.
@@ -2664,7 +2679,7 @@ wcPlayEditor.prototype = {
         top: rect.top - node._meta.bounds.center.height + this._drawStyle.links.length,
         left: rect.left,
         width: rect.width,
-        height: node._meta.bounds.center.height,
+        height: node._meta.bounds.center.height
       };
 
       node._meta.bounds.exitBounds.push({
@@ -2672,9 +2687,9 @@ wcPlayEditor.prototype = {
         longRect: longRect,
         point: {
           x: rect.left + rect.width/2,
-          y: rect.top + rect.height + 1,
+          y: rect.top + rect.height + 1
         },
-        name: links[i].name,
+        name: links[i].name
       });
 
       xPos += w;
@@ -2688,7 +2703,7 @@ wcPlayEditor.prototype = {
    * @private
    * @param {wcNode} node - The node to draw.
    * @param {external:Canvas~Context} context - The canvas context.
-   * @param {Boolean} [isPalette] - If true, this node will be rendered for the palette view. 
+   * @param {boolean} [isPalette] - If true, this node will be rendered for the palette view. 
    * @returns {wcPlayEditor~DrawPropertyData} - Contains bounding rectangles for various drawings.
    */
   __drawCenter: function(node, context, isPalette) {
@@ -2697,17 +2712,19 @@ wcPlayEditor.prototype = {
 
     // Node background
     context.save();
+    {
       var left = node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width/2;
       var top = node.pos.y + node._meta.bounds.center.top + (node._meta.bounds.center.height)/2;
       var gradient = context.createRadialGradient(left, top, 10, left, top, Math.max(node._meta.bounds.center.width, node._meta.bounds.center.height));
       gradient.addColorStop(0, (node.enabled()? node._meta.color: '#555'));
-      gradient.addColorStop(1, "white");
+      gradient.addColorStop(1, 'white');
       context.fillStyle = context.strokeStyle = gradient;
-      context.lineJoin = "round";
+      context.lineJoin = 'round';
       var diameter = this._drawStyle.node.radius*2;
       context.lineWidth = diameter;
       context.fillRect(node.pos.x + node._meta.bounds.center.left + diameter/2, node.pos.y + node._meta.bounds.center.top - upper + diameter/2, node._meta.bounds.center.width - diameter, node._meta.bounds.center.height + upper + lower - diameter);
       context.strokeRect(node.pos.x + node._meta.bounds.center.left + diameter/2, node.pos.y + node._meta.bounds.center.top - upper + diameter/2, node._meta.bounds.center.width - diameter, node._meta.bounds.center.height + upper + lower - diameter);
+    }
     context.restore();
     this.__drawRoundedRect({
       left: node._meta.bounds.center.left,
@@ -2747,16 +2764,16 @@ wcPlayEditor.prototype = {
     // Title Text
     context.save();
     upper += this._font.title.size;
-    context.fillStyle = "black";
-    context.strokeStyle = "black";
-    context.textAlign = "left";
+    context.fillStyle = 'black';
+    context.strokeStyle = 'black';
+    context.textAlign = 'left';
     this.__setCanvasFont(this._font.title, context);
     context.fillText(this._drawStyle.title.wrapL + node.type + ': ', node.pos.x + node._meta.bounds.titleBounds.left - node._meta.bounds.titleBounds.typeWidth, node.pos.y + node._meta.bounds.titleBounds.top + upper);
 
     this.__setCanvasFont(this._font.titleDesc, context);
     context.fillText(this._drawStyle.title.nameWrapL + (node.name || this._drawStyle.title.placeholder) + this._drawStyle.title.nameWrapR, node.pos.x + node._meta.bounds.titleBounds.left, node.pos.y + node._meta.bounds.titleBounds.top + upper);
 
-    context.textAlign = "right";
+    context.textAlign = 'right';
     this.__setCanvasFont(this._font.title, context);
     context.fillText(this._drawStyle.title.wrapR, node.pos.x + node._meta.bounds.titleBounds.left, node.pos.y + node._meta.bounds.titleBounds.top + upper);
 
@@ -2800,38 +2817,40 @@ wcPlayEditor.prototype = {
     this.__drawRoundedRect(headerBounds, this._drawStyle.property.headerColor, this._drawStyle.property.headerBorder, this._font.property.size/2, context, node.pos);
 
     if (node._meta.bounds.centerOuter.valueWidth) {
-      context.fillStyle = "black";
-      context.textAlign = "right";
+      context.fillStyle = 'black';
+      context.textAlign = 'right';
       this.__setCanvasFont(this._font.propertyHeader, context);
-      context.fillText("Initial", node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin - this._drawStyle.property.headerSpace, node.pos.y + node._meta.bounds.center.top + upper);
+      context.fillText('Initial', node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin - this._drawStyle.property.headerSpace, node.pos.y + node._meta.bounds.center.top + upper);
 
-      context.fillStyle = "#444444";
+      context.fillStyle = '#444444';
       this.__setCanvasFont(this._font.propertyHeader, context);
-      context.fillText("Current", node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin - this._drawStyle.property.headerSpace - node._meta.bounds.center.initialWidth, node.pos.y + node._meta.bounds.center.top + upper);
+      context.fillText('Current', node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin - this._drawStyle.property.headerSpace - node._meta.bounds.center.initialWidth, node.pos.y + node._meta.bounds.center.top + upper);
     } else {
-      context.fillStyle = "black";
-      context.textAlign = "right";
+      context.fillStyle = 'black';
+      context.textAlign = 'right';
       this.__setCanvasFont(this._font.propertyHeader, context);
-      context.fillText("Initial", node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin - this._drawStyle.property.headerSpace, node.pos.y + node._meta.bounds.center.top + upper);
+      context.fillText('Initial', node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin - this._drawStyle.property.headerSpace, node.pos.y + node._meta.bounds.center.top + upper);
     }
 
     upper += this._drawStyle.property.spacing;
 
+    var i = 0;
+    var a = 0;
     var props = node.properties;
-    for (var i = 0; i < props.length; ++i) {
+    for (i = 0; i < props.length; ++i) {
       upper += this._font.property.size;
 
-      var propertyBound = null;
-      for (var a = 0; a < node._meta.bounds.propertyBounds.length; ++a) {
-        if (node._meta.bounds.propertyBounds[a].name === props[i].name) {
-          propertyBound = node._meta.bounds.propertyBounds[a];
-          break;
-        }
-      }
+      // var propertyBound = null;
+      // for (var a = 0; a < node._meta.bounds.propertyBounds.length; ++a) {
+      //   if (node._meta.bounds.propertyBounds[a].name === props[i].name) {
+      //     propertyBound = node._meta.bounds.propertyBounds[a];
+      //     break;
+      //   }
+      // }
 
       // Initial property value.
       var initialBound = null;
-      for (var a = 0; a < node._meta.bounds.initialBounds.length; ++a) {
+      for (a = 0; a < node._meta.bounds.initialBounds.length; ++a) {
         if (node._meta.bounds.initialBounds[a].name === props[i].name) {
           initialBound = node._meta.bounds.initialBounds[a];
           break;
@@ -2840,7 +2859,7 @@ wcPlayEditor.prototype = {
 
       // Property value.
       var valueBound = null;
-      for (var a = 0; a < node._meta.bounds.valueBounds.length; ++a) {
+      for (a = 0; a < node._meta.bounds.valueBounds.length; ++a) {
         if (node._meta.bounds.valueBounds[a].name === props[i].name) {
           valueBound = node._meta.bounds.valueBounds[a];
           break;
@@ -2866,25 +2885,25 @@ wcPlayEditor.prototype = {
         }
       }
 
-      context.fillStyle = "black";
-      context.textAlign = "left";
+      context.fillStyle = 'black';
+      context.textAlign = 'left';
       this.__setCanvasFont(this._font.property, context);
       context.fillText(props[i].name + ': ', node.pos.x + node._meta.bounds.center.left + this._drawStyle.node.margin, node.pos.y + node._meta.bounds.center.top + upper);
 
-      context.fillStyle = "black";
-      context.textAlign = "right";
+      context.fillStyle = 'black';
+      context.textAlign = 'right';
       this.__setCanvasFont(this._font.initialValue, context);
       context.fillText(this._drawStyle.property.initialWrapL + this.__drawPropertyValue(node, props[i], true, !showValue) + this._drawStyle.property.initialWrapR, node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin, node.pos.y + node._meta.bounds.center.top + upper);
 
       if (this._engine && showValue) {
-        context.fillStyle = "#444444";
+        context.fillStyle = '#444444';
         this.__setCanvasFont(this._font.value, context);
         context.fillText(this._drawStyle.property.valueWrapL + this.__drawPropertyValue(node, props[i]) + this._drawStyle.property.valueWrapR, node.pos.x + node._meta.bounds.center.left + node._meta.bounds.center.width - this._drawStyle.node.margin - node._meta.bounds.center.initialWidth, node.pos.y + node._meta.bounds.center.top + upper);
       }
 
       // Property input.
       var linkRect = null;
-      for (var a = 0; a < node._meta.bounds.inputBounds.length; ++a) {
+      for (a = 0; a < node._meta.bounds.inputBounds.length; ++a) {
         if (node._meta.bounds.inputBounds[a].name === props[i].name) {
           linkRect = node._meta.bounds.inputBounds[a].rect;
           break;
@@ -2892,8 +2911,8 @@ wcPlayEditor.prototype = {
       }
 
       if (props[i].options && props[i].options.input) {
-        context.fillStyle = (this._highlightInputLink && this._highlightInputLink.name === props[i].name && this._highlightNode === node? "cyan": props[i].inputMeta.color);
-        context.strokeStyle = "black";
+        context.fillStyle = (this._highlightInputLink && this._highlightInputLink.name === props[i].name && this._highlightNode === node? 'cyan': props[i].inputMeta.color);
+        context.strokeStyle = 'black';
         context.beginPath();
         context.moveTo(node.pos.x + linkRect.left, node.pos.y + linkRect.top + 5);
         context.lineTo(node.pos.x + linkRect.left + linkRect.width, node.pos.y + linkRect.top + 5);
@@ -2906,8 +2925,8 @@ wcPlayEditor.prototype = {
       }
 
       // Property output.
-      var linkRect = null;
-      for (var a = 0; a < node._meta.bounds.outputBounds.length; ++a) {
+      linkRect = null;
+      for (a = 0; a < node._meta.bounds.outputBounds.length; ++a) {
         if (node._meta.bounds.outputBounds[a].name === props[i].name) {
           linkRect = node._meta.bounds.outputBounds[a].rect;
           break;
@@ -2915,8 +2934,8 @@ wcPlayEditor.prototype = {
       }
 
       if (props[i].options && props[i].options.output) {
-        context.fillStyle = (this._highlightOutputLink && this._highlightOutputLink.name === props[i].name && this._highlightNode === node? "cyan": props[i].outputMeta.color);
-        context.strokeStyle = "black";
+        context.fillStyle = (this._highlightOutputLink && this._highlightOutputLink.name === props[i].name && this._highlightNode === node? 'cyan': props[i].outputMeta.color);
+        context.strokeStyle = 'black';
         context.beginPath();
         context.moveTo(node.pos.x + linkRect.left, node.pos.y + linkRect.top + 5);
         context.lineTo(node.pos.x + linkRect.left + linkRect.width/2, node.pos.y + linkRect.top + 5);
@@ -2949,7 +2968,7 @@ wcPlayEditor.prototype = {
    * @private
    * @param {wcNode} node - The node to draw.
    * @param {external:Canvas~Context} context - The canvas context.
-   * @param {Number} width - The width of the area to draw in.
+   * @param {number} width - The width of the area to draw in.
    */
   __drawEntryLinks: function(node, context, width) {
     var xPos = node.pos.x - width/2 + this._drawStyle.links.margin;
@@ -2961,7 +2980,7 @@ wcPlayEditor.prototype = {
     var links = node.chain.entry;
     for (var i = 0; i < links.length; ++i) {
       // Link label
-      context.fillStyle = "black";
+      context.fillStyle = 'black';
       var w = context.measureText(links[i].name).width + this._drawStyle.links.spacing;
       context.fillText(links[i].name, xPos + this._drawStyle.links.spacing/2, yPos);
 
@@ -2974,8 +2993,8 @@ wcPlayEditor.prototype = {
         }
       }
 
-      context.fillStyle = (this._highlightEntryLink && this._highlightEntryLink.name === links[i].name && this._highlightNode === node? "cyan": links[i].meta.color);
-      context.strokeStyle = "black";
+      context.fillStyle = (this._highlightEntryLink && this._highlightEntryLink.name === links[i].name && this._highlightNode === node? 'cyan': links[i].meta.color);
+      context.strokeStyle = 'black';
       context.beginPath();
       context.moveTo(node.pos.x + rect.left + 5, node.pos.y + rect.top);
       context.lineTo(node.pos.x + rect.left + rect.width/2, node.pos.y + rect.top + rect.height/3);
@@ -2998,8 +3017,8 @@ wcPlayEditor.prototype = {
    * @private
    * @param {wcNode} node - The node to draw.
    * @param {external:Canvas~Context} context - The canvas context.
-   * @param {Number} offset - An offset height.
-   * @param {Number} width - The width of the area to draw in.
+   * @param {number} offset - An offset height.
+   * @param {number} width - The width of the area to draw in.
    */
   __drawExitLinks: function(node, context, offset, width) {
     var xPos = node.pos.x - width/2 + this._drawStyle.links.margin;
@@ -3011,7 +3030,7 @@ wcPlayEditor.prototype = {
     var links = node.chain.exit;
     for (var i = 0; i < links.length; ++i) {
       // Link label
-      context.fillStyle = "black";
+      context.fillStyle = 'black';
       var w = context.measureText(links[i].name).width + this._drawStyle.links.spacing;
       context.fillText(links[i].name, xPos + this._drawStyle.links.spacing/2, yPos);
 
@@ -3024,8 +3043,8 @@ wcPlayEditor.prototype = {
         }
       }
 
-      context.fillStyle = (this._highlightExitLink && this._highlightExitLink.name === links[i].name && this._highlightNode === node? "cyan": links[i].meta.color);
-      context.strokeStyle = "black";
+      context.fillStyle = (this._highlightExitLink && this._highlightExitLink.name === links[i].name && this._highlightNode === node? 'cyan': links[i].meta.color);
+      context.strokeStyle = 'black';
       context.beginPath();
       context.moveTo(node.pos.x + rect.left + 5, node.pos.y + rect.top);
       context.lineTo(node.pos.x + rect.left + rect.width - 5, node.pos.y + rect.top);
@@ -3062,7 +3081,15 @@ wcPlayEditor.prototype = {
    * @param {external:Canvas~Context} context - The canvas context.
    */
   __drawNodeChains: function(node, context) {
-    for (var i = 0; i < node.chain.exit.length; ++i) {
+    var i = 0;
+    var a = 0;
+    var b = 0;
+    var targetNode = null;
+    var targetName = '';
+    var flash = false;
+    var highlight = false;
+
+    for (i = 0; i < node.chain.exit.length; ++i) {
       var exitLink = node.chain.exit[i];
 
       // Skip links that are not chained with anything.
@@ -3070,9 +3097,9 @@ wcPlayEditor.prototype = {
         continue;
       }
 
-      var exitPoint;
+      var exitPoint = null;
       // Find the corresponding meta data for this link.
-      for (var a = 0; a < node._meta.bounds.exitBounds.length; ++a) {
+      for (a = 0; a < node._meta.bounds.exitBounds.length; ++a) {
         if (node._meta.bounds.exitBounds[a].name === exitLink.name) {
           exitPoint = node._meta.bounds.exitBounds[a].point;
           break;
@@ -3086,17 +3113,17 @@ wcPlayEditor.prototype = {
       }
 
       // Follow each chain to their entry links.
-      for (var a = 0; a < exitLink.links.length; ++a) {
-        var targetNode = exitLink.links[a].node;
-        var targetName = exitLink.links[a].name;
-        var entryLink;
+      for (a = 0; a < exitLink.links.length; ++a) {
+        targetNode = exitLink.links[a].node;
+        targetName = exitLink.links[a].name;
+        var entryLink = null;
 
         // Skip pairs of nodes that are not visible.
         if (!node._meta.visible && !targetNode._meta.visible) {
           continue;
         }
 
-        for (var b = 0; b < targetNode.chain.entry.length; ++b) {
+        for (b = 0; b < targetNode.chain.entry.length; ++b) {
           if (targetNode.chain.entry[b].name === targetName) {
             entryLink = targetNode.chain.entry[b];
             break;
@@ -3111,7 +3138,7 @@ wcPlayEditor.prototype = {
 
         // Find the corresponding meta data for this link.
         var entryPoint;
-        for (var b = 0; b < targetNode._meta.bounds.entryBounds.length; ++b) {
+        for (b = 0; b < targetNode._meta.bounds.entryBounds.length; ++b) {
           if (targetNode._meta.bounds.entryBounds[b].name === entryLink.name) {
             entryPoint = targetNode._meta.bounds.entryBounds[b].point;
             break;
@@ -3124,9 +3151,8 @@ wcPlayEditor.prototype = {
           continue;
         }
 
-        var flash = (exitLink.meta.flashDelta > 0 && entryLink.meta.flashDelta > 0);
-
-        var highlight = 
+        flash = (exitLink.meta.flashDelta > 0 && entryLink.meta.flashDelta > 0);
+        highlight = 
           (this._highlightNode === targetNode && this._highlightEntryLink && this._highlightEntryLink.name === entryLink.name) ||
           (this._highlightNode === node && this._highlightExitLink && this._highlightExitLink.name === exitLink.name);
 
@@ -3135,7 +3161,7 @@ wcPlayEditor.prototype = {
       }
     }
 
-    for (var i = 0; i < node.properties.length; ++i) {
+    for (i = 0; i < node.properties.length; ++i) {
       var outputProp = node.properties[i];
 
       // Skip properties with no output links.
@@ -3145,7 +3171,7 @@ wcPlayEditor.prototype = {
 
       // Find the corresponding meta data for this link.
       var outputPoint;
-      for (var a = 0; a < node._meta.bounds.outputBounds.length; ++a) {
+      for (a = 0; a < node._meta.bounds.outputBounds.length; ++a) {
         if (node._meta.bounds.outputBounds[a].name === outputProp.name) {
           outputPoint = node._meta.bounds.outputBounds[a].point;
           break;
@@ -3159,17 +3185,17 @@ wcPlayEditor.prototype = {
       }
 
       // Follow each chain to their input links.
-      for (var a = 0; a < outputProp.outputs.length; ++a) {
-        var targetNode = outputProp.outputs[a].node;
-        var targetName = outputProp.outputs[a].name;
-        var inputProp;
+      for (a = 0; a < outputProp.outputs.length; ++a) {
+        targetNode = outputProp.outputs[a].node;
+        targetName = outputProp.outputs[a].name;
+        var inputProp = null;
 
         // Skip pairs of nodes that are not visible.
         if (!node._meta.visible && !targetNode._meta.visible) {
           continue;
         }
 
-        for (var b = 0; b < targetNode.properties.length; ++b) {
+        for (b = 0; b < targetNode.properties.length; ++b) {
           if (targetNode.properties[b].name === targetName) {
             inputProp = targetNode.properties[b];
           }
@@ -3183,7 +3209,7 @@ wcPlayEditor.prototype = {
 
         // Find the corresponding meta data for this link.
         var inputPoint;
-        for (var b = 0; b < targetNode._meta.bounds.inputBounds.length; ++b) {
+        for (b = 0; b < targetNode._meta.bounds.inputBounds.length; ++b) {
           if (targetNode._meta.bounds.inputBounds[b].name === inputProp.name) {
             inputPoint = targetNode._meta.bounds.inputBounds[b].point;
             break;
@@ -3196,8 +3222,8 @@ wcPlayEditor.prototype = {
           continue;
         }
 
-        var flash = (outputProp.outputMeta.flashDelta > 0 || inputProp.inputMeta.flashDelta > 0);
-        var highlight =
+        flash = (outputProp.outputMeta.flashDelta > 0 || inputProp.inputMeta.flashDelta > 0);
+        highlight =
           (this._highlightNode === targetNode && this._highlightInputLink && this._highlightInputLink.name === inputProp.name) ||
           (this._highlightNode === node && this._highlightOutputLink && this._highlightOutputLink.name === outputProp.name);
 
@@ -3207,11 +3233,14 @@ wcPlayEditor.prototype = {
     }
 
     // Draw a link to the mouse cursor if we are making a connection.
+    var targetPos = null;
+    var targetRect = null;
+    var targetOffset = null;
+    var point = null;
+
     if (this._selectedNode === node && this._selectedEntryLink) {
-      var targetPos;
-      var targetRect = null;
-      var targetOffset = null;
-      var highlight = false;
+      highlight = false;
+
       if (this._highlightNode && this._highlightExitLink) {
         targetPos = this._highlightExitLink.point;
         targetRect = this._highlightExitLink.rect;
@@ -3220,19 +3249,19 @@ wcPlayEditor.prototype = {
       } else {
         targetPos = {
           x: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z,
-          y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z,
+          y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z
         };
         targetRect = {
           left: targetPos.x,
           top: targetPos.y,
           width: 1,
-          height: 1,
+          height: 1
         };
         targetOffset = {x: 0, y: 0};
       }
 
-      var point;
-      for (var i = 0; i < node._meta.bounds.entryBounds.length; ++i) {
+      point = null;
+      for (i = 0; i < node._meta.bounds.entryBounds.length; ++i) {
         if (node._meta.bounds.entryBounds[i].name === this._selectedEntryLink.name) {
           point = node._meta.bounds.entryBounds[i].point;
         }
@@ -3242,10 +3271,10 @@ wcPlayEditor.prototype = {
     }
 
     if (this._selectedNode === node && this._selectedExitLink) {
-      var targetPos;
-      var targetRect = null;
-      var targetOffset = null;
-      var highlight = false;
+      targetPos = null;
+      targetRect = null;
+      targetOffset = null;
+      highlight = false;
       if (this._highlightNode && this._highlightEntryLink) {
         targetPos = this._highlightEntryLink.point;
         targetRect = this._highlightEntryLink.rect;
@@ -3254,19 +3283,19 @@ wcPlayEditor.prototype = {
       } else {
         targetPos = {
           x: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z,
-          y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z,
+          y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z
         };
         targetRect = {
           left: targetPos.x,
           top: targetPos.y,
           width: 1,
-          height: 1,
+          height: 1
         };
         targetOffset = {x: 0, y: 0};
       }
 
-      var point;
-      for (var i = 0; i < node._meta.bounds.exitBounds.length; ++i) {
+      point = null;
+      for (i = 0; i < node._meta.bounds.exitBounds.length; ++i) {
         if (node._meta.bounds.exitBounds[i].name === this._selectedExitLink.name) {
           point = node._meta.bounds.exitBounds[i].point;
         }
@@ -3276,10 +3305,11 @@ wcPlayEditor.prototype = {
     }
 
     if (this._selectedNode === node && this._selectedInputLink) {
-      var targetPos;
-      var targetRect = null;
-      var targetOffset = null;
-      var highlight = false;
+      targetPos = null;
+      targetRect = null;
+      targetOffset = null;
+      highlight = false;
+
       if (this._highlightNode && this._highlightOutputLink) {
         targetPos = this._highlightOutputLink.point;
         targetRect = this._highlightOutputLink.rect;
@@ -3288,19 +3318,19 @@ wcPlayEditor.prototype = {
       } else {
         targetPos = {
           x: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z,
-          y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z,
+          y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z
         };
         targetRect = {
           left: targetPos.x,
           top: targetPos.y,
           width: 1,
-          height: 1,
+          height: 1
         };
         targetOffset = {x: 0, y: 0};
       }
 
-      var point;
-      for (var i = 0; i < node._meta.bounds.inputBounds.length; ++i) {
+      point = null;
+      for (i = 0; i < node._meta.bounds.inputBounds.length; ++i) {
         if (node._meta.bounds.inputBounds[i].name === this._selectedInputLink.name) {
           point = node._meta.bounds.inputBounds[i].point;
         }
@@ -3310,10 +3340,10 @@ wcPlayEditor.prototype = {
     }
 
     if (this._selectedNode === node && this._selectedOutputLink) {
-      var targetPos;
-      var targetRect = null;
-      var targetOffset = null;
-      var highlight = false;
+      targetPos = null;
+      targetRect = null;
+      targetOffset = null;
+      highlight = false;
       if (this._highlightNode && this._highlightInputLink) {
         targetPos = this._highlightInputLink.point;
         targetRect = this._highlightInputLink.rect;
@@ -3322,19 +3352,19 @@ wcPlayEditor.prototype = {
       } else {
         targetPos = {
           x: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z,
-          y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z,
+          y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z
         };
         targetRect = {
           left: targetPos.x,
           top: targetPos.y,
           width: 1,
-          height: 1,
+          height: 1
         };
         targetOffset = {x: 0, y: 0};
       }
 
-      var point;
-      for (var i = 0; i < node._meta.bounds.outputBounds.length; ++i) {
+      point = null;
+      for (i = 0; i < node._meta.bounds.outputBounds.length; ++i) {
         if (node._meta.bounds.outputBounds[i].name === this._selectedOutputLink.name) {
           point = node._meta.bounds.outputBounds[i].point;
         }
@@ -3345,7 +3375,7 @@ wcPlayEditor.prototype = {
   },
 
   /**
-   * Generic draw chain function, you can flip the x and y axes to achieve either a flow or property chain orientation.
+   * Draws a chain between two connector links, you can flip the x and y axes to achieve either a flow or property chain orientation.
    * @function wcPlayEditor#__drawChain
    * @private
    * @param {wcPlay~Coordinates} startOffset - The offset for the start position and rect.
@@ -3353,29 +3383,30 @@ wcPlayEditor.prototype = {
    * @param {wcPlay~Coordinates} startPos - The start position (the exit link).
    * @param {wcPlay~Coordinates} endPos - The end position (the entry link).
    * @param {wcPlayEditor~Rect} startRect - The start node's bounding rect to avoid.
-   * @param {wcPlayEditor~Rect} endPos - The end node's bounding rect to avoid.
-   * @param {Boolean} [flash] - If true, will flash the link.
-   * @param {Boolean} [isProperty] - If true, will render property chain orientation.
+   * @param {wcPlayEditor~Rect} endRect - The end node's bounding rect to avoid.
    * @param {external:Canvas~Context} context - The canvas context.
+   * @param {boolean} [flash] - If true, will flash the link.
+   * @param {boolean} [highlight] - If true, the link will be highlighted.
+   * @param {boolean} [isProperty] - If true, will render property chain orientation.
    */
   __drawChain: function(startOffset, endOffset, startPos, endPos, startRect, endRect, context, flash, highlight, isProperty) {
     context.save();
     context.lineWidth = 2;
-    context.lineCap = "round";
-    context.lineJoin = "round";
+    context.lineCap = 'round';
+    context.lineJoin = 'round';
     context.beginPath();
     context.moveTo((startOffset.x + startPos.x), (startOffset.y + startPos.y));
 
     // this._chainDrawCount += 1;
 
     // Do some preparation to make the orientation invisible.
-    function __lineTo(x, y) {
-      if (isProperty) {
-        context.lineTo(y, x);
-      } else {
-        context.lineTo(x, y);
-      }
-    };
+    // function __lineTo(x, y) {
+    //   if (isProperty) {
+    //     context.lineTo(y, x);
+    //   } else {
+    //     context.lineTo(x, y);
+    //   }
+    // }
 
     function __arcTo(x1, y1, x2, y2, radius) {
       if (isProperty) {
@@ -3383,7 +3414,7 @@ wcPlayEditor.prototype = {
       } else {
         context.arcTo(x1, y1, x2, y2, radius);
       }
-    };
+    }
 
     function __curveTo(x1, y1, x2, y2, x3, y3) {
       if (isProperty) {
@@ -3391,74 +3422,74 @@ wcPlayEditor.prototype = {
       } else {
         context.bezierCurveTo(x1, y1, x2, y2, x3, y3);
       }
-    };
+    }
 
     var start, end, startBounds, endBounds;
     if (isProperty) {
       start = {
         x: startOffset.y + startPos.y,
-        y: startOffset.x + startPos.x,
+        y: startOffset.x + startPos.x
       };
       end = {
         x: endOffset.y + endPos.y,
-        y: endOffset.x + endPos.x,
+        y: endOffset.x + endPos.x
       };
       startBounds = {
         top: startRect.left + startOffset.x,
         left: startRect.top + startOffset.y,
         width: startRect.height,
-        height: startRect.width,
+        height: startRect.width
       };
       endBounds = {
         top: endRect.left + endOffset.x,
         left: endRect.top + endOffset.y,
         width: endRect.height,
-        height: endRect.width,
+        height: endRect.width
       };
       context.strokeStyle = (highlight? 'cyan': (flash? '#CCCC00': '#33CC33'));
     } else {
       start = {
         x: startOffset.x + startPos.x,
-        y: startOffset.y + startPos.y,
+        y: startOffset.y + startPos.y
       };
       end = {
         x: endOffset.x + endPos.x,
-        y: endOffset.y + endPos.y,
+        y: endOffset.y + endPos.y
       };
       startBounds = {
         top: startRect.top + startOffset.y,
         left: startRect.left + startOffset.x,
         width: startRect.width,
-        height: startRect.height,
+        height: startRect.height
       };
       endBounds = {
         top: endRect.top + endOffset.y,
         left: endRect.left + endOffset.x,
         width: endRect.width,
-        height: endRect.height,
+        height: endRect.height
       };
       context.strokeStyle = (highlight? 'cyan': (flash? '#CCCC00': '#000000'));
     }
 
+    var a = 0, midx = 0, midy = 0, leftx = 0, rightx = 0, sidex = 0, radius = 0, top = 0, bottom = 0, coreRadius = 15;
     switch (this._chainStyle) {
       // Squared chains
       case 0:
-        var coreRadius = 15;
         // If the exit link is above the entry link
         if (start.y < end.y) {
-          var midx = (end.x + start.x) / 2;
-          var midy = (end.y + start.y) / 2;
-          var radius = Math.min(coreRadius, Math.abs(end.x - start.x)/2, Math.abs(end.y - start.y)/2);
+          midx = (end.x + start.x) / 2;
+          midy = (end.y + start.y) / 2;
+          radius = Math.min(coreRadius, Math.abs(end.x - start.x)/2, Math.abs(end.y - start.y)/2);
           __arcTo(start.x, midy, midx, midy, radius);
           __arcTo(end.x, midy, end.x, end.y, radius);
         }
         // If the start rect is to the left side of the end rect.
         else if (startBounds.left + startBounds.width < endBounds.left) {
-          var midx = (endBounds.left + startBounds.left + startBounds.width) / 2 - 2;
-          var midy = (end.y + start.y) / 2;
-          var leftx = (midx + start.x) / 2;
-          var rightx = (end.x + midx) / 2;
-          var radius = Math.min(coreRadius, Math.abs(end.y - start.y)/4, Math.abs(midx - leftx), Math.abs(midx - rightx));
+          midx = (endBounds.left + startBounds.left + startBounds.width) / 2 - 2;
+          midy = (end.y + start.y) / 2;
+          leftx = (midx + start.x) / 2;
+          rightx = (end.x + midx) / 2;
+          radius = Math.min(coreRadius, Math.abs(end.y - start.y)/4, Math.abs(midx - leftx), Math.abs(midx - rightx));
           __arcTo(start.x, start.y + radius, leftx, start.y + radius, radius);
           __arcTo(midx, start.y + radius, midx, midy, radius);
           __arcTo(midx, end.y - radius, rightx, end.y - radius, radius);
@@ -3466,11 +3497,11 @@ wcPlayEditor.prototype = {
         }
         // If the start rect is to the right side of the end rect.
         else if (startBounds.left > endBounds.left + endBounds.width) {
-          var midx = (startBounds.left + endBounds.left + endBounds.width) / 2 + 2;
-          var midy = (end.y + start.y) / 2;
-          var leftx = (midx + end.x) / 2;
-          var rightx = (start.x + midx) / 2;
-          var radius = Math.min(coreRadius, Math.abs(end.y - start.y)/4, Math.abs(midx - leftx), Math.abs(midx - rightx));
+          midx = (startBounds.left + endBounds.left + endBounds.width) / 2 + 2;
+          midy = (end.y + start.y) / 2;
+          leftx = (midx + end.x) / 2;
+          rightx = (start.x + midx) / 2;
+          radius = Math.min(coreRadius, Math.abs(end.y - start.y)/4, Math.abs(midx - leftx), Math.abs(midx - rightx));
           __arcTo(start.x, start.y + radius, rightx, start.y + radius, radius);
           __arcTo(midx, start.y + radius, midx, midy, radius);
           __arcTo(midx, end.y - radius, leftx, end.y - radius, radius);
@@ -3478,10 +3509,10 @@ wcPlayEditor.prototype = {
         }
         // If the start link is below the end link. Makes a loop around the nodes.
         else if (start.y > end.y && Math.abs(start.y - end.y) > this._drawStyle.links.length) {
-          var a = start.x;
-          var top = Math.min(startBounds.top - coreRadius, endBounds.top - coreRadius);
-          var bottom = Math.max(startBounds.top + startBounds.height + coreRadius, endBounds.top + endBounds.height + coreRadius);
-          var midy = (start.y + end.y) / 2;
+          a = start.x;
+          top = Math.min(startBounds.top - coreRadius, endBounds.top - coreRadius);
+          bottom = Math.max(startBounds.top + startBounds.height + coreRadius, endBounds.top + endBounds.height + coreRadius);
+          midy = (start.y + end.y) / 2;
           // Choose left or right.
           if (Math.abs(Math.min(startBounds.left, endBounds.left) - start.x) <= Math.abs(Math.max(startBounds.left + startBounds.width, endBounds.left + endBounds.width) - end.x)) {
             // Left
@@ -3492,8 +3523,8 @@ wcPlayEditor.prototype = {
             a = Math.max(startBounds.left + startBounds.width + coreRadius, endBounds.left + endBounds.width + coreRadius);
             bottom += 2;
           }
-          var midx = (start.x + a) / 2;
-          var radius = Math.min(coreRadius, Math.abs(a - (start.x))/2, Math.abs(a - (end.x))/2);
+          midx = (start.x + a) / 2;
+          radius = Math.min(coreRadius, Math.abs(a - (start.x))/2, Math.abs(a - (end.x))/2);
 
           __arcTo(start.x, bottom, midx, bottom, radius);
           __arcTo(a, bottom, a, midy, radius);
@@ -3505,20 +3536,20 @@ wcPlayEditor.prototype = {
       case 1:
         // If the Exit link is right above the Entry link target.
         if (start.y < end.y) {
-          var midy = (start.y + end.y) / 2;
-          var midx = (start.x + end.x) / 2;
+          midy = (start.y + end.y) / 2;
+          midx = (start.x + end.x) / 2;
           __curveTo(start.x, midy, end.x, midy, end.x, end.y);
         }
         // If the start rect is to the left or right side of the end rect.
         else if (startBounds.left + startBounds.width < endBounds.left || startBounds.left > endBounds.left + endBounds.width) {
-          var radius = Math.abs(start.y - end.y) / 2;
-          var top = endBounds.top - radius;
-          var bottom = startBounds.top + startBounds.height + radius;
+          radius = Math.abs(start.y - end.y) / 2;
+          top = endBounds.top - radius;
+          bottom = startBounds.top + startBounds.height + radius;
           __curveTo(start.x, bottom, end.x, top, end.x, end.y);
         }
         // If the start link is below the end link. Makes a loop around the nodes.
         else if (start.y > end.y && Math.abs(start.y - end.y) > this._drawStyle.links.length) {
-          var sidex = start.x;
+          sidex = start.x;
           // Choose left or right.
           if (Math.abs(Math.min(startBounds.left, endBounds.left) - start.x) <= Math.abs(Math.max(startBounds.left + startBounds.width, endBounds.left + endBounds.width) - end.x)) {
             // Left
@@ -3527,14 +3558,14 @@ wcPlayEditor.prototype = {
             // Right
             sidex = Math.max(startBounds.left + startBounds.width, endBounds.left + endBounds.width) + 15;
           }
-          var top = endBounds.top - 30;
-          var bottom = Math.max(startBounds.top + startBounds.height + 30, endBounds.top + endBounds.height + 30);
-          var midy = (start.y + end.y)/2;
+          top = endBounds.top - 30;
+          bottom = Math.max(startBounds.top + startBounds.height + 30, endBounds.top + endBounds.height + 30);
+          midy = (start.y + end.y)/2;
           __curveTo(start.x, bottom, sidex, bottom, sidex, midy);
           __curveTo(sidex, top, end.x, top, end.x, end.y);
 
-          // var top = endBounds.top - Math.abs(end.x - sidex)/2;
-          // var bottom = Math.max(startBounds.top + startBounds.height + Math.abs(start.x - sidex)/2, endBounds.top + endBounds.height + Math.abs(end.x - sidex)/2);
+          // top = endBounds.top - Math.abs(end.x - sidex)/2;
+          // bottom = Math.max(startBounds.top + startBounds.height + Math.abs(start.x - sidex)/2, endBounds.top + endBounds.height + Math.abs(end.x - sidex)/2);
           // __curveTo(start.x, bottom, sidex, bottom, sidex, start.y);
           // __lineTo(sidex, end.y);
           // __curveTo(sidex, top, end.x, top, end.x, end.y);
@@ -3554,15 +3585,15 @@ wcPlayEditor.prototype = {
    * @private
    * @param {wcNode} node - The node that owns this property.
    * @param {Object} property - The property data.
-   * @param {Boolean} [initial] - Set true if the property being viewed is the initial value.
-   * @param {Boolean} [expanded] - For initial values, if we are not displaying the current value then we should expand the display
-   * @returns {String} - A string value to print as the value.
+   * @param {boolean} [initial] - Set true if the property being viewed is the initial value.
+   * @param {boolean} [expanded] - For initial values, if we are not displaying the current value then we should expand the display.
+   * @returns {string} - A string value to print as the value.
    *
    * @see {wcNode~PropertyOptions}
    * @see {wcNode~PropertyDisplay}
    */
   __drawPropertyValue: function(node, property, initial, expanded) {
-    var value;
+    var value = null;
     if (initial) {
       value = node.initialProperty(property.name);
     } else {
@@ -3661,11 +3692,194 @@ wcPlayEditor.prototype = {
    * @function wcPlayEditor#__drawPalettePopup
    * @param {wcPlay~Coordinates} pos - The position to center the popup.
    * @param {wcNode} [linkNode] - If supplied, the source node to link with.
-   * @param {String} [linkName] - If supplied, the name of the source link.
+   * @param {string} [linkName] - If supplied, the name of the source link.
    * @param {wcNode.LINK_TYPE} [linkType] - If supplying a node, this is the type of link you are attaching to.
    * @param {wcPlayEditor~OnPalettePopupFinished} [onFinished] - A callback function to call when the popup has resolved.
    */
   __drawPalettePopup: function(pos, linkNode, linkName, linkType, onFinished) {
+    // Populate the node list.
+    var $resultList = null;
+    function __searchList(key) {
+      var result = fuse.search(key);
+      // No results, just show the full listing.
+      if (!result.length && !key) {
+        result = self._nodeLibrary;
+      }
+
+      var $listContainer = $('<div id="wcPlayEditorPaletteList">');
+      var $list = $('<ul>');
+      $listContainer.append($list);
+      for (var i = 0; i < result.length; ++i) {
+        var data = result[i];
+        var links = null;
+
+        // Determine whether to filter a node based on available connection links.
+        if (connectLink) {
+          if (!data[connectLink].length) {
+            continue;
+          }
+          links = data[connectLink];
+        }
+
+        var link = '';
+        if (!links) {
+          link = ' class="wcSelectable"';
+        }
+
+        var describer = data.node.category;
+        var add = false;
+        var $item = $('<li id="wcNode-' + data.id + '"' + link + ' title="' + data.desc + '"><span class="wcMainLabel">' + data.displayName + '</span><span class="wcDescriber">' + describer + '</span></li>');
+        if (links) {
+          var $links = $('<ul>');
+          $item.append($links);
+          for (var a = 0; a < links.length; ++a) {
+            // Ensure the connection can actually be made.
+            var linkOptions = data.node.propertyOptions(links[a].name);
+            if (!options ||
+                ((!options[linkType + 'Condition'] || options[linkType + 'Condition'].call(linkNode, data.node, links[a].name)) &&
+                (!linkOptions[connectLink + 'Condition'] || linkOptions[connectLink + 'Condition'].call(data.node, linkNode, linkName)))) {
+              add = true;
+              $links.append('<li id="wcNode-' + data.id + '-' + a + '" class="wcSelectable wcLinkItem" title="' + links[a].desc + '"><span class="wcPrefix">' + connectLink + ' -- </span><span class="wcMainLabel">' + links[a].name + '</span></li>');
+            }
+          }
+        } else {
+          add = true;
+        }
+        if (add) {
+          $list.append($item);
+        }
+      }
+
+      // Attempt to find the currently selected item.
+      var $selected = [];
+      if (current) {
+        $selected = $list.find('#'+current);
+      }
+
+      // No item found that was currently selected, try selecting the first item instead.
+      if (!$selected.length) {
+        $selected = $list.find('.wcSelectable').first();
+      }
+      
+      current = null;
+      if ($selected.length) {
+        $selected.addClass('wcSelected');
+        current = $selected.attr('id');
+      }
+
+      if ($resultList) {
+        $resultList.remove();
+      }
+
+      $resultList = $listContainer;
+      $popup.append($resultList);
+      __ensureVisible($selected);
+
+      // Make all selection items clickable.
+      $('#wcPlayEditorPaletteList .wcSelectable').click(function() {
+        current = this.id;
+        __createNode(function() {
+          $blocker.click();
+        });
+        event.preventDefault();
+        return true;
+      });
+    }
+
+    function __ensureVisible($item) {
+      if ($item.length && $item[0].scrollIntoView) {
+        // Check if the item is visible.
+        var itemRect = $item[0].getBoundingClientRect();
+        var listRect = $resultList[0].getBoundingClientRect();
+
+        if (itemRect.top < listRect.top) {
+          if ($item.hasClass('wcLinkItem')) {
+            $item = $item.parents('li');
+          }
+          $item[0].scrollIntoView(true);
+        } else if (itemRect.bottom > listRect.bottom) {
+          $item[0].scrollIntoView(false);
+        }
+      }
+    }
+
+    function __createNode(cb) {
+      if (!current) {
+        cb();
+        return;
+      }
+
+      var id   = current.split('-')[1];
+      var link = current.split('-')[2];
+
+      var data = self._nodeLibrary[id];
+      if (!data) {
+        return;
+      }
+
+      // Create an instance of the node and add it to the script.
+      var newNode = new window.wcPlayNodes[data.className](self._parent, {x: 0, y: 0});
+      var exportData = data.node.export();  // Export nodes default data set.
+      exportData.id = newNode.id;
+
+      // Position the new node.
+      exportData.pos.x = (pos.x - self._viewportCamera.x) / self._viewportCamera.z;
+      exportData.pos.y = (pos.y - self._viewportCamera.y) / self._viewportCamera.z;
+
+      // Calculate position based on link connector.
+      var bounds = null;
+      switch (linkType) {
+        case wcNode.LINK_TYPE.ENTRY:
+          bounds = data.node._meta.bounds.exitBounds;
+          break;
+        case wcNode.LINK_TYPE.EXIT:
+          bounds = data.node._meta.bounds.entryBounds;
+          break;
+        case wcNode.LINK_TYPE.INPUT:
+          bounds = data.node._meta.bounds.outputBounds;
+          break;
+        case wcNode.LINK_TYPE.OUTPUT:
+          bounds = data.node._meta.bounds.inputBounds;
+          break;
+      }
+      if (bounds) {
+        var bound = bounds.find(function(bound) {
+          return bound.name === data[connectLink][link].name;
+        });
+        if (bound) {
+          exportData.pos.x -= bound.point.x;
+          exportData.pos.y -= bound.point.y;
+        }
+      }
+
+      newNode.import(exportData, []);
+
+      // Connect nodes if possible.
+      switch (linkType) {
+        case wcNode.LINK_TYPE.ENTRY:
+          linkNode.connectEntry(linkName, newNode, data[connectLink][link].name);
+          break;
+        case wcNode.LINK_TYPE.EXIT:
+          linkNode.connectExit(linkName, newNode, data[connectLink][link].name);
+          break;
+        case wcNode.LINK_TYPE.INPUT:
+          linkNode.connectInput(linkName, newNode, data[connectLink][link].name);
+          break;
+        case wcNode.LINK_TYPE.OUTPUT:
+          linkNode.connectOutput(linkName, newNode, data[connectLink][link].name);
+          break;
+      }
+
+      self.__onCreateNode(newNode);
+
+      self._selectedNode = newNode;
+      self._selectedNodes = [newNode];
+
+      self.__updateNode(newNode, 0, self._viewportContext);
+      self.__drawNode(newNode, self._viewportContext);
+      cb();
+    }
+
     if (!this._showingSelector) {
       var self = this;
       var current = null;
@@ -3709,6 +3923,9 @@ wcPlayEditor.prototype = {
         // Stop the key presses from triggering hotkeys
         event.stopPropagation();
 
+        var $selected = null;
+        var $next = null;
+
         // Cancel on escape.
         if (event.keyCode === 27) {
           $blocker.click();
@@ -3725,11 +3942,10 @@ wcPlayEditor.prototype = {
         // Down arrow, or Tab to cycle next item.
         else if (event.keyCode === 40 || (event.keyCode === 9 && !event.shiftKey)) {
           if (current) {
-            var $selected = $('#'+current);
+            $selected = $('#'+current);
 
             if ($selected.length) {
-
-              var $next = $selected.next('.wcSelectable');
+              $next = $selected.next('.wcSelectable');
               // No more siblings, jump to first child of our parent instead.
               if (!$next.length) {
                 $next = $selected.parents('li').next();
@@ -3750,11 +3966,10 @@ wcPlayEditor.prototype = {
         // Up arrow, shift-tab to cycle previous item.
         else if (event.keyCode === 38 || (event.keyCode === 9 && event.shiftKey)) {
           if (current) {
-            var $selected = $('#'+current);
+            $selected = $('#'+current);
 
             if ($selected.length) {
-
-              var $next = $selected.prev('.wcSelectable');
+              $next = $selected.prev('.wcSelectable');
               // No more siblings, jump to first child of our parent instead.
               if (!$next.length) {
                 $next = $selected.parents('li').prev();
@@ -3776,7 +3991,7 @@ wcPlayEditor.prototype = {
       });
 
       var searchValue = '';
-      $input.keyup(function(event) {
+      $input.keyup(function() {
         // Re-perform the search when the search value has changed.
         var val = $input.val().toLowerCase();
         if (searchValue !== val) {
@@ -3797,190 +4012,6 @@ wcPlayEditor.prototype = {
         keys: ['displayName', 'category', connectLink + '.name']
       });
 
-      // Populate the node list.
-      var $resultList = null;
-      function __searchList(key) {
-        var result = fuse.search(key);
-        // No results, just show the full listing.
-        if (!result.length && !key) {
-          result = self._nodeLibrary;
-        }
-
-        var $listContainer = $('<div id="wcPlayEditorPaletteList">');
-        var $list = $('<ul>');
-        $listContainer.append($list);
-        for (var i = 0; i < result.length; ++i) {
-          var data = result[i];
-          var links = null;
-          var type = null;
-
-          // Determine whether to filter a node based on available connection links.
-          if (connectLink) {
-            if (!data[connectLink].length) {
-              continue;
-            }
-            links = data[connectLink];
-          }
-
-          var link = '';
-          if (!links) {
-            link = ' class="wcSelectable"';
-          }
-
-          var describer = data.node.category;
-          var add = false;
-          var $item = $('<li id="wcNode-' + data.id + '"' + link + ' title="' + data.desc + '"><span class="wcMainLabel">' + data.displayName + '</span><span class="wcDescriber">' + describer + '</span></li>');
-          if (links) {
-            var $links = $('<ul>');
-            $item.append($links);
-            for (var a = 0; a < links.length; ++a) {
-              // Ensure the connection can actually be made.
-              var linkOptions = data.node.propertyOptions(links[a].name);
-              if (!options ||
-                  ((!options[linkType + 'Condition'] || options[linkType + 'Condition'].call(linkNode, data.node, links[a].name)) &&
-                  (!linkOptions[connectLink + 'Condition'] || linkOptions[connectLink + 'Condition'].call(data.node, linkNode, linkName)))) {
-                add = true;
-                $links.append('<li id="wcNode-' + data.id + '-' + a + '" class="wcSelectable wcLinkItem" title="' + links[a].desc + '"><span class="wcPrefix">' + connectLink + ' -- </span><span class="wcMainLabel">' + links[a].name + '</span></li>');
-              }
-            }
-          } else {
-            add = true;
-          }
-          if (add) {
-            $list.append($item);
-          }
-        }
-
-        // Attempt to find the currently selected item.
-        var $selected = [];
-        var found = false;
-        if (current) {
-          $selected = $list.find('#'+current);
-        }
-
-        // No item found that was currently selected, try selecting the first item instead.
-        if (!$selected.length) {
-          $selected = $list.find('.wcSelectable').first();
-        }
-        
-        current = null;
-        if ($selected.length) {
-          $selected.addClass('wcSelected');
-          current = $selected.attr('id');
-        }
-
-        if ($resultList) {
-          $resultList.remove();
-        }
-
-        $resultList = $listContainer;
-        $popup.append($resultList);
-        __ensureVisible($selected);
-
-        // Make all selection items clickable.
-        $('#wcPlayEditorPaletteList .wcSelectable').click(function() {
-          current = this.id;
-          __createNode(function() {
-            $blocker.click();
-          });
-          event.preventDefault();
-          return true;
-        });
-      };
-
-      function __ensureVisible($item) {
-        if ($item.length && $item[0].scrollIntoView) {
-          // Check if the item is visible.
-          var itemRect = $item[0].getBoundingClientRect();
-          var listRect = $resultList[0].getBoundingClientRect();
-
-          if (itemRect.top < listRect.top) {
-            if ($item.hasClass('wcLinkItem')) {
-              $item = $item.parents('li');
-            }
-            $item[0].scrollIntoView(true);
-          } else if (itemRect.bottom > listRect.bottom) {
-            $item[0].scrollIntoView(false);
-          }
-        }
-      };
-
-      function __createNode(cb) {
-        if (!current) {
-          cb();
-          return;
-        }
-
-        var id   = current.split('-')[1];
-        var link = current.split('-')[2];
-
-        var data = self._nodeLibrary[id];
-        if (!data) {
-          return;
-        }
-
-        // Create an instance of the node and add it to the script.
-        var newNode = new window.wcPlayNodes[data.className](self._parent, {x: 0, y: 0});
-        var exportData = data.node.export();  // Export nodes default data set.
-        exportData.id = newNode.id;
-
-        // Position the new node.
-        exportData.pos.x = (pos.x - self._viewportCamera.x) / self._viewportCamera.z;
-        exportData.pos.y = (pos.y - self._viewportCamera.y) / self._viewportCamera.z;
-
-        // Calculate position based on link connector.
-        var bounds = null;
-        switch (linkType) {
-          case wcNode.LINK_TYPE.ENTRY:
-            bounds = data.node._meta.bounds.exitBounds;
-            break;
-          case wcNode.LINK_TYPE.EXIT:
-            bounds = data.node._meta.bounds.entryBounds;
-            break;
-          case wcNode.LINK_TYPE.INPUT:
-            bounds = data.node._meta.bounds.outputBounds;
-            break;
-          case wcNode.LINK_TYPE.OUTPUT:
-            bounds = data.node._meta.bounds.inputBounds;
-            break;
-        }
-        if (bounds) {
-          var bound = bounds.find(function(bound) {
-            return bound.name === data[connectLink][link].name;
-          });
-          if (bound) {
-            exportData.pos.x -= bound.point.x;
-            exportData.pos.y -= bound.point.y;
-          }
-        }
-
-        newNode.import(exportData, []);
-
-        // Connect nodes if possible.
-        switch (linkType) {
-          case wcNode.LINK_TYPE.ENTRY:
-            linkNode.connectEntry(linkName, newNode, data[connectLink][link].name);
-            break;
-          case wcNode.LINK_TYPE.EXIT:
-            linkNode.connectExit(linkName, newNode, data[connectLink][link].name);
-            break;
-          case wcNode.LINK_TYPE.INPUT:
-            linkNode.connectInput(linkName, newNode, data[connectLink][link].name);
-            break;
-          case wcNode.LINK_TYPE.OUTPUT:
-            linkNode.connectOutput(linkName, newNode, data[connectLink][link].name);
-            break;
-        }
-
-        self.__onCreateNode(newNode);
-
-        self._selectedNode = newNode;
-        self._selectedNodes = [newNode];
-
-        self.__updateNode(newNode, 0, self._viewportContext);
-        self.__drawNode(newNode, self._viewportContext);
-        cb();
-      };
       __searchList('');
     }
 
@@ -4052,7 +4083,7 @@ wcPlayEditor.prototype = {
             id: node.id,
             oldValue: node.name,
             newValue: $control.val(),
-            engine: self._engine,
+            engine: self._engine
           },
           // Undo
           function() {
@@ -4091,7 +4122,7 @@ wcPlayEditor.prototype = {
 
     var offset = {
       top: 0,
-      left: this.$palette.width(),
+      left: this.$palette.width()
     };
 
     this.$main.append($control);
@@ -4135,7 +4166,7 @@ wcPlayEditor.prototype = {
    * @param {wcNode} node - The node to draw for.
    * @param {Object} property - The property data.
    * @param {wcPlayEditor~BoundingData} bounds - The bounding data for this property.
-   * @param {Boolean} [initial] - Set true if the property being changed is the initial value.
+   * @param {boolean} [initial] - Set true if the property being changed is the initial value.
    */
   __drawPropertyEditor: function(node, property, bounds, initial) {
     if (this._options.readOnly || property.options.readOnly) {
@@ -4157,7 +4188,7 @@ wcPlayEditor.prototype = {
           propFn: propFn,
           oldValue: oldValue,
           newValue: newValue,
-          engine: self._engine,
+          engine: self._engine
         },
         // Undo
         function() {
@@ -4177,9 +4208,13 @@ wcPlayEditor.prototype = {
     }
     function endChange() {
       self._undoManager && self._undoManager.endGroup();
-    };
+    }
 
     var $blocker = $('<div class="wcPlayEditorBlocker">');
+    var items = [];
+    var value = null;
+    var datalistProp = '';
+    var i = 0;
 
     // Determine what editor to use for the property.
     switch (property.type) {
@@ -4217,15 +4252,14 @@ wcPlayEditor.prototype = {
 
       case wcPlay.PROPERTY.STRING:
       case wcPlay.PROPERTY.DYNAMIC:
-        var datalistProp = '';
-        var items = property.options.items;
+        items = property.options.items;
         if ($.isFunction(items)) {
           items = items.call(node);
         }
         if (Array.isArray(items)) {
           datalistProp = ' list="wcDynamicSuggestionList"';
           var $dataList = $('<datalist id="wcDynamicSuggestionList"/>');
-          for (var i = 0; i < items.length; ++i) {
+          for (i = 0; i < items.length; ++i) {
             if (typeof items[i] === 'object') {
               $dataList.append($('<option value="' + items[i].value + '">' + items[i].name + '</option>'));
             } else {
@@ -4256,10 +4290,10 @@ wcPlayEditor.prototype = {
 
 
       case wcPlay.PROPERTY.SELECT:
-        var value = node[propFn](property.name);
+        value = node[propFn](property.name);
         $control = $('<select>');
 
-        var items = property.options.items;
+        items = property.options.items;
         if ($.isFunction(items)) {
           items = items.call(node);
         }
@@ -4274,7 +4308,7 @@ wcPlayEditor.prototype = {
             $control.append($('<option value=""' + (noneValue == value? ' selected': '') + '>&lt;none&gt;</option>'));
             if (noneValue == value) found = true;
           }
-          for (var i = 0; i < items.length; ++i) {
+          for (i = 0; i < items.length; ++i) {
             if (typeof items[i] === 'object') {
               $control.append($('<option value="' + items[i].value + '"' + (items[i].value == value? ' selected': '') + '>' + items[i].name + '</option>'));
               if (items[i].value == value) found = true;
@@ -4288,7 +4322,7 @@ wcPlayEditor.prototype = {
             $control.prepend($('<option value="' + value + '" selected>&lt;unknown&gt;</option>'));
           }
         } else {
-          console.log("ERROR: Tried to display a Select type property when no selection list was provided.");
+          console.log('ERROR: Tried to display a Select type property when no selection list was provided.');
           return;
         }
 
@@ -4310,7 +4344,7 @@ wcPlayEditor.prototype = {
 
       case wcPlay.PROPERTY.CUSTOM:
         if (typeof property.options.onCreate === 'function') {
-          var value = node[propFn](property.name);
+          value = node[propFn](property.name);
 
           $control = $(property.options.onCreate(node, property.name, value, initial, function(newValue) {
             if (!cancelled) {
@@ -4328,7 +4362,7 @@ wcPlayEditor.prototype = {
     if ($control) {
       var offset = {
         top: 0,
-        left: this.$palette.width(),
+        left: this.$palette.width()
       };
 
       this.$main.append($blocker);
@@ -4377,13 +4411,12 @@ wcPlayEditor.prototype = {
    * @param {wcNode} node - The node that was created.
    */
   __onCreateNode: function(node) {
-    this._undoManager && this._undoManager.addEvent('Created Node "' + node.category + '.' + node.type + '"',
-    {
+    this._undoManager && this._undoManager.addEvent('Created Node "' + node.category + '.' + node.type + '"', {
       id: node.id,
       className: node.className,
       data: node.export(),
       engine: this._engine,
-      parent: this._parent.id || this._parent,
+      parent: this._parent.id || this._parent
     },
     // Undo
     function() {
@@ -4421,14 +4454,13 @@ wcPlayEditor.prototype = {
   /**
    * Generates an undo event for a node that is destroyed.
    * @function wcPlayEditor#__onDestroyNode
-   * @param {wcNode} node - the node to destroy.
+   * @param {wcNode} node - The node to destroy.
    */
   __onDestroyNode: function(node) {
-    this._undoManager && this._undoManager.addEvent('',
-    {
+    this._undoManager && this._undoManager.addEvent('', {
       data: node.export(),
       parent: this._parent,
-      engine: this._engine,
+      engine: this._engine
     },
     // Undo
     function() {
@@ -4461,8 +4493,8 @@ wcPlayEditor.prototype = {
   /**
    * Handles auto scrolling based on mouse position.
    * @function wcPlayEditor#__handleAutoScroll
-   * @param {Boolean} active - Whether the auto scroll is active.
-   * @param {Boolean} movingNodes - If true, the auto scroll will also move selected nodes.
+   * @param {boolean} active - Whether the auto scroll is active.
+   * @param {boolean} movingNodes - If true, the auto scroll will also move selected nodes.
    */
   __handleAutoScroll: function(active, movingNodes) {
     var shouldBeActive = false;
@@ -4510,14 +4542,14 @@ wcPlayEditor.prototype = {
             var node = self._selectedNodes[i];
             var oldPos = {
               x: node.pos.x,
-              y: node.pos.y,
+              y: node.pos.y
             };
             var newPos = {
               x: node.pos.x + (moveX / self._viewportCamera.z),
-              y: node.pos.y + (moveY / self._viewportCamera.z),
+              y: node.pos.y + (moveY / self._viewportCamera.z)
             };
 
-            var newPos = node.onMoving(oldPos, newPos) || newPos;
+            newPos = node.onMoving(oldPos, newPos) || newPos;
 
             if (oldPos.x !== newPos.x || oldPos.y !== newPos.y) {
               node.pos.x = newPos.x;
@@ -4535,7 +4567,7 @@ wcPlayEditor.prototype = {
 
   /**
    * Initializes user control.
-   * @funciton wcPlayEditor#__setupControls
+   * @function wcPlayEditor#__setupControls
    * @private
    */
   __setupControls: function() {
@@ -4761,6 +4793,7 @@ wcPlayEditor.prototype = {
    * @param {Object} elem - The target element.
    */
   __onViewportMouseMove: function(event, elem) {
+    elem;
     var mouse = this.__mouse(event, this.$viewport.offset());
     if (mouse.x !== this._mouse.x || mouse.y !== this._mouse.y) {
       this._mouseMoved = true;
@@ -4779,6 +4812,16 @@ wcPlayEditor.prototype = {
     //   return;
     // }
 
+    var self = this, i = 0, a = 0, moveX = 0, moveY = 0, node = null, rect = null, link = null;
+    var canConnect = true, myOptions = null, targetOptions = null;
+    function __nodesInRect(nodes) {
+      for (var i = 0; i < nodes.length; ++i) {
+        if (self.__rectOnRect(nodes[i]._meta.bounds.inner, self._highlightRect, nodes[i].pos)) {
+          self._selectedNodes.push(nodes[i]);
+        }
+      }
+    }
+
     // Box selection.
     if (this._highlightRect && this._parent) {
       this._highlightRect.x = ((mouse.x - this._viewportCamera.x) / this._viewportCamera.z) - this._highlightRect.ox;
@@ -4796,14 +4839,6 @@ wcPlayEditor.prototype = {
       }
 
       this._selectedNodes = [];
-      var self = this;
-      function __nodesInRect(nodes) {
-        for (var i = 0; i < nodes.length; ++i) {
-          if (self.__rectOnRect(nodes[i]._meta.bounds.inner, self._highlightRect, nodes[i].pos)) {
-            self._selectedNodes.push(nodes[i]);
-          }
-        }
-      };
       __nodesInRect(this._parent._storageNodes);
       __nodesInRect(this._parent._compositeNodes);
       __nodesInRect(this._parent._processNodes);
@@ -4815,8 +4850,8 @@ wcPlayEditor.prototype = {
 
     // Viewport panning.
     if (this._viewportMoving) {
-      var moveX = mouse.x - this._mouse.x;
-      var moveY = mouse.y - this._mouse.y;
+      moveX = mouse.x - this._mouse.x;
+      moveY = mouse.y - this._mouse.y;
       this._viewportCamera.x += moveX;
       this._viewportCamera.y += moveY;
       this._mouse = mouse;
@@ -4830,21 +4865,21 @@ wcPlayEditor.prototype = {
 
     // Moving nodes
     if (this._viewportMovingNode) {
-      var moveX = mouse.x - this._mouse.x;
-      var moveY = mouse.y - this._mouse.y;
+      moveX = mouse.x - this._mouse.x;
+      moveY = mouse.y - this._mouse.y;
 
-      for (var i = 0; i < this._selectedNodes.length; ++i) {
-        var node = this._selectedNodes[i];
+      for (i = 0; i < this._selectedNodes.length; ++i) {
+        node = this._selectedNodes[i];
         var oldPos = {
           x: node.pos.x,
-          y: node.pos.y,
+          y: node.pos.y
         };
         var newPos = {
           x: node.pos.x + (moveX / this._viewportCamera.z),
-          y: node.pos.y + (moveY / this._viewportCamera.z),
+          y: node.pos.y + (moveY / this._viewportCamera.z)
         };
 
-        var newPos = node.onMoving(oldPos, newPos) || newPos;
+        newPos = node.onMoving(oldPos, newPos) || newPos;
 
         if (oldPos.x !== newPos.x || oldPos.y !== newPos.y) {
           node.pos.x = newPos.x;
@@ -4879,7 +4914,7 @@ wcPlayEditor.prototype = {
     this.$viewport.removeClass('wcClickable wcMoving wcGrab wcNoDrop');
     this.$viewport.attr('title', '');
     
-    for (var i = 0; i < this._crumbBounds.length; ++i) {
+    for (i = 0; i < this._crumbBounds.length; ++i) {
       if (this.__inRect(mouse, this._crumbBounds[i].rect)) {
         this._highlightCrumb = i;
         this.$viewport.addClass('wcClickable');
@@ -4888,7 +4923,7 @@ wcPlayEditor.prototype = {
       }
     }
 
-    var node = null;
+    node = null;
     if (this._highlightCrumb === -1) {
       node = this.__findNodeAtPos(mouse, this._viewportCamera);
     }
@@ -4898,8 +4933,8 @@ wcPlayEditor.prototype = {
       if (!this._options.readOnly && this.__inRect(mouse, node._meta.bounds.farRect, node.pos, this._viewportCamera)) {
         this._highlightNode = node;
         // if (this.__inRect(mouse, node._meta.bounds.inner, node.pos, this._viewportCamera)) {
-          this.$viewport.attr('title', (node._meta.description? node._meta.description + '\n': ''));
-          this.$viewport.addClass('wcMoving');
+        this.$viewport.attr('title', (node._meta.description? node._meta.description + '\n': ''));
+        this.$viewport.addClass('wcMoving');
         // }
       }
 
@@ -4927,14 +4962,14 @@ wcPlayEditor.prototype = {
 
       // Entry links.
       if (!this._options.readOnly && !this._selectedEntryLink && !this._selectedInputLink && !this._selectedOutputLink) {
-        var rect = this._selectedExitLink? 'longRect': 'rect';
-        for (var i = 0; i < node._meta.bounds.entryBounds.length; ++i) {
+        rect = this._selectedExitLink? 'longRect': 'rect';
+        for (i = 0; i < node._meta.bounds.entryBounds.length; ++i) {
           if (this.__inRect(mouse, node._meta.bounds.entryBounds[i][rect], node.pos, this._viewportCamera)) {
             this._highlightNode = node;
             this._highlightEntryLink = node._meta.bounds.entryBounds[i];
 
-            var link;
-            for (var a = 0; a < node.chain.entry.length; ++a) {
+            link = null;
+            for (a = 0; a < node.chain.entry.length; ++a) {
               if (node.chain.entry[a].name == this._highlightEntryLink.name) {
                 link = node.chain.entry[a];
                 break;
@@ -4950,14 +4985,14 @@ wcPlayEditor.prototype = {
 
       // Exit links.
       if (!this._options.readOnly && !this._selectedExitLink && !this._selectedInputLink && !this._selectedOutputLink) {
-        var rect = this._selectedEntryLink? 'longRect': 'rect';
-        for (var i = 0; i < node._meta.bounds.exitBounds.length; ++i) {
+        rect = this._selectedEntryLink? 'longRect': 'rect';
+        for (i = 0; i < node._meta.bounds.exitBounds.length; ++i) {
           if (this.__inRect(mouse, node._meta.bounds.exitBounds[i][rect], node.pos, this._viewportCamera)) {
             this._highlightNode = node;
             this._highlightExitLink = node._meta.bounds.exitBounds[i];
 
-            var link;
-            for (var a = 0; a < node.chain.exit.length; ++a) {
+            link = null;
+            for (a = 0; a < node.chain.exit.length; ++a) {
               if (node.chain.exit[a].name == this._highlightExitLink.name) {
                 link = node.chain.exit[a];
                 break;
@@ -4973,15 +5008,15 @@ wcPlayEditor.prototype = {
 
       // Input links.
       if (!this._options.readOnly && !this._selectedEntryLink && !this._selectedExitLink && !this._selectedInputLink) {
-        var rect = this._selectedOutputLink? 'longRect': 'rect';
-        for (var i = 0; i < node._meta.bounds.inputBounds.length; ++i) {
+        rect = this._selectedOutputLink? 'longRect': 'rect';
+        for (i = 0; i < node._meta.bounds.inputBounds.length; ++i) {
           if (this.__inRect(mouse, node._meta.bounds.inputBounds[i][rect], node.pos, this._viewportCamera)) {
-            var canConnect = true;
+            canConnect = true;
             this._highlightNode = node;
             if (this._selectedOutputLink) {
               // Test for connectivity
-              var myOptions = this._selectedNode.propertyOptions(this._selectedOutputLink.name);
-              var targetOptions = node.propertyOptions(node._meta.bounds.inputBounds[i].name);
+              myOptions = this._selectedNode.propertyOptions(this._selectedOutputLink.name);
+              targetOptions = node.propertyOptions(node._meta.bounds.inputBounds[i].name);
               if ((myOptions.outputCondition && !myOptions.outputCondition.call(this._selectedNode, node, node._meta.bounds.inputBounds[i].name)) ||
                  (targetOptions.inputCondition && !targetOptions.inputCondition.call(node, this._selectedNode, this._selectedOutputLink.name))) {
                 canConnect = false;
@@ -5001,15 +5036,15 @@ wcPlayEditor.prototype = {
 
       // Output links.
       if (!this._options.readOnly && !this._selectedEntryLink && !this._selectedExitLink && !this._selectedOutputLink) {
-        var rect = this._selectedInputLink? 'longRect': 'rect';
-        for (var i = 0; i < node._meta.bounds.outputBounds.length; ++i) {
+        rect = this._selectedInputLink? 'longRect': 'rect';
+        for (i = 0; i < node._meta.bounds.outputBounds.length; ++i) {
           if (this.__inRect(mouse, node._meta.bounds.outputBounds[i][rect], node.pos, this._viewportCamera)) {
-            var canConnect = true;
+            canConnect = true;
             this._highlightNode = node;
             if (this._selectedInputLink) {
               // Test for connectivity
-              var myOptions = this._selectedNode.propertyOptions(this._selectedInputLink.name);
-              var targetOptions = node.propertyOptions(node._meta.bounds.outputBounds[i].name);
+              myOptions = this._selectedNode.propertyOptions(this._selectedInputLink.name);
+              targetOptions = node.propertyOptions(node._meta.bounds.outputBounds[i].name);
               if ((myOptions.inputCondition && !myOptions.inputCondition.call(this._selectedNode, node, node._meta.bounds.outputBounds[i].name)) ||
                  (targetOptions.outputCondition && !targetOptions.outputCondition.call(node, this._selectedNode, this._selectedInputLink.name))) {
                 canConnect = false;
@@ -5047,7 +5082,7 @@ wcPlayEditor.prototype = {
 
           // Property labels.
           var propBounds;
-          for (var i = 0; i < node._meta.bounds.propertyBounds.length; ++i) {
+          for (i = 0; i < node._meta.bounds.propertyBounds.length; ++i) {
             if (this.__inRect(this._mouse, node._meta.bounds.propertyBounds[i].rect, node.pos, this._viewportCamera)) {
               propBounds = node._meta.bounds.propertyBounds[i];
               break;
@@ -5055,7 +5090,7 @@ wcPlayEditor.prototype = {
           }
 
           if (propBounds) {
-            for (var i = 0; i < node.properties.length; ++i) {
+            for (i = 0; i < node.properties.length; ++i) {
               if (node.properties[i].name === propBounds.name) {
                 this.$viewport.attr('title', (node.properties[i].options.description? node.properties[i].options.description + '\n': ''));
                 break;
@@ -5065,7 +5100,7 @@ wcPlayEditor.prototype = {
 
           // Property values.
           var valueBounds;
-          for (var i = 0; i < node._meta.bounds.valueBounds.length; ++i) {
+          for (i = 0; i < node._meta.bounds.valueBounds.length; ++i) {
             if (this.__inRect(this._mouse, node._meta.bounds.valueBounds[i].rect, node.pos, this._viewportCamera)) {
               valueBounds = node._meta.bounds.valueBounds[i];
               break;
@@ -5073,7 +5108,7 @@ wcPlayEditor.prototype = {
           }
 
           if (valueBounds) {
-            for (var i = 0; i < node.properties.length; ++i) {
+            for (i = 0; i < node.properties.length; ++i) {
               if (node.properties[i].name === valueBounds.name) {
                 this._highlightNode = node;
                 this._highlightPropertyValue = valueBounds;
@@ -5088,7 +5123,7 @@ wcPlayEditor.prototype = {
 
           // Property initial values.
           var initialBounds;
-          for (var i = 0; i < node._meta.bounds.initialBounds.length; ++i) {
+          for (i = 0; i < node._meta.bounds.initialBounds.length; ++i) {
             if (this.__inRect(this._mouse, node._meta.bounds.initialBounds[i].rect, node.pos, this._viewportCamera)) {
               initialBounds = node._meta.bounds.initialBounds[i];
               break;
@@ -5096,7 +5131,7 @@ wcPlayEditor.prototype = {
           }
 
           if (initialBounds) {
-            for (var i = 0; i < node.properties.length; ++i) {
+            for (i = 0; i < node.properties.length; ++i) {
               if (node.properties[i].name === initialBounds.name) {
                 this._highlightNode = node;
                 this._highlightPropertyInitialValue = initialBounds;
@@ -5114,7 +5149,7 @@ wcPlayEditor.prototype = {
         if (node._meta.bounds.viewportBounds) {
           var pos = {
             x: (mouse.x - this._viewportCamera.x) / this._viewportCamera.z - (node.pos.x + node._meta.bounds.viewportBounds.left),
-            y: (mouse.y - this._viewportCamera.y) / this._viewportCamera.z - (node.pos.y + node._meta.bounds.viewportBounds.top),
+            y: (mouse.y - this._viewportCamera.y) / this._viewportCamera.z - (node.pos.y + node._meta.bounds.viewportBounds.top)
           };
 
           if (this.__inRect(this._mouse, node._meta.bounds.viewportBounds, node.pos, this._viewportCamera)) {
@@ -5143,8 +5178,10 @@ wcPlayEditor.prototype = {
    * @param {Object} elem - The target element.
    */
   __onViewportMouseDown: function(event, elem) {
+    elem;
     this._mouse = this.__mouse(event, this.$viewport.offset());
     this._mouseMoved = false;
+    var i = 0;
 
     // Control+drag or middle+drag to box select.
     if (event.ctrlKey || this._mouse.which === 2) {
@@ -5156,7 +5193,7 @@ wcPlayEditor.prototype = {
         x: 0,
         y: 0,
         width: 0,
-        height: 0,
+        height: 0
       };
       return;
     }
@@ -5166,7 +5203,7 @@ wcPlayEditor.prototype = {
     if (node) {
       // Entry links.
       if (!hasTarget && !this._options.readOnly) {
-        for (var i = 0; i < node._meta.bounds.entryBounds.length; ++i) {
+        for (i = 0; i < node._meta.bounds.entryBounds.length; ++i) {
           if (this.__inRect(this._mouse, node._meta.bounds.entryBounds[i].rect, node.pos, this._viewportCamera)) {
             hasTarget = true;
             // Alt click to disconnect all chains from this link.
@@ -5185,7 +5222,7 @@ wcPlayEditor.prototype = {
 
       // Exit links.
       if (!hasTarget && !this._options.readOnly) {
-        for (var i = 0; i < node._meta.bounds.exitBounds.length; ++i) {
+        for (i = 0; i < node._meta.bounds.exitBounds.length; ++i) {
           if (this.__inRect(this._mouse, node._meta.bounds.exitBounds[i].rect, node.pos, this._viewportCamera)) {
             hasTarget = true;
             // Alt click to disconnect all chains from this link.
@@ -5209,7 +5246,7 @@ wcPlayEditor.prototype = {
 
       // Input links.
       if (!hasTarget && !this._options.readOnly) {
-        for (var i = 0; i < node._meta.bounds.inputBounds.length; ++i) {
+        for (i = 0; i < node._meta.bounds.inputBounds.length; ++i) {
           if (this.__inRect(this._mouse, node._meta.bounds.inputBounds[i].rect, node.pos, this._viewportCamera)) {
             hasTarget = true;
             // Alt click to disconnect all chains from this link.
@@ -5228,7 +5265,7 @@ wcPlayEditor.prototype = {
 
       // Output links.
       if (!hasTarget && !this._options.readOnly) {
-        for (var i = 0; i < node._meta.bounds.outputBounds.length; ++i) {
+        for (i = 0; i < node._meta.bounds.outputBounds.length; ++i) {
           if (this.__inRect(this._mouse, node._meta.bounds.outputBounds[i].rect, node.pos, this._viewportCamera)) {
             hasTarget = true;
             // Alt click to disconnect all chains from this link.
@@ -5249,7 +5286,7 @@ wcPlayEditor.prototype = {
       if (!hasTarget && node._meta.bounds.viewportBounds) {
         var pos = {
           x: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z - node._meta.bounds.viewportBounds.left,
-          y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z - node._meta.bounds.viewportBounds.top,
+          y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z - node._meta.bounds.viewportBounds.top
         };
 
         if (this.__inRect(this._mouse, node._meta.bounds.viewportBounds, node.pos, this._viewportCamera)) {
@@ -5271,11 +5308,11 @@ wcPlayEditor.prototype = {
         }
         this._viewportMovingNode = !this._options.readOnly;
         this._selectedNodeOrigins = [];
-        for (var i = 0; i < this._selectedNodes.length; ++i) {
+        for (i = 0; i < this._selectedNodes.length; ++i) {
           var myNode = this._selectedNodes[i];
           this._selectedNodeOrigins.push({
             x: myNode.pos.x,
-            y: myNode.pos.y,
+            y: myNode.pos.y
           });
         }
       }
@@ -5296,7 +5333,9 @@ wcPlayEditor.prototype = {
    * @param {Object} elem - The target element.
    */
   __onViewportMouseUp: function(event, elem) {
+    elem;
     this.$viewport.removeClass('wcGrabbing');
+    var i = 0;
 
     // if (this._draggingNodeData && event.type === 'mouseup') {
     //   // Create an instance of the node and add it to the script.
@@ -5336,23 +5375,22 @@ wcPlayEditor.prototype = {
     if (this._selectedNodes.length && this._selectedNodeOrigins.length) {
       this._undoManager && this._undoManager.beginGroup('Node(s) moved.');
 
-      for (var i = 0; i < this._selectedNodes.length; ++i) {
+      for (i = 0; i < this._selectedNodes.length; ++i) {
         var node = this._selectedNodes[i];
         if (node.pos.x !== this._selectedNodeOrigins[i].x || node.pos.y !== this._selectedNodeOrigins[i].y) {
           node.onMoved({x: this._selectedNodeOrigins[i].x, y: this._selectedNodeOrigins[i].y}, {x: node.pos.x, y: node.pos.y});
 
-          this._undoManager && this._undoManager.addEvent('Moved Node "' + node.category + '.' + node.type + '"',
-          {
+          this._undoManager && this._undoManager.addEvent('Moved Node "' + node.category + '.' + node.type + '"', {
             id: node.id,
             start: {
               x: this._selectedNodeOrigins[i].x,
-              y: this._selectedNodeOrigins[i].y,
+              y: this._selectedNodeOrigins[i].y
             },
             end: {
               x: node.pos.x,
-              y: node.pos.y,
+              y: node.pos.y
             },
-            engine: this._engine,
+            engine: this._engine
           },
           // Undo
           function() {
@@ -5381,13 +5419,12 @@ wcPlayEditor.prototype = {
     if (this._selectedNode && this._selectedEntryLink && this._highlightNode && this._highlightExitLink) {
       if (this._selectedNode.connectEntry(this._selectedEntryLink.name, this._highlightNode, this._highlightExitLink.name) === wcNode.CONNECT_RESULT.ALREADY_CONNECTED) {
         this._selectedNode.disconnectEntry(this._selectedEntryLink.name, this._highlightNode, this._highlightExitLink.name);
-        this._undoManager && this._undoManager.addEvent('Disconnected Entry Link "' + this._selectedNode.category + '.' + this._selectedNode.type + '.' + this._selectedEntryLink.name + '" to Exit Link "' + this._highlightNode.category + '.' + this._highlightNode.type + '.' + this._highlightExitLink.name + '"',
-        {
+        this._undoManager && this._undoManager.addEvent('Disconnected Entry Link "' + this._selectedNode.category + '.' + this._selectedNode.type + '.' + this._selectedEntryLink.name + '" to Exit Link "' + this._highlightNode.category + '.' + this._highlightNode.type + '.' + this._highlightExitLink.name + '"', {
           id: this._selectedNode.id,
           name: this._selectedEntryLink.name,
           targetId: this._highlightNode.id,
           targetName: this._highlightExitLink.name,
-          engine: this._engine,
+          engine: this._engine
         },
         // Undo
         function() {
@@ -5402,13 +5439,12 @@ wcPlayEditor.prototype = {
           myNode.disconnectEntry(this.name, targetNode, this.targetName);
         });
       } else {
-        this._undoManager && this._undoManager.addEvent('Connected Entry Link "' + this._selectedNode.category + '.' + this._selectedNode.type + '.' + this._selectedEntryLink.name + '" to Exit Link "' + this._highlightNode.category + '.' + this._highlightNode.type + '.' + this._highlightExitLink.name + '"',
-        {
+        this._undoManager && this._undoManager.addEvent('Connected Entry Link "' + this._selectedNode.category + '.' + this._selectedNode.type + '.' + this._selectedEntryLink.name + '" to Exit Link "' + this._highlightNode.category + '.' + this._highlightNode.type + '.' + this._highlightExitLink.name + '"', {
           id: this._selectedNode.id,
           name: this._selectedEntryLink.name,
           targetId: this._highlightNode.id,
           targetName: this._highlightExitLink.name,
-          engine: this._engine,
+          engine: this._engine
         },
         // Undo
         function() {
@@ -5427,13 +5463,12 @@ wcPlayEditor.prototype = {
     if (this._selectedNode && this._selectedExitLink && this._highlightNode && this._highlightEntryLink) {
       if (this._selectedNode.connectExit(this._selectedExitLink.name, this._highlightNode, this._highlightEntryLink.name) === wcNode.CONNECT_RESULT.ALREADY_CONNECTED) {
         this._selectedNode.disconnectExit(this._selectedExitLink.name, this._highlightNode, this._highlightEntryLink.name);
-        this._undoManager && this._undoManager.addEvent('Disconnected Exit Link "' + this._selectedNode.category + '.' + this._selectedNode.type + '.' + this._selectedExitLink.name + '" to Entry Link "' + this._highlightNode.category + '.' + this._highlightNode.type + '.' + this._highlightEntryLink.name + '"',
-        {
+        this._undoManager && this._undoManager.addEvent('Disconnected Exit Link "' + this._selectedNode.category + '.' + this._selectedNode.type + '.' + this._selectedExitLink.name + '" to Entry Link "' + this._highlightNode.category + '.' + this._highlightNode.type + '.' + this._highlightEntryLink.name + '"', {
           id: this._selectedNode.id,
           name: this._selectedExitLink.name,
           targetId: this._highlightNode.id,
           targetName: this._highlightEntryLink.name,
-          engine: this._engine,
+          engine: this._engine
         },
         // Undo
         function() {
@@ -5448,13 +5483,12 @@ wcPlayEditor.prototype = {
           myNode.disconnectExit(this.name, targetNode, this.targetName);
         });
       } else {
-        this._undoManager && this._undoManager.addEvent('Connected Exit Link "' + this._selectedNode.category + '.' + this._selectedNode.type + '.' + this._selectedExitLink.name + '" to Entry Link "' + this._highlightNode.category + '.' + this._highlightNode.type + '.' + this._highlightEntryLink.name + '"',
-        {
+        this._undoManager && this._undoManager.addEvent('Connected Exit Link "' + this._selectedNode.category + '.' + this._selectedNode.type + '.' + this._selectedExitLink.name + '" to Entry Link "' + this._highlightNode.category + '.' + this._highlightNode.type + '.' + this._highlightEntryLink.name + '"', {
           id: this._selectedNode.id,
           name: this._selectedExitLink.name,
           targetId: this._highlightNode.id,
           targetName: this._highlightEntryLink.name,
-          engine: this._engine,
+          engine: this._engine
         },
         // Undo
         function() {
@@ -5473,13 +5507,12 @@ wcPlayEditor.prototype = {
     if (this._selectedNode && this._selectedInputLink && this._highlightNode && this._highlightOutputLink) {
       if (this._selectedNode.connectInput(this._selectedInputLink.name, this._highlightNode, this._highlightOutputLink.name) === wcNode.CONNECT_RESULT.ALREADY_CONNECTED) {
         this._selectedNode.disconnectInput(this._selectedInputLink.name, this._highlightNode, this._highlightOutputLink.name);
-        this._undoManager && this._undoManager.addEvent('Disconnected Property Input Link "' + this._selectedNode.category + '.' + this._selectedNode.type + '.' + this._selectedInputLink.name + '" to Property Output Link "' + this._highlightNode.category + '.' + this._highlightNode.type + '.' + this._highlightOutputLink.name + '"',
-        {
+        this._undoManager && this._undoManager.addEvent('Disconnected Property Input Link "' + this._selectedNode.category + '.' + this._selectedNode.type + '.' + this._selectedInputLink.name + '" to Property Output Link "' + this._highlightNode.category + '.' + this._highlightNode.type + '.' + this._highlightOutputLink.name + '"', {
           id: this._selectedNode.id,
           name: this._selectedInputLink.name,
           targetId: this._highlightNode.id,
           targetName: this._highlightOutputLink.name,
-          engine: this._engine,
+          engine: this._engine
         },
         // Undo
         function() {
@@ -5494,13 +5527,12 @@ wcPlayEditor.prototype = {
           myNode.disconnectInput(this.name, targetNode, this.targetName);
         });
       } else {
-        this._undoManager && this._undoManager.addEvent('Connected Property Input Link "' + this._selectedNode.category + '.' + this._selectedNode.type + '.' + this._selectedInputLink.name + '" to Property Output Link "' + this._highlightNode.category + '.' + this._highlightNode.type + '.' + this._highlightOutputLink.name + '"',
-        {
+        this._undoManager && this._undoManager.addEvent('Connected Property Input Link "' + this._selectedNode.category + '.' + this._selectedNode.type + '.' + this._selectedInputLink.name + '" to Property Output Link "' + this._highlightNode.category + '.' + this._highlightNode.type + '.' + this._highlightOutputLink.name + '"', {
           id: this._selectedNode.id,
           name: this._selectedInputLink.name,
           targetId: this._highlightNode.id,
           targetName: this._highlightOutputLink.name,
-          engine: this._engine,
+          engine: this._engine
         },
         // Undo
         function() {
@@ -5519,13 +5551,12 @@ wcPlayEditor.prototype = {
     if (this._selectedNode && this._selectedOutputLink && this._highlightNode && this._highlightInputLink) {
       if (this._selectedNode.connectOutput(this._selectedOutputLink.name, this._highlightNode, this._highlightInputLink.name) === wcNode.CONNECT_RESULT.ALREADY_CONNECTED) {
         this._selectedNode.disconnectOutput(this._selectedOutputLink.name, this._highlightNode, this._highlightInputLink.name);
-        this._undoManager && this._undoManager.addEvent('Disconnected Property Output Link "' + this._selectedNode.category + '.' + this._selectedNode.type + '.' + this._selectedOutputLink.name + '" to Property Input Link "' + this._highlightNode.category + '.' + this._highlightNode.type + '.' + this._highlightInputLink.name + '"',
-        {
+        this._undoManager && this._undoManager.addEvent('Disconnected Property Output Link "' + this._selectedNode.category + '.' + this._selectedNode.type + '.' + this._selectedOutputLink.name + '" to Property Input Link "' + this._highlightNode.category + '.' + this._highlightNode.type + '.' + this._highlightInputLink.name + '"', {
           id: this._selectedNode.id,
           name: this._selectedOutputLink.name,
           targetId: this._highlightNode.id,
           targetName: this._highlightInputLink.name,
-          engine: this._engine,
+          engine: this._engine
         },
         // Undo
         function() {
@@ -5540,13 +5571,12 @@ wcPlayEditor.prototype = {
           myNode.disconnectOutput(this.name, targetNode, this.targetName);
         });
       } else {
-        this._undoManager && this._undoManager.addEvent('Connected Property Output Link "' + this._selectedNode.category + '.' + this._selectedNode.type + '.' + this._selectedOutputLink.name + '" to Property Input Link "' + this._highlightNode.category + '.' + this._highlightNode.type + '.' + this._highlightInputLink.name + '"',
-        {
+        this._undoManager && this._undoManager.addEvent('Connected Property Output Link "' + this._selectedNode.category + '.' + this._selectedNode.type + '.' + this._selectedOutputLink.name + '" to Property Input Link "' + this._highlightNode.category + '.' + this._highlightNode.type + '.' + this._highlightInputLink.name + '"', {
           id: this._selectedNode.id,
           name: this._selectedOutputLink.name,
           targetId: this._highlightNode.id,
           targetName: this._highlightInputLink.name,
-          engine: this._engine,
+          engine: this._engine
         },
         // Undo
         function() {
@@ -5564,11 +5594,12 @@ wcPlayEditor.prototype = {
     }
 
     // Custom viewport area.
+    var mouse = null;
     if (this._selectedNode && this._highlightViewport) {
-      var mouse = this.__mouse(event, this.$viewport.offset());
+      mouse = this.__mouse(event, this.$viewport.offset());
       var pos = {
         x: (mouse.x - this._viewportCamera.x) / this._viewportCamera.z - this._selectedNode._meta.bounds.viewportBounds.left,
-        y: (mouse.y - this._viewportCamera.y) / this._viewportCamera.z - this._selectedNode._meta.bounds.viewportBounds.top,
+        y: (mouse.y - this._viewportCamera.y) / this._viewportCamera.z - this._selectedNode._meta.bounds.viewportBounds.top
       };
 
       this._selectedNode.onViewportMouseUp(event, pos, this._options.readOnly);
@@ -5615,8 +5646,9 @@ wcPlayEditor.prototype = {
         linkType = wcNode.LINK_TYPE.OUTPUT;
       }
       if (linkName && linkType) {
-        var mouse = this.__mouse(event, this.$viewport.offset());
+        mouse = this.__mouse(event, this.$viewport.offset());
         this.__drawPalettePopup(mouse, this._selectedNode, linkName, linkType, function(newNode) {
+          newNode;
           __cleanup();
         });
         return;
@@ -5639,6 +5671,7 @@ wcPlayEditor.prototype = {
    * @param {Object} elem - The target element.
    */
   __onViewportMouseEnter: function(event, elem) {
+    elem;
     this._mouseInViewport = true;
   },
 
@@ -5663,6 +5696,8 @@ wcPlayEditor.prototype = {
    * @param {Object} elem - The target element.
    */
   __onViewportMouseClick: function(event, elem) {
+    elem;
+    var state = false, i = 0;
     if (!this._mouseMoved) {
       if (this._highlightCrumb > -1) {
         if (this._crumbBounds[this._highlightCrumb].parent !== this._parent) {
@@ -5682,13 +5717,12 @@ wcPlayEditor.prototype = {
       if (node) {
         // Debug Log button.
         if (this.__inRect(this._mouse, node._meta.bounds.debugLog, node.pos, this._viewportCamera)) {
-          var state = !node._log;
+          state = !node._log;
           node.debugLog(state);
-          this._undoManager && this._undoManager.addEvent((state? 'Enabled': 'Disabled') + ' Debug Logging for Node "' + node.category + '.' + node.type + '"',
-          {
+          this._undoManager && this._undoManager.addEvent((state? 'Enabled': 'Disabled') + ' Debug Logging for Node "' + node.category + '.' + node.type + '"', {
             id: node.id,
             state: state,
-            engine: this._engine,
+            engine: this._engine
           },
           // Undo
           function() {
@@ -5704,13 +5738,12 @@ wcPlayEditor.prototype = {
 
         // Breakpoint button.
         if (this.__inRect(this._mouse, node._meta.bounds.breakpoint, node.pos, this._viewportCamera)) {
-          var state = !node._break;
+          state = !node._break;
           node.debugBreak(state);
-          this._undoManager && this._undoManager.addEvent((state? 'Enabled': 'Disabled') + ' Breakpoint on Node "' + node.category + '.' + node.type + '"',
-          {
+          this._undoManager && this._undoManager.addEvent((state? 'Enabled': 'Disabled') + ' Breakpoint on Node "' + node.category + '.' + node.type + '"', {
             id: node.id,
             state: state,
-            engine: this._engine,
+            engine: this._engine
           },
           // Undo
           function() {
@@ -5736,7 +5769,7 @@ wcPlayEditor.prototype = {
 
         // Property values.
         var propBounds;
-        for (var i = 0; i < node._meta.bounds.valueBounds.length; ++i) {
+        for (i = 0; i < node._meta.bounds.valueBounds.length; ++i) {
           if (this.__inRect(this._mouse, node._meta.bounds.valueBounds[i].rect, node.pos, this._viewportCamera)) {
             propBounds = node._meta.bounds.valueBounds[i];
             break;
@@ -5744,7 +5777,7 @@ wcPlayEditor.prototype = {
         }
 
         if (propBounds) {
-          for (var i = 0; i < node.properties.length; ++i) {
+          for (i = 0; i < node.properties.length; ++i) {
             if (node.properties[i].name === propBounds.name) {
               this.__drawPropertyEditor(node, node.properties[i], propBounds);
               break;
@@ -5753,7 +5786,7 @@ wcPlayEditor.prototype = {
         }
 
         var propInitialBounds;
-        for (var i = 0; i < node._meta.bounds.initialBounds.length; ++i) {
+        for (i = 0; i < node._meta.bounds.initialBounds.length; ++i) {
           if (this.__inRect(this._mouse, node._meta.bounds.initialBounds[i].rect, node.pos, this._viewportCamera)) {
             propInitialBounds = node._meta.bounds.initialBounds[i];
             break;
@@ -5761,7 +5794,7 @@ wcPlayEditor.prototype = {
         }
 
         if (propInitialBounds) {
-          for (var i = 0; i < node.properties.length; ++i) {
+          for (i = 0; i < node.properties.length; ++i) {
             if (node.properties[i].name === propInitialBounds.name) {
               this.__drawPropertyEditor(node, node.properties[i], propInitialBounds, true);
               break;
@@ -5773,7 +5806,7 @@ wcPlayEditor.prototype = {
         if (node._meta.bounds.viewportBounds) {
           var pos = {
             x: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z - node._meta.bounds.viewportBounds.left,
-            y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z - node._meta.bounds.viewportBounds.top,
+            y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z - node._meta.bounds.viewportBounds.top
           };
 
           if (this.__inRect(this._mouse, node._meta.bounds.viewportBounds, node.pos, this._viewportCamera)) {
@@ -5792,6 +5825,8 @@ wcPlayEditor.prototype = {
    * @param {Object} elem - The target element.
    */
   __onViewportMouseDoubleClick: function(event, elem) {
+    elem;
+    var i = 0;
     this._mouse = this.__mouse(event, this.$viewport.offset());
 
     var hasTarget = false;
@@ -5808,7 +5843,7 @@ wcPlayEditor.prototype = {
       }
 
       // Property values.
-      for (var i = 0; i < node._meta.bounds.valueBounds.length; ++i) {
+      for (i = 0; i < node._meta.bounds.valueBounds.length; ++i) {
         if (this.__inRect(this._mouse, node._meta.bounds.valueBounds[i].rect, node.pos, this._viewportCamera)) {
           hasTarget = true;
           break;
@@ -5817,7 +5852,7 @@ wcPlayEditor.prototype = {
 
       // Entry links.
       if (!this._options.readOnly && !hasTarget) {
-        for (var i = 0; i < node._meta.bounds.entryBounds.length; ++i) {
+        for (i = 0; i < node._meta.bounds.entryBounds.length; ++i) {
           if (this.__inRect(this._mouse, node._meta.bounds.entryBounds[i].rect, node.pos, this._viewportCamera)) {
             hasTarget = true;
             // Double click to manually fire this entry chain.
@@ -5829,7 +5864,7 @@ wcPlayEditor.prototype = {
 
       // Exit links.
       if (!this._options.readOnly && !hasTarget) {
-        for (var i = 0; i < node._meta.bounds.exitBounds.length; ++i) {
+        for (i = 0; i < node._meta.bounds.exitBounds.length; ++i) {
           if (this.__inRect(this._mouse, node._meta.bounds.exitBounds[i].rect, node.pos, this._viewportCamera)) {
             hasTarget = true;
             // Double click to manually fire this exit chain.
@@ -5841,7 +5876,7 @@ wcPlayEditor.prototype = {
 
       // Output links.
       if (!this._options.readOnly && !hasTarget) {
-        for (var i = 0; i < node._meta.bounds.outputBounds.length; ++i) {
+        for (i = 0; i < node._meta.bounds.outputBounds.length; ++i) {
           if (this.__inRect(this._mouse, node._meta.bounds.outputBounds[i].rect, node.pos, this._viewportCamera)) {
             hasTarget = true;
             // Double click to manually fire this output chain.
@@ -5855,7 +5890,7 @@ wcPlayEditor.prototype = {
       if (!hasTarget && node._meta.bounds.viewportBounds) {
         var pos = {
           x: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z - node._meta.bounds.viewportBounds.left,
-          y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z - node._meta.bounds.viewportBounds.top,
+          y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z - node._meta.bounds.viewportBounds.top
         };
 
         if (this.__inRect(this._mouse, node._meta.bounds.viewportBounds, node.pos, this._viewportCamera)) {
@@ -5888,6 +5923,7 @@ wcPlayEditor.prototype = {
   },
 
   __onViewportMouseWheel: function(event, elem) {
+    elem;
     // Disable zoom if we are currently highlighting
     if (this._highlightRect) {
       return;
@@ -5899,7 +5935,7 @@ wcPlayEditor.prototype = {
     if (this._highlightNode && this._highlightNode._meta.bounds.viewportBounds) {
       var pos = {
         x: (this._mouse.x - this._viewportCamera.x) / this._viewportCamera.z - this._highlightNode._meta.bounds.viewportBounds.left,
-        y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z - this._highlightNode._meta.bounds.viewportBounds.top,
+        y: (this._mouse.y - this._viewportCamera.y) / this._viewportCamera.z - this._highlightNode._meta.bounds.viewportBounds.top
       };
 
       if (this.__inRect(this._mouse, this._highlightNode._meta.bounds.viewportBounds, this._highlightNode.pos, this._viewportCamera) &&
@@ -5930,18 +5966,18 @@ wcPlayEditor.prototype = {
    * @returns {wcNode|null} - A node at the given position, or null if none was found.
    */
   __findNodeAtPos: function(pos, camera, nodes) {
-    if (this._parent) {
-      var self = this;
-      function __test(nodes) {
-        // Iterate backwards so we always test the nodes that are drawn on top first.
-        for (var i = nodes.length-1; i >= 0; --i) {
-          if (nodes[i]._meta.bounds && self.__inRect(pos, nodes[i]._meta.bounds.rect, nodes[i].pos, camera)) {
-            return nodes[i];
-          }
+    var self = this;
+    function __test(nodes) {
+      // Iterate backwards so we always test the nodes that are drawn on top first.
+      for (var i = nodes.length-1; i >= 0; --i) {
+        if (nodes[i]._meta.bounds && self.__inRect(pos, nodes[i]._meta.bounds.rect, nodes[i].pos, camera)) {
+          return nodes[i];
         }
-        return null;
-      };
+      }
+      return null;
+    }
 
+    if (this._parent) {
       if (nodes === undefined) {
         return __test(this._parent._storageNodes) ||
                __test(this._parent._compositeNodes) ||

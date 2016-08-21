@@ -40,20 +40,20 @@ See the [Getting Started](http://play.api.webcabin.org/tutorial-1.0.html) tutori
 
 ****
 ### Change Log ###
-#### Version: (pre-release) 1.0.0 ####
+#### Version: 1.0.0 ####
 
 
 ****
 ### Dependencies ###
-
-* JQuery Library version 1.11.1 [http://jquery.com/](http://jquery.com/)
-* Font-Awesome [http://fortawesome.github.io/Font-Awesome/](http://fortawesome.github.io/Font-Awesome/)
-* wcMenu [https://github.com/WebCabin/wcMenu](https://github.com/WebCabin/wcMenu)
+Begin by including the necessary dependencies (only if using the editor tool):  
+* `JQuery` Library version 1.11.1 [http://jquery.com/](http://jquery.com/)
+* `Font-Awesome` [http://fortawesome.github.io/Font-Awesome/](http://fortawesome.github.io/Font-Awesome/)
+* `wcMenu` [https://github.com/WebCabin/wcMenu](https://github.com/WebCabin/wcMenu) - File menu and toolbar.
 
 ### Optional Dependencies ###
-
-* wcUndoManager [https://github.com/WebCabin/wcUndoManager](https://github.com/WebCabin/wcUndoManager)
-* FileSaver.js [https://github.com/eligrey/FileSaver.js/](https://github.com/eligrey/FileSaver.js/)
+You can also include these optional dependencies for added features:  
+* `wcUndoManager` [https://github.com/WebCabin/wcUndoManager](https://github.com/WebCabin/wcUndoManager) - Full undo/redo support while using the editor.
+* `FileSaver.js` [https://github.com/eligrey/FileSaver.js/](https://github.com/eligrey/FileSaver.js/) - Helper for saving scripts as a download file.
 
 
 ****
