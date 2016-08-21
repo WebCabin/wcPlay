@@ -4296,7 +4296,9 @@ wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Import
       var node = this._compositeNodes[i];
       if (node.instanceOf('wcNodeCompositeEntry')) {
         if (node.name === name) {
-          node.activateExit('out');
+          node._activeTracker = this._activeTracker;
+          node.onActivated();
+          node._activeTracker = null;
           break;
         }
       }
@@ -4550,6 +4552,17 @@ wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeEntry', 'Entry', 'Linkers', {
     if (!this._invalid && this._parent) {
       this._parent.sortEntryLinks();
     }
+  },
+
+  /**
+   * Event that is called when an entry link has been activated.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeCompositeScript#onActivated
+   * @param {String} name - The name of the entry link triggered.
+   */
+  onActivated: function(name) {
+    name;
+    this.activateExit('out');
   },
 
   /**

@@ -45,6 +45,17 @@ wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeEntry', 'Entry', 'Linkers', {
   },
 
   /**
+   * Event that is called when an entry link has been activated.<br>
+   * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
+   * @function wcNodeCompositeScript#onActivated
+   * @param {String} name - The name of the entry link triggered.
+   */
+  onActivated: function(name) {
+    name;
+    this.activateExit('out');
+  },
+
+  /**
    * Event that is called when the name of this node is about to change.<br>
    * Overload this in inherited nodes, be sure to call 'this._super(..)' at the top.
    * @function wcNodeCompositeEntry#onNameChanging
