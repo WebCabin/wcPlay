@@ -294,17 +294,18 @@ $(document).ready(function() {
     var player = Crafty.e('2D, Canvas, PlayerControls, Slide, herosouth').attr({x:21*32, y:13*32});
     Crafty.e('Camera').camera(player);
 
-    var hasWon = false;
+    var triggerWin = true;
     player.addComponent('Collision').onHit('Wall', function() {
       this.cancelSlide();
     }).onHit('Goal', function() {
       // Win condition.
-      if (!hasWon) {
-        hasWon = true;
-        myPlay.triggerEvent('Game Win');
-        setTimeout(function() {
-          hasWon = false;
-        }, 2000);
+      if (triggerWin) {
+        triggerWin = false;
+        myPlay.triggerEvent('Game Win', {done: function() {
+          setTimeout(function() {
+            triggerWin = true;
+          }, 2000);
+        }});
       }
     });
   });
