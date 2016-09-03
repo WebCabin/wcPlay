@@ -52,7 +52,7 @@ wcPlayNodes.wcNodeStorage.extend('wcNodeStorageGlobal', 'Global Value', 'Global'
     var engine = this.engine();
     if (engine) {
       engine.createProperty(newName, wcPlay.PROPERTY.STRING, '');
-      
+
       // Perform a search and remove all global properties no longer being referenced.
       var propList = engine.listProperties();
       var i = 0;
@@ -201,7 +201,7 @@ wcPlayNodes.wcNodeStorage.extend('wcNodeStorageGlobal', 'Global Value', 'Global'
    * @param {Object} oldValue - The old value of the global property.
    * @param {Object} newValue - The new value of the global property.
    */
-  onGlobalInitialPropertyChanged: function (name, oldValue, newValue) {
+  onGlobalInitialPropertyChanged: function(name, oldValue, newValue) {
     if (this.name === name) {
       this.initialProperty('value', newValue, true, true);
       this._meta.dirty = true;

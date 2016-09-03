@@ -5,7 +5,7 @@ var _uglifyCSS = require('uglifycss');
 function concat(opts) {
   var fileList = opts.src;
   var distPath = opts.dest;
-  var out = fileList.map(function(filePath){
+  var out = fileList.map(function(filePath) {
     return _fs.readFileSync(filePath).toString();
   });
   _fs.writeFileSync(distPath, out.join('\n'));
@@ -16,7 +16,7 @@ function uglifyJS(srcPath, distPath) {
   var
     jsp = _uglifyJS.parser,
     pro = _uglifyJS.uglify,
-    ast = jsp.parse( _fs.readFileSync(srcPath).toString() );
+    ast = jsp.parse(_fs.readFileSync(srcPath).toString());
 
   ast = pro.ast_mangle(ast);
   ast = pro.ast_squeeze(ast);
@@ -109,7 +109,7 @@ concat({
 });
 concat({
   src: [
-    '../Code/editor.css',
+    '../Code/editor.css'
   ],
   dest: '../Build/wcPlayEditor.css'
 });
@@ -124,7 +124,7 @@ concat({
   dest: '../Build/wcPlayExampleNodes.js'
 });
 
-// Now minify them. 
+// Now minify them.
 uglifyJS('../Build/wcPlay.js', '../Build/wcPlay.min.js');
 uglifyJS('../Build/wcPlayNodes.js', '../Build/wcPlayNodes.min.js');
 uglifyJS('../Build/wcPlayEditor.js', '../Build/wcPlayEditor.min.js');

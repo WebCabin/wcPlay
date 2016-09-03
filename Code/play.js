@@ -180,7 +180,7 @@ wcPlay.prototype = {
    */
   stop: function() {
     this._isRunning = false;
-    
+
     this.notifyNodes('onStop', []);
   },
 
@@ -319,10 +319,10 @@ wcPlay.prototype = {
               data: data.nodes[i]
             });
           } catch (e) {
-            console.log('wcPlay ERROR: Attempted to load node "' + data.nodes[i].className + '" with error :' + e);
+            this.error('Attempted to load node "' + data.nodes[i].className + '" with error :' + e);
           }
         } else {
-          console.log('wcPlay ERROR: Attempted to load node "' + data.nodes[i].className + '", but the constructor could not be found!');
+          this.error('Attempted to load node "' + data.nodes[i].className + '", but the constructor could not be found!');
         }
       }
 
@@ -333,9 +333,9 @@ wcPlay.prototype = {
 
       this.reset();
       return true;
-    } catch (e) {
+    } catch (err) {
       // Something went wrong, restore the previous script.
-      console.log(e.stack);
+      this.error(err.stack);
       this.load(saveData);
     }
     return false;
@@ -401,8 +401,8 @@ wcPlay.prototype = {
       this.__removeNode(newNode);
       this._importedScripts.push(newNode);
       return true;
-    } catch (e) {
-      console.log(e.stack);
+    } catch (err) {
+      this.error(err.stack);
       if (newNode) {
         newNode.destroy();
       }
@@ -675,6 +675,36 @@ wcPlay.prototype = {
     }
 
     return this._isStepping;
+  },
+
+  /**
+   * Outputs a log message.
+   * @function wcPlay#log
+   * @param {...string} args - The log messages.
+   */
+  log: function(args) {
+    /* eslint-disable no-console */
+    args = Array.prototype.slice.call(arguments);
+    args.splice(0, 0, 'wcPlay:');
+    console.log.apply(console, args);
+    /* eslint-enable no-console */
+  },
+
+  /**
+   * Outputs an error message.
+   * @function wcPlay#error
+   * @param {...string} args - The log messages.
+   */
+  error: function(args) {
+    /* eslint-disable no-console */
+    args = Array.prototype.slice.call(arguments);
+    args.splice(0, 0, 'wcPlay ERROR:');
+    if (console.error) {
+      console.error.apply(console, args);
+    } else {
+      console.log.apply(console, args);
+    }
+    /* eslint-enable no-console */
   },
 
   /**
@@ -1071,7 +1101,7 @@ wcPlay.prototype = {
           alert('Flow Trackers have exceeded the limit, please ensure that you are not creating an infinite flow loop.\n\nThe chain will be forced to stop.\n\nThis message will only appear once.');
         }
       }
-      console.log('wcPlay ERROR: Flow Trackers have exceeded the limit, please ensure that you are not creating an infinite flow loop. The chain will be forced to stop.');
+      this.error('Flow Trackers have exceeded the limit, please ensure that you are not creating an infinite flow loop. The chain will be forced to stop.');
       this.endFlowTracker(parent);
       return null;
     }
@@ -1108,7 +1138,7 @@ wcPlay.prototype = {
 
     this._flowTrackers--;
     if (this._flowTrackers < 0) {
-      console.log('wcPlay ERROR: Flow tracker count reduced below zero!');
+      this.error('Flow tracker count reduced below zero!');
     }
 
     // Kill this tracker, in case anything else is still referencing it.

@@ -1,14 +1,18 @@
-(function(){
+'use strict';
+
+(function() {
   // Already defined, then we can skip.
-  if (this.wcPlayNodes && this.wcPlayNodes['wcClass']) {
+  if (window.wcPlayNodes && window.wcPlayNodes.wcClass) {
     return;
   }
 
-  if (!this.wcPlayNodes) {
-    this.wcPlayNodes = {};
+  if (!window.wcPlayNodes) {
+    window.wcPlayNodes = {};
   }
 
+  // Bind polyfill
   if (!Function.prototype.bind) {
+    /* eslint-disable no-extend-native */
     Function.prototype.bind = function(oThis) {
       if (typeof this !== 'function') {
         // closest thing possible to the ECMAScript 5
@@ -16,21 +20,22 @@
         throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
       }
 
-      var aArgs   = Array.prototype.slice.call(arguments, 1),
+      var aArgs = Array.prototype.slice.call(arguments, 1),
         fToBind = this,
-        fNOP    = function() {},
+        FNOP    = function() {},
         fBound  = function() {
-          return fToBind.apply(this instanceof fNOP? this : oThis, aArgs.concat(Array.prototype.slice.call(arguments)));
+          return fToBind.apply(this instanceof FNOP? this : oThis, aArgs.concat(Array.prototype.slice.call(arguments)));
         };
 
       if (this.prototype) {
         // Function.prototype doesn't have a prototype property
-        fNOP.prototype = this.prototype; 
+        FNOP.prototype = this.prototype;
       }
-      fBound.prototype = new fNOP();
+      fBound.prototype = new FNOP();
 
       return fBound;
     };
+    /* eslint-enable no-extend-native */
   }
 
   var initializing = false;
@@ -39,7 +44,7 @@
    * JavaScript class inheritance system.
    * @class wcClass
    */
-  var wcClass = function(){};
+  var wcClass = function() {};
 
   /**
    * Extends the class object.
@@ -54,11 +59,16 @@
       throw new Error('Class name contains invalid characters!');
     }
 
-    _args;
     // Last argument is always the class definition.
     var props = arguments[arguments.length-1];
 
     var _super = this.prototype;
+
+    // Instantiate a base class (but only create the instance,
+    // don't run the init constructor)
+    initializing = true;
+    var prototype = new this(arguments);
+    initializing = false;
 
     // Create a bound super class object that contains all of the
     // parent methods, but bound to the current object.
@@ -69,53 +79,48 @@
       }
     }
 
-
-    // Instantiate a base class (but only create the instance,
-    // don't run the init constructor)
-    initializing = true;
-    var prototype = new this(arguments);
-    initializing = false;
-
-    function BindSuper(owner, name) {
+    function bindSuper(owner, name) {
       var bound = null;
       if (_super && typeof _super[name] === 'function') {
         bound = _super[name].bind(owner);
       } else {
-        bound = function(){};
+        bound = function() {};
       }
       bound.prototype = _boundSuper;
       return bound;
     }
 
     // Copy the properties over onto the new prototype
-    for (var name in props) {
+    for (var propName in props) {
       // Check if we're overwriting an existing function
       // prototype[name] = typeof props[name] === 'function' && typeof _super[name] === 'function'?
-      prototype[name] = typeof props[name] === 'function'?
-        (function(name, fn){
+      prototype[propName] = typeof props[propName] === 'function'?
+        (function(name, fn) {
           return function() {
             var tmp = this._super;
-           
+
             // Add a new this._super() method that is the same method
             // but on the super-class
-            this._super = BindSuper(this, name);
-           
+            this._super = bindSuper(this, name);
+
             // The method only need to be bound temporarily, so we
             // remove it when we're done executing
             var ret = fn.apply(this, arguments);
             this._super = tmp;
-           
+
             return ret;
           };
-        })(name, props[name]):
-        props[name];
+        })(propName, props[propName]):
+        props[propName];
     }
 
     function __init() {
-      if(!initializing) {
-        this.init && this.init.apply(this, arguments);
-      } else {
-        this.classInit && this.classInit.apply(this, arguments[0]);
+      if (initializing) {
+        if (this.classInit) {
+          this.classInit.apply(this, arguments[0]);
+        }
+      } else if (this.init) {
+        this.init.apply(this, arguments);
       }
     }
 
@@ -129,18 +134,22 @@
       return this.isA(name) || (_super.instanceOf && _super.instanceOf(name));
     };
 
+    /* eslint-disable no-eval */
     // Converts __init to a new function that is named after className
     var Class = 'wcPlayNodes.' + className + ' = function ' + className + '() {' + __init.toString().match(/function[^{]+\{([\s\S]*)\}$/)[1] + '};';
     eval(Class);
+    /* eslint-enable no-eval */
 
     // Populate our constructed prototype object
     wcPlayNodes[className].prototype = prototype;
 
+    /* eslint-disable no-caller */
     // And make this class extendable
-    wcPlayNodes[className].extend = arguments.callee;
+    wcPlayNodes[className].extend = wcClass.extend;
+    /* eslint-enable no-caller */
     return Class;
   };
-  this.wcPlayNodes.wcClass = wcClass;
+  window.wcPlayNodes.wcClass = wcClass;
 
   /**
    * Class constructor.

@@ -47,11 +47,11 @@ wcPlayNodes.wcNodeProcess.extend('wcNodeProcessExampleViewport', 'Example Viewpo
     context.strokeStyle = 'red';
     context.strokeRect(0, 0, 100, 100);
     context.beginPath();
-    context.moveTo(0,0);
+    context.moveTo(0, 0);
     context.lineTo(100, 100);
     context.stroke();
     context.beginPath();
-    context.moveTo(100,0);
+    context.moveTo(100, 0);
     context.lineTo(0, 100);
     context.stroke();
 

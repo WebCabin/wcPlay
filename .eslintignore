@@ -1,0 +1,5 @@
+node_modules/
+Compiler/node_modules/
+bower_components/
+Build/
+*-min.js

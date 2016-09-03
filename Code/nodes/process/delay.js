@@ -23,7 +23,7 @@ wcPlayNodes.wcNodeProcess.extend('wcNodeProcessDelay', 'Delay', 'Flow Control', 
   onActivated: function(name) {
     this._super(name);
 
-    // Now set a timeout to wait for 'Milliseconds' amount of time.    
+    // Now set a timeout to wait for 'Milliseconds' amount of time.
     var delay = this.property('milliseconds');
 
     // Start a timeout event using the node's built in timeout handler.

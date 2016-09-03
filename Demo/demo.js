@@ -109,10 +109,10 @@ $(document).ready(function() {
 
       this.bind('Slide', function(dir) {
         // Don't continue to slide if we're already moving
-        if(this._moving) return false;
+        if (this._moving) return false;
         this._moving = true;
 
-        var direction = [0,0];
+        var direction = [0, 0];
         switch (dir) {
           case 'forward':  dir = this._direction;                break;
           case 'backward': dir = __getBackward(this._direction); break;
@@ -122,10 +122,10 @@ $(document).ready(function() {
         }
 
         switch (dir) {
-          case 'north': direction = [0,-1]; break;
-          case 'south': direction = [0,1];  break;
-          case 'west':  direction = [-1,0]; break;
-          case 'east':  direction = [1,0];  break;
+          case 'north': direction = [0, -1]; break;
+          case 'south': direction = [0, 1];  break;
+          case 'west':  direction = [-1, 0]; break;
+          case 'east':  direction = [1, 0];  break;
         }
 
         // Let's keep our pre-movement location
@@ -149,14 +149,14 @@ $(document).ready(function() {
 
         this._frames = this._stepFrames;
       }).bind('EnterFrame', function() {
-        if(!this._moving) return false;
+        if (!this._moving) return false;
 
         // If we're moving, update our position by our per-frame velocity
         this.x += this._vx;
         this.y += this._vy;
         this._frames--;
 
-        if(this._frames == 0) {
+        if (this._frames == 0) {
           // If we've run out of frames,
           // move us to our destination to avoid rounding errors.
           this._moving = false;
@@ -180,11 +180,11 @@ $(document).ready(function() {
       });
     },
 
-    slideFrames: function(frames) { 
+    slideFrames: function(frames) {
       this._stepFrames = frames;
     },
 
-    // A function we'll use later to 
+    // A function we'll use later to
     // cancel our movement and send us back to where we started
     cancelSlide: function() {
       this.x = this._sourceX;
@@ -265,13 +265,13 @@ $(document).ready(function() {
 
   Crafty.paths({images: 'Demo/'});
 
-  //the loading screen that will display while our assets load
+  // the loading screen that will display while our assets load
   Crafty.scene('loading', function() {
     Crafty.load(assets, function() {
-      Crafty.scene('main'); //when everything is loaded, run the main scene
+      Crafty.scene('main'); // when everything is loaded, run the main scene
     });
   });
- 
+
   Crafty.scene('main', function() {
     Crafty.background('#FFF');
 
@@ -281,7 +281,7 @@ $(document).ready(function() {
       level.push(columns);
       // Then split out each column
       $.each(columns, function(x, column) {
-        if(column === 'F') {
+        if (column === 'F') {
           Crafty.e('2D, Canvas, floor, Floor').attr({x:x*32, y:y*32});
         } else if (column === 'G') {
           Crafty.e('2D, Canvas, goal, Goal').attr({x:x*32, y:y*32});
