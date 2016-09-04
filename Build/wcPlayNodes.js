@@ -22,6 +22,7 @@ wcPlayNodes.wcNodeEntry.extend('wcNodeEntryStart', 'Start', 'Automatic', {
     this.onActivated();
   }
 });
+
 wcPlayNodes.wcNodeEntry.extend('wcNodeEntryUpdate', 'Update', 'Automatic', {
   /**
    * An entry node that fires continuously as soon as the flow chain has finished.
@@ -79,6 +80,7 @@ wcPlayNodes.wcNodeEntry.extend('wcNodeEntryUpdate', 'Update', 'Automatic', {
     }
   }
 });
+
 wcPlayNodes.wcNodeEntry.extend('wcNodeEntryInterval', 'Interval', 'Automatic', {
   /**
    * An entry node that fires continuously on a regular interval.
@@ -138,6 +140,7 @@ wcPlayNodes.wcNodeEntry.extend('wcNodeEntryInterval', 'Interval', 'Automatic', {
     }
   }
 });
+
 wcPlayNodes.wcNodeEntry.extend('wcNodeEntryRemote', 'Remote Event', 'Flow Control', {
   /**
    * An entry node that fires when a [Call Remote Event Node]{@link wcNodeEntryCallRemote} of the same name is activated.
@@ -153,6 +156,7 @@ wcPlayNodes.wcNodeEntry.extend('wcNodeEntryRemote', 'Remote Event', 'Flow Contro
     this.details('This node uses it\'s Title Name value as an identifier that links it with any Call Remote Event Nodes of the same name. Whenever any Call Remote Event Node of the same name is activated, this Node will become active as well. If multiple Remote Nodes exist with the same name, they will all be called in parallel.');
   }
 });
+
 wcPlayNodes.wcNodeEntry.extend('wcNodeEntryCallRemote', 'Call Remote Event', 'Flow Control', {
   /**
    * An entry node that fires when a [Call Remote Event Node]{@link wcNodeEntryCallRemote} of the same name is activated.
@@ -196,6 +200,7 @@ wcPlayNodes.wcNodeEntry.extend('wcNodeEntryCallRemote', 'Call Remote Event', 'Fl
     }
   }
 });
+
 wcPlayNodes.wcNodeProcess.extend('wcNodeProcessDelay', 'Delay', 'Flow Control', {
   /**
    * Waits for a specified amount of time before continuing the flow chain.
@@ -221,7 +226,7 @@ wcPlayNodes.wcNodeProcess.extend('wcNodeProcessDelay', 'Delay', 'Flow Control', 
   onActivated: function(name) {
     this._super(name);
 
-    // Now set a timeout to wait for 'Milliseconds' amount of time.    
+    // Now set a timeout to wait for 'Milliseconds' amount of time.
     var delay = this.property('milliseconds');
 
     // Start a timeout event using the node's built in timeout handler.
@@ -587,7 +592,7 @@ wcPlayNodes.wcNodeStorage.extend('wcNodeStorageGlobal', 'Global Value', 'Global'
     var engine = this.engine();
     if (engine) {
       engine.createProperty(newName, wcPlay.PROPERTY.STRING, '');
-      
+
       // Perform a search and remove all global properties no longer being referenced.
       var propList = engine.listProperties();
       var i = 0;
@@ -736,7 +741,7 @@ wcPlayNodes.wcNodeStorage.extend('wcNodeStorageGlobal', 'Global Value', 'Global'
    * @param {Object} oldValue - The old value of the global property.
    * @param {Object} newValue - The new value of the global property.
    */
-  onGlobalInitialPropertyChanged: function (name, oldValue, newValue) {
+  onGlobalInitialPropertyChanged: function(name, oldValue, newValue) {
     if (this.name === name) {
       this.initialProperty('value', newValue, true, true);
       this._meta.dirty = true;

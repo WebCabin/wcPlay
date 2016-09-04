@@ -60,6 +60,11 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
   },
 
   /**
+   * @member {string} wcNode#name - The title name of this node, editable by the user and shown in the editor view.
+   */
+  name: '',
+
+  /**
    * Outputs a log message.
    * @function wcNode#log
    * @param {...string} args - The log messages.
