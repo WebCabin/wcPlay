@@ -42,6 +42,7 @@ See the [Getting Started](http://play.api.webcabin.org/tutorial-1.0.html) tutori
 ### Change Log ###
 #### Version: [Unreleased] ####
 
+* Fixed a script error when searching nodes.
 #### Version: 1.1.0 ####
 
 * Added the ability to specify a custom list of node types that are allowed in your script.

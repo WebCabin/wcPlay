@@ -1225,7 +1225,7 @@ wcPlayEditor.prototype = {
       outer: this.$main,
       manualUpdate: true,
       data: this,
-      version: 'v1.0.7'
+      version: 'v1.1.0'
     });
 
     // File -> New Script...
@@ -1776,7 +1776,7 @@ wcPlayEditor.prototype = {
 
     this.$search.keyup(function() {
       // Re-perform the search when the search value has changed.
-      var val = $field.value().toLowerCase();
+      var val = $field.val().toLowerCase();
       if (searchValue !== val) {
         searchIndex = 0;
         searchParent = self._parent;
