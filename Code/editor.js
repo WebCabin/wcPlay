@@ -690,10 +690,10 @@ wcPlayEditor.prototype = {
     }
 
     return {
-      x: (event.clientX || event.pageX) - (offset? offset.left: 0) - (translation? translation.x: 0),
-      y: (event.clientY || event.pageY) - (offset? offset.top: 0) - (translation? translation.y: 0),
-      gx: (event.clientX || event.pageX),
-      gy: (event.clientY || event.pageY),
+      x: event.pageX - (offset? offset.left: 0) - (translation? translation.x: 0),
+      y: event.pageY - (offset? offset.top: 0) - (translation? translation.y: 0),
+      gx: event.pageX,
+      gy: event.pageY,
       which: event.which || 1
     };
   },

@@ -4,7 +4,7 @@
     "name": "WebCabin",
     "url": "http://play.webcabin.org"
   },
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Node based visual scripting tool.",
   "main": "Build/wcPlay.min.js",
   "dependencies": {
