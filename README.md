@@ -40,6 +40,14 @@ See the [Getting Started](http://play.api.webcabin.org/tutorial-1.0.html) tutori
 
 ****
 ### Change Log ###
+#### Version: [Unreleased] ####
+
+#### Version: 1.1.0 ####
+
+* Added the ability to specify a custom list of node types that are allowed in your script.
+* Fixed issue with mouse positioning not working when your browser is scrolled.
+* You can now register a callback event that triggers when an entire flow chain has finished executing (for an example, the `Update` node uses this)
+* Added lint rules
 #### Version: 1.0.0 ####
 
 

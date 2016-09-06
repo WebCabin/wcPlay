@@ -6,6 +6,93 @@
  * @param {wcPlay~Options} [options] - Custom options.
  */
 function wcPlay(options) {
+  var lib = null;
+
+  /**
+   * Contains a library of node types. Accessible via {@link wcPlay#nodeLibrary}. This
+   * is used by the editor tool to determine what nodes a user is allowed to use
+   * within a script. By default, this contains all nodes loaded by the browser. After
+   * updating this library, you will need to re-load the script within the editor
+   * to update the palette.
+   * @class wcNodeLibrary
+   */
+  function wcNodeLibrary() {}
+  wcNodeLibrary.prototype = {
+    /**
+     * Retrieves the library list of nodes.
+     * @function wcNodeLibrary#get
+     * @returns {wcNode[]} - The node list.
+     */
+    get: function() {
+      if (lib === null) {
+        this.all();
+      }
+      return lib;
+    },
+
+    /**
+     * Adds all node types to the library.
+     * @function wcNodeLibrary#all
+     */
+    all: function() {
+      lib = [];
+      for (var i = 0; i < wcPlay.NODE_LIBRARY.length; ++i) {
+        lib.push(wcPlay.NODE_LIBRARY[i]);
+      }
+    },
+
+    /**
+     * Clears all nodes from the library.
+     * @function wcNodeLibrary#clear
+     */
+    clear: function() {
+      lib = [];
+    },
+
+    /**
+     * Adds a node of a given class name to the library.
+     * @function wcNodeLibrary#add
+     * @param {string} nodeName - The node to add.
+     * @returns {boolean} - True if the node was added.
+     */
+    add: function(nodeName) {
+      if (lib === null) {
+        this.all();
+      }
+      for (var i = 0; i < wcPlay.NODE_LIBRARY.length; ++i) {
+        if (wcPlay.NODE_LIBRARY[i].className === nodeName) {
+          if (lib.indexOf(wcPlay.NODE_LIBRARY[i]) === -1) {
+            lib.push(wcPlay.NODE_LIBRARY[i]);
+          }
+          return true;
+        }
+      }
+      return false;
+    },
+
+    /**
+     * Remove a node of a given class name from the library
+     * @function wcNodeLibrary#remove
+     * @param {string} nodeName - The node to remove.
+     * @returns {boolean} - True if the node was removed.
+     */
+    remove: function(nodeName) {
+      if (lib === null) {
+        this.all();
+      }
+      for (var i = 0; i < lib.length; ++i) {
+        if (lib[i].className === nodeName) {
+          lib.splice(i, 1);
+          return true;
+        }
+      }
+      return false;
+    }
+  };
+
+  this._nodeLibrary = new wcNodeLibrary();
+  this._nodeLibrary.all();
+
   this._compositeNodes = [];
   this._entryNodes = [];
   this._processNodes = [];
@@ -159,6 +246,15 @@ wcPlay.unregisterNodeType = function(name) {
 };
 
 wcPlay.prototype = {
+  /**
+   * Retrieves the node library for this script. This is an object that allows
+   * you to manage the nodes you are allowed to use in this script.
+   * @function wcPlay#nodeLibrary
+   * @returns {wcNodeLibrary} - The node library list.
+   */
+  nodeLibrary: function() {
+    return this._nodeLibrary;
+  },
 
   /**
    * Initializes the script and begins the update process.

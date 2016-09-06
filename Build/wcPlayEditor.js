@@ -1839,10 +1839,12 @@ wcPlayEditor.prototype = {
       return;
     }
 
+    var nodeLibrary = this._engine.nodeLibrary().get();
+
     // Compile our node listing.
     this._nodeLibrary = [];
-    for (var i = 0; i < wcPlay.NODE_LIBRARY.length; ++i) {
-      var data = wcPlay.NODE_LIBRARY[i];
+    for (var i = 0; i < nodeLibrary.length; ++i) {
+      var data = nodeLibrary[i];
 
       // Skip categories we are not showing.
       if (data.className === 'wcNodeCompositeScript') {
@@ -3676,10 +3678,8 @@ wcPlayEditor.prototype = {
         $selected = $list.find('#'+current);
       }
 
-      // No item found that was currently selected, try selecting the first item instead.
-      if (!$selected.length) {
-        $selected = $list.find('.wcSelectable').first();
-      }
+      // Always select the first item.
+      $selected = $list.find('.wcSelectable').first();
 
       current = null;
       if ($selected.length) {

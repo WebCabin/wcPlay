@@ -1,3 +1,5 @@
+'use strict';
+
 /* globals Crafty */
 
 $(document).ready(function() {
@@ -19,6 +21,8 @@ $(document).ready(function() {
   var myPlayEditor = new wcPlayEditor('.playContainer', {
     readOnly: false
   });
+
+  // myPlay.nodeLibrary().remove('wcNodeProcessExampleDynamic');
 
   // Assign the current Play script to be rendered.
   myPlayEditor.engine(myPlay);
