@@ -111,6 +111,11 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
     var i = 0, item = null;
     this.onDestroying();
 
+    var engine = this.engine();
+    if (engine) {
+      engine.endFlowTracker(this._activeTracker);
+    }
+
     // Remove all links.
     for (i = 0; i < this.chain.entry.length; ++i) {
       item = this.chain.entry[i];
@@ -132,6 +137,7 @@ wcPlayNodes.wcClass.extend('wcNode', 'Node', '', {
 
     // Remove the node from its parent.
     this._parent && this._parent.__removeNode(this);
+
     this.onDestroyed();
   },
 
