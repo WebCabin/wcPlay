@@ -50,6 +50,24 @@ function wcPlay(options) {
     },
 
     /**
+     * Retrieves whether a node exists in the library.
+     * @function wcNodeLibrary#has
+     * @param {string} nodeName - The name of the node.
+     * @returns {boolean} - True if the node exists in the library.
+     */
+    has: function(nodeName) {
+      if (lib === null) {
+        this.all();
+      }
+      for (var i = 0; i < lib.length; ++i) {
+        if (lib[i].className === nodeName) {
+          return true;
+        }
+      }
+      return false;
+    },
+
+    /**
      * Adds a node of a given class name to the library.
      * @function wcNodeLibrary#add
      * @param {string} nodeName - The node to add.
@@ -91,7 +109,6 @@ function wcPlay(options) {
   };
 
   this._nodeLibrary = new wcNodeLibrary();
-  this._nodeLibrary.all();
 
   this._compositeNodes = [];
   this._entryNodes = [];
@@ -276,6 +293,7 @@ wcPlay.prototype = {
    */
   stop: function() {
     this._isRunning = false;
+    this.reset();
 
     this.notifyNodes('onStop', []);
   },
@@ -308,7 +326,10 @@ wcPlay.prototype = {
       this._storageNodes[i].reset();
     }
 
-    this._queuedChain = [];
+    while(this._queuedChain.length) {
+      var item = this._queuedChain.shift();
+      this.endFlowTracker(item.tracker);
+    }
     this._queuedProperties = [];
 
     for (i = 0; i < this._properties.length; ++i) {
@@ -976,12 +997,14 @@ wcPlay.prototype = {
       activeTracker = this.beginFlowTracker({}, null, options.done);
     }
 
-    for (var i = 0; i < this._entryNodes.length; ++i) {
-      var node = this._entryNodes[i];
-      if (node.type === type && (!options.hasOwnProperty('name') || node.name === options.name)) {
-        node._activeTracker = activeTracker;
-        node.onActivated(options.data);
-        node._activeTracker = null;
+    if (this._isRunning) {
+      for (var i = 0; i < this._entryNodes.length; ++i) {
+        var node = this._entryNodes[i];
+        if (node.type === type && (!options.hasOwnProperty('name') || node.name === options.name)) {
+          node._activeTracker = activeTracker;
+          node.onActivated(options.data);
+          node._activeTracker = null;
+        }
       }
     }
 

@@ -1579,9 +1579,8 @@ wcPlayEditor.prototype = {
       display: function(editor) {
         if (editor._engine && editor._engine.paused()) {
           return 'Resume Script';
-        } else {
-          return 'Pause Script';
         }
+        return 'Pause Script';
       },
       toolbarIndex: -1,
       description: 'Pause or Continue the script.',

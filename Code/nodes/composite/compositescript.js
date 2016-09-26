@@ -78,21 +78,28 @@ wcPlayNodes.wcNodeComposite.extend('wcNodeCompositeScript', 'Composite', 'Import
   decompile: function(idMap) {
     this.onDestroying();
 
+    var engine = this.engine();
     var newNodes = [], i = 0, data = null;
 
-    if (this.compiledNodes) {
+    if (this.compiledNodes && engine) {
+      var nodeLibrary = engine.nodeLibrary();
       for (i = 0; i < this.compiledNodes.length; ++i) {
         data = this.compiledNodes[i];
         if (wcPlayNodes[data.className]) {
-          var newNode = new wcPlayNodes[data.className](this, data.pos, data.name);
-          if (idMap) {
-            idMap[data.id] = newNode.id;
+          if (nodeLibrary.has(data.className)) {
+            var newNode = new wcPlayNodes[data.className](this, data.pos, data.name);
+            if (idMap) {
+              idMap[data.id] = newNode.id;
+            } else {
+              newNode.id = data.id;
+            }
+            newNodes.push(newNode);
           } else {
-            newNode.id = data.id;
+            console.log('ERROR: Attempted to load node "' + data.className + '", but this script does not include it within its library of valid node types!');
+            newNodes.push(null);
           }
-          newNodes.push(newNode);
         } else {
-          console.log('ERROR: Attempted to load node "' + this.compiledNodes[i].className + '", but the constructor could not be found!');
+          console.log('ERROR: Attempted to load node "' + data.className + '", but the constructor could not be found!');
           newNodes.push(null);
         }
       }
