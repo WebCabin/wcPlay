@@ -1818,11 +1818,14 @@ wcPlayEditor.prototype = {
     }
 
     var nodeLibrary = this._engine.nodeLibrary().get();
+    var i = 0;
+    var data = null;
+    var node = null;
 
     // Compile our node listing.
     this._nodeLibrary = [];
-    for (var i = 0; i < nodeLibrary.length; ++i) {
-      var data = nodeLibrary[i];
+    for (i = 0; i < nodeLibrary.length; ++i) {
+      data = nodeLibrary[i];
 
       // Skip categories we are not showing.
       if (data.className === 'wcNodeCompositeScript') {
@@ -1835,29 +1838,26 @@ wcPlayEditor.prototype = {
         }
       }
 
-      // Now create an instance of the node so we can extract further data from it.
-      var node = new window.wcPlayNodes[data.className](null);
-      data.entry = node.chain.entry.map(function(link) {
-        return {name: link.name, desc: ''};
-      });
-      data.exit = node.chain.exit.map(function(link) {
-        return {name: link.name, desc: ''};
-      });
-      data.input = node.properties.filter(function(prop) {
-        return prop.options.input;
-      }).map(function(prop) {
-        return {name: prop.name, desc: prop.options.description};
-      });
-      data.output = node.properties.filter(function(prop) {
-        return prop.options.output;
-      }).map(function(prop) {
-        return {name: prop.name, desc: prop.options.description};
-      });
-      data.desc = node._meta.description;
-      data.node = node;
-      data.id = this._nodeLibrary.length;
+      node = new window.wcPlayNodes[data.className](null);
+      this.__addNodeToPalette(data, node);
 
-      this._nodeLibrary.push(data);
+      // We need to update the node to get it's proper measurements.
+      this.__updateNode(node, 0, this._viewportContext);
+    }
+
+    // Load our imported composite nodes as well.
+    var composites = this._engine.importedComposites();
+    for (var i = 0; i < composites.length; ++i) {
+      node = composites[i];
+
+      data = {
+        className: node.className,
+        displayName: node.name,
+        category: node.category,
+        nodeType: node.type
+      };
+
+      this.__addNodeToPalette(data, node);
 
       // We need to update the node to get it's proper measurements.
       this.__updateNode(node, 0, this._viewportContext);
@@ -2035,6 +2035,38 @@ wcPlayEditor.prototype = {
     //   self.$typeArea[2].addClass('wcPlayHidden');
     //   self.$typeArea[3].removeClass('wcPlayHidden');
     // });
+  },
+
+  /**
+   * Adds one node into the palette.
+   * @function wcPlayEditor#__addNodeToPalette
+   * @param {Object} data - The library data object.
+   * @param {wcNode} node - The node.
+   * @private
+   */
+  __addNodeToPalette: function(data, node) {
+    // Now create an instance of the node so we can extract further data from it.
+    data.entry = node.chain.entry.map(function(link) {
+      return {name: link.name, desc: ''};
+    });
+    data.exit = node.chain.exit.map(function(link) {
+      return {name: link.name, desc: ''};
+    });
+    data.input = node.properties.filter(function(prop) {
+      return prop.options.input;
+    }).map(function(prop) {
+      return {name: prop.name, desc: prop.options.description};
+    });
+    data.output = node.properties.filter(function(prop) {
+      return prop.options.output;
+    }).map(function(prop) {
+      return {name: prop.name, desc: prop.options.description};
+    });
+    data.desc = node._meta.description;
+    data.node = node;
+    data.id = this._nodeLibrary.length;
+
+    this._nodeLibrary.push(data);
   },
 
   // /**
