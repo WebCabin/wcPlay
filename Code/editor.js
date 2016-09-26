@@ -25,8 +25,8 @@ window.wcPlayEditorClipboard = {
  */
 function wcPlayEditor(container, options) {
   this.$container = $(container);
-  this.$typeButton = [];
-  this.$typeArea = [];
+  // this.$typeButton = [];
+  // this.$typeArea = [];
   this._paletteSize = 0;
   this._chainStyle = 1;
   this._chainStyleMax = 1;
@@ -4705,7 +4705,7 @@ wcPlayEditor.prototype = {
             if (self._engine.import(e.target.result, file.name)) {
               self.__setupPalette();
               self.triggerEvent('onImported', []);
-              self.$typeButton[3].click();
+              // self.$typeButton[3].click();
             }
           } else {
             if (self._engine.load(e.target.result)) {
